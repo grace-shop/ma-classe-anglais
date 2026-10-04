@@ -73,7 +73,7 @@ Le dépôt GitHub **grace-shop/ma-classe-anglais** publie le site et fabrique l'
    - `SUPABASE_URL` = votre Project URL
    - `SUPABASE_ANON_KEY` = votre clé publique anon / publishable
    (Plus besoin de modifier `www/config.js` à la main.)
-2. **Settings → Pages → Build and deployment → Source : GitHub Actions** (une seule fois).
+2. Normalement le site s'active tout seul. S'il ne s'affiche pas : **Settings → Pages → Build and deployment → Source : Deploy from a branch → `gh-pages` / `(root)`** → Save (une seule fois).
 3. **Actions** → *Site en ligne (GitHub Pages)* → **Run workflow**. Deux minutes plus tard, le site est en ligne à :
    **https://grace-shop.github.io/ma-classe-anglais/**
 4. Supabase → *Authentication → URL Configuration* :

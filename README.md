@@ -12,7 +12,7 @@ Application d'apprentissage de l'anglais pour le Togo : leçons du programme (CP
 2. Ici sur GitHub : **Settings → Secrets and variables → Actions → onglet Variables → New repository variable** :
    - `SUPABASE_URL` = l'adresse de votre projet (https://xxxx.supabase.co)
    - `SUPABASE_ANON_KEY` = la clé publique « anon / publishable »
-3. **Settings → Pages → Source : GitHub Actions** (une seule fois).
+3. Si le site ne s'affiche pas : **Settings → Pages → Source : Deploy from a branch → gh-pages / (root)** → Save (une seule fois).
 4. **Actions** → relancez les deux tâches (*Run workflow*) : le site et l'APK sont reconstruits avec vos réglages.
 5. Dans Supabase → *Authentication → URL Configuration* : ajoutez `https://grace-shop.github.io/ma-classe-anglais/` et `tg.maclasse.anglais://login`.
 
