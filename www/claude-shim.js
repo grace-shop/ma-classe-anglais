@@ -207,10 +207,13 @@
 #authGate .p{background:linear-gradient(135deg,#DCE3FF,#AFC0FF);color:#0E1120;border:0;font-weight:800;cursor:pointer}
 #authGate .l{background:none;border:0;color:#93ABFF;font-weight:700;cursor:pointer;padding:4px;width:auto}
 #authGate .tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:#1D2238}
-#authGate .tabs button{border:0;background:none;color:#C4CAE4;font-weight:700;cursor:pointer;padding:9px}#authGate .tabs button[aria-pressed=true]{background:linear-gradient(135deg,#3A4CB4,#5D72DE);color:#fff}
+#authGate .tabs button{border:0;background:none;color:#C4CAE4;font-weight:700;cursor:pointer;padding:9px 6px;white-space:nowrap;font-size:.92rem}#authGate .tabs button[aria-pressed=true]{background:linear-gradient(135deg,#3A4CB4,#5D72DE);color:#fff}
 #authGate .or{display:flex;align-items:center;gap:10px;color:#8D94B5;font-size:.85rem}#authGate .or::before,#authGate .or::after{content:"";flex:1;height:1px;background:#2A3050}
 #authGate .msg{padding:10px 12px;border-radius:12px;font-size:.92rem}#authGate .msg.err{background:#3E1E27;color:#FFB3BF}#authGate .msg.ok{background:#163327;color:#8BE8BC}
-#authGate form{display:grid;gap:12px}#authGate button:disabled{opacity:.5}`;
+#authGate form{display:grid;gap:12px}
+#authGate .pw{position:relative;display:block}#authGate .pw input{padding-right:52px}
+#authGate .pw .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;padding:0;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#AFC0FF;cursor:pointer}
+#authGate .pw .eye.on{color:#fff;background:#2A3260}#authGate button:disabled{opacity:.5}`;
   let gate = null, mode = "in", note = null;
   const G = `<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2c-2 1.5-4.5 2.4-7.2 2.4-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
   function drawGate() {
@@ -219,12 +222,12 @@
     const reset = mode === "newpass";
     gate.innerHTML = `<div class="box" role="dialog" aria-labelledby="agT"><div class="logo">En</div><div><h1 id="agT">Ma Classe d'Anglais</h1><p>${reset ? "Choisis ton nouveau mot de passe." : "Connecte-toi pour retrouver ta classe, tes leçons et ta progression."}</p></div>
     ${note ? `<div class="msg ${note.ok ? "ok" : "err"}">${esc(note.t)}</div>` : ""}
-    ${reset ? `<form data-f="newpass"><label>Nouveau mot de passe<input id="agP" type="password" minlength="6" required autocomplete="new-password"></label><button class="p" type="submit">Enregistrer</button></form>` : `
+    ${reset ? `<form data-f="newpass"><label>Nouveau mot de passe<span class="pw"><input id="agP" type="password" minlength="6" required autocomplete="new-password"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label><button class="p" type="submit">Enregistrer</button></form>` : `
     ${CFG.googleEnabled === false ? "" : `<button class="g" data-x="google">${G}Continuer avec Google</button><div class="or">ou avec ton e-mail</div>`}
     <div class="tabs"><button data-x="in" aria-pressed="${mode === "in"}">Se connecter</button><button data-x="up" aria-pressed="${mode === "up"}">Créer un compte</button></div>
     <form data-f="${mode}">${mode === "up" ? `<label>Prénom et nom<input id="agN" required maxlength="60" autocomplete="name" placeholder="Ex. Ama Kossi"></label>` : ""}
     <label>E-mail<input id="agE" type="email" required autocomplete="email" placeholder="ton.email@gmail.com"></label>
-    <label>Mot de passe<input id="agP" type="password" required minlength="6" autocomplete="${mode === "up" ? "new-password" : "current-password"}" placeholder="6 caractères minimum"></label>
+    <label>Mot de passe<span class="pw"><input id="agP" type="password" required minlength="6" autocomplete="${mode === "up" ? "new-password" : "current-password"}" placeholder="6 caractères minimum"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
     <button class="p" type="submit">${mode === "up" ? "Créer mon compte" : "Se connecter"}</button></form>
     ${mode === "in" ? `<button class="l" data-x="forgot">Mot de passe oublié ?</button>` : ""}`}</div>`;
   }
@@ -235,6 +238,7 @@
   document.addEventListener("click", async (e) => {
     const b = e.target.closest && e.target.closest("#authGate [data-x]"); if (!b) return; e.preventDefault();
     const x = b.dataset.x;
+    if (x === "eye") { const inp = b.parentNode.querySelector("input"); const show = inp.type === "password"; inp.type = show ? "text" : "password"; b.classList.toggle("on", show); b.setAttribute("aria-label", show ? "Masquer le mot de passe" : "Afficher le mot de passe"); inp.focus(); return; }
     if (x === "in" || x === "up") { mode = x; note = null; drawGate(); return; }
     if (x === "google") {
       const native = isNative(), redirectTo = native ? CFG.nativeRedirect : location.origin + location.pathname;
