@@ -16,6 +16,7 @@
     "@capacitor/filesystem": "latest",
     "@capacitor/share": "latest",
     "@capacitor-community/speech-recognition": "latest",
+    "@capacitor-community/text-to-speech": "latest",
     "@supabase/supabase-js": "^2"
   },
   "devDependencies": {
