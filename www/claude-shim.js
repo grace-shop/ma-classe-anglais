@@ -361,6 +361,8 @@
 
   var queue = Promise.resolve();
   var token = 0;
+  var pending = [];
+  var timer = null;
 
   function Utter(text) {
     this.text = text; this.lang = "en-US"; this.rate = 1; this.pitch = 1; this.volume = 1; this.voice = null;
@@ -369,21 +371,36 @@
   synth.getVoices = function () { return []; };
   synth.addEventListener = function () {};
   synth.removeEventListener = function () {};
+
+  // L'application découpe le texte en petites phrases. On les regroupe en UN SEUL appel
+  // pour éviter une pause (démarrage du moteur) entre chaque phrase.
   synth.speak = function (u) {
+    pending.push(u);
+    if (timer) return;
     var my = token;
-    queue = queue.then(function () {
-      if (my !== token) return;
-      return TTS.speak({
-        text: String(u.text || ""),
-        lang: u.lang || "en-US",
-        rate: u.rate || 1.0,
-        pitch: u.pitch || 1.0,
-        volume: 1.0,
-        category: "playback"
-      }).catch(function (e) { console.warn("TTS :", e); });
-    });
+    timer = setTimeout(function () {
+      var batch = pending; pending = []; timer = null;
+      var text = batch.map(function (x) { return String(x.text || ""); }).join(" ").trim();
+      if (!text) return;
+      var first = batch[0];
+      queue = queue.then(function () {
+        if (my !== token) return;
+        return TTS.speak({
+          text: text,
+          lang: first.lang || "en-US",
+          rate: first.rate || 1.0,
+          pitch: first.pitch || 1.0,
+          volume: 1.0,
+          category: "playback"
+        }).catch(function (e) { console.warn("TTS :", e); });
+      });
+    }, 0);
   };
-  synth.cancel = function () { token++; try { TTS.stop(); } catch (e) {} };
+  synth.cancel = function () {
+    token++; pending = [];
+    if (timer) { clearTimeout(timer); timer = null; }
+    try { TTS.stop(); } catch (e) {}
+  };
   synth.pause = function () {};
   synth.resume = function () {};
   try { window.speechSynthesis = synth; } catch (e) {
