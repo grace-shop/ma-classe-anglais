@@ -1,0 +1,7 @@
+{
+  "appId": "tg.maclasse.anglais",
+  "appName": "Ma Classe d'Anglais",
+  "webDir": "www",
+  "backgroundColor": "#0E1120",
+  "android": { "allowMixedContent": false }
+}

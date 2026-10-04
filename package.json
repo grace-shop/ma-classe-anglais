@@ -1,0 +1,24 @@
+{
+  "name": "ma-classe-anglais",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ma Classe d'Anglais — application Android (Capacitor) et site web (Supabase + Gemini)",
+  "scripts": {
+    "postinstall": "node scripts/vendor.mjs",
+    "android": "npx cap sync android && npx cap open android",
+    "sync": "npx cap sync"
+  },
+  "dependencies": {
+    "@capacitor/android": "latest",
+    "@capacitor/app": "latest",
+    "@capacitor/browser": "latest",
+    "@capacitor/core": "latest",
+    "@capacitor/filesystem": "latest",
+    "@capacitor/share": "latest",
+    "@capacitor-community/speech-recognition": "latest",
+    "@supabase/supabase-js": "^2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "latest"
+  }
+}

@@ -1,0 +1,18 @@
+<!-- À AJOUTER dans android/app/src/main/AndroidManifest.xml (voir GUIDE, étape 8) -->
+
+<!-- 1. Juste avant la balise <application ...> : -->
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<queries>
+  <intent>
+    <action android:name="android.speech.RecognitionService" />
+  </intent>
+</queries>
+
+<!-- 2. À l'intérieur de <activity ... android:name=".MainActivity" ...>, à côté de l'intent-filter existant : -->
+<intent-filter android:autoVerify="false">
+  <action android:name="android.intent.action.VIEW" />
+  <category android:name="android.intent.category.DEFAULT" />
+  <category android:name="android.intent.category.BROWSABLE" />
+  <data android:scheme="tg.maclasse.anglais" android:host="login" />
+</intent-filter>

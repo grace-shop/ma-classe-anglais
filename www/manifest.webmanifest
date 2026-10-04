@@ -1,0 +1,17 @@
+{
+  "name": "Ma Classe d'Anglais",
+  "short_name": "Ma Classe",
+  "description": "Apprendre l'anglais au Togo : leçons du programme, quiz, jeux d'images, conversation avec Nova et suivi de la professeure.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E1120",
+  "theme_color": "#0E1120",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

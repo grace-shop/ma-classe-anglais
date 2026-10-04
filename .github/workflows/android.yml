@@ -1,0 +1,48 @@
+name: Application Android (APK)
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: android-actions/setup-android@v3
+      - name: Réglages Supabase
+        run: node scripts/write-config.mjs
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+      - name: Installer Capacitor
+        run: npm install --legacy-peer-deps
+      - name: Créer le projet Android
+        run: |
+          npx cap add android
+          node scripts/patch-android.mjs
+          npx @capacitor/assets generate --android --iconBackgroundColor '#0E1120' --splashBackgroundColor '#0E1120' || echo "icônes par défaut"
+          npx cap sync android
+      - name: Compiler l'APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../ma-classe-anglais.apk
+      - uses: actions/upload-artifact@v4
+        with: { name: ma-classe-anglais-apk, path: ma-classe-anglais.apk }
+      - name: Publier dans « Releases »
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-latest
+          name: Application Android — dernière version
+          body: |
+            Téléchargez **ma-classe-anglais.apk** sur votre téléphone Android, ouvrez-le et acceptez « Installer des applications inconnues ».
+            Version construite automatiquement depuis le commit ${{ github.sha }}.
+          files: ma-classe-anglais.apk
+          make_latest: true
