@@ -337,3 +337,57 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();
+
+/* =====================================================================
+   Voix native Android : micro (reconnaissance vocale) + lecture à haute voix
+   À coller tout à la fin de www/claude-shim.js
+   ===================================================================== */
+(function () {
+  "use strict";
+  var cap = window.Capacitor;
+  if (!(cap && cap.isNativePlatform && cap.isNativePlatform())) return; // navigateur : rien à changer
+  var P = cap.Plugins || {};
+
+  // 1) MICRO : dans l'APK, le WebView expose une fausse "webkitSpeechRecognition" qui répond
+  //    toujours "bloqué". On la masque pour que l'application utilise le plugin natif.
+  if (P.SpeechRecognition) {
+    try { window.SpeechRecognition = undefined; } catch (e) {}
+    try { window.webkitSpeechRecognition = undefined; } catch (e) {}
+  }
+
+  // 2) VOIX : on branche speechSynthesis sur le moteur de synthèse vocale d'Android.
+  var TTS = P.TextToSpeech;
+  if (!TTS) return;
+
+  var queue = Promise.resolve();
+  var token = 0;
+
+  function Utter(text) {
+    this.text = text; this.lang = "en-US"; this.rate = 1; this.pitch = 1; this.volume = 1; this.voice = null;
+  }
+  var synth = window.speechSynthesis || {};
+  synth.getVoices = function () { return []; };
+  synth.addEventListener = function () {};
+  synth.removeEventListener = function () {};
+  synth.speak = function (u) {
+    var my = token;
+    queue = queue.then(function () {
+      if (my !== token) return;
+      return TTS.speak({
+        text: String(u.text || ""),
+        lang: u.lang || "en-US",
+        rate: u.rate || 1.0,
+        pitch: u.pitch || 1.0,
+        volume: 1.0,
+        category: "playback"
+      }).catch(function (e) { console.warn("TTS :", e); });
+    });
+  };
+  synth.cancel = function () { token++; try { TTS.stop(); } catch (e) {} };
+  synth.pause = function () {};
+  synth.resume = function () {};
+  try { window.speechSynthesis = synth; } catch (e) {
+    try { Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true }); } catch (e2) {}
+  }
+  window.SpeechSynthesisUtterance = Utter;
+})();
