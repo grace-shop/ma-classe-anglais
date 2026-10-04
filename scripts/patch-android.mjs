@@ -1,9 +1,13 @@
-// Ajoute au projet Android : micro, reconnaissance vocale et retour de connexion Google
+// Ajoute au projet Android : micro, reconnaissance vocale, synthèse vocale et retour de connexion Google
 import { readFileSync, writeFileSync } from "node:fs";
 const f = "android/app/src/main/AndroidManifest.xml";
 let s = readFileSync(f, "utf8");
 if (!s.includes("RECORD_AUDIO")) s = s.replace("<application", `<uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <queries><intent><action android:name="android.speech.RecognitionService" /></intent></queries>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <queries>
+        <intent><action android:name="android.speech.RecognitionService" /></intent>
+        <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+    </queries>
     <application`);
 if (!s.includes('android:scheme="tg.maclasse.anglais"')) s = s.replace(/(<activity[\s\S]*?MainActivity[\s\S]*?<\/intent-filter>)/, `$1
             <intent-filter>
