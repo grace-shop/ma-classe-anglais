@@ -163,8 +163,9 @@
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + (s ? s.access_token : ""), apikey: CFG.supabaseAnonKey },
         body: JSON.stringify(body),
       });
-    } catch (e) { throw e && e.name === "AbortError" ? { code: "cancelled", message: "Annulé" } : { code: "upstream_error", message: "Pas de connexion à Internet." }; }
+    } catch (e) { window.__lastAIErr = e && e.name === "AbortError" ? null : (navigator.onLine === false ? "Pas de connexion à Internet." : "Nova est injoignable. Professeure : dans Supabase, vérifie que la fonction « ai » est déployée et que « Verify JWT » est désactivé."); throw e && e.name === "AbortError" ? { code: "cancelled", message: "Annulé" } : { code: "upstream_error", message: navigator.onLine === false ? "Pas de connexion à Internet." : "Nova est injoignable : le serveur « ai » n'est pas encore prêt (professeure : voir le guide, étape Nova)." }; }
     const out = await res.json().catch(() => ({}));
+    if (!res.ok || out.error) { window.__lastAIErr = (out.error && out.error.message) || (res.status === 404 ? "Le serveur de Nova (fonction « ai ») est introuvable dans Supabase." : res.status === 401 ? "Nova refuse la connexion : dans Supabase, désactive « Verify JWT » pour la fonction « ai »." : "Nova a rencontré une erreur (" + res.status + ")."); } else window.__lastAIErr = null;
     if (!res.ok || out.error) throw { code: (out.error && out.error.code) || "upstream_error", message: (out.error && out.error.message) || "Erreur " + res.status };
     if (opts.onText) { try { opts.onText({ text: out.text, delta: out.text }); } catch (e) {} }
     return { text: out.text, truncated: !!out.truncated, modelTierApplied: body.modelTier };
@@ -193,6 +194,10 @@
       }
     },
   };
+  if (!isNative() && CFG.apkUrl) window.__appDownload = { apk: CFG.apkUrl, canInstall: false };
+  let deferredPrompt = null;
+  addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; if (window.__appDownload) { window.__appDownload.canInstall = true; try { window.render && window.render(); } catch (err) {} } });
+  window.__pwaInstall = async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); try { await deferredPrompt.userChoice; } catch (e) {} deferredPrompt = null; if (window.__appDownload) window.__appDownload.canInstall = false; };
   window.__appLogout = async () => { try { await sb.auth.signOut(); } catch (e) {} location.reload(); };
 
   /* ---------------- écran de connexion ---------------- */
@@ -211,6 +216,7 @@
 #authGate .or{display:flex;align-items:center;gap:10px;color:#8D94B5;font-size:.85rem}#authGate .or::before,#authGate .or::after{content:"";flex:1;height:1px;background:#2A3050}
 #authGate .msg{padding:10px 12px;border-radius:12px;font-size:.92rem}#authGate .msg.err{background:#3E1E27;color:#FFB3BF}#authGate .msg.ok{background:#163327;color:#8BE8BC}
 #authGate form{display:grid;gap:12px}
+#authGate .dl{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:14px;border:1px dashed #3B4366;color:#8BE8BC;font-weight:700;text-decoration:none}#authGate .dl:hover{border-color:#8BE8BC}
 #authGate .pw{position:relative;display:block}#authGate .pw input{padding-right:52px}
 #authGate .pw .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;padding:0;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#AFC0FF;cursor:pointer}
 #authGate .pw .eye.on{color:#fff;background:#2A3260}#authGate button:disabled{opacity:.5}`;
@@ -229,7 +235,8 @@
     <label>E-mail<input id="agE" type="email" required autocomplete="email" placeholder="ton.email@gmail.com"></label>
     <label>Mot de passe<span class="pw"><input id="agP" type="password" required minlength="6" autocomplete="${mode === "up" ? "new-password" : "current-password"}" placeholder="6 caractères minimum"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
     <button class="p" type="submit">${mode === "up" ? "Créer mon compte" : "Se connecter"}</button></form>
-    ${mode === "in" ? `<button class="l" data-x="forgot">Mot de passe oublié ?</button>` : ""}`}</div>`;
+    ${mode === "in" ? `<button class="l" data-x="forgot">Mot de passe oublié ?</button>` : ""}`}
+    ${!isNative() && CFG.apkUrl ? `<a class="dl" href="${esc(CFG.apkUrl)}" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Télécharger l'application Android</a>` : ""}</div>`;
   }
   function showGate() { drawGate(); }
   function hideGate() { if (gate) { gate.remove(); gate = null; } const sp = document.getElementById("splash"); if (sp) sp.style.display = ""; }
@@ -300,9 +307,10 @@
     member = data || { level: "interact" };
   }
   let started = false;
+  function brandAI() { const el = document.getElementById("aiSub"); if (el) el.textContent = "Assistant IA propulsé par Gemini"; }
   async function afterLogin() {
     if (started) return; started = true;
-    hideGate(); await loadMember(); await offerStarterContent().catch(() => {}); resolveReady();
+    hideGate(); brandAI(); await loadMember(); await offerStarterContent().catch(() => {}); resolveReady();
   }
   async function boot() {
     if (!CFG.supabaseUrl || !CFG.supabaseAnonKey || /VOTRE/.test(CFG.supabaseUrl)) {
