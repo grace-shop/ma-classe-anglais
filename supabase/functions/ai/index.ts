@@ -25,6 +25,15 @@ const fail = (code: string, message: string, status = 400) => json({ error: { co
 
 type Turn = { role: string; content: string };
 
+// Clé serveur : ancienne (SUPABASE_SERVICE_ROLE_KEY) ou nouvelle (SUPABASE_SECRET_KEYS)
+function serviceKey(): string {
+  const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (legacy) return legacy;
+  const raw = Deno.env.get("SUPABASE_SECRET_KEYS") ?? "";
+  try { const o = JSON.parse(raw); const v = typeof o === "string" ? o : Object.values(o)[0]; if (v) return String(v); } catch { /* texte brut */ }
+  return raw.split(",")[0].trim();
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return fail("invalid_request", "POST uniquement", 405);
@@ -34,7 +43,7 @@ Deno.serve(async (req) => {
 
   // 1. Qui demande ?
   const jwt = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
-  const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const admin = createClient(Deno.env.get("SUPABASE_URL")!, serviceKey());
   const { data: auth, error: authErr } = await admin.auth.getUser(jwt);
   if (authErr || !auth?.user) return fail("session_expired", "Reconnecte-toi pour utiliser Nova.", 401);
 
