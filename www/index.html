@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Ma Classe d'Anglais</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; frame-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#0E1120"><meta name="color-scheme" content="light dark"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<title>Ma Classe d'Anglais</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; frame-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"><meta name="referrer" content="no-referrer"><meta http-equiv="X-Content-Type-Options" content="nosniff"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0E1120"><meta name="color-scheme" content="light dark"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>html{box-sizing:border-box;height:100%;overscroll-behavior-y:none;-webkit-text-size-adjust:100%}body{margin:0;min-height:100%;background:#0E1120;overscroll-behavior-y:none}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <script>if(window.top!==window.self){try{window.top.location=window.self.location}catch(e){document.documentElement.innerHTML=""}}</script><script src="config.js"></script><script src="claude-shim.js"></script>
@@ -1901,14 +1901,18 @@ function epFormHTML(lvlSel,audSel){const ed=S.editing&&S.editing.kind==="epreuve
 
 
 /* ============ Élèves rangés en dossiers ============ */
+const devSub=s=>{const L=recentDevices(s,60);if(!L.length)return"";
+  return`<tr class="devsub"><td colspan="9"><div class="devline"><span class="devlbl">${ic("device")} Appareils</span>${L.map(([k,d])=>{const st=devState(s.id,k);
+    return`<span class="devchip${st==="blocked"?" is-blocked":""}"><span class="dl"><b>${esc(d.label||"Appareil")}</b><small>${st==="blocked"?"Suspendu · ":""}${ago(d.last)}</small></span>${st==="blocked"?`<button class="btn sus ok sm" data-a="devAllow" data-id="${s.id}" data-d="${esc(k)}">Rétablir</button>`:`<button class="btn sus sm" data-a="devBlock" data-id="${s.id}" data-d="${esc(k)}">${ic("lock")}Suspendre</button>`}</span>`}).join("")}</div></td></tr>`};
+const accCell=s=>stOf(s)==="blocked"?`<button class="btn sus ok sm" data-a="unblockSt" data-id="${s.id}">${ic("check")}Rétablir</button>`:S.confirm==="block"+s.id?`<div class="row" style="flex-wrap:nowrap"><button class="btn danger sus sm" data-a="blockSt" data-id="${s.id}">Confirmer</button><button class="btn ghost sm" data-a="cancelDel">Annuler</button></div>`:`<button class="btn sus sm" data-a="askBlock" data-id="${s.id}">${ic("lock")}Suspendre</button>`;
 const stRow=s=>{const x=stats(s),sk=s.lastDay===today()||s.lastDay===yesterday()?(s.streak||0):0;return`
-    <tr class="click" data-a="openStudent" data-id="${s.id}"><td><div class="row" style="flex-wrap:nowrap">${avatar(s.id,s.name)}<b>${esc(s.name)}</b><span class="dot ${online(s)?"on":""}"></span>${stOf(s)==="blocked"?`<span class="chip bad">Suspendu</span>`:""}${sharedFlag(s)?`<span class="chip warn">${ic("device")}À vérifier</span>`:""}</div></td><td>${lvlChip(s.level)}</td><td class="small">${esc(PROFILES[s.profile]||"—")}${s.classe?`<br><span class="muted">${esc(s.classe)}</span>`:""}</td><td class="num" style="color:var(--ink)">${s.xp||0}</td><td class="num">${sk?`<span class="flame">${sk}</span>`:"—"}</td><td>${x.avg!=null?`<div class="row" style="flex-wrap:nowrap"><div class="mini"><i style="width:${x.avg}%"></i></div><span class="num small">${x.avg} %</span></div>`:"—"}</td><td class="num">${x.subs}/${S.homework.length}</td><td class="small muted">${ago(s.lastActive)}</td></tr>`};
+    <tr class="click${stOf(s)==="blocked"?" is-blocked":""}" data-a="openStudent" data-id="${s.id}"><td><div class="row" style="flex-wrap:nowrap">${avatar(s.id,s.name)}<b>${esc(s.name)}</b><span class="dot ${online(s)?"on":""}"></span>${stOf(s)==="blocked"?`<span class="chip bad">Suspendu</span>`:""}${sharedFlag(s)?`<span class="chip warn">${ic("device")}À vérifier</span>`:""}</div></td><td>${lvlChip(s.level)}</td><td class="small">${esc(PROFILES[s.profile]||"—")}${s.classe?`<br><span class="muted">${esc(s.classe)}</span>`:""}</td><td class="num" style="color:var(--ink)">${s.xp||0}</td><td class="num">${sk?`<span class="flame">${sk}</span>`:"—"}</td><td>${x.avg!=null?`<div class="row" style="flex-wrap:nowrap"><div class="mini"><i style="width:${x.avg}%"></i></div><span class="num small">${x.avg} %</span></div>`:"—"}</td><td class="num">${x.subs}/${S.homework.length}</td><td class="small muted">${ago(s.lastActive)}</td><td>${accCell(s)}</td></tr>${devSub(s)}`};
 const stGrpKey=s=>{const g=S.drafts.st_grp||"classe";return g==="niveau"?(s.level||"Sans niveau"):g==="profil"?(PROFILES[s.profile]||"Sans profil"):(s.classe||"Sans classe")};
 function stFolders(F){if(!F.length)return`<div class="empty">Aucun élève ne correspond à ta recherche.</div>`;
   const m=new Map();for(const s of F){const k=stGrpKey(s);if(!m.has(k))m.set(k,[]);m.get(k).push(s)}
   const sans=/^Sans /,keys=[...m.keys()].sort((a,b)=>(sans.test(a)-sans.test(b))||a.localeCompare(b,"fr",{numeric:true})),searching=!!(S.drafts.st_q||"").trim()||stOnOff();
   return`<div style="display:grid;gap:10px">${keys.map(k=>{const L=m.get(k),open=searching||(S.stOpen&&S.stOpen[k]!==undefined?S.stOpen[k]:keys.length===1),lim=(S.stFLim&&S.stFLim[k])||ST_STEP,on=L.filter(online).length;
-    return`<div class="glass folder${open?" open":""}"><button class="folder-h" type="button" data-a="stFolder" data-k="${esc(k)}" aria-expanded="${open}"><span class="folder-ic" aria-hidden="true">${open?"📂":"📁"}</span><b>${esc(k)}</b><span class="chip">${L.length} élève${L.length>1?"s":""}</span>${on?`<span class="chip ok"><span class="dot on"></span>${on} en ligne</span>`:""}<span class="folder-chev" aria-hidden="true">${open?"▾":"▸"}</span></button>${open?`<div class="tablewrap"><table><thead><tr><th>Élève</th><th>Niveau</th><th>Profil</th><th>XP</th><th>Série</th><th>Moyenne</th><th>Devoirs</th><th>Activité</th></tr></thead><tbody>${L.slice(0,lim).map(stRow).join("")}</tbody></table></div>${L.length>lim?`<div style="text-align:center;padding:10px"><button class="btn ghost sm" data-a="stFMore" data-k="${esc(k)}">Afficher plus (${L.length-lim} restant${L.length-lim>1?"s":""})</button></div>`:""}`:""}</div>`}).join("")}</div>`}
+    return`<div class="glass folder${open?" open":""}"><button class="folder-h" type="button" data-a="stFolder" data-k="${esc(k)}" aria-expanded="${open}"><span class="folder-ic" aria-hidden="true">${open?"📂":"📁"}</span><b>${esc(k)}</b><span class="chip">${L.length} élève${L.length>1?"s":""}</span>${on?`<span class="chip ok"><span class="dot on"></span>${on} en ligne</span>`:""}<span class="folder-chev" aria-hidden="true">${open?"▾":"▸"}</span></button>${open?`<div class="tablewrap"><table><thead><tr><th>Élève</th><th>Niveau</th><th>Profil</th><th>XP</th><th>Série</th><th>Moyenne</th><th>Devoirs</th><th>Activité</th><th>Accès</th></tr></thead><tbody>${L.slice(0,lim).map(stRow).join("")}</tbody></table></div>${L.length>lim?`<div style="text-align:center;padding:10px"><button class="btn ghost sm" data-a="stFMore" data-k="${esc(k)}">Afficher plus (${L.length-lim} restant${L.length-lim>1?"s":""})</button></div>`:""}`:""}</div>`}).join("")}</div>`}
 
 /* ============ Appareils : suspendre / limiter ============ */
 const devAcc=sid=>S.access[sid]||{};
@@ -2758,6 +2762,55 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--neon1)!impo
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:760px){.glass,.kpi{backdrop-filter:blur(10px)}}
 </style>
+
+<style id="fx-v3">
+/* ===== Anti-décalage : rien ne dépasse de l'écran, plus de glissement latéral ===== */
+html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behavior:none;position:relative}
+body{min-height:100dvh;touch-action:pan-y}
+.aurora,#bg3d,body::before{max-width:100vw;max-height:100lvh;contain:paint}
+.aurora{animation:none!important;transform:none!important;inset:0!important}
+.wrap,.section,.glass,.card,.grid>*,.cols>*,.folder{min-width:0;max-width:100%}
+img,svg,canvas,video,iframe{max-width:100%}
+header.top,nav.tabs{max-width:100vw}
+.tablewrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.seg{max-width:100%;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}.seg::-webkit-scrollbar{display:none}.seg button{white-space:nowrap;flex:0 0 auto}
+.hero{grid-template-columns:1.4fr 1fr}@media (max-width:760px){.hero{grid-template-columns:1fr}}
+/* ===== Boutons Suspendre ===== */
+.btn.sus:not(.ghost):not(.danger){background:linear-gradient(135deg,#FF4D6D,#FF8A5B)!important;box-shadow:0 6px 18px rgba(255,77,109,.35),inset 0 1px 0 rgba(255,255,255,.35)!important;color:#fff!important;white-space:nowrap}
+.btn.sus.ok:not(.ghost):not(.danger){background:linear-gradient(135deg,#1D9A6C,#35E0C2)!important;box-shadow:0 6px 18px rgba(53,224,194,.32)!important}
+.btn.sus.danger{background:#C0223B!important;color:#fff!important;white-space:nowrap}
+.btn.sm{min-height:36px;padding:7px 14px}
+tr.is-blocked>td{opacity:.72}
+tr.devsub td{padding:0 16px 12px!important;border-bottom:1px solid var(--line);background:linear-gradient(180deg,transparent,rgba(124,156,255,.06))}
+.devline{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.devlbl{display:inline-flex;gap:6px;align-items:center;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted)}.devlbl svg{width:16px;height:16px}
+.devchip{display:inline-flex;align-items:center;gap:10px;padding:6px 6px 6px 14px;border-radius:999px;border:1px solid rgba(124,156,255,.35);background:var(--glass-bg);backdrop-filter:blur(10px)}
+.devchip .dl{display:grid;line-height:1.2}.devchip small{color:var(--muted);font-size:.72rem}
+.devchip.is-blocked{border-color:rgba(255,77,109,.55);box-shadow:0 0 16px rgba(255,77,109,.22)}
+/* ===== Look futuriste ===== */
+:root{--neon1:#7C9CFF;--neon2:#B38CFF;--neon3:#35E0C2}
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(60% 40% at 15% 0%,rgba(124,156,255,.22),transparent 70%),radial-gradient(50% 40% at 100% 100%,rgba(53,224,194,.16),transparent 70%)}
+.kpi{background-image:linear-gradient(135deg,rgba(124,156,255,.10),rgba(53,224,194,.06))}
+.kpi .num,.kpi b{text-shadow:0 0 18px rgba(124,156,255,.35)}
+.glass.hero{background-image:linear-gradient(135deg,rgba(124,156,255,.16),rgba(179,140,255,.10) 50%,rgba(53,224,194,.10))}
+.glass::before{background-size:300% 300%;animation:fxRing 9s linear infinite}
+@keyframes fxRing{0%{background-position:0 50%}100%{background-position:300% 50%}}
+h2{letter-spacing:-.02em}
+.dot.on{box-shadow:0 0 0 4px rgba(53,224,194,.25),0 0 14px rgba(53,224,194,.9)}
+nav.tabs button:active,.iconbtn:active,.pcard:active{transform:scale(.95)}
+@media (max-width:760px){
+  .glass::before{animation:none}
+  .btn{min-height:44px}
+  .wrap{padding-inline:12px!important}
+  table{min-width:760px}
+}
+@media (min-width:1100px){.grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}}
+</style>
+<script>
+/* Empêche tout glissement horizontal de la page (téléphone) */
+(function(){var f=function(){if(window.scrollX||document.documentElement.scrollLeft||document.body.scrollLeft){window.scrollTo(0,window.scrollY);document.documentElement.scrollLeft=0;document.body.scrollLeft=0}};
+addEventListener("scroll",f,{passive:true});addEventListener("resize",f);addEventListener("orientationchange",f);setInterval(f,1500)})();
+</script>
 
 <script>if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
 </body></html>
