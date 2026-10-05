@@ -28,6 +28,77 @@
     return { code: "unavailable", message: m || "Erreur réseau" };
   }
 
+
+  /* ---------------- mode hors-ligne : cache de lecture + file d'attente d'écriture ---------------- */
+  const idb = (() => {
+    let p = null;
+    const open = () => p || (p = new Promise((res, rej) => {
+      if (!window.indexedDB) return rej(new Error("no idb"));
+      const r = indexedDB.open("mca", 1);
+      r.onupgradeneeded = () => { const d = r.result; d.createObjectStore("kv"); d.createObjectStore("outbox", { keyPath: "k" }); };
+      r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+    }));
+    const tx = async (store, mode, fn) => {
+      const d = await open();
+      return new Promise((res, rej) => { const t = d.transaction(store, mode), rq = fn(t.objectStore(store)); t.oncomplete = () => res(rq && rq.result); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error); });
+    };
+    return {
+      get: (k) => tx("kv", "readonly", (s) => s.get(k)).catch(() => undefined),
+      set: (k, v) => tx("kv", "readwrite", (s) => s.put(v, k)).catch(() => {}),
+      all: () => tx("outbox", "readonly", (s) => s.getAll()).then((x) => x || []).catch(() => []),
+      put: (v) => tx("outbox", "readwrite", (s) => s.put(v)),
+      del: (k) => tx("outbox", "readwrite", (s) => s.delete(k)).catch(() => {}),
+    };
+  })();
+  window.__outbox = { put: idb.put, all: idb.all, del: idb.del };
+
+  const uidKey = () => (session && session.user && session.user.id) || "anon";
+  const QK = "mca_q";
+  const qRead = () => { try { return JSON.parse(localStorage.getItem(QK) || "[]"); } catch (e) { return []; } };
+  const qWrite = (a) => { try { localStorage.setItem(QK, JSON.stringify(a.slice(-300))); } catch (e) {} try { window.dispatchEvent(new Event("mca-queue")); } catch (e) {} };
+  window.__queueLen = () => qRead().filter((x) => x.u === uidKey()).length;
+  const isNet = (e) => !navigator.onLine || (e && e.code === "unavailable");
+  const runners = new Map(); // chemin -> fonctions de rafraîchissement des écouteurs
+  const pokeRunners = (path) => { const s = runners.get(path); if (s) s.forEach((f) => { try { f(); } catch (e) {} }); };
+  function deepMerge(a, b) {
+    if (!a || typeof a !== "object" || Array.isArray(a) || !b || typeof b !== "object" || Array.isArray(b)) return b;
+    const r = { ...a };
+    for (const k of Object.keys(b)) r[k] = (r[k] && typeof r[k] === "object" && !Array.isArray(r[k]) && b[k] && typeof b[k] === "object" && !Array.isArray(b[k])) ? deepMerge(r[k], b[k]) : b[k];
+    return r;
+  }
+  // Affichage immédiat : on applique par-dessus les données les écritures encore en attente
+  function withQueued(path, row) {
+    const items = qRead().filter((x) => x.path === path && x.u === uidKey());
+    if (!items.length) return row;
+    let data = row ? row.data : undefined;
+    for (const it of items) data = it.op === "s" ? it.patch : deepMerge(data || {}, it.patch);
+    return { path, id: path.split("/").pop(), data };
+  }
+  let flushing = false;
+  async function flushQueue() {
+    if (flushing || !sb || !session || !navigator.onLine) return;
+    flushing = true;
+    try {
+      let q = qRead();
+      for (const it of q.filter((x) => x.u === uidKey())) {
+        let err = null;
+        if (it.op === "s") { const { error } = await sb.from("docs").upsert({ path: it.path, data: it.patch }, { onConflict: "path" }); err = error; }
+        else { const { error } = await sb.rpc("doc_update", { p_path: it.path, p_patch: it.patch }); err = error; }
+        if (err && isNet(mapErr(err))) break;           // toujours pas de réseau : on réessaiera
+        q = qRead().filter((x) => x.id !== it.id);
+        if (err) console.warn("écriture abandonnée", it.path, err.message);
+        qWrite(q); pokeRunners(it.path);
+      }
+    } finally { flushing = false; }
+  }
+  addEventListener("online", () => { flushQueue(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) flushQueue(); });
+  setInterval(flushQueue, 30000);
+  function queueWrite(op, path, patch) {
+    const q = qRead(); q.push({ id: rid(8), u: uidKey(), op, path, patch, at: Date.now() });
+    qWrite(q); pokeRunners(path);
+  }
+
   /* ---------------- base de données (même API que Claude) ---------------- */
   function snapOf(rows) {
     const docs = rows.map((r) => ({ id: r.id, exists: true, data: () => r.data, ref: docRef(r.path) }));
@@ -43,19 +114,27 @@
     }
     q = o.order ? q.order("data->" + o.order[0], { ascending: o.order[1] !== "desc", nullsFirst: false }) : q.order("path");
     q = q.limit(Math.min(o.limit || 1000, 1000));
-    const { data, error } = await q; if (error) throw mapErr(error); return data || [];
+    const ck = "r:" + uidKey() + ":" + col + "|" + JSON.stringify(o);
+    const { data, error } = await q;
+    if (error) { const m = mapErr(error); if (m.code === "unavailable") { const c = await idb.get(ck); if (c) return c; } throw m; }
+    idb.set(ck, data || []); return data || [];
   }
   async function getRow(path) {
+    const ck = "d:" + uidKey() + ":" + path;
     const { data, error } = await sb.from("docs").select("path,id,data").eq("path", path).maybeSingle();
-    if (error) throw mapErr(error); return data;
+    if (error) { const m = mapErr(error); if (m.code === "unavailable") { const c = await idb.get(ck); if (c !== undefined) return withQueued(path, c); } throw m; }
+    idb.set(ck, data || null); return withQueued(path, data);
   }
   async function putDoc(path, data) {
-    const { error } = await sb.from("docs").upsert({ path, data: JSON.parse(JSON.stringify(data ?? {})) }, { onConflict: "path" });
-    if (error) throw mapErr(error);
+    const clean = JSON.parse(JSON.stringify(data ?? {}));
+    if (!navigator.onLine) return queueWrite("s", path, clean);
+    const { error } = await sb.from("docs").upsert({ path, data: clean }, { onConflict: "path" });
+    if (error) { const m = mapErr(error); if (isNet(m)) return queueWrite("s", path, clean); throw m; }
   }
   function listen(filter, refresh, onError) {
     let stopped = false, timer = null, poll = null;
     const run = () => { if (!stopped) refresh().catch((e) => onError && onError(e)); };
+    if (filter.path) { if (!runners.has(filter.path)) runners.set(filter.path, new Set()); runners.get(filter.path).add(run); }
     run();
     const ch = sb.channel("l-" + rid(10)).on("postgres_changes",
       { event: "*", schema: "public", table: "docs", filter: filter.path ? `path=eq.${filter.path}` : `col=eq.${filter.col}` },
@@ -63,7 +142,7 @@
       .subscribe((st) => { if ((st === "CHANNEL_ERROR" || st === "TIMED_OUT") && !poll) poll = setInterval(run, 20000); });
     const wake = () => { if (!document.hidden) run(); };
     document.addEventListener("visibilitychange", wake); addEventListener("online", run);
-    return () => { stopped = true; clearInterval(poll); clearTimeout(timer); document.removeEventListener("visibilitychange", wake); removeEventListener("online", run); sb.removeChannel(ch); };
+    return () => { stopped = true; if (filter.path && runners.get(filter.path)) runners.get(filter.path).delete(run); clearInterval(poll); clearTimeout(timer); document.removeEventListener("visibilitychange", wake); removeEventListener("online", run); sb.removeChannel(ch); };
   }
   function query(col, o = {}) {
     return {
@@ -83,7 +162,12 @@
       id, path,
       get: async () => snap(await getRow(path)),
       set: (data) => putDoc(path, data),
-      update: async (patch) => { const { error } = await sb.rpc("doc_update", { p_path: path, p_patch: JSON.parse(JSON.stringify(patch ?? {})) }); if (error) throw mapErr(error); },
+      update: async (patch) => {
+        const clean = JSON.parse(JSON.stringify(patch ?? {}));
+        if (!navigator.onLine) return queueWrite("u", path, clean);
+        const { error } = await sb.rpc("doc_update", { p_path: path, p_patch: clean });
+        if (error) { const m = mapErr(error); if (isNet(m)) return queueWrite("u", path, clean); throw m; }
+      },
       delete: async () => { const { error } = await sb.from("docs").delete().eq("path", path); if (error) throw mapErr(error); },
       onSnapshot: (next, err) => listen({ path }, () => getRow(path).then((r) => next(snap(r))), err),
       collection: (sub) => query(path + "/" + sub),
@@ -116,6 +200,37 @@
     },
     list: async () => ({ assets: [], usage: {} }),
     delete: async (id) => { await sb.storage.from("assets").remove([id]); },
+  };
+
+  /* ---------------- copies d'élèves (photos / PDF des devoirs et épreuves) ---------------- */
+  window.__grade = async (body) => {
+    const { data, error } = await sb.functions.invoke("grade", { body });
+    if (error) {
+      let msg = error.message || "erreur";
+      try { const j = await error.context.json(); if (j && j.error) msg = j.error; } catch (e) {}
+      throw new Error(msg);
+    }
+    return data;
+  };
+  window.__copies = {
+    upload: async (file) => {
+      const type = file.type || "application/octet-stream";
+      const ext = ({ "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "application/pdf": "pdf" })[type] || "jpg";
+      const path = `${session.user.id}/${Date.now().toString(36)}-${rid(6)}.${ext}`;
+      const { error } = await sb.storage.from("copies").upload(path, file, { contentType: type, upsert: false });
+      if (error) throw { code: "upload_failed", message: error.message };
+      return { p: path, n: String(file.name || "photo").slice(0, 60), t: type, s: file.size };
+    },
+    url: async (path) => {
+      const { data, error } = await sb.storage.from("copies").createSignedUrl(path, 21600);
+      if (error) throw error;
+      return data.signedUrl;
+    },
+    blob: async (path) => {
+      const { data, error } = await sb.storage.from("copies").download(path);
+      if (error) throw error;
+      return data;
+    },
   };
 
   /* ---------------- téléchargements ---------------- */

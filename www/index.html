@@ -1013,7 +1013,7 @@ function touch(activity,extra={}){if(!S.me||S.mode!=="student")return;const ad=a
     if(!S.settings.leaderboard&&unBoard){unBoard();unBoard=null;S.board=[]}render()},e=>console.warn(e));
   if(S.uid&&!S.isOwner)db.doc("parents/"+S.uid).onSnapshot(d=>{S.plink=d.exists?d.data():null;if(isParent(S.me))render()},()=>{});
   if(S.uid)db.doc("access/"+S.uid).onSnapshot(d=>{S.myAccess=d.exists?d.data():null;if(S.me&&stOf(S.me)==="active")recordDevice();render()},e=>console.warn(e));
-  if(S.uid)meRef().onSnapshot(s=>{S.me=s.exists?{id:s.id,...s.data()}:null;S.meLoaded=true;liveSub();if(S.me&&stOf(S.me)==="active")recordDevice();render()},()=>{S.meLoaded=true;render()});else S.meLoaded=true;
+  if(S.uid)meRef().onSnapshot(s=>{S.me=s.exists?{id:s.id,...s.data()}:null;notifRefresh();S.meLoaded=true;liveSub();if(S.me&&stOf(S.me)==="active")recordDevice();render()},()=>{S.meLoaded=true;render()});else S.meLoaded=true;
   claude.use("downloads").then(d=>{S.dl=d;render()});
   aiInit();
   claude.use("room").then(room=>{if(!room)return;S.room=room;
@@ -1128,11 +1128,11 @@ function studentView(){
   if(S.view?.type==="chat")return`<div class="section" style="max-width:720px;margin-inline:auto">${backBtn()}<div class="row">${ic("chat")}<div><span class="eyebrow">Messagerie privée</span><h2>Ma professeure</h2></div></div><p class="sub">Seuls toi et ta professeure voyez cette conversation.</p>${chatHTML(S.uid,"student")}</div>`;
   if(S.view?.type==="lesson")return lessonView();if(S.view?.type==="hw")return hwView();
   if(S.view?.type==="ep")return epView();if(S.view?.type==="shop")return shopView();if(S.view?.type==="talk")return talkView();
-  return liveBanner()+({home:homeView,learn:learnView,prac:practiceView,talk:talkView,hw:hwListView,me:profileView}[S.tab]||homeView)()}
+  return netBanner()+liveBanner()+({home:homeView,learn:learnView,prac:practiceView,talk:talkView,hw:hwListView,me:profileView}[S.tab]||homeView)()}
 const downloadHTML=()=>window.__appDownload?`<div class="section"><div class="glass card dl-card"><span class="dl-ic" aria-hidden="true">${E("📱")}</span><div style="display:grid;gap:4px;min-width:0"><h3 style="margin:0">L'application sur ton téléphone</h3><p class="sub small" style="margin:0">Installe Ma Classe d'Anglais comme une vraie application Android : icône sur l'écran d'accueil, plein écran, micro pour parler à Nova.</p></div><div class="row"><a class="btn sm" href="${esc(window.__appDownload.apk)}" rel="noopener">${ic("download")}Télécharger (Android)</a>${window.__appDownload.canInstall?`<button class="btn ghost sm" data-a="pwaInstall">${ic("plus")}Ajouter à l'écran d'accueil</button>`:""}</div></div></div>`:"";
 const logoutHTML=()=>downloadHTML()+(window.__appLogout?`<div class="section"><div class="glass card row between"><div><h3>Se déconnecter</h3><p class="sub small" style="margin:0">${esc(S.who?.email||"")}</p></div><button class="btn danger sm" data-a="logout">${ic("x")}Se déconnecter</button></div></div>`:"");
 const blobURL=id=>window.__blobURL?window.__blobURL(id):"/_blob/"+encodeURIComponent(id);
-function practiceView(){const k=S.prac||"quiz";return`<div class="section prac-top"><div><span class="eyebrow">S'entraîner</span><h2>Pratique</h2></div><div class="seg prac-seg" role="tablist" aria-label="Type d'entraînement">${[["quiz","Quiz","bolt"],["pics","Jeux d'images","camera"],["ep","Épreuves d'examen","file"]].map(([x,l,i])=>`<button role="tab" data-a="prac" data-k="${x}" aria-pressed="${k===x}">${ic(i)}${l}</button>`).join("")}</div></div>`+(k==="ep"?epListView():k==="pics"?audBar()+picGamesHTML():quizListView())}
+function practiceView(){const k=S.prac||"quiz";return`<div class="section prac-top"><div><span class="eyebrow">S'entraîner</span><h2>Pratique</h2></div><div class="seg prac-seg" role="tablist" aria-label="Type d'entraînement">${[["quiz","Quiz","bolt"],["pics","Jeux d'images","camera"],["ep","Épreuves d'examen","file"],["prono","Prononciation","mic"]].map(([x,l,i])=>`<button role="tab" data-a="prac" data-k="${x}" aria-pressed="${k===x}">${ic(i)}${l}</button>`).join("")}</div></div>`+(k==="prono"?pronView():k==="ep"?epListView():k==="pics"?audBar()+picGamesHTML():quizListView())}
 function homeView(){const m=S.me,xp=m.xp||0,rank=rankOf(xp),into=xp%XP_PER_RANK,t=today();
   const streak=liveStreak(m),dayXp=m.lastDay===t?(m.dayXp||0):0;
   const read=m.lessonsRead||{};
@@ -1204,7 +1204,7 @@ function hwListView(){const subs=S.me.submissions||{},fb=S.me.feedback||{},list=
     return`<div class="glass card click tilt" tabindex="0" data-a="openHw" data-id="${h.id}"><span class="glow t-ok"></span><div class="row between"><span class="ic t-ok">${ic("pen")}</span>${st}</div><h3>${esc(h.title)}</h3><span class="muted small row">${ic("clock")}Pour le ${h.due?new Date(h.due).toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"}):"—"}</span><div class="row">${lvlChip(h.level)}${audChip(h)}${exChip(h)}</div></div>`}).join("")}</div>`:`<div class="empty">Aucun devoir pour l'instant.</div>`}</div>`}
 function profileView(){const m=S.me,a=[...(m.attempts||[])].reverse(),avg=a.length?Math.round(a.reduce((s,x)=>s+pct(x.score,x.total),0)/a.length):null,fb=m.feedback||{};
   const words=Object.values(m.deckProgress||{}).reduce((s,d)=>s+((d&&d.known)||[]).length,0);
-  return`<div class="section"><div class="glass hero"><div class="row" style="gap:16px">${avatar(S.uid,m.name,72)}<div><span class="eyebrow">Rang ${rankOf(m.xp)} · ${esc(m.level)}</span><h2>${esc(m.name)}</h2>${titleOf(m)?`<span class="title-badge">${esc(titleOf(m))}</span>`:""}<div class="row">${leagueChip(m.xp)}<button class="btn ghost sm" data-a="openShop">${ic("bag")}Boutique · ${coinsOf(m)} XP</button></div><p class="sub">Inscrit le ${fmtDate(m.joinedAt)}</p></div></div>
+  return`<div class="section"><div class="glass hero"><div class="row" style="gap:16px">${avatar(S.uid,m.name,72)}<div><span class="eyebrow">Rang ${rankOf(m.xp)} · ${esc(m.level)}</span><h2>${esc(m.name)}</h2>${titleOf(m)?`<span class="title-badge">${esc(titleOf(m))}</span>`:""}<div class="row">${leagueChip(m.xp)}<button class="btn ghost sm" data-a="openShop">${ic("bag")}Boutique · ${coinsOf(m)} XP</button></div><p class="sub">Inscrit le ${fmtDate(m.joinedAt)}</p></div></div>${notifCard()}
     <div class="kpis" style="grid-template-columns:repeat(2,1fr)"><div class="glass kpi"><b class="gradtext">${m.xp||0}</b><span>XP</span></div><div class="glass kpi"><b>${avg??"—"}${avg!=null?"<small> %</small>":""}</b><span>Moyenne quiz</span></div><div class="glass kpi"><b>${words}</b><span>Mots maîtrisés</span></div><div class="glass kpi"><b>${Object.keys(m.lessonsRead||{}).length}</b><span>Leçons lues</span></div></div></div></div>
   ${myGradesHTML(m)}${certsHTML(m)}
   ${regularityCard(m,"Ma régularité")}<div class="section"><div><span class="eyebrow">Récompenses</span><h2>Badges</h2></div><div class="badges">${BADGES.map(badgeHTML).join("")}</div></div>
@@ -1223,9 +1223,9 @@ function lessonView(){const l=S.lessons.find(x=>x.id===S.view.id);if(!l)return b
 function hwView(){const h=S.homework.find(x=>x.id===S.view.id);if(!h)return backBtn()+`<div class="empty">Ce devoir a été retiré.</div>`;
   const sub=(S.me.submissions||{})[h.id],fb=(S.me.feedback||{})[h.id];
   return`<div class="section" style="max-width:720px">${backBtn("Tous les devoirs")}<div class="glass card" style="padding:clamp(20px,4vw,32px);gap:16px"><div class="row">${lvlChip(h.level)}<span class="chip">${ic("clock")}Pour le ${fmtDate(h.due)}</span></div><h2>${esc(h.title)}</h2><div class="lesson-body">${lessonHTML(h.instructions)}</div>
-  ${fb?`<div class="feedback"><b>Note : <span class="mono">${esc(fb.grade)}/20 · ${mention(fb.grade)}</span></b><div style="white-space:pre-wrap">${esc(fb.comment||"")}</div></div>`:""}
-  ${sub?`<div class="glass card" style="background:var(--surface2)"><span class="eyebrow">Ta réponse · ${fmtDate(sub.at)}</span><div style="white-space:pre-wrap">${esc(sub.text)}</div></div>`:""}
-  ${fb?"":`<form class="form" data-f="submitHw" data-id="${h.id}"><label>${sub?"Modifier ta réponse":"Ta réponse en anglais"}<textarea id="hw_${h.id}" required maxlength="8000" placeholder="Write your answer here…"></textarea><span class="hint" id="wc_${h.id}">0 mot</span></label><div><button class="btn" type="submit">${ic("rocket")}${sub?"Renvoyer":"Rendre le devoir"}</button></div></form>`}</div></div>`}
+  ${fb?`<div class="feedback"><b>Note : <span class="mono">${esc(fb.grade)}/20 · ${mention(fb.grade)}</span></b>${fb.auto?` <span class="chip">Corrigé par Nova</span>`:""}<div style="white-space:pre-wrap">${esc(fb.comment||"")}</div></div>`:""}
+  ${sub?`<div class="glass card" style="background:var(--surface2)"><span class="eyebrow">Ta réponse · ${fmtDate(sub.at)}</span>${sub.text?`<div style="white-space:pre-wrap">${esc(sub.text)}</div>`:""}${copyTiles(sub.files)}</div>`:""}
+  ${fb?"":`<form class="form" data-f="submitHw" data-id="${h.id}"><label>${sub?"Modifier ta réponse":"Ta réponse en anglais"}<textarea id="hw_${h.id}" maxlength="8000" placeholder="Write your answer here…"></textarea><span class="hint" id="wc_${h.id}">0 mot</span></label>${fileBtnsHTML("hw_"+h.id)}${h.autoCorrect?`<span class="hint">${ic("spark")} ${h.autoMode==="draft"?"Nova prépare une correction que ta prof validera avant de te l'envoyer.":"Nova corrigera ta copie automatiquement dès que tu la rends."}</span>`:""}<div><button class="btn" type="submit">${ic("rocket")}${sub?"Renvoyer":"Rendre le devoir"}</button></div></form>`}</div></div>`}
 const quizBadge=r=>r.exam?`<span class="timer" id="examTimer">${ic("timer")}<span>${(()=>{const l=Math.max(0,r.deadline-Date.now());return Math.floor(l/60000)+":"+String(Math.floor(l%60000/1000)).padStart(2,"0")})()}</span></span>`:r.combo>1?`<span class="combo">${ic("flame")} Combo x${r.combo}</span>`:`<span class="pill xp">${ic("bolt")}${r.score*10}</span>`;
 const quitBtn=r=>r.exam?(S.confirm==="quitExam"?`<span class="row"><button class="btn danger sm" data-a="submitExam">Rendre maintenant</button><button class="btn ghost sm" data-a="cancelDel">Continuer</button></span>`:`<button class="back" data-a="askQuitExam">${ic("send")}Rendre l'examen</button>`):`<button class="back" data-a="endQuiz">${ic("x")}Quitter</button>`;
 function quizRunView(){const r=S.run,q=curQuiz();if(!q){S.run=null;return studentView()}const qs=q.questions||[];
@@ -1729,7 +1729,7 @@ const micBtn=t=>SRC?`<button type="button" class="micbtn ${S.mic?.target===t?"on
 async function micNative(target){const P=NATIVE_SR();try{const av=await P.available();if(!av?.available){S.micHelp="nosupport";render();return}const perm=await P.requestPermissions();if(perm&&(perm.speechRecognition==="denied"||perm.microphone==="denied")){S.micHelp="denied";render();return}
   S.mic={target};render();const res=await P.start({language:"en-US",maxResults:1,prompt:"Speak in English",partialResults:false,popup:true});S.mic=null;const t=(res?.matches||[])[0]||"";if(!t){S.micHelp="nospeech";render();return}
   const el=document.getElementById(target),val=(((el?.value||"").trim()?(el.value.trim()+" "):"")+t).trim();S.drafts[target]=val;render();if(target==="talkIn")talkSend(val)}catch(e){S.mic=null;S.micHelp="blocked";render()}}
-async function micGo(target){S.micLast=target;if(S.micRec){try{S.micRec.stop()}catch(e){}return}if(NATIVE_SR()&&!(window.SpeechRecognition||window.webkitSpeechRecognition)){S.micHelp=null;return micNative(target)}
+async function micGo(target){if(target==="__pron"){S.micHelp=null;return pronListen()}S.micLast=target;if(S.micRec){try{S.micRec.stop()}catch(e){}return}if(NATIVE_SR()&&!(window.SpeechRecognition||window.webkitSpeechRecognition)){S.micHelp=null;return micNative(target)}
   if(!SRC){S.micHelp="nosupport";render();return}
   let ok=false;try{ok=localStorage.getItem("mca_micok")==="1"}catch(e){}
   try{const st=await navigator.permissions?.query({name:"microphone"});if(st&&st.state==="denied"){S.micHelp="denied";render();return}if(st&&st.state==="granted")ok=true}catch(e){}
@@ -1781,15 +1781,15 @@ setInterval(()=>{const r=S.run;if(!r||!r.exam||r.finished)return;const left=Math
 const quizToText=qs=>(qs||[]).map(x=>x.type==="type"?`${x.q}\n= ${(x.accept||[]).join(" / ")}`:[x.q,...x.choices.map((c,i)=>(i===x.answer?"* ":"- ")+c)].join("\n")).join("\n\n");
 const deckToText=cs=>(cs||[]).map(c=>c.ex?`${c.en} | ${c.fr} | ${c.ex}`:`${c.en} | ${c.fr}`).join("\n");
 const KIND_FORM={lessons:"lesson",quizzes:"quiz",decks:"deck",homework:"hw",epreuves:"ep"};
-const FORM_FIELDS={lesson:["l_title","l_level","l_aud","l_cls","l_unit","l_theme","l_gram","l_body"],quiz:["q_title","q_level","q_aud","q_lesson","q_body","q_exam","q_min"],deck:["d_title","d_level","d_aud","d_body"],hw:["h_title","h_level","h_aud","h_due","h_body"],ep:["e_title","e_exam","e_year","e_level","e_aud","e_min","e_sujet","e_cor"]};
+const FORM_FIELDS={lesson:["l_title","l_level","l_aud","l_cls","l_unit","l_theme","l_gram","l_body"],quiz:["q_title","q_level","q_aud","q_lesson","q_body","q_exam","q_min"],deck:["d_title","d_level","d_aud","d_body"],hw:["h_title","h_level","h_aud","h_due","h_body","h_auto","h_amode"],ep:["e_title","e_exam","e_year","e_level","e_aud","e_min","e_sujet","e_cor","e_auto","e_amode"]};
 function startEdit(kind,id){const x=S[{lessons:"lessons",quizzes:"quizzes",decks:"decks",homework:"homework",epreuves:"eps"}[kind]].find(y=>y.id===id);if(!x)return;const f=KIND_FORM[kind];
   for(const k of FORM_FIELDS[f])delete S.drafts[k];
   const D=S.drafts,au=x.audience||"tous";D.l_aud=D.q_aud=D.d_aud=D.h_aud=D.e_aud=au;
-  if(f==="ep"){const c=S.corriges[id]||{};D.e_title=x.title;D.e_exam=x.exam||"Autre";D.e_year=x.year||"";D.e_level=x.level;D.e_min=x.minutes?String(x.minutes):"";D.e_sujet=x.sujet||"";D.e_cor=c.text||""}
+  if(f==="ep"){const c=S.corriges[id]||{};D.e_title=x.title;D.e_exam=x.exam||"Autre";D.e_year=x.year||"";D.e_level=x.level;D.e_min=x.minutes?String(x.minutes):"";D.e_sujet=x.sujet||"";D.e_cor=c.text||"";D.e_auto=x.autoCorrect?"1":"";D.e_amode=x.autoMode||"live"}
   if(f==="lesson"){D.l_title=x.title;D.l_level=x.level;D.l_body=x.body||"";D.l_cls=x.classe||"";D.l_unit=x.unit?String(x.unit):"";D.l_theme=x.theme||"";D.l_gram=x.grammar||""}
   if(f==="quiz"){D.q_title=x.title;D.q_level=x.level;D.q_lesson=x.lessonId||"";D.q_body=quizToText(x.questions);D.q_exam=x.exam?"1":"";D.q_min=String(x.minutes||10)}
   if(f==="deck"){D.d_title=x.title;D.d_level=x.level;D.d_body=deckToText(x.cards)}
-  if(f==="hw"){D.h_title=x.title;D.h_level=x.level;D.h_due=x.due||"";D.h_body=x.instructions||""}
+  if(f==="hw"){D.h_title=x.title;D.h_level=x.level;D.h_due=x.due||"";D.h_body=x.instructions||"";D.h_auto=x.autoCorrect?"1":"";D.h_amode=x.autoMode||"live"}
   S.create=f;S.editing={kind,id,title:x.title};scrollTo({top:0,behavior:reduceMotion?"auto":"smooth"})}
 function cancelEdit(){clearScan("sujet");clearScan("cor");if(S.editing)for(const k of FORM_FIELDS[KIND_FORM[S.editing.kind]])delete S.drafts[k];S.editing=null}
 function saveContent(col,data){const ed=S.editing&&S.editing.kind===col?S.editing:null;
@@ -1845,9 +1845,9 @@ function epView(){const e=S.eps.find(x=>x.id===S.view.id);if(!e)return backBtn()
   const sub=(S.me.epreuveSubs||{})[e.id],fb=(S.me.epreuveFb||{})[e.id],tm=S.epTimer&&S.epTimer.id===e.id;
   return`<div class="section" style="max-width:820px">${backBtn("Toutes les épreuves")}${head}
   ${!sub&&e.minutes?`<div class="row">${tm?`<span class="timer" id="epTimer">${ic("timer")}<span>${e.minutes}:00</span></span><span class="hint">Le chrono t'aide à t'entraîner dans les conditions de l'examen.</span>`:`<button class="btn ghost sm" data-a="epTimer" data-id="${e.id}">${ic("timer")}Démarrer le chrono (${e.minutes} min)</button>`}</div>`:""}
-  ${fb?`<div class="feedback"><b>Note : ${esc(fb.grade)}/20</b><div style="white-space:pre-wrap">${esc(fb.comment||"")}</div></div>`:""}
-  ${sub?`<div class="glass card"><span class="eyebrow">Ta copie · ${fmtDate(sub.at)}</span><div style="white-space:pre-wrap">${esc(sub.text)}</div></div>`:""}
-  ${fb?"":`<form class="glass card form" data-f="submitEp" data-id="${e.id}"><label>${sub?"Modifier ta copie":"Ta copie"}<textarea id="ep_${e.id}" required maxlength="15000" style="min-height:220px" placeholder="Write your answers here. Numérote tes réponses comme dans le sujet."></textarea></label><div><button class="btn" type="submit">${ic("send")}${sub?"Renvoyer ma copie":"Rendre ma copie"}</button></div></form>`}
+  ${fb?`<div class="feedback"><b>Note : ${esc(fb.grade)}/20</b>${fb.auto?` <span class="chip">Corrigé par Nova</span>`:""}<div style="white-space:pre-wrap">${esc(fb.comment||"")}</div></div>`:""}
+  ${sub?`<div class="glass card"><span class="eyebrow">Ta copie · ${fmtDate(sub.at)}</span>${sub.text?`<div style="white-space:pre-wrap">${esc(sub.text)}</div>`:""}${copyTiles(sub.files)}</div>`:""}
+  ${fb?"":`<form class="glass card form" data-f="submitEp" data-id="${e.id}"><label>${sub?"Modifier ta copie":"Ta copie"}<textarea id="ep_${e.id}" maxlength="15000" style="min-height:220px" placeholder="Write your answers here. Numérote tes réponses comme dans le sujet."></textarea></label>${fileBtnsHTML("ep_"+e.id)}${e.autoCorrect?`<span class="hint">${ic("spark")} ${e.autoMode==="draft"?"Nova prépare une correction que ta prof validera avant de te l'envoyer.":"Nova corrigera ta copie automatiquement dès que tu la rends."}</span>`:""}<div><button class="btn" type="submit">${ic("send")}${sub?"Renvoyer ma copie":"Rendre ma copie"}</button></div></form>`}
   ${e.corrigeVisible&&e.corrigePublic&&(e.corrigePublic.text||e.corrigePublic.fileId)?`<div class="glass card" style="border-color:#BFE3D0"><span class="eyebrow">Corrigé publié par ta professeure</span>${e.corrigePublic.text?`<div class="lesson-body" style="font-size:1rem">${lessonHTML(e.corrigePublic.text)}</div>`:""}${e.corrigePublic.fileId?`<div>${fileView(e.corrigePublic.fileId,e.corrigePublic.fileType,"Ouvrir le corrigé")}</div>`:""}</div>`:`<p class="hint row">${ic("lock")}Le corrigé reste réservé à ta professeure.</p>`}</div>`}
 function epFormHTML(lvlSel,audSel){const ed=S.editing&&S.editing.kind==="epreuves"?S.editing:null,prev=ed?S.eps.find(x=>x.id===ed.id):null,pc=ed?S.corriges[ed.id]:null;
   return`<form class="form" data-f="ep"><div class="two"><label>Titre<input id="e_title" required maxlength="140" placeholder="BAC II 2023 – Anglais, série A4"></label><label>Type d'examen<select id="e_exam">${EXAMS.map(x=>`<option>${x}</option>`).join("")}</select></label></div>
@@ -1855,6 +1855,7 @@ function epFormHTML(lvlSel,audSel){const ed=S.editing&&S.editing.kind==="epreuve
   <div class="two"><label>Niveau${lvlSel("e_level")}</label>${audSel("e_aud")}</div>
   <label>Sujet (texte)<textarea id="e_sujet" style="min-height:200px" placeholder="Colle ici le texte du sujet, ou prends-le en photo juste en dessous : l'IA peut le retranscrire."></textarea></label>
   ${scanBlock("sujet","Sujet",prev?.fileId?(prev.fileName||"sujet"):"")}
+  ${autoChk("e_auto","Nova corrige avec le sujet, ton corrigé (qui reste privé) et la copie de l'élève.")}${S.drafts.e_auto==="1"?`<label>Quand l'élève voit la note<select id="e_amode"><option value="live"${(S.drafts.e_amode||"live")==="live"?" selected":""}>Tout de suite</option><option value="draft"${S.drafts.e_amode==="draft"?" selected":""}>Brouillon : je valide avant</option></select></label>`:""}
   <div class="editbar" style="display:grid;gap:12px;background:var(--surface2);border-color:var(--line)"><span class="row">${ic("lock")}<b>Corrigé</b><span class="hint">Visible par toi seulement, sauf si tu décides de le publier.</span></span>
   <label>Corrigé (texte)<textarea id="e_cor" style="min-height:160px" placeholder="Réponses attendues, barème…"></textarea></label>
   ${scanBlock("cor","Corrigé",pc?.fileId?(pc.fileName||"corrigé"):"")}</div>
@@ -1993,19 +1994,189 @@ function teacherView(){if(S.view?.type==="student")return studentDetail();if(S.v
 function msgsView(){const st=[...S.students,...S.parents].sort((a,b)=>(b.lastMsgAt||0)-(a.lastMsgAt||0));
   return`<div class="section"><div><span class="eyebrow">Messagerie</span><h2>Conversations</h2><p class="sub">Chaque conversation est privée entre toi et l'élève ou le parent.</p></div>
   ${st.length?`<div class="glass list">${st.map(s=>`<div class="thread" data-a="openChat" data-id="${s.id}" tabindex="0">${avatar(s.id,s.name)}<div class="txt"><b>${esc(s.name)}${isParent(s)?` <span class="chip">Parent${s.childName?" de "+esc(s.childName):""}</span>`:""}</b><span>${s.lastMsgAt?esc((s.lastMsgFrom==="teacher"?"Toi : ":"")+(s.lastMsgText||"Nouveau message")):"Aucun message"}</span></div><div class="row small muted">${s.lastMsgAt?fmtTime(s.lastMsgAt):""}${teacherUnread(s)?`<span class="chip bad">Nouveau</span>`:""}</div></div>`).join("")}</div>`:`<div class="empty">Les conversations apparaîtront quand des élèves auront rejoint la classe.</div>`}</div>`}
-function dashView(){const st=S.profFilter?S.students.filter(s=>s.profile===S.profFilter):S.students,on=st.filter(online);const all=st.flatMap(s=>s.attempts||[]);const avg=all.length?Math.round(all.reduce((x,y)=>x+pct(y.score,y.total),0)/all.length):null;
+/* ---- Liste d'élèves : recherche, filtres, pagination ---- */
+const ST_STEP=15,GV_STEP=10;
+const stOnOff=()=>S.drafts.st_on==="1";
+function stFiltered(st){const q=(S.drafts.st_q||"").trim().toLowerCase(),cl=S.drafts.st_cls||"",on=stOnOff();
+  return [...st].filter(s=>(!q||(s.name||"").toLowerCase().includes(q))&&(!cl||(s.classe||"")===cl)&&(!on||online(s))).sort((a,b)=>(b.lastActive||0)-(a.lastActive||0))}
+function stToolbar(st,n){const cls=[...new Set(st.map(s=>s.classe).filter(Boolean))].sort();
+  return`<div class="row" style="gap:10px;flex-wrap:wrap;margin-bottom:12px"><input id="st_q" type="search" placeholder="Chercher un élève…" value="${esc(S.drafts.st_q||"")}" style="flex:1;min-width:170px">${cls.length>1?`<select id="st_cls"><option value="">Toutes les classes</option>${cls.map(c=>`<option value="${esc(c)}"${S.drafts.st_cls===c?" selected":""}>${esc(c)}</option>`).join("")}</select>`:""}<label class="row small" style="gap:6px;flex-wrap:nowrap"><input id="st_on" type="checkbox"${stOnOff()?" checked":""}>En ligne</label><span class="chip">${n} / ${st.length}</span></div>`}
+function moreBtn(shown,total,act){return total>shown?`<div style="text-align:center;margin-top:12px"><button class="btn ghost sm" data-a="${act}">Afficher plus (${total-shown} restant${total-shown>1?"s":""})</button></div>`:""}
+
+/* ---- Copies d'élèves : photo / fichier à joindre au devoir ou à l'épreuve ---- */
+const PEND={},COPYURL={};
+const isImg=t=>/^image\//.test(t||"");
+async function shrinkImg(file,max=1600,q=.72){if(!isImg(file.type))return file;
+  try{const bmp=await createImageBitmap(file),r=Math.min(1,max/Math.max(bmp.width,bmp.height)),c=document.createElement("canvas");
+    c.width=Math.round(bmp.width*r);c.height=Math.round(bmp.height*r);c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+    const b=await new Promise(res=>c.toBlob(res,"image/jpeg",q));
+    return b&&b.size<file.size?new File([b],(file.name||"photo").replace(/\.\w+$/,"")+".jpg",{type:"image/jpeg"}):file}catch(e){return file}}
+async function addCopies(key,files){const a=PEND[key]=PEND[key]||[];
+  for(const f of files){if(a.length>=5){toast("5 fichiers maximum.","x");break}
+    if(!isImg(f.type)&&f.type!=="application/pdf"){toast("Format non accepté : photo ou PDF.","x");continue}
+    if(f.type==="application/pdf"&&f.size>5*1024*1024){toast("PDF trop lourd (5 Mo maximum).","x");continue}
+    a.push(await shrinkImg(f))}
+  render()}
+function pendHTML(key){const a=PEND[key]||[];return a.length?`<div class="row" style="gap:8px;flex-wrap:wrap">${a.map((f,i)=>`<span class="chip">${ic(isImg(f.type)?"camera":"file")}${esc(f.name.length>22?f.name.slice(0,19)+"…":f.name)}<button type="button" class="iconbtn" data-a="cpRm" data-k="${key}" data-i="${i}" aria-label="Retirer" style="margin-left:4px">${ic("x")}</button></span>`).join("")}</div>`:""}
+function fileBtnsHTML(key){return`<div class="row" style="gap:8px;flex-wrap:wrap"><label class="btn ghost sm" style="cursor:pointer">${ic("camera")}Prendre une photo<input id="cpf_cam_${key}" type="file" accept="image/*" capture="environment" hidden></label><label class="btn ghost sm" style="cursor:pointer">${ic("file")}Importer photo ou PDF<input id="cpf_${key}" type="file" accept="image/*,application/pdf" multiple hidden></label></div>${pendHTML(key)}<span class="hint">Facultatif · jusqu'à 5 fichiers (photos ou PDF de 5 Mo maximum).</span>`}
+function copyTiles(files){if(!files||!files.length)return"";
+  return`<div class="row" style="gap:8px;flex-wrap:wrap">${files.map(f=>isImg(f.t)?`<button type="button" data-a="openCopy" data-p="${esc(f.p)}" data-t="${esc(f.t)}" aria-label="Voir la photo" style="padding:0;border:0;background:none;cursor:pointer"><img data-copy="${esc(f.p)}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:10px;background:var(--surface2)"></button>`:`<button type="button" class="btn ghost sm" data-a="openCopy" data-p="${esc(f.p)}" data-t="${esc(f.t)}">${ic("file")}${esc(f.n||"Fichier")}</button>`).join("")}</div>`}
+async function copyURL(p){return COPYURL[p]=COPYURL[p]||await window.__copies.url(p)}
+async function openCopy(p,t){try{const u=await copyURL(p);
+  if(isImg(t)){const o=document.createElement("div");o.style.cssText="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:grid;place-items:center;padding:12px;overflow:auto";
+    o.innerHTML=`<img src="${u}" alt="" style="max-width:100%;max-height:100%;object-fit:contain"><button style="position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;padding:10px 14px;border-radius:12px;border:0;font-weight:700">Fermer</button>`;
+    o.onclick=()=>o.remove();document.body.appendChild(o)}else window.open(u,"_blank")}catch(e){toast("Impossible d'ouvrir le fichier.","x")}}
+async function hydrateCopies(){if(!window.__copies)return;
+  for(const img of document.querySelectorAll("img[data-copy]:not([data-ok])")){img.dataset.ok="1";try{img.src=await copyURL(img.dataset.copy)}catch(e){}}}
+new MutationObserver(()=>{clearTimeout(hydrateCopies._t);hydrateCopies._t=setTimeout(hydrateCopies,60)}).observe(document.body,{childList:true,subtree:true});
+
+/* ---- Rendre un devoir ou une épreuve (texte et/ou photos), même sans réseau ---- */
+async function sendCopy(kind,id,text,pend,btn){const isEp=kind==="ep",item=isEp?S.eps.find(x=>x.id===id):S.homework.find(x=>x.id===id);
+  const old=((isEp?S.me.epreuveSubs:S.me.submissions)||{})[id],up=[];
+  if(pend.length){if(!window.__copies)throw{message:"indisponible ici"};for(const file of pend)up.push(await window.__copies.upload(file))}
+  const files=[...((old&&old.files)||[]),...up].slice(-6),first=!old,sub={text,at:Date.now(),files};
+  const extra=isEp?{epreuveSubs:{[id]:sub}}:{submissions:{[id]:sub}};
+  if(first)gain(40,(isEp?"A traité l'épreuve : ":"A rendu : ")+(item?.title||""),extra,btn);else touch((isEp?"A modifié sa copie : ":"A modifié : ")+(item?.title||""),extra);
+  return{item,sub}}
+const netErr=e=>!navigator.onLine||/fetch|network|load failed|timeout|unavailable/i.test(String((e&&(e.message||e.code))||e||""));
+async function submitCopy(kind,f){const isEp=kind==="ep",id=f.dataset.id,key=kind+"_"+id,fid=(isEp?"ep_":"hw_")+id;
+  const text=(document.getElementById(fid)?.value||"").trim(),pend=PEND[key]||[];
+  if(!text&&!pend.length){toast("Écris ta réponse ou ajoute une photo.","x");return}
+  const btn=f.querySelector('button[type="submit"]');if(btn)btn.disabled=true;
+  const done=()=>{PEND[key]=[];delete S.drafts[fid];f.reset()};
+  const toOutbox=async()=>{try{await window.__outbox.put({k:key+"_"+Date.now(),kind,id,text,files:pend.map(x=>({name:x.name,type:x.type,blob:x}))});
+    done();S.outboxN=(await window.__outbox.all()).length;toast("Pas de réseau : ta copie sera envoyée automatiquement dès que tu seras connecté.","clock");render()}
+    catch(e){toast("Impossible de garder ta copie hors ligne : réessaie avec du réseau.","x");if(btn)btn.disabled=false}};
+  if(pend.length&&(!navigator.onLine)&&window.__outbox){await toOutbox();return}
+  const first=!((isEp?S.me.epreuveSubs:S.me.submissions)||{})[id];
+  try{if(pend.length)toast("Envoi des fichiers…","send");
+    const r=await sendCopy(kind,id,text,pend,btn);done();
+    toast(!navigator.onLine?"Enregistré : sera envoyé dès que le réseau revient":first?(isEp?"Copie rendue":"Devoir rendu"):"Réponse mise à jour",isEp?"send":"pen");
+    if(r.item&&r.item.autoCorrect&&navigator.onLine)autoCorrect(kind,id)}
+  catch(e){if(pend.length&&netErr(e)&&window.__outbox){await toOutbox();return}toast("Envoi impossible : "+((e&&e.message)||"réessaie"),"x");if(btn)btn.disabled=false}}
+let flushingOb=false;
+async function flushOutbox(){if(flushingOb||!window.__outbox||!S.me||S.mode!=="student"||!navigator.onLine)return;flushingOb=true;
+  try{const all=await window.__outbox.all();S.outboxN=all.length;
+    for(const it of all){try{const files=it.files.map(x=>new File([x.blob],x.name,{type:x.type})),r=await sendCopy(it.kind,it.id,it.text,files,null);
+      await window.__outbox.del(it.k);toast("Copie envoyée : "+(r.item?.title||""),"send");if(r.item&&r.item.autoCorrect)autoCorrect(it.kind,it.id)}catch(e){break}}
+    S.outboxN=(await window.__outbox.all()).length}catch(e){}finally{flushingOb=false;render()}}
+addEventListener("online",()=>{render();flushOutbox()});addEventListener("offline",()=>render());
+addEventListener("mca-queue",()=>{S.qN=window.__queueLen?window.__queueLen():0;render()});
+setInterval(flushOutbox,30000);setTimeout(flushOutbox,5000);
+const netBanner=()=>{if(S.mode!=="student")return"";const n=(S.qN||0)+(S.outboxN||0);if(navigator.onLine&&!n)return"";
+  return`<div class="section"><div class="glass card" style="grid-template-columns:auto 1fr;align-items:center;gap:12px;border-color:var(--gold-soft)"><span class="ic t-gold">${ic("clock")}</span><div><b>${navigator.onLine?"Envoi en cours…":"Pas de réseau"}</b><div class="small muted">${navigator.onLine?"":"Tu peux lire tes leçons déjà ouvertes et rendre tes devoirs : tout part dès que tu es reconnecté. "}${n?n+" élément"+(n>1?"s":"")+" en attente.":""}</div></div></div></div>`};
+
+/* ---- Correction automatique par l'IA : calculée sur le SERVEUR (l'élève ne peut pas modifier sa note) ---- */
+async function autoCorrect(kind,id){const isEp=kind==="ep",item=isEp?S.eps.find(x=>x.id===id):S.homework.find(x=>x.id===id);
+  if(!item||!item.autoCorrect)return;toast("Nova corrige ta copie…","spark");
+  try{if(!window.__grade)throw new Error("indisponible");const r=await window.__grade({kind,id});
+    if(r&&r.mode==="draft")toast("Copie reçue : ta prof validera ta note.","check");
+    else if(r&&typeof r.grade==="number")toast("Ta copie est corrigée : "+r.grade+"/20","check");
+    else throw new Error("réponse vide")}
+  catch(e){toast("Correction automatique impossible : ta prof corrigera ta copie.","x")}}
+
+/* ---- Rappels (notifications) ---- */
+const LN=()=>{try{return window.Capacitor?.Plugins?.LocalNotifications||null}catch(e){return null}};
+const notifOn=()=>{try{return localStorage.getItem("mca_notif")==="1"}catch(e){return false}};
+const nid=s=>{let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))%2000000000;return h+1};
+async function notifEnable(){const P=LN();if(!P){toast("Les rappels marchent dans l'application installée sur le téléphone.","x");return}
+  try{const r=await P.requestPermissions();if(r.display!=="granted"){toast("Autorise les notifications dans les réglages du téléphone.","x");return}
+    try{localStorage.setItem("mca_notif","1")}catch(e){}try{await P.createChannel({id:"rappels",name:"Rappels",importance:4})}catch(e){}
+    notifRefresh(true);toast("Rappels activés","check");render()}catch(e){toast("Impossible d'activer les rappels.","x")}}
+async function notifOff(){const P=LN();try{localStorage.setItem("mca_notif","0")}catch(e){}
+  try{if(P){const p=await P.getPending();if(p.notifications?.length)await P.cancel({notifications:p.notifications.map(n=>({id:n.id}))})}}catch(e){}toast("Rappels désactivés","check")}
+let notifT=null;const notifRefresh=now=>{clearTimeout(notifT);notifT=setTimeout(notifDo,now?0:2500)};
+const DAILY=["5 minutes d'anglais aujourd'hui ? Un petit quiz et c'est fait.","Ton anglais progresse chaque jour : viens faire un quiz !","Un mot nouveau aujourd'hui ? Ouvre ta classe d'anglais."];
+async function notifDo(){const P=LN();if(!P||!notifOn()||!S.me||S.mode!=="student")return;
+  try{const pend=await P.getPending();if(pend.notifications?.length)await P.cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
+    const list=[],now=new Date(),at=(d,h,m)=>{const x=new Date(d);x.setHours(h,m,0,0);return x},streak=liveStreak(S.me),did=S.me.lastDay===today();
+    for(let i=0;i<3;i++){const d=new Date();d.setDate(d.getDate()+i);const t=at(d,18,0);if(t<=now||(i===0&&did))continue;
+      list.push({id:nid("daily"+i),title:"Ma Classe d'Anglais",body:i===0&&streak>0?`Ta série de ${streak} jour${streak>1?"s":""} t'attend : 5 minutes d'anglais ?`:DAILY[i%DAILY.length],schedule:{at:t,allowWhileIdle:true},channelId:"rappels"})}
+    for(const h of S.homework.filter(visible)){if(!h.due||(S.me.submissions||{})[h.id])continue;const due=new Date(h.due+"T00:00:00"),t1=at(new Date(due.getTime()-864e5),17,0),t2=at(due,8,0);
+      if(t1>now)list.push({id:nid("hw1"+h.id),title:"Devoir à rendre demain",body:h.title,schedule:{at:t1,allowWhileIdle:true},channelId:"rappels"});
+      if(t2>now)list.push({id:nid("hw2"+h.id),title:"Devoir à rendre aujourd'hui",body:h.title,schedule:{at:t2,allowWhileIdle:true},channelId:"rappels"})}
+    if(list.length)await P.schedule({notifications:list})}catch(e){console.warn("rappels",e)}}
+async function notifyNow(title,body){const P=LN();if(!P||!notifOn())return;try{await P.schedule({notifications:[{id:nid(title+body+Date.now()),title,body,schedule:{at:new Date(Date.now()+800)},channelId:"rappels"}]})}catch(e){}}
+const seenGet=k=>{try{const v=localStorage.getItem(k);return v?new Set(JSON.parse(v)):null}catch(e){return null}};
+const seenSet=(k,s)=>{try{localStorage.setItem(k,JSON.stringify([...s].slice(-300)))}catch(e){}};
+function notifyNew(){if(S.mode!=="student"||!S.me||!S.meLoaded)return;
+  const fbIds=new Set([...Object.keys(S.me.feedback||{}).map(x=>"h"+x),...Object.keys(S.me.epreuveFb||{}).map(x=>"e"+x)]);
+  const hwIds=new Set(S.homework.filter(visible).map(h=>h.id));
+  let sf=seenGet("mca_fbseen"),sh=seenGet("mca_hwseen");
+  if(!sf){seenSet("mca_fbseen",fbIds);sf=fbIds}else{const n=[...fbIds].filter(x=>!sf.has(x));if(n.length){toast("Ta professeure a corrigé "+(n.length>1?n.length+" copies":"une copie"),"check");notifyNow("Copie corrigée","Va voir ta note et le commentaire de ta prof.");seenSet("mca_fbseen",new Set([...sf,...n]))}}
+  if(!sh){if(hwIds.size)seenSet("mca_hwseen",hwIds)}else{const n=S.homework.filter(visible).filter(h=>!sh.has(h.id));if(n.length){toast("Nouveau devoir : "+n[0].title,"pen");notifyNow("Nouveau devoir",n[0].title+(n[0].due?" · pour le "+fmtDate(n[0].due):""));seenSet("mca_hwseen",new Set([...sh,...n.map(h=>h.id)]));notifRefresh()}}}
+setInterval(notifyNew,6000);
+const notifCard=()=>{if(S.mode!=="student"||!LN())return"";const on=notifOn();
+  return`<div class="row" style="margin-top:12px;gap:10px;flex-wrap:wrap"><button class="btn ${on?"ghost":""} sm" data-a="${on?"notifOff":"notifOn"}">${ic("mega")}${on?"Rappels activés : désactiver":"Activer les rappels"}</button><span class="hint">Un rappel à 18 h et la veille de chaque devoir.</span></div>`};
+
+/* ---- Alertes pour la professeure ---- */
+function alertsHTML(st){if(!st.length)return"";const now=Date.now(),D=864e5,t=today();
+  const tg=(h,s)=>!h.audience||h.audience==="tous"||h.audience===s.profile;
+  const inactive=st.filter(s=>stOf(s)!=="blocked").map(s=>({s,d:Math.floor((now-(s.lastActive||s.joinedAt||now))/D)})).filter(x=>x.d>=7).sort((a,b)=>b.d-a.d);
+  const late=S.homework.filter(h=>h.due&&h.due<t);
+  const lateBy=st.map(s=>({s,n:late.filter(h=>tg(h,s)&&!(s.submissions||{})[h.id]).length})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
+  const worst=late.map(h=>{const g=st.filter(s=>tg(h,s)),miss=g.filter(s=>!(s.submissions||{})[h.id]).length;return{h,miss,tot:g.length}}).filter(x=>x.tot>=3&&x.miss/x.tot>=.4).sort((a,b)=>String(b.h.due).localeCompare(String(a.h.due)))[0];
+  const rows=(arr,txt)=>arr.slice(0,5).map(x=>`<div class="it click" data-a="openStudent" data-id="${x.s.id}" style="cursor:pointer">${avatar(x.s.id,x.s.name)}<div class="txt"><b>${esc(x.s.name)}</b><span>${txt(x)}</span></div></div>`).join("")+(arr.length>5?`<div class="small muted" style="padding:8px 14px">et ${arr.length-5} autre${arr.length-5>1?"s":""}</div>`:"");
+  if(!inactive.length&&!lateBy.length&&!worst)return`<div class="section"><div class="glass card" style="grid-template-columns:auto 1fr;align-items:center;gap:12px"><span class="ic t-ok">${ic("check")}</span><div><b>Aucune alerte</b><div class="small muted">Tous tes élèves ont été actifs cette semaine et sont à jour dans leurs devoirs.</div></div></div></div>`;
+  return`<div class="section"><div><span class="eyebrow">À surveiller</span><h2>Alertes</h2></div>
+  ${worst?`<div class="glass card" style="border-color:var(--gold-soft)"><b>${Math.round(worst.miss/worst.tot*100)} % de la classe n'a pas rendu « ${esc(worst.h.title)} »</b><div class="small muted">Date limite dépassée (${fmtDate(worst.h.due)}) · ${worst.miss} élève${worst.miss>1?"s":""} sur ${worst.tot}</div></div>`:""}
+  <div class="cols">${lateBy.length?`<div class="glass list"><div style="padding:12px 14px"><b>Devoirs en retard</b></div>${rows(lateBy,x=>x.n+" devoir"+(x.n>1?"s":"")+" non rendu"+(x.n>1?"s":""))}</div>`:""}${inactive.length?`<div class="glass list"><div style="padding:12px 14px"><b>Inactifs depuis 7 jours ou plus</b></div>${rows(inactive,x=>"Inactif depuis "+x.d+" jours")}</div>`:""}</div></div>`}
+
+/* ---- Prononciation : lire une phrase, Nova dit quels mots sont mal compris ---- */
+const PRON={A1:["I like chocolate and bananas.","My brother is thirteen years old.","Thank you very much for your help.","This is my third English book.","The weather is nice today.","I have three black cats."],
+ A2:["I usually have breakfast at seven o'clock.","She works in a hospital near my house.","Which language do you speak at home?","It was a wonderful Thursday evening.","We watched a really funny film last night.","Could you repeat that, please?"],
+ B1:["I would rather travel by train than by plane.","Vegetables are very important for a healthy life.","He thought about the question for three months.","Although it was raining, we decided to walk.","Learning a language takes patience and practice.","The company develops comfortable furniture."],
+ B2:["Whether you agree or not, the results are remarkably clear.","The government announced a series of environmental measures.","Thoroughly prepared students rarely feel anxious before exams.","She has been working there since she graduated.","Despite the weather, the ceremony took place as planned.","Nobody could have predicted such a dramatic outcome."]};
+const NUMW=["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty"];
+const pnw=w=>{let x=String(w).toLowerCase().replace(/[’]/g,"'").replace(/[^a-z0-9']/g,"");if(/^\d+$/.test(x)&&+x<=20)x=NUMW[+x];return x};
+function pronAlign(target,said){const A=target.split(/\s+/).filter(Boolean),a=A.map(pnw),b=String(said).split(/\s+/).map(pnw).filter(Boolean),n=a.length,m=b.length,d=[];
+  for(let i=0;i<=n;i++){d.push(new Array(m+1).fill(0));d[i][0]=i}for(let j=0;j<=m;j++)d[0][j]=j;
+  for(let i=1;i<=n;i++)for(let j=1;j<=m;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  const ok=new Array(n).fill(false);let i=n,j=m;
+  while(i>0&&j>0){if(a[i-1]===b[j-1]&&d[i][j]===d[i-1][j-1]){ok[i-1]=true;i--;j--}else if(d[i][j]===d[i-1][j-1]+1){i--;j--}else if(d[i][j]===d[i-1][j]+1)i--;else j--}
+  const good=ok.filter(Boolean).length;return{words:A.map((w,k)=>({w,ok:ok[k]})),score:n?Math.round(good/n*100):0}}
+function pronNew(){const lv=(S.me&&S.me.level)||"A2",bank=PRON[lv]||PRON.B2,i=Math.floor(Math.random()*bank.length);return{target:bank[i],res:null,busy:false,rewarded:false,last:bank[i]}}
+function pronNext(){const lv=(S.me&&S.me.level)||"A2",bank=PRON[lv]||PRON.B2;let t=S.pron?.target,k=0;while((t===S.pron?.target)&&k++<8)t=bank[Math.floor(Math.random()*bank.length)];S.pron={target:t,res:null,busy:false,rewarded:false}}
+async function pronAI(){if(!AI.sample||AI.disabled)return;const T=S.pron||(S.pron=pronNew());T.busy=true;render();
+  try{const r=await AI.sample(`Écris UNE seule phrase en anglais de 8 à 14 mots, niveau ${(S.me&&S.me.level)||"A2"}, utile dans la vie de tous les jours, avec 1 ou 2 mots difficiles à prononcer pour un francophone (th, h, r, voyelles longues, -ed). Réponds uniquement par la phrase, sans guillemets ni explication.`,{cache:false,modelTier:"quick"});
+    const t=String(r.text||"").trim().replace(/^["“]|["”]$/g,"").split("\n")[0];if(t.split(/\s+/).length>=4&&t.length<160){S.pron={target:t,res:null,busy:false,rewarded:false}}else T.busy=false}
+  catch(e){T.busy=false;toast("Nova n'a pas pu proposer de phrase : en voici une autre.","x");pronNext()}render()}
+async function pronListen(){const T=S.pron||(S.pron=pronNew());if(T.busy)return;T.busy=true;T.res=null;S.micLast="__pron";render();
+  try{let alts=[];const P=NATIVE_SR();
+    if(P&&!(window.SpeechRecognition||window.webkitSpeechRecognition)){const av=await P.available();if(!av?.available){S.micHelp="nosupport";return}
+      const perm=await P.requestPermissions();if(perm&&(perm.speechRecognition==="denied"||perm.microphone==="denied")){S.micHelp="denied";return}
+      const res=await P.start({language:"en-US",maxResults:3,prompt:"Read the sentence aloud",partialResults:false,popup:true});alts=res?.matches||[]}
+    else if(SRC&&SRC!==true){alts=await new Promise((resolve,reject)=>{const r=new SRC();r.lang="en-US";r.maxAlternatives=3;r.interimResults=false;r.continuous=false;const out=[];
+      r.onresult=ev=>{for(const x of ev.results[0])out.push(x.transcript)};r.onerror=ev=>reject(ev.error||"blocked");r.onend=()=>resolve(out);try{r.start()}catch(e){reject("blocked")}})}
+    else{S.micHelp="nosupport";return}
+    if(!alts.length){S.micHelp="nospeech";return}
+    let best=null;for(const a of alts){const r=pronAlign(T.target,a);if(!best||r.score>best.score)best={...r,said:a}}
+    T.res=best;if(best.score>=80&&!T.rewarded){T.rewarded=true;gain(10,"A travaillé sa prononciation",{})}}
+  catch(e){S.micHelp=(e==="not-allowed"||e==="service-not-allowed"||e==="audio-capture")?"denied":e==="no-speech"?"nospeech":"blocked"}
+  finally{T.busy=false;render()}}
+function pronView(){const T=S.pron||(S.pron=pronNew()),r=T.res,ai=AI.sample&&!AI.disabled;
+  const sentence=r?r.words.map(x=>`<span style="color:${x.ok?"#3ad29f":"var(--coral)"};${x.ok?"":"text-decoration:underline wavy"}">${esc(x.w)}</span>`).join(" "):esc(T.target);
+  const bad=r?r.words.filter(x=>!x.ok):[];
+  return`<div class="section" style="max-width:720px"><div><span class="eyebrow">Oral</span><h2>Prononciation</h2><p class="sub">Écoute la phrase, puis lis-la à voix haute. Nova te dit quels mots elle n'a pas bien compris.</p></div>
+  <div class="glass card" style="gap:16px;padding:clamp(20px,4vw,32px)"><div style="font-size:clamp(1.3rem,4.5vw,1.8rem);line-height:1.45;font-weight:600">${sentence}</div>
+  <div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn ghost sm" data-a="pronHear">${ic("speaker")}Écouter</button><button class="btn sm" data-a="pronMic" ${T.busy?"disabled":""}>${ic("mic")}${T.busy?"Écoute en cours…":(r?"Réessayer":"Parler")}</button><button class="btn ghost sm" data-a="pronNext" ${T.busy?"disabled":""}>${ic("refresh")}Autre phrase</button>${ai?`<button class="btn ghost sm" data-a="pronAI" ${T.busy?"disabled":""}>${ic("spark")}Phrase de Nova</button>`:""}</div>
+  ${r?`<div class="feedback"><b>${r.score>=80?"Très bien !":r.score>=50?"Pas mal, continue !":"Réessaie doucement"} · <span class="mono">${r.score} %</span></b><div class="small" style="margin-top:6px">Nova a compris : « ${esc(r.said)} »</div>${bad.length?`<div class="small" style="margin-top:10px">Mots à retravailler (touche pour écouter) :</div><div class="row" style="gap:8px;flex-wrap:wrap;margin-top:6px">${bad.map(x=>`<button class="btn ghost sm" data-a="pronWord" data-w="${esc(x.w.replace(/[^A-Za-z']/g,""))}">${ic("speaker")}${esc(x.w)}</button>`).join("")}</div><div class="small muted" style="margin-top:8px">Écoute le mot, répète-le lentement, puis relis toute la phrase.</div>`:`<div class="small" style="margin-top:6px">Tous les mots ont été reconnus.${r.score>=80&&T.rewarded?" +10 XP":""}</div>`}</div>`:""}</div>
+  <p class="hint">Astuce : parle dans un endroit calme. La reconnaissance vocale du téléphone sert de juge : si elle comprend ton mot, c'est bon signe, mais elle peut parfois se tromper.</p></div>`}
+
+const autoChk=(i,txt)=>`<label class="row" style="gap:10px;flex-wrap:nowrap;cursor:pointer;align-items:flex-start"><input id="${i}" type="checkbox"${S.drafts[i]==="1"?" checked":""}><span><b>Correction automatique par l'IA</b> <span class="hint">(facultatif) ${txt}</span></span></label>`;
+function dashView(){const st=S.profFilter?S.students.filter(s=>s.profile===S.profFilter):S.students,on=st.filter(online);const F=stFiltered(st),FL=F.slice(0,S.stLim||ST_STEP);const all=st.flatMap(s=>s.attempts||[]);const avg=all.length?Math.round(all.reduce((x,y)=>x+pct(y.score,y.total),0)/all.length):null;
   const feed=[...st].filter(s=>s.lastActive).sort((a,b)=>b.lastActive-a.lastActive).slice(0,7);
   const hard=S.quizzes.map(q=>{const at=st.flatMap(s=>(s.attempts||[]).filter(x=>x.quizId===q.id&&x.wrong));if(!at.length)return null;const miss={};for(const a of at)for(const w of a.wrong)miss[w]=(miss[w]||0)+1;
     const top=Object.entries(miss).sort((a,b)=>b[1]-a[1])[0];if(!top)return null;const qq=(q.questions||[])[+top[0]];return qq?{quiz:q.title,q:qq.q,rate:pct(top[1],at.length)}:null}).filter(Boolean).sort((a,b)=>b.rate-a.rate).slice(0,4);
   return`<div class="section"><div class="glass hero glow-border"><div style="display:grid;gap:12px"><span class="eyebrow row"><span class="dot on"></span>En direct${schoolPeriod().label?" · "+schoolPeriod().label+(schoolPeriod().week?", semaine "+schoolPeriod().week:""):""}</span><h2>Bonjour, <span class="gradtext">${esc((()=>{const w=(staffName(S.uid)||"Teacher").split(" ");return /^(mme|m\.?|mlle|mr|mrs|ms|dr)$/i.test(w[0])&&w[1]?w[0]+" "+w[1]:w[0]})())}</span></h2><p class="sub">Tout se met à jour en temps réel : dès qu'un élève lit, joue ou rend un devoir, tu le vois ici.</p>${mascotHTML(TIPS_TEACHER)}</div>
   <div class="kpis" style="grid-template-columns:repeat(2,1fr)"><div class="glass kpi"><b>${on.length}<small class="muted">/${st.length}</small></b><span>En ligne</span></div><div class="glass kpi"><b class="gradtext">${avg??"—"}${avg!=null?"<small> %</small>":""}</b><span>Moyenne quiz</span></div><div class="glass kpi"><b>${all.length}</b><span>Quiz joués</span></div><div class="glass kpi"><b style="color:${countToGrade()?"var(--coral)":"var(--fg)"}">${countToGrade()}</b><span>Copies à corriger</span></div></div></div></div>
-  ${(S.pending||[]).length?`<div class="section"><div class="glass card" style="grid-template-columns:auto 1fr auto;align-items:center;gap:14px;border-color:var(--gold-soft)"><span class="ic t-gold">${ic("shield")}</span><div><b>${S.pending.length} inscription${S.pending.length>1?"s":""} à valider</b><div class="small muted">Vérifie que ces personnes font bien partie de ta classe.</div></div><button class="btn sm" data-a="tab" data-k="class">Voir</button></div></div>`:""}${profFilterHTML()}
+  ${(S.pending||[]).length?`<div class="section"><div class="glass card" style="grid-template-columns:auto 1fr auto;align-items:center;gap:14px;border-color:var(--gold-soft)"><span class="ic t-gold">${ic("shield")}</span><div><b>${S.pending.length} inscription${S.pending.length>1?"s":""} à valider</b><div class="small muted">Vérifie que ces personnes font bien partie de ta classe.</div></div><button class="btn sm" data-a="tab" data-k="class">Voir</button></div></div>`:""}${profFilterHTML()}${alertsHTML(st)}
   ${st.length?`<div class="cols section"><div class="section" style="margin:0"><div><span class="eyebrow">Fil d'activité</span><h2>Ce qui se passe</h2></div><div class="glass feed">${feed.map(s=>`<div class="it click" data-a="openStudent" data-id="${s.id}" style="cursor:pointer">${avatar(s.id,s.name)}<div class="txt"><b>${esc(s.name)}</b><span>${esc(S.peers[s.id]?.doing||s.activity||"")}</span></div><div class="row small muted"><span class="dot ${online(s)?"on":""}"></span>${ago(s.lastActive)}</div></div>`).join("")}</div></div>
   <div class="section" style="margin:0"><div><span class="eyebrow">Classement XP</span><h2>Top élèves</h2></div>${leaderboardHTML(st.map(s=>({id:s.id,name:s.name,xp:s.xp,streak:s.lastDay===today()||s.lastDay===yesterday()?s.streak:0})).slice(0,8))}</div></div>`:""}
   ${regularityHTML(st)}${chartHTML(st)}
   <div class="section"><div class="head"><div><span class="eyebrow">Suivi individuel</span><h2>Mes élèves</h2></div></div>
-  ${st.length?`<div class="glass tablewrap"><table><thead><tr><th>Élève</th><th>Niveau</th><th>Profil</th><th>XP</th><th>Série</th><th>Moyenne</th><th>Devoirs</th><th>Activité</th></tr></thead><tbody>${[...st].sort((a,b)=>(b.lastActive||0)-(a.lastActive||0)).map(s=>{const x=stats(s),sk=s.lastDay===today()||s.lastDay===yesterday()?(s.streak||0):0;return`
-    <tr class="click" data-a="openStudent" data-id="${s.id}"><td><div class="row" style="flex-wrap:nowrap">${avatar(s.id,s.name)}<b>${esc(s.name)}</b><span class="dot ${online(s)?"on":""}"></span>${stOf(s)==="blocked"?`<span class="chip bad">Suspendu</span>`:""}${sharedFlag(s)?`<span class="chip warn">${ic("device")}À vérifier</span>`:""}</div></td><td>${lvlChip(s.level)}</td><td class="small">${esc(PROFILES[s.profile]||"—")}${s.classe?`<br><span class="muted">${esc(s.classe)}</span>`:""}</td><td class="num" style="color:var(--ink)">${s.xp||0}</td><td class="num">${sk?`<span class="flame">${sk}</span>`:"—"}</td><td>${x.avg!=null?`<div class="row" style="flex-wrap:nowrap"><div class="mini"><i style="width:${x.avg}%"></i></div><span class="num small">${x.avg} %</span></div>`:"—"}</td><td class="num">${x.subs}/${S.homework.length}</td><td class="small muted">${ago(s.lastActive)}</td></tr>`}).join("")}</tbody></table></div>`:
+  ${st.length?`${stToolbar(st,F.length)}<div class="glass tablewrap"><table><thead><tr><th>Élève</th><th>Niveau</th><th>Profil</th><th>XP</th><th>Série</th><th>Moyenne</th><th>Devoirs</th><th>Activité</th></tr></thead><tbody>${FL.map(s=>{const x=stats(s),sk=s.lastDay===today()||s.lastDay===yesterday()?(s.streak||0):0;return`
+    <tr class="click" data-a="openStudent" data-id="${s.id}"><td><div class="row" style="flex-wrap:nowrap">${avatar(s.id,s.name)}<b>${esc(s.name)}</b><span class="dot ${online(s)?"on":""}"></span>${stOf(s)==="blocked"?`<span class="chip bad">Suspendu</span>`:""}${sharedFlag(s)?`<span class="chip warn">${ic("device")}À vérifier</span>`:""}</div></td><td>${lvlChip(s.level)}</td><td class="small">${esc(PROFILES[s.profile]||"—")}${s.classe?`<br><span class="muted">${esc(s.classe)}</span>`:""}</td><td class="num" style="color:var(--ink)">${s.xp||0}</td><td class="num">${sk?`<span class="flame">${sk}</span>`:"—"}</td><td>${x.avg!=null?`<div class="row" style="flex-wrap:nowrap"><div class="mini"><i style="width:${x.avg}%"></i></div><span class="num small">${x.avg} %</span></div>`:"—"}</td><td class="num">${x.subs}/${S.homework.length}</td><td class="small muted">${ago(s.lastActive)}</td></tr>`}).join("")}</tbody></table></div>${F.length?moreBtn(FL.length,F.length,"stMore"):`<div class="empty">Aucun élève ne correspond à ta recherche.</div>`}`:
   `<div class="empty"><b>Aucun élève inscrit pour l'instant.</b><br>Va dans l'onglet <b>Classe</b> pour savoir comment inviter tes élèves.</div>`}</div>
   ${hard.length?`<div class="section"><div><span class="eyebrow">Analyse</span><h2>Points difficiles</h2><p class="sub">La question la plus ratée de chaque quiz. Idéal pour préparer ton prochain cours.</p></div><div class="grid">${hard.map(h=>`<div class="glass card"><div class="row between"><span class="eyebrow">${esc(h.quiz)}</span><span class="chip bad mono">${h.rate} % d'erreurs</span></div><h3>${esc(h.q)}</h3></div>`).join("")}</div></div>`:""}`}
 function chartHTML(st){const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(dayStr(d))}
@@ -2055,7 +2226,7 @@ Traduis : « Je suis fatigué ».
 = I am tired / I'm tired</pre><p class="hint" id="q_preview">${nq?`${nq} question(s) reconnue(s).`:"Aucune question reconnue pour l'instant."}</p><div><button class="btn" type="submit">${ic("rocket")}${S.editing?"Enregistrer les modifications":S.drafts.q_exam==="1"?"Publier l'examen":"Publier le quiz"}</button></div></form>`:""}
   ${cr==="deck"?`<form class="form" data-f="deck"><div class="two"><label>Titre<input id="d_title" required maxlength="120" placeholder="Food and drinks"></label><label>Niveau${lvlSel("d_level")}</label></div>${audSel("d_aud")}<label>Mots<textarea id="d_body" required style="min-height:220px"></textarea><span class="hint">Un mot par ligne : anglais | français | exemple (facultatif).</span></label><pre class="fmt">apple | pomme | I eat an apple every day.
 to borrow | emprunter | Can I borrow your pen?</pre><p class="hint" id="d_preview">${nd?`${nd} mot(s) reconnu(s).`:"Aucun mot reconnu pour l'instant."}</p><div><button class="btn" type="submit">${ic("rocket")}${S.editing?"Enregistrer les modifications":"Publier la liste"}</button></div></form>`:""}
-  ${cr==="hw"?`<form class="form" data-f="hw"><div class="two"><label>Titre<input id="h_title" required maxlength="120" placeholder="My dream holiday"></label><label>À rendre le<input id="h_due" type="date" required></label></div><label>Niveau${lvlSel("h_level")}</label>${audSel("h_aud")}<label>Consignes<textarea id="h_body" required placeholder="Write 80 words about…"></textarea></label><div><button class="btn" type="submit">${ic("rocket")}${S.editing?"Enregistrer les modifications":"Publier le devoir"}</button></div></form>`:""}
+  ${cr==="hw"?`<form class="form" data-f="hw"><div class="two"><label>Titre<input id="h_title" required maxlength="120" placeholder="My dream holiday"></label><label>À rendre le<input id="h_due" type="date" required></label></div><label>Niveau${lvlSel("h_level")}</label>${audSel("h_aud")}<label>Consignes<textarea id="h_body" required placeholder="Write 80 words about…"></textarea></label>${autoChk("h_auto","Nova note et commente chaque copie dès que l'élève la rend. Tu peux toujours modifier la note ensuite.")}${S.drafts.h_auto==="1"?`<label>Quand l'élève voit la note<select id="h_amode"><option value="live"${(S.drafts.h_amode||"live")==="live"?" selected":""}>Tout de suite</option><option value="draft"${S.drafts.h_amode==="draft"?" selected":""}>Brouillon : je valide avant</option></select></label>`:""}<div><button class="btn" type="submit">${ic("rocket")}${S.editing?"Enregistrer les modifications":"Publier le devoir"}</button></div></form>`:""}
   ${cr==="ep"?epFormHTML(lvlSel,audSel):""}
   ${cr==="pic"&&!S.editing?picFormHTML(lvlSel,audSel):""}
   </div></div>
@@ -2069,12 +2240,15 @@ to borrow | emprunter | Can I borrow your pen?</pre><p class="hint" id="d_previe
 function gradeView(){const items=[];for(const s of S.students){for(const[hid,sub]of Object.entries(s.submissions||{})){const h=S.homework.find(x=>x.id===hid),fb=(s.feedback||{})[hid];items.push({s,h,hid,sub,fb,kind:"hw",todo:!fb||(fb.at||0)<(sub.at||0)})}
   for(const[hid,sub]of Object.entries(s.epreuveSubs||{})){const e=S.eps.find(x=>x.id===hid),fb=(s.epreuveFb||{})[hid];items.push({s,h:e?{title:"Épreuve · "+e.title}:{title:"Épreuve supprimée"},hid,sub,fb,kind:"ep",todo:!fb||(fb.at||0)<(sub.at||0)})}}
   items.sort((a,b)=>(b.todo-a.todo)||(b.sub.at-a.sub.at));
+  const gq=(S.drafts.gv_q||"").trim().toLowerCase(),gAll=S.drafts.gv_all==="1";
+  const shownAll=items.filter(it=>(gAll||it.todo)&&(!gq||(it.s.name||"").toLowerCase().includes(gq))),shownItems=shownAll.slice(0,S.gvLim||GV_STEP);
+  const gvBar=`<div class="row" style="gap:10px;flex-wrap:wrap"><input id="gv_q" type="search" placeholder="Chercher un élève…" value="${esc(S.drafts.gv_q||"")}" style="flex:1;min-width:170px"><label class="row small" style="gap:6px;flex-wrap:nowrap"><input id="gv_all" type="checkbox"${gAll?" checked":""}>Voir aussi les copies corrigées</label><span class="chip">${shownAll.length} copie${shownAll.length>1?"s":""}</span></div>`;
   const head=`<div><span class="eyebrow">Corrections</span><h2>Copies <span class="gradtext">${countToGrade()} à corriger</span></h2><p class="sub">L'élève reçoit ta note et ton commentaire instantanément.</p></div>`;
   if(!items.length)return`<div class="section">${head}<div class="empty">Aucun devoir rendu pour l'instant. Les copies arriveront ici en direct.</div></div>`;
-  return`<div class="section">${head}${items.map(it=>{const k=it.s.id+"_"+it.hid,wc=String(it.sub.text).trim().split(/\s+/).length;return`
-  <div class="glass card" style="padding:clamp(18px,3vw,24px)"><div class="row between"><div class="row">${avatar(it.s.id,it.s.name)}<div><b>${esc(it.s.name)}</b><div class="small muted">${esc(it.h?.title||"Devoir supprimé")} · ${ago(it.sub.at)} · ${wc} mots</div></div></div>${it.todo?`<span class="chip warn">À corriger</span>`:gradeChip(it.fb.grade)}</div>
-  <div style="white-space:pre-wrap;max-width:65ch;background:var(--surface2);border-radius:12px;padding:14px">${esc(it.sub.text)}</div>
-  <form class="form" data-f="grade" data-s="${it.s.id}" data-h="${it.hid}" data-kind="${it.kind}"><div class="two"><label>Note sur 20<input id="g_${k}" type="number" min="0" max="20" step="0.5" required value="${it.fb?esc(it.fb.grade):""}"></label><span></span></div><label>Commentaire<textarea id="c_${k}" style="min-height:80px" placeholder="Great use of the past simple! Watch your spelling…">${it.fb?esc(it.fb.comment||""):""}</textarea></label><div><button class="btn ${it.todo?"":"ghost"} sm" type="submit">${ic("check")}${it.todo?"Envoyer la correction":"Mettre à jour"}</button></div></form></div>`}).join("")}</div>`}
+  return`<div class="section">${head}${gvBar}${shownAll.length?"":`<div class="empty">Aucune copie à corriger pour l'instant.</div>`}${shownItems.map(it=>{const k=it.s.id+"_"+it.hid,dr=S.corriges["draft_"+k],wc=String(it.sub.text||"").trim()?String(it.sub.text).trim().split(/\s+/).length:0;return`
+  <div class="glass card" style="padding:clamp(18px,3vw,24px)"><div class="row between"><div class="row">${avatar(it.s.id,it.s.name)}<div><b>${esc(it.s.name)}</b><div class="small muted">${esc(it.h?.title||"Devoir supprimé")} · ${ago(it.sub.at)} · ${wc} mots</div></div></div>${it.todo?`<span class="chip warn">À corriger</span>`:gradeChip(it.fb.grade)}${it.fb&&it.fb.auto?`<span class="chip">Corrigé par l'IA</span>`:""}${!it.fb&&dr?`<span class="chip warn">Proposition de Nova : à valider</span>`:""}</div>
+  ${it.sub.text?`<div style="white-space:pre-wrap;max-width:65ch;background:var(--surface2);border-radius:12px;padding:14px">${esc(it.sub.text)}</div>`:""}${copyTiles(it.sub.files)}
+  <form class="form" data-f="grade" data-s="${it.s.id}" data-h="${it.hid}" data-kind="${it.kind}"><div class="two"><label>Note sur 20<input id="g_${k}" type="number" min="0" max="20" step="0.5" required value="${it.fb?esc(it.fb.grade):dr?esc(dr.grade):""}"></label><span></span></div><label>Commentaire<textarea id="c_${k}" style="min-height:80px" placeholder="Great use of the past simple! Watch your spelling…">${it.fb?esc(it.fb.comment||""):dr?esc(dr.comment||""):""}</textarea></label><div><button class="btn ${it.todo?"":"ghost"} sm" type="submit">${ic("check")}${it.todo?"Envoyer la correction":"Mettre à jour"}</button></div></form></div>`}).join("")}${moreBtn(shownItems.length,shownAll.length,"gvMore")}</div>`}
 function pendingHTML(){const P=S.pending||[];if(!P.length)return"";return`<div class="section"><div><span class="eyebrow">Sécurité</span><h2>Inscriptions à valider <span class="muted mono small">${P.length}</span></h2><p class="sub">Vérifie que chaque personne fait bien partie de ta classe avant de lui ouvrir l'accès.</p></div><div class="glass list" style="border-color:var(--gold-soft)">${P.map(p=>`<div class="it">${avatar(p.id,p.name)}<div class="txt"><b>${esc(p.name)}</b><div class="small muted">${isParent(p)?"Parent de "+esc(p.childName||"—"):esc(PROFILES[p.profile]||"")+(p.classe?" · "+esc(p.classe):"")} · ${ago(p.joinedAt)}</div></div><button class="btn sm" data-a="approveSt" data-id="${p.id}">${ic("check")}Accepter</button><button class="btn ghost sm" data-a="refuseSt" data-id="${p.id}">Refuser</button></div>`).join("")}</div></div>`}
 function securityHTML(){const all=[...S.students,...S.parents],flagged=all.filter(sharedFlag),blocked=all.filter(x=>stOf(x)==="blocked");
   return`<div class="section"><div><span class="eyebrow">Sécurité</span><h2>Protection de la classe</h2><p class="sub">Qui peut entrer, et comment repérer un compte prêté à quelqu'un d'autre.</p></div>
@@ -2109,13 +2283,14 @@ function classViewInner(){const c=S.confirm;
 
 /* ============ events ============ */
 document.addEventListener("input",e=>{const el=e.target;if(!el.id||el.type==="file")return;S.drafts[el.id]=el.type==="checkbox"?(el.checked?"1":""):el.value;
+  if(el.id==="st_q"||el.id==="st_cls"||el.id==="st_on"||el.id==="gv_q"||el.id==="gv_all"){S.stLim=ST_STEP;S.gvLim=GV_STEP;render();return}
   if(el.id==="q_exam"){render();return}
   if(/_prof$/.test(el.id)){delete S.drafts[el.id.replace(/_prof$/,"_cls")];render();return}
   if(el.id==="q_body"){const n=parseQuiz(el.value).length,p=$("#q_preview");if(p)p.textContent=n?`${n} question(s) reconnue(s).`:"Aucune question reconnue pour l'instant."}
   if(el.id==="d_body"){const n=parseDeck(el.value).length,p=$("#d_preview");if(p)p.textContent=n?`${n} mot(s) reconnu(s).`:"Aucun mot reconnu pour l'instant."}
   if(el.id.startsWith("hw_")){const n=el.value.trim()?el.value.trim().split(/\s+/).length:0,p=document.getElementById("wc_"+el.id.slice(3));if(p)p.textContent=n+(n>1?" mots":" mot")}});
-document.addEventListener("change",e=>{const el=e.target;if(el.id==="pic_file"){picFile(el.files&&el.files[0]);el.value="";return}if(el.id==="lv_cls"){S.liveClass=el.value;delete S.drafts.lv_quiz;render();return}if(el.id==="att_date"){S.drafts.att_date=el.value||today();S.attDraft=null;render();return}if(el.tagName==="SELECT"&&/_prof$/.test(el.id)){S.drafts[el.id]=el.value;delete S.drafts[el.id.replace(/_prof$/,"_cls")];render();return}
-  if(el.type==="checkbox"&&el.id){S.drafts[el.id]=el.checked?"1":"";if(el.id==="q_exam")render()}});
+document.addEventListener("change",e=>{const el=e.target;if(el.type==="file"&&el.id&&el.id.startsWith("cpf_")){const key=el.id.replace(/^cpf_(cam_)?/,""),fl=[...el.files];el.value="";addCopies(key,fl);return}if(el.id==="pic_file"){picFile(el.files&&el.files[0]);el.value="";return}if(el.id==="lv_cls"){S.liveClass=el.value;delete S.drafts.lv_quiz;render();return}if(el.id==="att_date"){S.drafts.att_date=el.value||today();S.attDraft=null;render();return}if(el.tagName==="SELECT"&&/_prof$/.test(el.id)){S.drafts[el.id]=el.value;delete S.drafts[el.id.replace(/_prof$/,"_cls")];render();return}
+  if(el.type==="checkbox"&&el.id){S.drafts[el.id]=el.checked?"1":"";if(el.id==="q_exam"||el.id==="h_auto"||el.id==="e_auto")render()}});
 document.addEventListener("keydown",e=>{if(e.target&&e.target.id==="talkIn"&&e.key==="Enter"&&!e.shiftKey&&matchMedia("(hover:hover)").matches){e.preventDefault();talkSend(e.target.value);return}if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-a][tabindex]")){e.preventDefault();e.target.click()}});
 if(matchMedia("(hover:hover)").matches&&!reduceMotion){document.addEventListener("pointermove",e=>{const c=e.target.closest&&e.target.closest(".tilt");document.querySelectorAll(".tilt[style]").forEach(x=>{if(x!==c)x.removeAttribute("style")});if(!c)return;const r=c.getBoundingClientRect();c.style.setProperty("--ry",((e.clientX-r.left)/r.width-.5)*8+"deg");c.style.setProperty("--rx",(.5-(e.clientY-r.top)/r.height)*8+"deg")},{passive:true})}
 function finishDeck(st,d){if(st.i<st.order.length)return;
@@ -2193,7 +2368,7 @@ document.addEventListener("click",e=>{const say_=e.target.closest("[data-say]");
   case"toggleClosed":{const v=!S.settings.closed;write(()=>S.db.doc("settings/main").set({...S.settings,closed:v})).then(()=>toast(v?"Inscriptions fermées":"Inscriptions ouvertes","shield"));break}
   case"pickRole":S.drafts.j_role=el.dataset.k||"";S.animate=true;break;
   case"showAll":S.showAll=!S.showAll;S.animate=true;break;
-  case"profFilter":S.profFilter=el.dataset.k||"";break;
+  case"profFilter":S.profFilter=el.dataset.k||"";S.stLim=ST_STEP;break;case"pronMic":pronListen();return;case"pronHear":speak(S.pron?.target||"","en");return;case"pronWord":speak(el.dataset.w||"","en");return;case"pronNext":pronNext();break;case"pronAI":pronAI();return;case"notifOn":notifEnable();return;case"notifOff":notifOff().then(render);return;case"stMore":S.stLim=(S.stLim||ST_STEP)+ST_STEP;break;case"gvMore":S.gvLim=(S.gvLim||GV_STEP)+GV_STEP;break;case"cpRm":(PEND[el.dataset.k]||[]).splice(+el.dataset.i,1);break;case"openCopy":openCopy(el.dataset.p,el.dataset.t);return;
   case"toggleCor":{const e=S.eps.find(x=>x.id===id),c=S.corriges[id];if(!e)break;
     if(!e.corrigeVisible){if(!c||(!c.text&&!c.fileId)){toast("Ajoute d'abord un corrigé.","x");break}write(()=>S.db.doc("epreuves/"+id).update({corrigeVisible:true,corrigePublic:{text:c.text||"",fileId:c.fileId||"",fileName:c.fileName||"",fileType:c.fileType||""}})).then(()=>toast("Corrigé publié aux élèves","eye"))}
     else write(()=>S.db.doc("epreuves/"+id).update({corrigeVisible:false,corrigePublic:null})).then(()=>toast("Corrigé masqué aux élèves","lock"));break}
@@ -2289,9 +2464,7 @@ document.addEventListener("submit",e=>{e.preventDefault();const f=e.target,k=f.d
   if(k==="join"){const name=v("j_name");if(!name)return;const now=Date.now(),level=v("j_level"),profile=S.drafts.j_role||"lycee",classe=composeClasse(v("j_cls"),v("j_serie"));delete S.drafts.j_role;delete S.drafts.j_name;
     write(()=>meRef().set({name,level,profile,classe,teacherId:v("j_teacher")||principalId()||"",joinedAt:now,lastActive:now,activity:"Vient de rejoindre la classe",xp:0,streak:1,lastDay:today(),dayXp:0,attempts:[],submissions:{},feedback:{},lessonsRead:{},badges:{},deckProgress:{},...(S.isOwner||S.isStaff?{preview:true}:{})}))
       .then(()=>{if(!S.isOwner)return write(()=>S.db.doc("board/"+S.uid).set({name,level,xp:0,streak:1,teacherId:v("j_teacher")||principalId()||"",updatedAt:now}))}).then(()=>{if(!S.writeBlocked){toast("Bienvenue dans la classe !","rocket");confetti();S.animate=true}})}
-  else if(k==="submitHw"){const id=f.dataset.id,text=v("hw_"+id);if(!text)return;const h=S.homework.find(x=>x.id===id),first=!(S.me.submissions||{})[id];
-    const extra={submissions:{[id]:{text,at:Date.now()}}};if(first)gain(40,"A rendu : "+(h?.title||"un devoir"),extra,f.querySelector("button"));else touch("A modifié : "+(h?.title||"un devoir"),extra);
-    clear(["hw_"+id]);toast(first?"Devoir rendu":"Réponse mise à jour","pen")}
+  else if(k==="submitHw"){submitCopy("hw",f)}
   else if(k==="lesson"){saveContent("lessons",{title:v("l_title"),level:v("l_level"),audience:v("l_aud")||"tous",classe:v("l_cls"),unit:parseInt(v("l_unit"))||0,theme:v("l_theme"),grammar:v("l_gram"),body:document.getElementById("l_body").value.trim()}).then(ed=>{clear(FORM_FIELDS.lesson);toast(ed?"Leçon modifiée":"Leçon publiée","book");render()})}
   else if(k==="quiz"){const questions=parseQuiz(document.getElementById("q_body").value);if(!questions.length){toast("Aucune question reconnue : vérifie les * et les -.","x");return}
     const exam=!!document.getElementById("q_exam")?.checked,mins=Math.max(1,Math.min(180,parseInt(v("q_min"))||10));
@@ -2299,7 +2472,7 @@ document.addEventListener("submit",e=>{e.preventDefault();const f=e.target,k=f.d
     saveContent("quizzes",d).then(ed=>{clear(FORM_FIELDS.quiz);toast(ed?"Quiz modifié":exam?`Examen publié (${questions.length} questions, ${mins} min)`:`Quiz publié (${questions.length} questions)`,exam?"timer":"bolt");render()})}
   else if(k==="deck"){const cards=parseDeck(document.getElementById("d_body").value);if(!cards.length){toast("Aucun mot reconnu : utilise anglais | français.","x");return}
     saveContent("decks",{title:v("d_title"),level:v("d_level"),audience:v("d_aud")||"tous",cards}).then(ed=>{clear(FORM_FIELDS.deck);toast(ed?"Liste modifiée":`Liste publiée (${cards.length} mots)`,"cards");render()})}
-  else if(k==="hw"){saveContent("homework",{title:v("h_title"),level:v("h_level"),audience:v("h_aud")||"tous",due:v("h_due"),instructions:document.getElementById("h_body").value.trim()}).then(ed=>{clear(FORM_FIELDS.hw);toast(ed?"Devoir modifié":"Devoir publié","pen");render()})}
+  else if(k==="hw"){saveContent("homework",{title:v("h_title"),level:v("h_level"),audience:v("h_aud")||"tous",due:v("h_due"),instructions:document.getElementById("h_body").value.trim(),autoCorrect:!!document.getElementById("h_auto")?.checked,autoMode:S.drafts.h_amode==="draft"?"draft":"live"}).then(ed=>{clear(FORM_FIELDS.hw);toast(ed?"Devoir modifié":"Devoir publié","pen");render()})}
   else if(k==="chat"){const sid=f.dataset.s,text=v("chatInput");if(!text)return;const at=Date.now(),from=S.mode==="teacher"?"teacher":"student";delete S.drafts.chatInput;f.reset();
     write(()=>S.db.collection("students/"+sid+"/msgs").add({from,text,at})).then(()=>write(()=>S.db.doc("students/"+sid).update(from==="teacher"?{lastMsgAt:at,lastMsgFrom:"teacher",lastMsgText:text.slice(0,80),teacherReadAt:at}:{lastMsgAt:at,lastMsgFrom:"student",lastMsgText:text.slice(0,80),studentReadAt:at,lastActive:at,activity:"A écrit à la prof"})));
     if(from==="student")presence("Écrit un message");return}
@@ -2320,7 +2493,7 @@ document.addEventListener("submit",e=>{e.preventDefault();const f=e.target,k=f.d
     try{const up=async k=>{const sc=S.scan[k];if(!sc||!sc.blob)return null;if(sc.busy)throw{code:"busy"};if(!S.assets)throw{code:"no_assets"};const type=sc.type||"image/jpeg";const r=await S.assets.upload(sc.blob,{type});return{id:r.id,name:sc.name,type}};
       const ed=S.editing&&S.editing.kind==="epreuves"?S.editing:null,prev=ed?S.eps.find(x=>x.id===ed.id):null,prevC=ed?(S.corriges[ed.id]||{}):{};
       const suj=await up("sujet"),cor=await up("cor");
-      const data={title:v("e_title"),exam:v("e_exam"),year:v("e_year"),level:v("e_level"),audience:v("e_aud")||"tous",minutes:Math.max(0,parseInt(v("e_min"))||0),sujet:(document.getElementById("e_sujet")?.value||"").trim(),fileId:suj?suj.id:(prev?.fileId||""),fileName:suj?suj.name:(prev?.fileName||""),fileType:suj?suj.type:(prev?.fileType||"")};
+      const data={title:v("e_title"),exam:v("e_exam"),year:v("e_year"),level:v("e_level"),audience:v("e_aud")||"tous",minutes:Math.max(0,parseInt(v("e_min"))||0),autoCorrect:!!document.getElementById("e_auto")?.checked,autoMode:S.drafts.e_amode==="draft"?"draft":"live",sujet:(document.getElementById("e_sujet")?.value||"").trim(),fileId:suj?suj.id:(prev?.fileId||""),fileName:suj?suj.name:(prev?.fileName||""),fileType:suj?suj.type:(prev?.fileType||"")};
       if(!data.sujet&&!data.fileId){toast("Ajoute le texte du sujet ou un fichier.","x");return}
       const corr={text:(document.getElementById("e_cor")?.value||"").trim(),fileId:cor?cor.id:(prevC.fileId||""),fileName:cor?cor.name:(prevC.fileName||""),fileType:cor?cor.type:(prevC.fileType||"")};
       let id;if(ed){id=ed.id;await write(()=>S.db.doc("epreuves/"+id).update(data))}else{const ref=S.db.collection("epreuves").doc();id=ref.id;await write(()=>ref.set({...data,teacherId:S.uid,createdAt:Date.now(),corrigeVisible:false}))}
@@ -2329,11 +2502,9 @@ document.addEventListener("submit",e=>{e.preventDefault();const f=e.target,k=f.d
       S.editing=null;FORM_FIELDS.ep.forEach(i=>delete S.drafts[i]);clearScan("sujet");clearScan("cor");f.reset();toast(ed?"Épreuve modifiée":"Épreuve publiée","file")}
     catch(err){const c=err&&err.code;toast(c==="too_large"?"Fichier trop lourd (20 Mo maximum).":c==="unsupported_type"?"Format non accepté : utilise un PDF ou une image.":c==="no_assets"?"L'envoi de fichiers n'est pas disponible ici.":c==="quota_or_state"?"Espace de stockage plein.":c==="busy"?"Attends la fin de l'amélioration de la photo.":"Enregistrement impossible. Réessaie.","x")}
     finally{if(btn)btn.disabled=false;render()}})();return}
-  else if(k==="submitEp"){const id=f.dataset.id,text=v("ep_"+id);if(!text)return;const e=S.eps.find(x=>x.id===id),first=!(S.me.epreuveSubs||{})[id];
-    const extra={epreuveSubs:{[id]:{text,at:Date.now()}}};if(first)gain(40,"A traité l'épreuve : "+(e?.title||""),extra,f.querySelector("button"));else touch("A modifié sa copie : "+(e?.title||""),extra);
-    delete S.drafts["ep_"+id];f.reset();if(S.epTimer?.id===id)S.epTimer=null;toast(first?"Copie rendue":"Copie mise à jour","send")}
+  else if(k==="submitEp"){submitCopy("ep",f)}
   else if(k==="grade"){const s=f.dataset.s,h=f.dataset.h,key=s+"_"+h,isEp=f.dataset.kind==="ep";const grade=Math.max(0,Math.min(20,parseFloat(v("g_"+key))));if(isNaN(grade))return;
-    write(()=>S.db.doc("students/"+s).update({[isEp?"epreuveFb":"feedback"]:{[h]:{grade,comment:v("c_"+key),at:Date.now()}}})).then(()=>{delete S.drafts["g_"+key];delete S.drafts["c_"+key];toast("Correction envoyée","check")})}
+    write(()=>S.db.doc("students/"+s).update({[isEp?"epreuveFb":"feedback"]:{[h]:{grade,comment:v("c_"+key),at:Date.now(),auto:false}}})).then(()=>S.corriges["draft_"+key]?write(()=>S.db.doc("corriges/draft_"+key).delete()):0).then(()=>{delete S.drafts["g_"+key];delete S.drafts["c_"+key];toast("Correction envoyée","check")})}
   else if(k==="setLevel"){const s=f.dataset.id,upd={level:v("lv_"+s),profile:v("pf_"+s),classe:v("cl_"+s)};if(document.getElementById("tc_"+s))upd.teacherId=v("tc_"+s);write(()=>S.db.doc("students/"+s).update(upd)).then(()=>toast("Fiche mise à jour","check"))}
   else if(k==="aiGen"){const topic=v("ag_free")||v("ag_topic");const n=parseInt(v("ag_n"))||10;delete S.drafts.ag_free;aiGenQuiz(topic,n);return}
   else if(k==="joinProf"){const name=v("j_name");if(!name)return;write(()=>S.db.doc("staffRequests/"+S.uid).set({name,subject:v("j_subject"),at:Date.now()})).then(()=>{delete S.drafts.j_role;toast("Demande envoyée à la prof principale","send")});return}
