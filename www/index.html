@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Ma Classe d'Anglais</title><meta name="theme-color" content="#0E1120"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
+<title>Ma Classe d'Anglais</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; frame-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#0E1120"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;background:#0E1120}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <script src="config.js"></script><script src="claude-shim.js"></script>
 </head><body>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
 <style>
 /* Layout: porcelain app — soft light ground with slow pearl 3D behind, white cards with hairline borders, ink primary + gold for rewards; sticky header, segmented nav (top on desktop, bottom bar on phone) */
 :root{
@@ -647,6 +647,32 @@ th{font-size:.76rem;letter-spacing:.1em}
 :root[data-lite="1"] .enter>*{animation:none!important}
 :root[data-lite="1"] .dot.on,:root[data-lite="1"] .bigplay,:root[data-lite="1"] #aiFab .orb{animation:none}
 :root[data-lite="1"] .card.click:hover,:root[data-lite="1"] .tilt:hover{transform:none}
+
+/* ===== Couche « Néo » : futuriste, fluide, PC + téléphone ===== */
+:root{--f-display:"Space Grotesk","Manrope","Segoe UI",system-ui,sans-serif;--neo-a:#5EEAD4;--neo-b:#7C9CFF;--neo-c:#C084FC}
+h1,h2,h3{font-family:var(--f-display);letter-spacing:-.02em;font-weight:700}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(124,156,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(124,156,255,.05) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(80% 60% at 50% 0%,#000,transparent 75%);mask-image:radial-gradient(80% 60% at 50% 0%,#000,transparent 75%)}
+:root[data-skin="nuit"] .aurora{background:radial-gradient(38% 30% at 10% 4%,rgba(94,234,212,.16),transparent 70%),radial-gradient(36% 32% at 92% 10%,rgba(124,156,255,.22),transparent 70%),radial-gradient(44% 36% at 60% 100%,rgba(192,132,252,.16),transparent 70%)}
+:root[data-skin="nuit"] .glass{border-color:rgba(124,156,255,.16);border-radius:20px}
+:root[data-skin="nuit"] .glass.card{transition:border-color .25s,box-shadow .25s}
+:root[data-skin="nuit"] .glass.card:hover{border-color:rgba(94,234,212,.38);box-shadow:inset 0 1px 0 rgba(201,211,255,.12),0 0 0 1px rgba(94,234,212,.12),0 20px 60px rgba(0,0,0,.5),0 0 36px rgba(94,234,212,.10)}
+:root[data-skin="nuit"] .btn:not(.ghost):not(.danger){background:linear-gradient(120deg,#5EEAD4,#7C9CFF);color:#07101F;box-shadow:0 8px 26px rgba(94,234,212,.22)}
+.btn:active{transform:scale(.97)}
+:root[data-skin="nuit"] .btn.ghost{border:1px solid rgba(124,156,255,.35);background:rgba(124,156,255,.08)}
+:root[data-skin="nuit"] nav.tabs{background:rgba(12,16,36,.72);border-color:rgba(124,156,255,.22);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+:root[data-skin="nuit"] nav.tabs button[aria-current="true"]{color:#07101F;background:linear-gradient(120deg,#5EEAD4,#7C9CFF);box-shadow:0 0 22px rgba(94,234,212,.35)}
+header.top{border-width:0 0 1px;border-style:solid;border-image:linear-gradient(90deg,transparent,rgba(94,234,212,.4),rgba(124,156,255,.4),transparent) 1}
+:focus-visible{outline:2px solid var(--neo-a);outline-offset:3px}
+.devrow{display:grid!important;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.devrow .btn{white-space:nowrap;min-height:40px}
+.devrow.is-blocked{background:rgba(192,57,79,.10);box-shadow:inset 0 0 0 1px rgba(192,57,79,.35)}
+@media (max-width:520px){.devrow{grid-template-columns:auto 1fr}.devrow .btn{grid-column:1/-1;width:100%}}
+@media (max-width:760px){
+  nav.tabs{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));border-radius:26px;border-width:1px;padding:7px 6px}
+  :root[data-skin="nuit"] .glass{border-radius:18px}
+}
+@media (min-width:1100px){.wrap{max-width:1240px}.grid{grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 
 <canvas id="bg3d" aria-hidden="true"></canvas>
@@ -689,7 +715,7 @@ const canEditContent=x=>S.isOwner?(!x.teacherId||x.teacherId===S.uid):(!!x.teach
 const vis=list=>S.mode==="teacher"?list.filter(x=>!x.teacherId||x.teacherId===S.uid):list.filter(teacherOk);
 function stOf(x){if(!x)return"pending";if(x.preview)return"active";const a=(S.mode==="student"&&x.id===S.uid)?S.myAccess:S.access[x.id];return a?.status||(S.settings.approve===false?"active":"pending")}
 function deviceLabel(){const u=navigator.userAgent||"";const os=/iPhone/.test(u)?"iPhone":/iPad/.test(u)?"iPad":/Android/.test(u)?"Android":/Windows/.test(u)?"Windows":/Mac OS X/.test(u)?"Mac":/Linux/.test(u)?"Linux":"Appareil";const br=/Edg\//.test(u)?"Edge":/OPR\//.test(u)?"Opera":/Chrome\//.test(u)?"Chrome":/Firefox\//.test(u)?"Firefox":/Safari\//.test(u)?"Safari":"Navigateur";return os+" · "+br}
-function deviceId(){let id=null;try{id=localStorage.getItem("mca_dev")}catch(e){}if(!id){id="d"+Math.random().toString(36).slice(2,10);try{localStorage.setItem("mca_dev",id)}catch(e){}}return id}
+function deviceId(){let id=null;try{id=localStorage.getItem("mca_dev")}catch(e){}if(!id){try{id="d"+crypto.randomUUID().replace(/-/g,"").slice(0,16)}catch(e){id="d"+Math.random().toString(36).slice(2,12)+Date.now().toString(36)}try{localStorage.setItem("mca_dev",id)}catch(e){}}return id}
 function recentDevices(s,days=14){return Object.entries(s.devices||{}).filter(([k,d])=>d&&d.last&&Date.now()-d.last<days*864e5).sort((a,b)=>b[1].last-a[1].last)}
 const sharedFlag=s=>recentDevices(s).length>=3||(S.peerCount&&S.peerCount[s.id]>1);
 let devRecorded=false;function recordDevice(){if(devRecorded||!S.me||S.mode!=="student"||S.isOwner||S.isStaff)return;devRecorded=true;const id=deviceId(),prev=(S.me.devices||{})[id];const now=Date.now();
@@ -1888,7 +1914,7 @@ function stFolders(F){if(!F.length)return`<div class="empty">Aucun élève ne co
 const devAcc=sid=>S.access[sid]||{};
 const devState=(sid,k)=>{const a=devAcc(sid);if(a.blockedDevices&&a.blockedDevices[k])return"blocked";if(a.deviceLimit&&!(a.allowedDevices&&a.allowedDevices[k]))return"pending";return"ok"};
 function devRow(s,k,d){const st=devState(s.id,k),lim=!!devAcc(s.id).deviceLimit;
-  return`<div class="it"><span class="ic t-cyan" style="width:36px;height:36px">${ic("device")}</span><div class="txt"><b>${esc(d.label||"Appareil")}</b> ${st==="blocked"?`<span class="chip bad">Suspendu</span>`:st==="pending"?`<span class="chip warn">Non autorisé</span>`:lim?`<span class="chip ok">Autorisé</span>`:""}<div class="small muted">Première connexion le ${fmtDate(d.first)} · dernière ${ago(d.last)}</div></div>${st==="ok"?`<button class="btn ghost sm" data-a="devBlock" data-id="${s.id}" data-d="${esc(k)}">${ic("lock")}Suspendre</button>`:`<button class="btn sm" data-a="devAllow" data-id="${s.id}" data-d="${esc(k)}">${ic("check")}Rétablir</button>`}</div>`}
+  return`<div class="it devrow${st==="blocked"?" is-blocked":""}"><span class="ic t-cyan" style="width:36px;height:36px">${ic("device")}</span><div class="txt"><b>${esc(d.label||"Appareil")}</b> ${st==="blocked"?`<span class="chip bad">Suspendu</span>`:st==="pending"?`<span class="chip warn">Non autorisé</span>`:lim?`<span class="chip ok">Autorisé</span>`:""}<div class="small muted">Première connexion le ${fmtDate(d.first)} · dernière ${ago(d.last)}</div></div>${st==="ok"?`<button class="btn ghost sm" data-a="devBlock" data-id="${s.id}" data-d="${esc(k)}">${ic("lock")}Suspendre</button>`:`<button class="btn sm" data-a="devAllow" data-id="${s.id}" data-d="${esc(k)}">${ic("check")}Rétablir</button>`}</div>`}
 function devLimitBar(s){const lim=devAcc(s.id).deviceLimit||0;
   return`<div style="display:grid;gap:8px"><div class="row small" style="gap:8px"><b>Nombre d'appareils autorisés :</b>${[1,2,3].map(n=>`<button class="btn ${lim===n?"":"ghost "}sm" data-a="devLimit" data-id="${s.id}" data-n="${n}" aria-pressed="${lim===n}">${n}</button>`).join("")}${lim?`<button class="btn ghost sm" data-a="devLimit" data-id="${s.id}" data-n="0">Sans limite</button>`:""}</div><p class="hint" style="margin:0">${lim?"Les "+lim+" appareils utilisés le plus récemment sont autorisés. Tout nouvel appareil est bloqué jusqu'à ce que tu le rétablisses.":"Choisis un nombre : les appareils les plus récents sont gardés, les autres sont suspendus. Tu peux aussi suspendre un téléphone précis dans la liste."}</p></div>`}
 const devBlockedMe=()=>{if(S.mode!=="student"||S.isOwner||S.isStaff||!S.uid||!S.myAccess)return false;const a=S.myAccess,id=deviceId();return!!(a.blockedDevices&&a.blockedDevices[id])||!!(a.deviceLimit&&!(a.allowedDevices&&a.allowedDevices[id]))};
@@ -2328,7 +2354,7 @@ function studentDetail(){const s=S.students.find(x=>x.id===S.view.id);if(!s)retu
   <form class="glass card form" data-f="appr" data-id="${s.id}"><label>Appréciation pour le bulletin<textarea id="ap_${s.id}" style="min-height:90px" maxlength="1500" placeholder="Élève sérieux et motivé. Doit encore travailler les verbes irréguliers.">${esc(s.appreciation||"")}</textarea><span class="hint">Elle apparaît sur le bulletin téléchargeable que tu peux transmettre aux parents.</span></label><div><button class="btn ghost sm" type="submit">${ic("check")}Enregistrer l'appréciation</button></div></form></div>
   ${(()=>{const ex=S.quizzes.filter(q=>q.exam);if(!ex.length)return"";return`<div class="section"><div><span class="eyebrow">Évaluations</span><h2>Examens</h2></div><div class="glass list">${ex.map(q=>{const att=(s.attempts||[]).filter(a=>a.quizId===q.id&&a.exam).pop(),started=examTaken(s,q.id);
     return`<div class="it"><span class="ic t-coral" style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center">${ic("timer")}</span><div class="txt"><b>${esc(q.title)}</b><div class="small muted">${started?(att&&att.at>=started?`${att.score}/${att.total} · ${pct(att.score,att.total)} % · ${fmtDate(att.at)}`:"Commencé mais pas terminé"):"Pas encore passé"}</div></div>${started?`<button class="btn ghost sm" data-a="resetExam" data-id="${s.id}" data-q="${q.id}">${ic("refresh")}Autoriser une nouvelle tentative</button>`:""}</div>`}).join("")}</div></div>`})()}
-  <div class="section"><div><span class="eyebrow">Sécurité</span><h2>Appareils et accès</h2></div><div class="glass card">${recentDevices(s,60).length?`<div class="list" style="padding:0">${recentDevices(s,60).map(([k,d])=>devRow(s,k,d)).join("")}</div>`:`<p class="muted small" style="margin:0">Aucun appareil enregistré pour l'instant.</p>`}${devLimitBar(s)}
+  <div class="section"><div class="row between" style="align-items:flex-end"><div><span class="eyebrow">Sécurité</span><h2>Appareils et accès</h2></div>${stOf(s)==="blocked"?`<span class="chip bad">${ic("lock")}Élève suspendu</span>`:`<span class="chip ok">${ic("check")}Accès actif</span>`}</div><div class="glass card">${recentDevices(s,60).length?`<div class="list" style="padding:0">${recentDevices(s,60).map(([k,d])=>devRow(s,k,d)).join("")}</div>`:`<p class="muted small" style="margin:0">Aucun appareil enregistré pour l'instant.</p>`}${devLimitBar(s)}
   ${sharedFlag(s)?`<div class="note small">Ce compte a été utilisé sur plusieurs appareils récemment${S.peerCount?.[s.id]>1?", dont deux en même temps":""}. Vérifie avec l'élève qu'il ne prête pas son compte.</div>`:""}
   <div class="row">${stOf(s)==="blocked"?`<button class="btn sm" data-a="unblockSt" data-id="${s.id}">${ic("check")}Rétablir l'accès</button>`:S.confirm==="block"+s.id?`<button class="btn danger sm" data-a="blockSt" data-id="${s.id}">Confirmer la suspension</button><button class="btn ghost sm" data-a="cancelDel">Annuler</button>`:`<button class="btn ghost sm" data-a="askBlock" data-id="${s.id}">${ic("lock")}Suspendre l'accès</button>`}</div><p class="hint" style="margin:0">Pour couper complètement l'accès, retire aussi son adresse e-mail dans le menu Partager.</p></div></div>
   ${(()=>{const ts=triSummary(s),ct=curTri(),at=attOf(s.id,ct.y,ct.t),cs=certsOf(s);return`<div class="section"><div><span class="eyebrow">Bulletin trimestriel · ${esc(ct.y)}</span><h2>Moyennes, rang et présence</h2></div><div class="kpis">${[1,2,3].map(t=>{const e=ts.find(x=>x.t===t);return`<div class="glass kpi"><b>${fmt2(e?.avg)}</b><span>T${t}${e?.rank?" · "+rankTxt(e.rank,e.ex)+" / "+e.of:""}</span></div>`}).join("")}<div class="glass kpi"><b style="color:var(--bad-ink)">${at.A}</b><span>Absences (T${ct.t})</span></div><div class="glass kpi"><b style="color:var(--warn-ink)">${at.R}</b><span>Retards (T${ct.t})</span></div><div class="glass kpi"><b>${cs.length}</b><span>Certificats</span></div></div>${at.list.length?`<p class="small muted" style="margin:0">Dernières absences : ${at.list.slice(0,8).map(x=>fmtDate(x.date)+(x.k==="R"?" (retard)":"")).join(", ")}</p>`:""}</div>`})()}

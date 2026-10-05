@@ -435,7 +435,8 @@
       return;
     }
     if (!window.supabase) { try { await loadScript(CFG.supabaseJs || "vendor/supabase.js"); } catch (e) { await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"); } }
-    sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" } });
+    var mcaDev = (function () { try { var id = localStorage.getItem("mca_dev"); if (!id) { id = "d" + crypto.randomUUID().replace(/-/g, "").slice(0, 16); localStorage.setItem("mca_dev", id); } return id; } catch (e) { return ""; } })();
+    sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { global: { headers: { "x-device-id": mcaDev } }, auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" } });
     const App = plug("App");
     if (isNative() && App) App.addListener("appUrlOpen", async ({ url }) => {
       if (!CFG.nativeRedirect || !url.startsWith(CFG.nativeRedirect)) return;
