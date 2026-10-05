@@ -313,7 +313,9 @@
   let deferredPrompt = null;
   addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; if (window.__appDownload) { window.__appDownload.canInstall = true; try { window.render && window.render(); } catch (err) {} } });
   window.__pwaInstall = async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); try { await deferredPrompt.userChoice; } catch (e) {} deferredPrompt = null; if (window.__appDownload) window.__appDownload.canInstall = false; };
-  window.__appLogout = async () => { try { await sb.auth.signOut(); } catch (e) {} location.reload(); };
+  window.__appLogout = async () => { try { await sb.rpc("release_device"); } catch (e) {} try { await sb.auth.signOut(); } catch (e) {} location.reload(); };
+  window.__freeDevice = async (uid) => { const { error } = await sb.rpc("free_device", { p_uid: uid }); if (error) throw error; };
+  window.__deviceInfo = async (uid) => { try { const { data } = await sb.rpc("device_lock_info", { p_uid: uid }); return data; } catch (e) { return null; } };
 
   /* ---------------- écran de connexion ---------------- */
   const CSS = `#authGate{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:16px;overflow:auto;background:radial-gradient(120% 80% at 50% -10%,#1A2150 0%,#0E1120 45%,#090B16 100%);color:#F1F3FB;font-family:Manrope,"Segoe UI",system-ui,sans-serif}
@@ -422,11 +424,41 @@
     const { data } = await sb.from("members").select("level,email").eq("uid", session.user.id).maybeSingle();
     member = data || { level: "interact" };
   }
+
+  /* ---------------- un seul appareil par compte ---------------- */
+  function devLabel() { const u = navigator.userAgent, os = /Android/.test(u) ? "Android" : /iPhone|iPad/.test(u) ? "iOS" : /Windows/.test(u) ? "Windows" : /Mac/.test(u) ? "Mac" : /Linux/.test(u) ? "Linux" : "Appareil"; const br = /Edg\//.test(u) ? "Edge" : /OPR\//.test(u) ? "Opera" : /Chrome\//.test(u) ? "Chrome" : /Firefox\//.test(u) ? "Firefox" : /Safari\//.test(u) ? "Safari" : "Navigateur"; return os + " · " + br; }
+  const myDev = () => { try { return localStorage.getItem("mca_dev") || ""; } catch (e) { return ""; } };
+  async function claim() {
+    if (!navigator.onLine) return "offline";
+    try { const { data, error } = await sb.rpc("claim_device", { p_device: myDev(), p_label: devLabel() }); if (error) return "offline"; return data || "ok"; } catch (e) { return "offline"; }
+  }
+  function showBusy(kind) {
+    return new Promise((done) => {
+      let box = document.getElementById("authGate");
+      if (!box) { const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st); box = document.createElement("div"); box.id = "authGate"; document.body.appendChild(box); }
+      const blocked = kind === "blocked";
+      box.innerHTML = `<div class="box"><div class="logo">En</div><h1>${blocked ? "Appareil suspendu" : "Compte déjà connecté ailleurs"}</h1><p>${blocked ? "Ton professeur a suspendu l'accès sur cet appareil. Contacte-le pour qu'il te le rétablisse." : "Ton compte est ouvert sur un autre appareil. Pour continuer ici, déconnecte-toi d'abord de l'autre appareil (Classe → Se déconnecter). Si cet appareil est éteint, ça se libère tout seul au bout de 5 minutes."}</p><div class="msg" id="agMsg" hidden></div><button class="btn" id="agRetry">Réessayer</button><button class="btn ghost" id="agOut">Se déconnecter ici</button></div>`;
+      box.hidden = false; box.style.display = "";
+      box.querySelector("#agOut").onclick = async () => { try { await sb.auth.signOut(); } catch (e) {} location.reload(); };
+      box.querySelector("#agRetry").onclick = async () => { const r = await claim(); if (r === "ok" || r === "offline") { box.remove(); done(); } else { const m = box.querySelector("#agMsg"); m.hidden = false; m.className = "msg err"; m.textContent = "Toujours connecté sur l'autre appareil."; } };
+    });
+  }
+  let beat = null;
+  async function deviceGate() {
+    if (member.level === "admin" || member.level === "owner") return;     // professeurs : aucune limite
+    const r = await claim();
+    if (r === "busy" || r === "blocked") await showBusy(r);
+    clearInterval(beat);
+    beat = setInterval(async () => { const x = await claim(); if (x === "busy" || x === "blocked") location.reload(); }, 60000);
+    document.addEventListener("visibilitychange", async () => { if (!document.hidden) { const x = await claim(); if (x === "busy" || x === "blocked") location.reload(); } });
+  }
   let started = false;
   function brandAI() { const el = document.getElementById("aiSub"); if (el) el.textContent = "Assistant IA propulsé par Gemini"; }
   async function afterLogin() {
     if (started) return; started = true;
-    hideGate(); brandAI(); await loadMember(); await offerStarterContent().catch(() => {}); resolveReady();
+    hideGate(); brandAI(); await loadMember();
+    await deviceGate();                       // un seul appareil par compte (vérifié aussi par le serveur)
+    await offerStarterContent().catch(() => {}); resolveReady();
   }
   async function boot() {
     if (!CFG.supabaseUrl || !CFG.supabaseAnonKey || /VOTRE/.test(CFG.supabaseUrl)) {
