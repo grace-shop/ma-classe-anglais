@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Ma Classe d'Anglais</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; frame-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#0E1120"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
+<title>Ma Classe d'Anglais</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; frame-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#0E1120"><meta name="color-scheme" content="light dark"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;background:#0E1120}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<script src="config.js"></script><script src="claude-shim.js"></script>
+<style>html{box-sizing:border-box;height:100%;overscroll-behavior-y:none;-webkit-text-size-adjust:100%}body{margin:0;min-height:100%;background:#0E1120;overscroll-behavior-y:none}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<script>if(window.top!==window.self){try{window.top.location=window.self.location}catch(e){document.documentElement.innerHTML=""}}</script><script src="config.js"></script><script src="claude-shim.js"></script>
 </head><body>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1914,9 +1914,9 @@ function stFolders(F){if(!F.length)return`<div class="empty">Aucun élève ne co
 const devAcc=sid=>S.access[sid]||{};
 const devState=(sid,k)=>{const a=devAcc(sid);if(a.blockedDevices&&a.blockedDevices[k])return"blocked";if(a.deviceLimit&&!(a.allowedDevices&&a.allowedDevices[k]))return"pending";return"ok"};
 function devRow(s,k,d){const st=devState(s.id,k),lim=!!devAcc(s.id).deviceLimit;
-  return`<div class="it devrow${st==="blocked"?" is-blocked":""}"><span class="ic t-cyan" style="width:36px;height:36px">${ic("device")}</span><div class="txt"><b>${esc(d.label||"Appareil")}</b> ${st==="blocked"?`<span class="chip bad">Suspendu</span>`:st==="pending"?`<span class="chip warn">Non autorisé</span>`:lim?`<span class="chip ok">Autorisé</span>`:""}<div class="small muted">Première connexion le ${fmtDate(d.first)} · dernière ${ago(d.last)}</div></div>${st==="ok"?`<button class="btn ghost sm" data-a="devBlock" data-id="${s.id}" data-d="${esc(k)}">${ic("lock")}Suspendre</button>`:`<button class="btn sm" data-a="devAllow" data-id="${s.id}" data-d="${esc(k)}">${ic("check")}Rétablir</button>`}</div>`}
+  return`<div class="it devrow${st==="blocked"?" is-blocked":""}"><span class="ic t-cyan" style="width:36px;height:36px">${ic("device")}</span><div class="txt"><b>${esc(d.label||"Appareil")}</b> ${st==="blocked"?`<span class="chip bad">Suspendu</span>`:st==="pending"?`<span class="chip warn">Non autorisé</span>`:lim?`<span class="chip ok">Autorisé</span>`:""}<div class="small muted">Première connexion le ${fmtDate(d.first)} · dernière ${ago(d.last)}</div></div>${st==="ok"?`<button class="btn ghost sm" data-a="devBlock" data-id="${s.id}" data-d="${esc(k)}">${ic("lock")}Suspendre l'accès</button>`:`<button class="btn sm" data-a="devAllow" data-id="${s.id}" data-d="${esc(k)}">${ic("check")}Rétablir l'accès</button>`}</div>`}
 function devLimitBar(s){const lim=devAcc(s.id).deviceLimit||0;
-  return`<div style="display:grid;gap:8px"><div class="row small" style="gap:8px"><b>Nombre d'appareils autorisés :</b>${[1,2,3].map(n=>`<button class="btn ${lim===n?"":"ghost "}sm" data-a="devLimit" data-id="${s.id}" data-n="${n}" aria-pressed="${lim===n}">${n}</button>`).join("")}${lim?`<button class="btn ghost sm" data-a="devLimit" data-id="${s.id}" data-n="0">Sans limite</button>`:""}</div><p class="hint" style="margin:0">${lim?"Les "+lim+" appareils utilisés le plus récemment sont autorisés. Tout nouvel appareil est bloqué jusqu'à ce que tu le rétablisses.":"Choisis un nombre : les appareils les plus récents sont gardés, les autres sont suspendus. Tu peux aussi suspendre un téléphone précis dans la liste."}</p></div>`}
+  return`<div style="display:grid;gap:8px"><div class="note small">${ic("device")} <b>Un seul appareil à la fois.</b> L'élève doit se déconnecter d'un appareil avant d'utiliser un autre (libération automatique après 5 min d'inactivité).</div><div class="row"><button class="btn ghost sm" data-a="devFree" data-id="${s.id}">${ic("refresh")}Libérer le compte (téléphone perdu / bloqué)</button></div><div class="row small" style="gap:8px"><b>Nombre d'appareils autorisés :</b>${[1,2,3].map(n=>`<button class="btn ${lim===n?"":"ghost "}sm" data-a="devLimit" data-id="${s.id}" data-n="${n}" aria-pressed="${lim===n}">${n}</button>`).join("")}${lim?`<button class="btn ghost sm" data-a="devLimit" data-id="${s.id}" data-n="0">Sans limite</button>`:""}</div><p class="hint" style="margin:0">${lim?"Les "+lim+" appareils utilisés le plus récemment sont autorisés. Tout nouvel appareil est bloqué jusqu'à ce que tu le rétablisses.":"Choisis un nombre : les appareils les plus récents sont gardés, les autres sont suspendus. Tu peux aussi suspendre un téléphone précis dans la liste."}</p></div>`}
 const devBlockedMe=()=>{if(S.mode!=="student"||S.isOwner||S.isStaff||!S.uid||!S.myAccess)return false;const a=S.myAccess,id=deviceId();return!!(a.blockedDevices&&a.blockedDevices[id])||!!(a.deviceLimit&&!(a.allowedDevices&&a.allowedDevices[id]))};
 const deviceBlockedView=()=>lockCard("lock","t-coral","Appareil non autorisé","Cet appareil est suspendu","Ton professeur limite le nombre de téléphones ou de navigateurs pour ce compte. Utilise ton appareil habituel, ou demande à ton professeur d'autoriser celui-ci.");
 
@@ -2562,6 +2562,7 @@ document.addEventListener("click",e=>{const say_=e.target.closest("[data-say]");
   case"corPng":{const k=el.dataset.k,t=corTxt(k);if(!t){toast("Le corrigé est vide : écris-le ou fais-le rédiger par Nova.","x");return}makePng("Corrigé : "+corTitle(k),t).then(b=>saveFile("corrige-"+safeName(corTitle(k))+".png",b));return}
   case"stFolder":{const k=el.dataset.k;S.stOpen=S.stOpen||{};S.stOpen[k]=el.getAttribute("aria-expanded")!=="true";break}
   case"stFMore":{const k=el.dataset.k;S.stFLim=S.stFLim||{};S.stFLim[k]=(S.stFLim[k]||ST_STEP)+ST_STEP;break}
+  case"devFree":if(window.__freeDevice)window.__freeDevice(id).then(()=>toast("Compte libéré : l'élève peut se connecter sur un autre appareil","check")).catch(()=>toast("Impossible de libérer le compte","lock"));break;
   case"devBlock":write(()=>S.db.doc("access/"+id).update({blockedDevices:{[el.dataset.d]:true},allowedDevices:{[el.dataset.d]:null}})).then(()=>toast("Appareil suspendu","lock"));break;
   case"devAllow":write(()=>S.db.doc("access/"+id).update({blockedDevices:{[el.dataset.d]:null},allowedDevices:{[el.dataset.d]:true}})).then(()=>toast("Appareil autorisé","check"));break;
   case"devLimit":{const n=+el.dataset.n,st=S.students.find(x=>x.id===id);if(!st)break;const patch={deviceLimit:n||null};
@@ -2702,6 +2703,61 @@ document.addEventListener("submit",e=>{e.preventDefault();const f=e.target,k=f.d
 render();
 loadThree();
 </script>
+
+<style id="fx-v2">
+/* ===== Plein écran, plus de zones vides, plus de rebond ===== */
+html{height:100%;overscroll-behavior:none;overflow-x:clip;-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
+body{min-height:100dvh;overscroll-behavior-y:none;overflow-x:clip;touch-action:pan-y}
+#bg3d,.aurora{height:100lvh;width:100vw;inset:0}
+.aurora{inset:0!important}
+header.top{top:0!important;padding-top:calc(12px + env(safe-area-inset-top,0px))!important;padding-bottom:12px!important;margin-top:0}
+nav.tabs{top:calc(env(safe-area-inset-top,0px) + 74px)}
+.wrap{padding-block:0 calc(120px + env(safe-area-inset-bottom,0px))!important;min-height:100dvh}
+@media (max-width:760px){
+  .wrap{padding-inline:10px!important;max-width:none!important}
+  header.top{margin-inline:-10px!important;padding-inline:12px!important}
+  nav.tabs{padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))!important}
+  #aiFab{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+}
+@media (min-width:1100px){.wrap{max-width:1360px}}
+/* ===== Style futuriste ===== */
+:root{--neon1:#7C9CFF;--neon2:#B38CFF;--neon3:#35E0C2;--fx-ring:linear-gradient(135deg,rgba(124,156,255,.65),rgba(179,140,255,.35) 45%,rgba(53,224,194,.55))}
+::selection{background:rgba(124,156,255,.35)}
+*{scrollbar-width:thin;scrollbar-color:rgba(124,156,255,.45) transparent}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(124,156,255,.4);border-radius:8px}
+.glass,.card,.kpi,.list{position:relative;backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);border-radius:22px;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,border-color .25s}
+.glass::before,.kpi::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:var(--fx-ring);opacity:.55;pointer-events:none;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+@media (hover:hover){.glass:hover,.kpi:hover{transform:translateY(-2px);box-shadow:0 18px 50px rgba(60,80,200,.18),0 0 0 1px rgba(124,156,255,.25)}}
+.btn:not(.ghost):not(.danger){background:linear-gradient(135deg,#4B6BD6,#7C5CFF 60%,#35B8E0)!important;color:#fff!important;border:0!important;box-shadow:0 8px 24px rgba(92,108,255,.35),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .15s,box-shadow .2s,filter .2s}
+.btn:not(.ghost):not(.danger):hover{filter:brightness(1.08);box-shadow:0 12px 32px rgba(92,108,255,.5)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{backdrop-filter:blur(8px);border-color:rgba(124,156,255,.4)!important}
+.btn.danger{box-shadow:0 8px 22px rgba(220,60,90,.3)}
+.logo{background:linear-gradient(135deg,#4B6BD6,#B38CFF 55%,#35E0C2)!important;box-shadow:0 0 0 1px rgba(255,255,255,.25),0 8px 28px rgba(124,156,255,.55)!important}
+.brand h1{background:linear-gradient(90deg,var(--ink),#7C5CFF 60%,#35B8E0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+header.top{backdrop-filter:blur(22px) saturate(1.6)!important;-webkit-backdrop-filter:blur(22px) saturate(1.6)!important;border-bottom:1px solid rgba(124,156,255,.25)!important}
+nav.tabs{border:1px solid rgba(124,156,255,.3)!important;backdrop-filter:blur(22px) saturate(1.6)!important;-webkit-backdrop-filter:blur(22px) saturate(1.6)!important;box-shadow:0 12px 40px rgba(40,60,160,.22)!important}
+nav.tabs button{transition:transform .2s,background .25s,color .25s,box-shadow .25s}
+nav.tabs button[aria-current="true"]{background:linear-gradient(135deg,#4B6BD6,#7C5CFF 60%,#35B8E0)!important;color:#fff!important;box-shadow:0 6px 22px rgba(92,108,255,.55)!important}
+@media (max-width:760px){
+  nav.tabs{left:10px!important;right:10px!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;border-radius:26px!important;padding-bottom:8px!important;border-width:1px!important}
+  nav.tabs button[aria-current="true"]{transform:translateY(-3px)}
+}
+.chip{backdrop-filter:blur(8px);font-weight:700;letter-spacing:.01em}
+.chip.ok{box-shadow:0 0 14px rgba(53,224,194,.28)}.chip.bad{box-shadow:0 0 14px rgba(255,90,120,.25)}.chip.warn{box-shadow:0 0 14px rgba(255,190,80,.25)}
+.eyebrow{background:linear-gradient(90deg,#7C5CFF,#35B8E0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:.18em}
+.devrow{transition:background .2s}.devrow.is-blocked{opacity:.78}
+#aiFab{background:linear-gradient(135deg,#4B6BD6,#7C5CFF 60%,#35B8E0)!important;box-shadow:0 10px 34px rgba(92,108,255,.6),0 0 0 6px rgba(124,156,255,.15)!important;animation:fxPulse 3.2s ease-in-out infinite}
+@keyframes fxPulse{50%{box-shadow:0 10px 40px rgba(92,108,255,.75),0 0 0 12px rgba(124,156,255,.06)}}
+.aurora{animation:fxDrift 22s ease-in-out infinite alternate}
+@keyframes fxDrift{to{transform:translate3d(2%,-2%,0) scale(1.06)}}
+@keyframes fxIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.section,.glass.card,.grid>*{animation:fxIn .45s cubic-bezier(.2,.8,.2,1) both}
+input,select,textarea{transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--neon1)!important;box-shadow:0 0 0 4px rgba(124,156,255,.22)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:760px){.glass,.kpi{backdrop-filter:blur(10px)}}
+</style>
 
 <script>if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
 </body></html>
