@@ -1,59 +1,67 @@
 -- =====================================================================
---  Verrou de l'XP : un élève ne peut plus s'attribuer des points à la main.
---  À coller dans Supabase → SQL Editor → New query → Run (sans risque : on peut le relancer).
---  Les professeurs et la prof principale ne sont pas concernés.
+--  Verrou de l'XP : un élève ne peut plus se donner de l'XP à volonté.
+--  À coller dans Supabase → SQL Editor → New query → Run (sans risque, relançable).
+--  Règles pour un élève / un parent (les professeurs ne sont pas limités) :
+--   1. son XP ne peut jamais baisser ;
+--   2. un seul enregistrement ne peut pas ajouter plus de 'xp_max_per_write' XP ;
+--   3. il ne peut pas gagner plus de 'xp_max_per_day' XP par jour ;
+--   4. son XP au classement (board) ne peut pas dépasser son vrai XP.
+--  Tout excès est simplement ramené à la limite (l'application ne plante pas).
 -- =====================================================================
-create table if not exists public.xp_guard (
+
+insert into public.app_config(key, value) values
+  ('xp_max_per_write', '600'),
+  ('xp_max_per_day',   '4000')
+on conflict (key) do nothing;
+
+create table if not exists public.xp_daily (
   uid    uuid not null,
   day    date not null default current_date,
   gained int  not null default 0,
   primary key (uid, day)
 );
-alter table public.xp_guard enable row level security;   -- aucune règle : seules les fonctions du serveur y touchent
+alter table public.xp_daily enable row level security;
 
-create or replace function public.guard_xp() returns trigger
+create or replace function public.guard_student_xp() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare
-  oxp numeric := 0; nxp numeric := 0; osp numeric := 0; nsp numeric := 0;
-  d numeric; g int; sxp numeric;
-  max_per_write constant int := 500;    -- plus gros gain plausible en une seule action
-  max_per_day   constant int := 2500;   -- plafond d'XP par élève et par jour
+  me text := auth.uid()::text;
+  old_xp numeric := 0; new_xp numeric := 0; real_xp numeric := 0;
+  gain numeric; allowed numeric; used int;
+  per_write int := coalesce((select value::int from app_config where key = 'xp_max_per_write'), 600);
+  per_day   int := coalesce((select value::int from app_config where key = 'xp_max_per_day'), 4000);
 begin
-  if auth.uid() is null or public.my_level() >= 3 then return new; end if;   -- serveur ou professeur : libre
+  if me is null or public.my_level() >= 3 then return new; end if;   -- professeurs et serveur : libres
 
-  if new.col = 'students' and new.id = auth.uid()::text then
-    if tg_op = 'INSERT' then
-      new.data := (new.data - 'spent') || jsonb_build_object('xp', 0);
-      return new;
+  if new.path = 'students/' || me then
+    new_xp := coalesce((new.data->>'xp')::numeric, 0);
+    if tg_op = 'UPDATE' then old_xp := coalesce((old.data->>'xp')::numeric, 0); end if;
+    if new_xp < old_xp then new_xp := old_xp; end if;                 -- l'XP ne baisse pas
+    gain := new_xp - old_xp;
+    if gain > 0 then
+      allowed := least(gain, per_write);
+      select coalesce(gained, 0) into used from xp_daily where uid = auth.uid() and day = current_date;
+      used := coalesce(used, 0);
+      allowed := greatest(0, least(allowed, per_day - used));
+      insert into xp_daily(uid, day, gained) values (auth.uid(), current_date, allowed)
+        on conflict (uid, day) do update set gained = xp_daily.gained + allowed;
+      new_xp := old_xp + allowed;
     end if;
-    oxp := coalesce((old.data->>'xp')::numeric, 0);
-    osp := coalesce((old.data->>'spent')::numeric, 0);
-    nxp := coalesce((new.data->>'xp')::numeric, oxp);
-    nsp := coalesce((new.data->>'spent')::numeric, osp);
-    d := nxp - oxp;
-    if d < 0 then nxp := oxp; d := 0; end if;                 -- l'XP ne peut pas baisser
-    if nsp < osp then nsp := osp; end if;                       -- les dépenses ne peuvent pas être annulées
-    if nsp > nxp then raise exception 'xp: dépense supérieure aux points' using errcode = '23514'; end if;
-    if d > 0 then
-      if d > max_per_write then raise exception 'xp: gain trop élevé' using errcode = '23514'; end if;
-      insert into xp_guard(uid, day, gained) values (auth.uid(), current_date, d::int)
-        on conflict (uid, day) do update set gained = xp_guard.gained + d::int
-        returning gained into g;
-      if g > max_per_day then raise exception 'xp: plafond du jour atteint' using errcode = '23514'; end if;
+    if new.data ? 'xp' or tg_op = 'INSERT' then
+      new.data := jsonb_set(new.data, '{xp}', to_jsonb(new_xp::bigint));
     end if;
-    new.data := new.data || jsonb_build_object('xp', nxp, 'spent', nsp);
-    return new;
-  end if;
 
-  if new.col = 'board' and new.id = auth.uid()::text then       -- classement : jamais plus que la fiche (marge de 500)
-    select coalesce((data->>'xp')::numeric, 0) into sxp from docs where path = 'students/' || auth.uid()::text;
-    if coalesce((new.data->>'xp')::numeric, 0) > coalesce(sxp, 0) + max_per_write then
-      new.data := new.data || jsonb_build_object('xp', coalesce(sxp, 0));
+  elsif new.path = 'board/' || me then                                 -- classement
+    select coalesce((data->>'xp')::numeric, 0) into real_xp from docs where path = 'students/' || me;
+    real_xp := coalesce(real_xp, 0);
+    if coalesce((new.data->>'xp')::numeric, 0) > real_xp then
+      new.data := jsonb_set(new.data, '{xp}', to_jsonb(real_xp::bigint));
     end if;
   end if;
   return new;
 end $$;
 
-drop trigger if exists docs_guard on public.docs;
-create trigger docs_guard before insert or update on public.docs
-  for each row execute function public.guard_xp();
+-- nom en « zz_ » : s'exécute après docs_fill
+drop trigger if exists zz_docs_xp_guard on public.docs;
+create trigger zz_docs_xp_guard before insert or update on public.docs
+  for each row execute function public.guard_student_xp();
