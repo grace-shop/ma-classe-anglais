@@ -182,7 +182,7 @@
   const meta = () => (session && session.user && session.user.user_metadata) || {};
   const userApi = {
     id: async () => session.user.id,
-    me: async () => ({ id: session.user.id, name: meta().full_name || meta().name || (session.user.email || "").split("@")[0] || "Utilisateur", avatarUrl: meta().avatar_url || meta().picture || "", email: session.user.email || "" }),
+    me: async () => ({ id: session.user.id, name: meta().full_name || meta().name || (session.user.email || "").split("@")[0] || "Utilisateur", avatarUrl: meta().avatar_url || meta().picture || "", email: window.__isTelEmail(session.user.email) ? window.__telOf(session.user.email) : (session.user.email || "") }),
     isOwner: async () => member.level === "owner",
     canEdit: async () => member.level === "admin" || member.level === "owner",
     can: async (n) => (n === "data.write" ? true : null),
@@ -238,6 +238,13 @@
       if (error) throw error;
       CHATURL[path] = { url: data.signedUrl, until: Date.now() + 5 * 3600e3 }; return data.signedUrl;
     },
+  };
+  window.__resetPwd = async (uid) => {
+    const { data: { session: s } } = await sb.auth.getSession();
+    const res = await fetch(CFG.supabaseUrl.replace(/\/$/, "") + "/functions/v1/ai", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (s ? s.access_token : ""), apikey: CFG.supabaseAnonKey }, body: JSON.stringify({ action: "reset_password", uid }) });
+    const out = await res.json().catch(() => ({}));
+    if (!res.ok || !out.password) throw new Error((out.error && out.error.message) || (res.status === 404 ? "Mets d'abord à jour la fonction « ai » dans Supabase (nouveau code sur GitHub)." : "Réinitialisation impossible pour le moment."));
+    return out.password;
   };
   window.__grade = async (body) => {
     const { data, error } = await sb.functions.invoke("grade", { body });
@@ -352,7 +359,12 @@
   let deferredPrompt = null;
   addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; if (window.__appDownload) { window.__appDownload.canInstall = true; try { window.render && window.render(); } catch (err) {} } });
   window.__pwaInstall = async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); try { await deferredPrompt.userChoice; } catch (e) {} deferredPrompt = null; if (window.__appDownload) window.__appDownload.canInstall = false; };
-  window.__appLogout = async () => { try { await sb.auth.signOut(); } catch (e) {} location.reload(); };
+  window.__appLogout = async () => {
+    try { await Promise.race([sb.auth.signOut({ scope: "local" }), new Promise((r) => setTimeout(r, 2500))]); } catch (e) {}
+    try { for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (/^sb-.+-auth-token/.test(k)) localStorage.removeItem(k); } } catch (e) {}
+    session = null; mode = "in"; note = null;
+    location.replace(location.pathname + "#connexion"); setTimeout(() => location.reload(), 50);
+  };
 
   /* ---------------- écran de connexion ---------------- */
   const CSS = `#authGate{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:16px;overflow:auto;background:radial-gradient(120% 80% at 50% -10%,#1A2150 0%,#0E1120 45%,#090B16 100%);color:#F1F3FB;font-family:Manrope,"Segoe UI",system-ui,sans-serif}
@@ -381,10 +393,20 @@
 @media (prefers-reduced-motion:reduce){#authGate .dlc::after{animation:none}}
 #authGate .warn{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,rgba(255,196,87,.14),rgba(255,120,90,.10));border:1px solid rgba(255,196,87,.45);color:#FFE4B0;font-size:.88rem;line-height:1.45}
 #authGate .warn b{color:#FFD27A}#authGate .warn svg{color:#FFC457;margin-top:1px}
+#authGate .idsw{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:12px;background:#151A30;border:1px solid #2A3050}#authGate .idsw button{border:0;background:none;color:#AEB6D8;font-weight:700;cursor:pointer;padding:8px 6px;font-size:.86rem;border-radius:9px}#authGate .idsw button[aria-pressed=true]{background:#2A3260;color:#fff}
 #authGate .pw{position:relative;display:block}#authGate .pw input{padding-right:52px}
 #authGate .pw .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;padding:0;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#AFC0FF;cursor:pointer}
 #authGate .pw .eye.on{color:#fff;background:#2A3260}#authGate button:disabled{opacity:.5}`;
   let gate = null, mode = "in", note = null;
+  /* connexion par e-mail OU par numéro de téléphone (le numéro devient un identifiant interne, sans SMS) */
+  const TEL_DOMAIN = "tel.english-classes.app";
+  let idMode = "email"; try { idMode = localStorage.getItem("mca_idmode") === "tel" ? "tel" : "email"; } catch (e) {}
+  const telDigits = (v) => { let d = String(v || "").replace(/[^0-9]/g, ""); if (d.startsWith("00")) d = d.slice(2); if (d.length === 8) d = "228" + d; return d; };
+  const telOk = (d) => /^[0-9]{10,15}$/.test(d);
+  const telEmail = (v) => telDigits(v) + "@" + TEL_DOMAIN;
+  window.__isTelEmail = (e) => String(e || "").toLowerCase().endsWith("@" + TEL_DOMAIN);
+  window.__telOf = (e) => { const d = String(e || "").split("@")[0]; return d.startsWith("228") && d.length === 11 ? "+228 " + d.slice(3).replace(/(\d\d)(?=\d)/g, "$1 ") : "+" + d; };
+  const loginId = () => { const raw = ((document.getElementById("agE") || {}).value || "").trim(); if (idMode !== "tel") return { email: raw }; const d = telDigits(raw); return telOk(d) ? { email: telEmail(raw) } : { err: "Numéro invalide : écris ton numéro de téléphone, par exemple 90 12 34 56." }; };
   const G = `<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2c-2 1.5-4.5 2.4-7.2 2.4-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
   function drawGate() {
     if (!gate) { const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st); gate = document.createElement("div"); gate.id = "authGate"; document.body.appendChild(gate); }
@@ -396,7 +418,8 @@
     ${CFG.googleEnabled === false ? "" : `<button class="g" data-x="google">${G}Continuer avec Google</button><div class="or">ou avec ton e-mail</div>`}
     <div class="tabs"><button data-x="in" aria-pressed="${mode === "in"}">Se connecter</button><button data-x="up" aria-pressed="${mode === "up"}">Créer un compte</button></div>
     <form data-f="${mode}">${mode === "up" ? `<label>Prénom et nom<input id="agN" required maxlength="60" autocomplete="name" placeholder="Ex. Ama Kossi"></label>` : ""}
-    <label>E-mail<input id="agE" type="email" required autocomplete="email" placeholder="ton.email@gmail.com"></label>
+    <div class="idsw" role="group" aria-label="Se connecter avec"><button type="button" data-x="idEmail" aria-pressed="${idMode !== "tel"}">E-mail</button><button type="button" data-x="idTel" aria-pressed="${idMode === "tel"}">Téléphone</button></div>
+    ${idMode === "tel" ? `<label>Numéro de téléphone<input id="agE" type="tel" inputmode="tel" required autocomplete="tel" placeholder="90 12 34 56" maxlength="20"></label>` : `<label>E-mail<input id="agE" type="email" required autocomplete="email" placeholder="ton.email@gmail.com"></label>`}
     <label>Mot de passe<span class="pw"><input id="agP" type="password" required minlength="6" autocomplete="${mode === "up" ? "new-password" : "current-password"}" placeholder="6 caractères minimum"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
     <div class="warn" role="note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/></svg><div>${mode === "up" ? `<b>Important : n'oublie jamais ton mot de passe.</b> Choisis-en un dont tu te souviendras et note-le dans un endroit sûr. Ne le donne à personne, même pas à un camarade : c'est une règle de sécurité. Il protège tes notes, tes messages et ta progression.` : `<b>Ton mot de passe est secret.</b> Ne l'oublie en aucun cas et ne le donne jamais à personne, même pas à un camarade ou à quelqu'un qui dit venir de l'école. C'est une règle de sécurité.`}</div></div>
     <button class="p" type="submit">${mode === "up" ? "Créer mon compte" : "Se connecter"}</button></form>
@@ -406,12 +429,13 @@
   function showGate() { drawGate(); }
   function hideGate() { if (gate) { gate.remove(); gate = null; } const sp = document.getElementById("splash"); if (sp) sp.style.display = ""; }
   const say = (t, ok) => { note = { t, ok }; drawGate(); };
-  const frErr = (m) => /Invalid login/i.test(m) ? "E-mail ou mot de passe incorrect." : /already registered|already exists/i.test(m) ? "Un compte existe déjà avec cet e-mail : connecte-toi." : /Email not confirmed/i.test(m) ? "Confirme d'abord ton e-mail grâce au lien reçu." : /Password should/i.test(m) ? "Le mot de passe doit contenir au moins 6 caractères." : /rate limit/i.test(m) ? "Trop d'essais. Attends quelques minutes." : m;
+  const frErr = (m) => /Invalid login/i.test(m) ? "E-mail ou mot de passe incorrect." : /already registered|already exists/i.test(m) ? (idMode === "tel" ? "Un compte existe déjà avec ce numéro : connecte-toi." : "Un compte existe déjà avec cet e-mail : connecte-toi.") : /Email not confirmed/i.test(m) ? "Confirme d'abord ton e-mail grâce au lien reçu." : /Password should/i.test(m) ? "Le mot de passe doit contenir au moins 6 caractères." : /rate limit/i.test(m) ? "Trop d'essais. Attends quelques minutes." : m;
   document.addEventListener("click", async (e) => {
     const b = e.target.closest && e.target.closest("#authGate [data-x]"); if (!b) return; e.preventDefault();
     const x = b.dataset.x;
     if (x === "eye") { const inp = b.parentNode.querySelector("input"); const show = inp.type === "password"; inp.type = show ? "text" : "password"; b.classList.toggle("on", show); b.setAttribute("aria-label", show ? "Masquer le mot de passe" : "Afficher le mot de passe"); inp.focus(); return; }
     if (x === "in" || x === "up") { mode = x; note = null; drawGate(); return; }
+    if (x === "idEmail" || x === "idTel") { idMode = x === "idTel" ? "tel" : "email"; try { localStorage.setItem("mca_idmode", idMode); } catch (e) {} note = null; drawGate(); const f = document.getElementById("agE"); if (f) f.focus(); return; }
     if (x === "google") {
       const native = isNative(), redirectTo = native ? CFG.nativeRedirect : location.origin + location.pathname;
       const { data, error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo, skipBrowserRedirect: native } });
@@ -420,6 +444,7 @@
       return;
     }
     if (x === "forgot") {
+      if (idMode === "tel") return say("Avec un numéro de téléphone, demande à ta professeure de réinitialiser ton mot de passe : elle le fait depuis ta fiche, dans son espace.");
       const email = (document.getElementById("agE") || {}).value || "";
       if (!email) return say("Écris d'abord ton e-mail, puis touche « Mot de passe oublié ».");
       const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: isNative() ? CFG.nativeRedirect : location.origin + location.pathname });
@@ -431,10 +456,12 @@
     const v = (id) => ((document.getElementById(id) || {}).value || "").trim();
     const btn = f.querySelector("button"); if (btn) btn.disabled = true;
     try {
-      if (f.dataset.f === "in") { const { error } = await sb.auth.signInWithPassword({ email: v("agE"), password: v("agP") }); if (error) say(frErr(error.message)); }
+      const id = f.dataset.f === "newpass" ? {} : loginId();
+      if (id.err) { say(id.err); return; }
+      if (f.dataset.f === "in") { const { error } = await sb.auth.signInWithPassword({ email: id.email, password: v("agP") }); if (error) say(idMode === "tel" && /Invalid login/i.test(error.message) ? "Numéro ou mot de passe incorrect." : frErr(error.message)); }
       else if (f.dataset.f === "up") {
-        const { data, error } = await sb.auth.signUp({ email: v("agE"), password: v("agP"), options: { data: { full_name: v("agN") }, emailRedirectTo: isNative() ? CFG.nativeRedirect : location.origin + location.pathname } });
-        if (error) say(frErr(error.message)); else if (!data.session) { mode = "in"; say("Compte créé ! Ouvre l'e-mail de confirmation, puis connecte-toi.", true); }
+        const { data, error } = await sb.auth.signUp({ email: id.email, password: v("agP"), options: { data: { full_name: v("agN"), ...(idMode === "tel" ? { phone: "+" + telDigits(v("agE")) } : {}) }, emailRedirectTo: isNative() ? CFG.nativeRedirect : location.origin + location.pathname } });
+        if (error) say(frErr(error.message)); else if (!data.session) { mode = "in"; say(idMode === "tel" ? "Compte créé ! Connecte-toi maintenant avec ton numéro et ton mot de passe." : "Compte créé ! Ouvre l'e-mail de confirmation, puis connecte-toi.", true); }
       } else if (f.dataset.f === "newpass") { const { error } = await sb.auth.updateUser({ password: v("agP") }); if (error) say(frErr(error.message)); else { mode = "in"; note = null; hideGate(); location.reload(); } }
     } finally { if (btn) btn.disabled = false; }
   }, true);

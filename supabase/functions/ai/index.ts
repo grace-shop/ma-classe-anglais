@@ -38,8 +38,6 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return fail("invalid_request", "POST uniquement", 405);
 
-  const key = Deno.env.get("GEMINI_API_KEY");
-  if (!key) return fail("sampling_disabled", "La clé GEMINI_API_KEY n'est pas configurée sur le serveur.", 500);
 
   // 1. Qui demande ?
   const jwt = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
@@ -47,9 +45,27 @@ Deno.serve(async (req) => {
   const { data: auth, error: authErr } = await admin.auth.getUser(jwt);
   if (authErr || !auth?.user) return fail("session_expired", "Reconnecte-toi pour utiliser Nova.", 401);
 
-  let body: { input?: string | Turn[]; json?: boolean; modelTier?: string; images?: { mime: string; data: string }[] };
+  let body: { input?: string | Turn[]; json?: boolean; modelTier?: string; images?: { mime: string; data: string }[]; action?: string; uid?: string };
   try { body = await req.json(); } catch { return fail("invalid_request", "Requête illisible."); }
   if (JSON.stringify(body).length > 6_000_000) return fail("prompt_too_large", "Demande trop longue.", 413);
+
+  // Professeure : réinitialiser le mot de passe d'un élève (comptes créés avec un numéro de téléphone)
+  if (body.action === "reset_password") {
+    const { data: me } = await admin.from("members").select("level").eq("uid", auth.user.id).maybeSingle();
+    if (!me || !["admin", "owner"].includes(me.level)) return fail("invalid_request", "Réservé aux professeurs.", 403);
+    const target = String(body.uid || "");
+    if (!/^[0-9a-f-]{36}$/i.test(target) || target === auth.user.id) return fail("invalid_request", "Compte invalide.");
+    const { data: tm } = await admin.from("members").select("level").eq("uid", target).maybeSingle();
+    if (tm && ["admin", "owner"].includes(tm.level) && me.level !== "owner") return fail("invalid_request", "Seule la professeure principale peut faire cela pour un professeur.", 403);
+    const abc = "abcdefghjkmnpqrstuvwxyz23456789"; const r = new Uint32Array(8); crypto.getRandomValues(r);
+    const temp = Array.from(r, (x) => abc[x % abc.length]).join("");
+    const { error } = await admin.auth.admin.updateUserById(target, { password: temp });
+    if (error) return fail("upstream_error", "Réinitialisation impossible : " + error.message, 500);
+    return json({ password: temp });
+  }
+
+  const key = Deno.env.get("GEMINI_API_KEY");
+  if (!key) return fail("sampling_disabled", "La clé GEMINI_API_KEY n'est pas configurée sur le serveur.", 500);
 
   // 2. Limite quotidienne par personne (réglable dans la table app_config)
   const { data: count, error: limErr } = await admin.rpc("ai_take", { p_uid: auth.user.id });

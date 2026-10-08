@@ -492,6 +492,16 @@ function wdTest(){const pend=wdPending();if(!pend.length)return;const all=(wdOf(
 const v4BackLogin=()=>window.__appLogout?`<div class="section v4back" style="max-width:640px;margin:0 auto 12px"><button class="back" data-v4="toLogin">${ic("left")}Retour à la connexion</button></div>`:"";
 for(const n of["joinView","waitingView","blockedView","refusedView","closedView","pendingTeacherView","noAccessView"]){const f=window[n];if(typeof f!=="function")continue;
   window[n]=function(){return v4BackLogin()+f.apply(this,arguments)}}
+
+/* =====================================================================
+   11. Professeure : réinitialiser le mot de passe d'un élève (utile pour les
+       comptes créés avec un numéro de téléphone, sans e-mail)
+   ===================================================================== */
+{const _sd=studentDetail;studentDetail=function(){const h=_sd();const s=S.students.find(x=>x.id===S.view?.id);if(!s||!window.__resetPwd||!(S.isOwner||S.isStaff))return h;
+  const R=V4.pwd&&V4.pwd.id===s.id?V4.pwd:null;
+  return h+`<div class="section"><div class="glass card" style="gap:10px"><div class="row"><span class="ic t-gold">${ic("lock")}</span><div><h3 style="margin:0">Mot de passe oublié ?</h3><p class="sub small" style="margin:0">Crée un mot de passe provisoire pour ${esc(String(s.name||"").split(" ")[0])}, à lui donner en main propre. Il pourra ensuite se connecter avec.</p></div></div>
+  ${R&&R.pw?`<div class="note"><b>Nouveau mot de passe : <span class="mono" style="font-size:1.2rem;letter-spacing:1px">${esc(R.pw)}</span></b><br><span class="small">Donne-le uniquement à l'élève. L'ancien mot de passe ne marche plus.</span></div>`:R&&R.err?`<div class="note small">${esc(R.err)}</div>`:""}
+  <div class="row">${R&&R.ask?`<button class="btn danger sm" data-v4="pwdGo" data-id="${s.id}" ${R.busy?"disabled":""}>${R.busy?"Patiente…":"Oui, réinitialiser"}</button><button class="btn ghost sm" data-v4="pwdCancel">Annuler</button>`:`<button class="btn ghost sm" data-v4="pwdAsk" data-id="${s.id}">${ic("refresh")}Réinitialiser le mot de passe</button>`}</div></div></div>`}}
 /* =====================================================================
    9. Événements
    ===================================================================== */
@@ -519,6 +529,8 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"aipGen":aipGen();return;case"aipPub":aipPublish(el.dataset.id,document.getElementById("aipAud_"+el.dataset.id)?.value);return;
   case"aipDrop":{const s=(V4.aipics?.sets||[]).find(x=>x.id===el.dataset.id);if(s){s.done=true;write(()=>S.db.doc("aipics/"+S.uid).set(V4.aipics));render();aipAuto()}return}
   case"wdTest":wdTest();return;
+  case"pwdAsk":V4.pwd={id:el.dataset.id,ask:true};render();return;case"pwdCancel":V4.pwd=null;render();return;
+  case"pwdGo":{const id=el.dataset.id;V4.pwd={id,ask:true,busy:true};render();window.__resetPwd(id).then(pw=>{V4.pwd={id,pw}}).catch(e=>{V4.pwd={id,err:e.message}}).finally(render);return}
   case"toLogin":{el.disabled=true;Promise.resolve(window.__appLogout&&window.__appLogout()).catch(()=>location.reload());return}
   }},true);
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);
