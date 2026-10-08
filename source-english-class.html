@@ -3131,6 +3131,14 @@ function wdTest(){const pend=wdPending();if(!pend.length)return;const all=(wdOf(
 {const _lv=learnView;learnView=function(){return wdHTML(false)+_lv()}}
 {const _hm=homeView;homeView=function(){const h=_hm(),w=wdHTML(true);if(!w)return h;const i=h.indexOf('<div class="section"',10);return i>0?h.slice(0,i)+w+h.slice(i):h+w}}
 
+
+/* =====================================================================
+   10. Pages d'accueil après connexion (inscription, attente, accès suspendu…) :
+       bouton « Retour à la connexion » pour changer de compte
+   ===================================================================== */
+const v4BackLogin=()=>window.__appLogout?`<div class="section v4back" style="max-width:640px;margin:0 auto 12px"><button class="back" data-v4="toLogin">${ic("left")}Retour à la connexion</button></div>`:"";
+for(const n of["joinView","waitingView","blockedView","refusedView","closedView","pendingTeacherView","noAccessView"]){const f=window[n];if(typeof f!=="function")continue;
+  window[n]=function(){return v4BackLogin()+f.apply(this,arguments)}}
 /* =====================================================================
    9. Événements
    ===================================================================== */
@@ -3158,6 +3166,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"aipGen":aipGen();return;case"aipPub":aipPublish(el.dataset.id,document.getElementById("aipAud_"+el.dataset.id)?.value);return;
   case"aipDrop":{const s=(V4.aipics?.sets||[]).find(x=>x.id===el.dataset.id);if(s){s.done=true;write(()=>S.db.doc("aipics/"+S.uid).set(V4.aipics));render();aipAuto()}return}
   case"wdTest":wdTest();return;
+  case"toLogin":{el.disabled=true;Promise.resolve(window.__appLogout&&window.__appLogout()).catch(()=>location.reload());return}
   }},true);
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches("[data-v4][tabindex]")){e.preventDefault();e.target.click()}});
