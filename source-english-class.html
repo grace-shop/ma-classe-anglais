@@ -3243,6 +3243,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"photoRmFor":write(()=>S.db.doc("students/"+el.dataset.id).update({photo:""})).then(()=>{try{S.db.doc("board/"+el.dataset.id).update({photo:""}).catch(()=>{})}catch(e){}toast("Photo retirée","trash")});return;
   case"staffOpen":staffOpen(el.dataset.id);return;
   case"staffBack":SC.unsub?.();SC.unsub=null;SC.with=null;S.view=null;S.tab="msgs";S.msgsTab="staff";S.animate=true;render();return;
+  case"iosGuide":window.__iosGuide&&window.__iosGuide();return;
   case"toLogin":{el.disabled=true;Promise.resolve(window.__appLogout&&window.__appLogout()).catch(()=>location.reload());return}
   }},true);
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);

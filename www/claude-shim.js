@@ -399,7 +399,30 @@
       }
     },
   };
-  if (!isNative() && CFG.apkUrl) window.__appDownload = { apk: CFG.apkUrl, canInstall: false };
+  const IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const STANDALONE = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  window.__isIOS = IOS; window.__standaloneApp = STANDALONE;
+  if (!isNative() && !STANDALONE && CFG.apkUrl) window.__appDownload = { apk: CFG.apkUrl, canInstall: false, ios: IOS };
+  /* guide d'installation sur iPhone / iPad (Safari → Partager → Sur l'écran d'accueil) */
+  window.__iosGuide = () => {
+    if (document.getElementById("iosGuide")) return;
+    const share = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4FA3FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-5px"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1"/></svg>';
+    const plus = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-5px"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
+    const notSafari = /CriOS|FxiOS|EdgiOS|OPiOS|GSA\/|FBAN|FBAV|Instagram|WhatsApp/i.test(navigator.userAgent);
+    const d = document.createElement("div"); d.id = "iosGuide";
+    d.style.cssText = "position:fixed;inset:0;z-index:9500;background:rgba(5,7,20,.72);display:flex;align-items:flex-end;justify-content:center;padding:12px;font-family:Manrope,system-ui,sans-serif";
+    d.innerHTML = `<div style="width:min(440px,100%);background:#141831;color:#F1F3FB;border:1px solid #2E3560;border-radius:24px;padding:22px 20px calc(20px + env(safe-area-inset-bottom));box-shadow:0 30px 80px rgba(0,0,0,.6);display:grid;gap:14px">
+      <div style="display:flex;gap:12px;align-items:center"><img src="icons/apple-touch-icon.png" alt="" style="width:52px;height:52px;border-radius:13px"><div><b style="font-size:1.1rem">Installer English Classes sur iPhone</b><div style="color:#AEB6D8;font-size:.85rem">Gratuit · 30 secondes · icône sur l'écran d'accueil</div></div></div>
+      ${notSafari ? `<div style="background:#3E2E12;color:#FFD27A;border-radius:12px;padding:10px 12px;font-size:.88rem">Ouvre d'abord ce site dans <b>Safari</b> (copie l'adresse et colle-la dans Safari), puis suis les étapes.</div>` : ""}
+      <ol style="margin:0;padding-left:22px;display:grid;gap:10px;line-height:1.45">
+        <li>Touche le bouton <b>Partager</b> ${share} en bas de l'écran (en haut sur iPad).</li>
+        <li>Fais défiler et choisis <b>« Sur l'écran d'accueil »</b> ${plus}.</li>
+        <li>Touche <b>« Ajouter »</b> en haut à droite.</li>
+        <li>Ouvre <b>English Classes</b> depuis ton écran d'accueil : elle s'ouvre en plein écran, comme une vraie application.</li></ol>
+      <button id="iosGuideOk" style="font:inherit;font-weight:800;border:0;border-radius:14px;padding:13px;background:linear-gradient(135deg,#8EA0FF,#B49BFF 55%,#6FE3F0);color:#06091c;cursor:pointer">J'ai compris</button></div>`;
+    d.addEventListener("click", (e) => { if (e.target === d || e.target.id === "iosGuideOk") d.remove(); });
+    document.body.appendChild(d);
+  };
   let deferredPrompt = null;
   addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; if (window.__appDownload) { window.__appDownload.canInstall = true; try { window.render && window.render(); } catch (err) {} } });
   window.__pwaInstall = async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); try { await deferredPrompt.userChoice; } catch (e) {} deferredPrompt = null; if (window.__appDownload) window.__appDownload.canInstall = false; };
@@ -468,7 +491,8 @@
     <div class="warn" role="note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/></svg><div>${mode === "up" ? `<b>Important : n'oublie jamais ton mot de passe.</b> Choisis-en un dont tu te souviendras et note-le dans un endroit sûr. Ne le donne à personne, même pas à un camarade : c'est une règle de sécurité. Il protège tes notes, tes messages et ta progression.` : `<b>Ton mot de passe est secret.</b> Ne l'oublie en aucun cas et ne le donne jamais à personne, même pas à un camarade ou à quelqu'un qui dit venir de l'école. C'est une règle de sécurité.`}</div></div>
     <button class="p" type="submit">${mode === "up" ? "Créer mon compte" : "Se connecter"}</button></form>
     ${mode === "in" ? `<button class="l" data-x="forgot">Mot de passe oublié ?</button>` : ""}`}
-    ${!isNative() && CFG.apkUrl ? `<a class="dlc" href="${esc(CFG.apkUrl)}" rel="noopener"><img src="icons/icon-192.png" alt=""><span><b>Application Android</b><small>Gratuite · plein écran · marche même hors ligne</small></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Télécharger</span></a>` : ""}</div>`;
+    ${!isNative() && !window.__standaloneApp && window.__isIOS ? `<a class="dlc" href="#" data-x="ios"><img src="icons/icon-192.png" alt=""><span><b>Application iPhone</b><small>Gratuite · s'installe depuis Safari en 30 secondes</small></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1"/></svg>Installer</span></a>` : ""}
+    ${!isNative() && !window.__standaloneApp && !window.__isIOS && CFG.apkUrl ? `<a class="dlc" href="${esc(CFG.apkUrl)}" rel="noopener"><img src="icons/icon-192.png" alt=""><span><b>Application Android</b><small>Gratuite · plein écran · marche même hors ligne</small></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Télécharger</span></a>` : ""}</div>`;
   }
   function showGate() { drawGate(); }
   function hideGate() { if (gate) { gate.remove(); gate = null; } const sp = document.getElementById("splash"); if (sp) sp.style.display = ""; }
@@ -479,6 +503,7 @@
     const x = b.dataset.x;
     if (x === "eye") { const inp = b.parentNode.querySelector("input"); const show = inp.type === "password"; inp.type = show ? "text" : "password"; b.classList.toggle("on", show); b.setAttribute("aria-label", show ? "Masquer le mot de passe" : "Afficher le mot de passe"); inp.focus(); return; }
     if (x === "in" || x === "up") { mode = x; note = null; drawGate(); return; }
+    if (x === "ios") { window.__iosGuide(); return; }
     if (x === "idEmail" || x === "idTel") { idMode = x === "idTel" ? "tel" : "email"; try { localStorage.setItem("mca_idmode", idMode); } catch (e) {} note = null; drawGate(); const f = document.getElementById("agE"); if (f) f.focus(); return; }
     if (x === "google") {
       const native = isNative(), redirectTo = native ? CFG.nativeRedirect : location.origin + location.pathname;
