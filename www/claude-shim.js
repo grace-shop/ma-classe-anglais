@@ -148,18 +148,39 @@
     const { error } = await sb.from("docs").upsert({ path, data: clean }, { onConflict: "path" });
     if (error) { const m = mapErr(error); if (isNet(m)) return queueWrite("s", path, clean); throw m; }
   }
-  function listen(filter, refresh, onError) {
-    let stopped = false, timer = null, poll = null;
+  function listen(filter, refresh, onError, live) {
+    let stopped = false, timer = null, poll = null, pending = [];
     const run = () => { if (!stopped) refresh().catch((e) => onError && onError(e)); };
     if (filter.path) { if (!runners.has(filter.path)) runners.set(filter.path, new Set()); runners.get(filter.path).add(run); }
     run();
+    // Grandes classes : pour une collection simple, on applique seulement le document qui a changé
+    // (au lieu de tout retélécharger à chaque mouvement d'un élève), regroupé toutes les 0,4 s.
+    const flush = () => { const ev = pending; pending = []; if (stopped) return; if (!live || ev.some((p) => !p || !live.apply(p))) run(); else live.emit(); };
     const ch = sb.channel("l-" + rid(10)).on("postgres_changes",
       { event: "*", schema: "public", table: "docs", filter: filter.path ? `path=eq.${filter.path}` : `col=eq.${filter.col}` },
-      () => { clearTimeout(timer); timer = setTimeout(run, 150); })
+      (payload) => { pending.push(payload); clearTimeout(timer); timer = setTimeout(flush, live ? 400 : 150); })
       .subscribe((st) => { if ((st === "CHANNEL_ERROR" || st === "TIMED_OUT") && !poll) poll = setInterval(run, 20000); });
     const wake = () => { if (!document.hidden) run(); };
     document.addEventListener("visibilitychange", wake); addEventListener("online", run);
     return () => { stopped = true; if (filter.path && runners.get(filter.path)) runners.get(filter.path).delete(run); clearInterval(poll); clearTimeout(timer); document.removeEventListener("visibilitychange", wake); removeEventListener("online", run); sb.removeChannel(ch); };
+  }
+  // liste vivante pour une collection sans filtre ni limite
+  function liveList(col, next) {
+    let rows = null;
+    return {
+      set: (r) => { rows = r.slice(); next(snapOf(rows)); },
+      apply: (p) => {
+        if (!rows) return false;
+        const t = p.eventType, n = p.new || {}, o = p.old || {};
+        if (t === "DELETE") { const path = o.path; if (!path) return false; rows = rows.filter((r) => r.path !== path); return true; }
+        if (!n.path || n.data === undefined || n.col !== col) return false;          // contenu incomplet : on relit tout
+        const row = { path: n.path, id: n.id || n.path.split("/").pop(), data: n.data };
+        const i = rows.findIndex((r) => r.path === row.path);
+        if (i >= 0) rows[i] = row; else { rows.push(row); rows.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0)); }
+        return true;
+      },
+      emit: () => { if (rows) { idb.set("r:" + uidKey() + ":" + col + "|{}", rows); next(snapOf(rows.slice())); } },
+    };
   }
   function query(col, o = {}) {
     return {
@@ -169,7 +190,10 @@
       doc: (id) => docRef(col + "/" + (id || rid())),
       add: async (data) => { const id = rid(); await putDoc(col + "/" + id, data); return docRef(col + "/" + id); },
       get: async () => snapOf(await fetchRows(col, o)),
-      onSnapshot: (next, err) => listen({ col }, () => fetchRows(col, o).then((r) => next(snapOf(r))), err),
+      onSnapshot: (next, err) => {
+        const simple = !o.where && !o.order && !o.limit, L = simple ? liveList(col, next) : null;
+        return listen({ col }, () => fetchRows(col, o).then((r) => (L ? L.set(r) : next(snapOf(r)))), err, L);
+      },
     };
   }
   function docRef(path) {

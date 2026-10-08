@@ -211,20 +211,22 @@ async function v4Play(p,t){const A=V4.audio||(V4.audio=new Audio());if(V4.playin
   catch(e){V4.playing=null;render();toast(navigator.onLine?"Lecture impossible sur cet appareil.":"Ce vocal n'est pas encore enregistré sur l'appareil.","x")}}
 function v4PanelHTML(kind,t){return`<div class="v4panel glass"><div class="v4tabs seg"><button type="button" data-v4="panel" data-k="${kind}" data-t="emo" aria-pressed="${t==="emo"}">Emojis</button><button type="button" data-v4="panel" data-k="${kind}" data-t="stk" aria-pressed="${t==="stk"}">Stickers 3D</button><button type="button" class="iconbtn sm" data-v4="panelClose" aria-label="Fermer">${ic("x")}</button></div>
   ${t==="emo"?`<div class="v4grid emo">${V4EMO.map(x=>`<button type="button" data-v4="emo" data-k="${kind}" data-e="${x}" aria-label="${x}">${E(x)}</button>`).join("")}</div>`:`<div class="v4grid stk">${V4STK.map(c=>`<button type="button" data-v4="stk" data-k="${kind}" data-e="${c}" aria-label="Envoyer ce sticker"><img src="img/${c}.webp" alt="" loading="lazy"></button>`).join("")}</div>`}</div>`}
-function v4Bar(kind,target,ph){const inId=kind==="peer"?"peerInput":"chatInput",files=!!window.__chatFiles,rec=V4.rec&&V4.rec.kind===kind?V4.rec:null,pan=V4.panel&&V4.panel.kind===kind?V4.panel.t:null,busy=V4.sending||(kind==="peer"&&PR.sending);
+const V4IN=k=>({peer:"peerInput",chat:"chatInput",staff:"staffInput"})[k]||"chatInput",V4F=k=>({peer:"peerchat",chat:"chat",staff:"staffchat"})[k]||"chat";
+function v4Bar(kind,target,ph){const inId=V4IN(kind),files=!!window.__chatFiles,rec=V4.rec&&V4.rec.kind===kind?V4.rec:null,pan=V4.panel&&V4.panel.kind===kind?V4.panel.t:null,busy=V4.sending||(kind==="peer"&&PR.sending);
   if(rec)return`<div class="v4rec" role="status"><span class="v4rec-dot" aria-hidden="true"></span><b>Enregistrement <span id="v4recT">${fmtDur(rec.sec)}</span></b><span class="v4wave" aria-hidden="true">${"<i></i>".repeat(18)}</span><button type="button" class="iconbtn" data-v4="recCancel" aria-label="Annuler le vocal" title="Annuler">${ic("trash")}</button><button type="button" class="btn sm" data-v4="recSend" aria-label="Envoyer le vocal">${ic("send")}</button></div>`;
-  return`${pan?v4PanelHTML(kind,pan):""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Envoi en cours…</div>`:""}<form class="chatbar v4bar" data-f="${kind==="peer"?"peerchat":"chat"}" data-s="${esc(target)}">
+  return`${pan?v4PanelHTML(kind,pan):""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Envoi en cours…</div>`:""}<form class="chatbar v4bar" data-f="${V4F(kind)}" data-s="${esc(target)}">
   <button type="button" class="iconbtn${pan?" on":""}" data-v4="panel" data-k="${kind}" data-t="${pan||"emo"}" aria-label="Emojis et stickers" title="Emojis et stickers">${ic("smile")}</button>
   <input id="${inId}" placeholder="${esc(ph||"Écris un message…")}" maxlength="1000" autocomplete="off" aria-label="Message">
   ${files?`<label class="iconbtn" title="Envoyer une photo ou un fichier" aria-label="Envoyer une photo ou un fichier">${ic("clip")}<input type="file" id="v4f_${kind}" hidden accept="image/*,application/pdf,audio/*,.doc,.docx,.ppt,.pptx,.txt"></label>${V4.canRec?`<button type="button" class="iconbtn" data-v4="rec" data-k="${kind}" aria-label="Enregistrer un message vocal" title="Message vocal">${ic("mic")}</button>`:""}`:""}
   <button class="btn" type="submit" aria-label="Envoyer" ${busy?"disabled":""}>${ic("send")}</button></form>`}
 async function v4Deliver(kind,target,text,att){
+  if(kind==="staff")return staffSend(target,text,att);
   if(kind==="peer"){const id=await window.__peer.send(target,text||"",att||null);PR.inbox.unshift({id:id||("tmp"+Date.now()),sender:S.uid,receiver:target,body:text||"",att:att||null,created_at:new Date().toISOString(),read_at:null});render();return}
   const at=Date.now(),from=S.mode==="teacher"?"teacher":"student",pv=(text||attLabel(att)).slice(0,80);
   await write(()=>S.db.collection("students/"+target+"/msgs").add({from,text:text||"",at,...(att?{att}:{})}));
   await write(()=>S.db.doc("students/"+target).update(from==="teacher"?{lastMsgAt:at,lastMsgFrom:"teacher",lastMsgText:pv,teacherReadAt:at}:{lastMsgAt:at,lastMsgFrom:"student",lastMsgText:pv,studentReadAt:at,lastActive:at,activity:"A écrit à la prof"}));
   if(from==="student")presence("Écrit un message")}
-function v4Target(kind){const f=document.querySelector(`form.v4bar[data-f="${kind==="peer"?"peerchat":"chat"}"]`);return f?f.dataset.s:(V4.rec&&V4.rec.target)||(V4.panel&&V4.panel.target)||""}
+function v4Target(kind){const f=document.querySelector(`form.v4bar[data-f="${V4F(kind)}"]`);return f?f.dataset.s:(V4.rec&&V4.rec.target)||(V4.panel&&V4.panel.target)||""}
 async function v4SendFile(kind,target,file,name,k,dur){if(!window.__chatFiles){toast("L'envoi de fichiers n'est pas disponible ici.","x");return}
   if(!navigator.onLine){toast("Pas de réseau : réessaie quand tu es connecté.","x");return}
   if(!target)return;if(file.size>10*1024*1024){toast("Fichier trop lourd (10 Mo maximum).","x");return}
@@ -232,7 +234,7 @@ async function v4SendFile(kind,target,file,name,k,dur){if(!window.__chatFiles){t
   const kk=k||(/^image\//.test(f.type)?"img":"file");V4.sending=true;V4.upl=kind;render();
   try{const up=await window.__chatFiles.upload(f,name||f.name||"fichier");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{})};
     if(kk!=="file")V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f);
-    let text="";if(kk!=="voice"){const inp=document.getElementById(kind==="peer"?"peerInput":"chatInput");text=(inp&&inp.value||"").trim();if(inp){inp.value="";delete S.drafts[inp.id]}}
+    let text="";if(kk!=="voice"){const inp=document.getElementById(V4IN(kind));text=(inp&&inp.value||"").trim();if(inp){inp.value="";delete S.drafts[inp.id]}}
     await v4Deliver(kind,target,text,att)}
   catch(e){toast((e&&e.message)||"Envoi impossible pour le moment.","x")}
   V4.sending=false;V4.upl=null;render()}
@@ -520,6 +522,45 @@ function photoCardHTML(){const m=S.me;if(!m||!window.__avatarUpload)return"";
 {const _sd2=studentDetail;studentDetail=function(){const h=_sd2();const s=S.students.find(x=>x.id===S.view?.id);if(!s||!s.photo)return h;
   return h+`<div class="section"><div class="glass card row between"><div class="row">${avatar(s.id,s.name,56)}<div><h3 style="margin:0">Photo de profil</h3><p class="sub small" style="margin:0">Si la photo n'est pas convenable, tu peux la retirer.</p></div></div><button class="btn ghost sm" data-v4="photoRmFor" data-id="${s.id}">${ic("trash")}Retirer la photo</button></div></div>`}}
 document.addEventListener("change",e=>{const el=e.target;if(el&&el.id==="v4photo"){const f=el.files&&el.files[0];el.value="";if(f)photoSet(f);e.stopPropagation()}},true);
+
+/* =====================================================================
+   13. Messagerie entre professeurs (privée : les élèves n'y ont pas accès)
+   ===================================================================== */
+const SC={un:{},subs:{},meta:{},msgs:[],ready:false,unsub:null,with:null};
+const staffPair=(a,b)=>"chat_"+[a,b].sort().join("_");
+const staffBase=o=>"gradebook/"+staffPair(S.uid,o);       // « gradebook » : lecture et écriture réservées aux professeurs
+const staffOn=()=>S.mode==="teacher"&&(S.isOwner||S.isStaff)&&!!S.db;
+const staffPeers=()=>(S.staff||[]).filter(d=>d.id!==S.uid&&(d.role==="principal"||d.role==="teacher"));
+function staffWatch(){if(!staffOn())return;for(const d of staffPeers()){if(SC.subs[d.id])continue;
+  SC.subs[d.id]=S.db.doc(staffBase(d.id)).onSnapshot(x=>{SC.meta[d.id]=x.exists?x.data():null;render()},()=>{})}}
+setInterval(()=>{try{staffWatch()}catch(e){}},4000);
+const staffUnread=id=>{const m=SC.meta[id];return!!(m&&m.last&&m.last.from!==S.uid&&(m.last.at||0)>((m.read||{})[S.uid]||0))};
+const staffUnreadCount=()=>staffPeers().filter(d=>staffUnread(d.id)).length;
+function staffOpen(id){SC.unsub?.();SC.with=id;SC.msgs=[];SC.ready=false;S.view={type:"staffchat",id};
+  SC.unsub=S.db.collection(staffBase(id)+"/msgs").orderBy("at","desc").limit(200).onSnapshot(q=>{SC.msgs=q.docs.map(d=>({id:d.id,...d.data()})).reverse();SC.ready=true;render()},()=>{SC.ready=true;render()});
+  write(()=>S.db.doc(staffBase(id)).set({...(SC.meta[id]||{}),read:{...((SC.meta[id]||{}).read||{}),[S.uid]:Date.now()}})).catch(()=>{});S.animate=true;scrollTo(0,0);render()}
+async function staffSend(to,text,att){const at=Date.now();
+  await write(()=>S.db.collection(staffBase(to)+"/msgs").add({from:S.uid,text:text||"",at,...(att?{att}:{})}));
+  const m=SC.meta[to]||{};await write(()=>S.db.doc(staffBase(to)).set({...m,members:[S.uid,to],last:{from:S.uid,text:(text||attLabel(att)).slice(0,80),at},read:{...(m.read||{}),[S.uid]:at}}))}
+function staffListHTML(){const L=staffPeers();
+  return`<div class="section"><div><span class="eyebrow">Entre collègues</span><h2>Professeurs</h2><p class="sub">Discute avec les autres professeurs de l'école : messages, vocaux, photos et fichiers. Les élèves et les parents n'y ont pas accès.</p></div>
+  ${L.length?`<div class="glass list">${L.sort((a,b)=>((SC.meta[b.id]||{}).last?.at||0)-((SC.meta[a.id]||{}).last?.at||0)).map(d=>{const m=SC.meta[d.id]||{},l=m.last;return`<div class="thread" data-v4="staffOpen" data-id="${d.id}" tabindex="0">${avatar(d.id,d.name||"Professeur")}<div class="txt"><b>${esc(d.name||"Professeur")} <small class="muted" style="font-weight:600">· ${d.role==="principal"?"Prof principale":"Professeur"}</small></b><span>${l?esc((l.from===S.uid?"Toi : ":"")+l.text):"Aucun message"}</span></div><div class="row small muted">${l?fmtTime(l.at):""}${staffUnread(d.id)?`<span class="chip bad">Nouveau</span>`:""}</div></div>`}).join("")}</div>`:`<div class="empty">Aucun autre professeur pour l'instant. Quand la prof principale accepte un professeur (onglet Classe), il apparaît ici.</div>`}</div>`}
+function staffChatView(){const id=S.view.id,d=(S.staff||[]).find(x=>x.id===id)||{},nm=d.name||"Professeur";
+  return`<div class="section" style="max-width:760px;margin-inline:auto"><div><button class="back" data-v4="staffBack">${ic("left")}Professeurs</button></div><div class="row">${avatar(id,nm,48)}<div><span class="eyebrow">Entre professeurs · privé</span><h2>${esc(nm)}</h2></div></div>
+  <div class="glass chat"><div class="msgs" id="chatScroll">${!SC.ready?`<div class="muted" style="margin:auto">Chargement…</div>`:SC.msgs.length?SC.msgs.map(m=>msgHTML(m.from===S.uid,m.text,m.att,m.at)).join(""):`<div class="muted" style="margin:auto;text-align:center">Aucun message pour l'instant.<br>Écris le premier message à ${esc(nm.split(" ")[0])}.</div>`}</div>
+  ${v4Bar("staff",id,"Écris à ton collègue…")}</div></div>`}
+{const _tabs=msgsTabsHTML;msgsTabsHTML=()=>{const h=_tabs();if(!staffOn())return h;const n=staffUnreadCount();return h.replace('</div></div>',`<button data-a="msgsTab" data-k="staff" aria-pressed="${S.msgsTab==="staff"}">Professeurs${n?` <span class="chip bad">${n}</span>`:""}</button></div></div>`)}}
+{const _mv=msgsView;msgsView=function(){if(S.msgsTab==="staff"&&staffOn())return msgsTabsHTML()+staffListHTML();return _mv()}}
+{const _tv=teacherView;teacherView=function(){if(S.view?.type==="staffchat"&&staffOn())return staffChatView();return _tv()}}
+
+/* =====================================================================
+   14. Espace prof plus léger pour les grosses classes : le tableau de bord
+       n'est recalculé que si les données ont vraiment changé
+   ===================================================================== */
+const V4OID=new WeakMap();let V4OIDN=0;const v4oid=x=>{if(!x||typeof x!=="object")return String(x);let n=V4OID.get(x);if(!n){n=++V4OIDN;V4OID.set(x,n)}return"#"+n};
+{const _dv=dashView;let mk=null,mh="";dashView=function(){
+  const k=[S.students,S.quizzes,S.homework,S.pending,S.eps,S.corriges,S.access,S.settings,S.staff].map(v4oid).join(",")+"|"+[S.profFilter,S.drafts.st_q,S.drafts.st_cls,S.drafts.st_on,S.stLim,S._peerSig,LITE,Math.floor(Date.now()/60000)].join("|");
+  if(k===mk)return mh;mk=k;mh=_dv();return mh}}
 /* =====================================================================
    9. Événements
    ===================================================================== */
@@ -531,7 +572,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"keepOff":{const it={k:"a",id:el.dataset.id,t:el.dataset.t};el.disabled=true;srcBlob(it).then(()=>{toast("Disponible hors ligne sur cet appareil","check");render()}).catch(()=>{el.disabled=false;toast("Téléchargement impossible pour le moment.","x")});return}
   case"panel":{const k=el.dataset.k,t=el.dataset.t;V4.panel=V4.panel&&V4.panel.kind===k&&V4.panel.t===t&&!el.closest(".v4panel")?null:{kind:k,t,target:v4Target(k)};render();return}
   case"panelClose":V4.panel=null;render();return;
-  case"emo":{const id=el.dataset.k==="peer"?"peerInput":"chatInput",inp=document.getElementById(id),cur=(inp?inp.value:S.drafts[id])||"";S.drafts[id]=(cur+el.dataset.e).slice(0,1000);render();return}
+  case"emo":{const id=V4IN(el.dataset.k),inp=document.getElementById(id),cur=(inp?inp.value:S.drafts[id])||"";S.drafts[id]=(cur+el.dataset.e).slice(0,1000);render();return}
   case"stk":{const k=el.dataset.k,t=v4Target(k)||(V4.panel&&V4.panel.target);V4.panel=null;render();if(!t)return;if(!navigator.onLine){toast("Pas de réseau : réessaie quand tu es connecté.","x");return}
     v4Deliver(k,t,"",{k:"sticker",e:el.dataset.e}).catch(err=>toast((err&&err.message)||"Envoi impossible","x"));return}
   case"rec":recStart(el.dataset.k,v4Target(el.dataset.k));return;
@@ -551,6 +592,8 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"pwdGo":{const id=el.dataset.id;V4.pwd={id,ask:true,busy:true};render();window.__resetPwd(id).then(pw=>{V4.pwd={id,pw}}).catch(e=>{V4.pwd={id,err:e.message}}).finally(render);return}
   case"photoRm":write(()=>meRef().update({photo:""})).then(()=>{try{S.db.doc("board/"+S.uid).update({photo:""}).catch(()=>{})}catch(e){}toast("Photo retirée","trash")});return;
   case"photoRmFor":write(()=>S.db.doc("students/"+el.dataset.id).update({photo:""})).then(()=>{try{S.db.doc("board/"+el.dataset.id).update({photo:""}).catch(()=>{})}catch(e){}toast("Photo retirée","trash")});return;
+  case"staffOpen":staffOpen(el.dataset.id);return;
+  case"staffBack":SC.unsub?.();SC.unsub=null;SC.with=null;S.view=null;S.tab="msgs";S.msgsTab="staff";S.animate=true;render();return;
   case"toLogin":{el.disabled=true;Promise.resolve(window.__appLogout&&window.__appLogout()).catch(()=>location.reload());return}
   }},true);
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);
@@ -560,4 +603,5 @@ document.addEventListener("change",e=>{const el=e.target;if(!el||!el.id)return;
   if(el.id==="v4hwf"){const fl=[...(el.files||[])];el.value="";for(const f of fl){if(V4.hwFiles.length>=5){toast("5 fichiers maximum.","x");break}if(f.size>20*1024*1024){toast(f.name+" : trop lourd (20 Mo maximum).","x");continue}V4.hwFiles.push(f)}render();e.stopPropagation()}},true);
 document.addEventListener("input",e=>{const el=e.target;if(el&&el.id==="fq_msgs"){S.drafts.fq_msgs=el.value;S.v4msgLim=40;render()}});
 document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset)return;
-  if(f.dataset.f==="hw"){e.preventDefault();e.stopImmediatePropagation();hwSubmit(f)}},true);
+  if(f.dataset.f==="hw"){e.preventDefault();e.stopImmediatePropagation();hwSubmit(f)}
+  if(f.dataset.f==="staffchat"){e.preventDefault();e.stopImmediatePropagation();const inp=document.getElementById("staffInput"),text=(inp&&inp.value||"").trim();if(!text)return;if(inp)inp.value="";delete S.drafts.staffInput;staffSend(f.dataset.s,text,null).catch(()=>{})}},true);

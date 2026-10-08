@@ -26,4 +26,7 @@ Application d'apprentissage de l'anglais pour le Togo : leçons du programme (CP
 | `supabase/schema.sql` | Base de données, comptes, règles de sécurité |
 | `supabase/functions/ai/` | Serveur de l'IA Nova (Google Gemini) |
 | `.github/workflows/` | Publication du site et fabrication de l'APK |
-| `source-english-class.html`, `build.py` | Source de l'application et reconstruction de `www/index.html` |
+| `source-english-class.html`, `build.py` | Source de l'application et reconstruction de `www/index.html` (`python3 build.py`) |
+| `app-v4.js`, `scripts/inject-v4.py` | Dernières fonctions (messageries riches, visionneuse, dossiers, Nova…) insérées dans la source |
+| `supabase/LISEZMOI.md` | Ordre des fichiers SQL et des fonctions serveur |
+| `contenu/` | Programme togolais et épreuves types (déjà inclus dans `www/content.json`) |

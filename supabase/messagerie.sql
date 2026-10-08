@@ -2,7 +2,7 @@
 --  MESSAGERIE COMPLÈTE : camarades + vocaux, photos, fichiers, stickers
 --  + PHOTOS DE PROFIL des apprenants
 --  À exécuter dans Supabase > SQL Editor (peut être relancé sans risque).
---  Remplace et complète supabase/peer.sql (inutile de lancer peer.sql avant).
+--  (Remplace l'ancien fichier peer.sql.)
 --  Règles appliquées par le SERVEUR :
 --   • messages entre élèves actifs de l'école (pas les parents, pas le primaire)
 --   • 1000 caractères maximum, 15 messages par minute, 400 par jour

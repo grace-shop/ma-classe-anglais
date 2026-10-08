@@ -1,6 +1,6 @@
-"""Reconstruit www/index.html à partir de la page de l'application (english-class.html)."""
+"""Reconstruit www/index.html à partir de la page de l'application (source-english-class.html)."""
 import re, sys, pathlib
-src = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "english-class.html").read_text(encoding="utf-8")
+src = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "source-english-class.html").read_text(encoding="utf-8")
 out = pathlib.Path(__file__).with_name("www") / "index.html"
 title = re.search(r"<title>(.*?)</title>", src, re.S); src = src.replace(title.group(0), "", 1) if title else src
 head = f"""<!doctype html>
