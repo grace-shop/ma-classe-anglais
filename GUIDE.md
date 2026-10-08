@@ -32,6 +32,11 @@ Comptez **environ 1 h** la première fois. Aucune compétence en programmation n
 
 > Vous pouvez relancer ce fichier sans risque : il ne supprime aucune donnée.
 
+**Compléments à exécuter ensuite (même méthode : SQL Editor → New query → coller → Run)** :
+- `supabase/copies.sql` : photos et PDF des copies d'élèves ;
+- `supabase/messagerie.sql` : messages entre apprenants, **messages vocaux, photos, fichiers et stickers** dans toutes les messageries (remplace `peer.sql`) ;
+- `supabase/xp-guard.sql`, `supabase/single-device.sql`, `supabase/securite.sql` : protections (XP, appareils, sécurité).
+
 ## Étape 3 — Les connexions (Google + e-mail)
 
 **E-mail et mot de passe** — déjà activé. Un réglage important :

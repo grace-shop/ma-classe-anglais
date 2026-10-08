@@ -208,16 +208,35 @@
   /* ---------------- copies d'élèves (photos / PDF des devoirs et épreuves) ---------------- */
   window.__peer = {
     dir: async () => { const { data, error } = await sb.rpc("peer_directory"); if (error) throw new Error(mapErr(error).message); return data || []; },
-    send: async (to, body) => { const { data, error } = await sb.rpc("send_peer_message", { p_to: to, p_body: body }); if (error) throw new Error(error.message || "Envoi impossible"); return data; },
+    send: async (to, body, att) => { const args = { p_to: to, p_body: body || "" }; if (att) args.p_att = att; const { data, error } = await sb.rpc("send_peer_message", args); if (error) throw new Error(/function .*send_peer_message|p_att|schema cache/i.test(error.message || "") ? "La professeure doit d'abord exécuter le fichier supabase/messagerie.sql dans Supabase." : (error.message || "Envoi impossible")); return data; },
     read: async (from) => { const { error } = await sb.rpc("mark_peer_read", { p_from: from }); if (error) throw new Error(error.message); },
-    inbox: async () => { const { data, error } = await sb.from("peer_messages").select("id,sender,receiver,body,created_at,read_at").order("created_at", { ascending: false }).limit(400); if (error) throw new Error(mapErr(error).message); return data || []; },
-    all: async () => { const { data, error } = await sb.from("peer_messages").select("id,sender,receiver,body,created_at,hidden").order("created_at", { ascending: false }).limit(300); if (error) throw new Error(mapErr(error).message); return data || []; },
+    inbox: async () => { const { data, error } = await sb.from("peer_messages").select("*").order("created_at", { ascending: false }).limit(400); if (error) throw new Error(mapErr(error).message); return data || []; },
+    all: async () => { const { data, error } = await sb.from("peer_messages").select("*").order("created_at", { ascending: false }).limit(300); if (error) throw new Error(mapErr(error).message); return data || []; },
     hide: async (id, on) => { const { error } = await sb.from("peer_messages").update({ hidden: !!on }).eq("id", id); if (error) throw new Error(mapErr(error).message); },
     listen: (fn) => {
       try {
         const ch = sb.channel("peer-" + rid(8)).on("postgres_changes", { event: "INSERT", schema: "public", table: "peer_messages" }, (p) => { try { fn(p.new); } catch (e) {} }).subscribe();
         return () => { try { sb.removeChannel(ch); } catch (e) {} };
       } catch (e) { return () => {}; }
+    },
+  };
+  /* ---------------- pièces jointes des messageries (vocaux, photos, fichiers) : dossier privé « chat » ---------------- */
+  const CHATURL = {};
+  window.__chatFiles = {
+    upload: async (blob, name) => {
+      const type = String(blob.type || "application/octet-stream").split(";")[0];
+      const ext = ({ "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "application/pdf": "pdf", "audio/webm": "webm", "audio/ogg": "ogg", "audio/mp4": "m4a", "audio/mpeg": "mp3", "audio/aac": "aac", "video/mp4": "mp4", "text/plain": "txt",
+        "application/msword": "doc", "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx", "application/vnd.ms-powerpoint": "ppt", "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx" })[type] || (String(name || "").split(".").pop() || "bin").slice(0, 5);
+      const path = `${session.user.id}/${Date.now().toString(36)}-${rid(8)}.${ext}`;
+      const { error } = await sb.storage.from("chat").upload(path, blob, { contentType: type, upsert: false });
+      if (error) throw { code: "upload_failed", message: /bucket not found/i.test(error.message || "") ? "La professeure doit d'abord exécuter le fichier supabase/messagerie.sql dans Supabase." : /mime|type/i.test(error.message || "") ? "Ce type de fichier n'est pas accepté." : /size|large/i.test(error.message || "") ? "Fichier trop lourd (10 Mo maximum)." : error.message };
+      return { p: path, t: type, n: String(name || "fichier").slice(0, 80), s: blob.size };
+    },
+    url: async (path) => {
+      const c = CHATURL[path]; if (c && c.until > Date.now()) return c.url;
+      const { data, error } = await sb.storage.from("chat").createSignedUrl(path, 21600);
+      if (error) throw error;
+      CHATURL[path] = { url: data.signedUrl, until: Date.now() + 5 * 3600e3 }; return data.signedUrl;
     },
   };
   window.__grade = async (body) => {
@@ -289,14 +308,17 @@
     if (opts.images && opts.images.length) body.images = await Promise.all(opts.images.slice(0, 4).map(blobToB64));
     const { data: { session: s } } = await sb.auth.getSession();
     let res;
+    const tctl = new AbortController(); let timedOut = false;
+    const tmr = setTimeout(() => { timedOut = true; tctl.abort(); }, 60000);
+    if (opts.signal) opts.signal.addEventListener("abort", () => tctl.abort(), { once: true });
     try {
       res = await fetch(CFG.supabaseUrl.replace(/\/$/, "") + "/functions/v1/ai", {
-        method: "POST", signal: opts.signal,
+        method: "POST", signal: tctl.signal,
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + (s ? s.access_token : ""), apikey: CFG.supabaseAnonKey },
         body: JSON.stringify(body),
       });
-    } catch (e) { window.__lastAIErr = e && e.name === "AbortError" ? null : (navigator.onLine === false ? "Pas de connexion à Internet." : "Nova est injoignable. Professeure : dans Supabase, vérifie que la fonction « ai » est déployée et que « Verify JWT » est désactivé."); throw e && e.name === "AbortError" ? { code: "cancelled", message: "Annulé" } : { code: "upstream_error", message: navigator.onLine === false ? "Pas de connexion à Internet." : "Nova est injoignable : le serveur « ai » n'est pas encore prêt (professeure : voir le guide, étape Nova)." }; }
-    const out = await res.json().catch(() => ({}));
+    } catch (e) { clearTimeout(tmr); if (timedOut) { window.__lastAIErr = "Nova met trop de temps à répondre. Vérifie ta connexion et réessaie."; throw { code: "upstream_error", message: window.__lastAIErr }; } window.__lastAIErr = e && e.name === "AbortError" ? null : (navigator.onLine === false ? "Pas de connexion à Internet." : "Nova est injoignable. Professeure : dans Supabase, vérifie que la fonction « ai » est déployée et que « Verify JWT » est désactivé."); throw e && e.name === "AbortError" ? { code: "cancelled", message: "Annulé" } : { code: "upstream_error", message: navigator.onLine === false ? "Pas de connexion à Internet." : "Nova est injoignable : le serveur « ai » n'est pas encore prêt (professeure : voir le guide, étape Nova)." }; }
+    const out = await res.json().catch(() => ({})); clearTimeout(tmr);
     if (!res.ok || out.error) { window.__lastAIErr = (out.error && out.error.message) || (res.status === 404 ? "Le serveur de Nova (fonction « ai ») est introuvable dans Supabase." : res.status === 401 ? "Nova refuse la connexion : dans Supabase, désactive « Verify JWT » pour la fonction « ai »." : "Nova a rencontré une erreur (" + res.status + ")."); } else window.__lastAIErr = null;
     if (!res.ok || out.error) throw { code: (out.error && out.error.code) || "upstream_error", message: (out.error && out.error.message) || "Erreur " + res.status };
     if (opts.onText) { try { opts.onText({ text: out.text, delta: out.text }); } catch (e) {} }
@@ -348,7 +370,17 @@
 #authGate .or{display:flex;align-items:center;gap:10px;color:#8D94B5;font-size:.85rem}#authGate .or::before,#authGate .or::after{content:"";flex:1;height:1px;background:#2A3050}
 #authGate .msg{padding:10px 12px;border-radius:12px;font-size:.92rem}#authGate .msg.err{background:#3E1E27;color:#FFB3BF}#authGate .msg.ok{background:#163327;color:#8BE8BC}
 #authGate form{display:grid;gap:12px}
-#authGate .dl{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:14px;border:1px dashed #3B4366;color:#8BE8BC;font-weight:700;text-decoration:none}#authGate .dl:hover{border-color:#8BE8BC}
+#authGate .dlc{position:relative;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:12px 12px 12px 12px;border-radius:20px;text-decoration:none;color:#F1F3FB;background:linear-gradient(#141831,#141831) padding-box,linear-gradient(120deg,#6C80FF,#B07CFF 50%,#4FD1E8) border-box;border:1.5px solid transparent;box-shadow:0 14px 40px -18px rgba(108,128,255,.9);overflow:hidden;transition:transform .18s,box-shadow .25s}
+#authGate .dlc::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.10) 45%,transparent 60%);transform:translateX(-100%);animation:dlShine 3.6s ease-in-out infinite;pointer-events:none}
+@keyframes dlShine{60%,100%{transform:translateX(100%)}}
+#authGate .dlc:hover{transform:translateY(-2px);box-shadow:0 18px 48px -16px rgba(108,128,255,1)}
+#authGate .dlc img{width:46px;height:46px;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+#authGate .dlc b{display:block;font-size:1rem}#authGate .dlc small{display:block;color:#AEB6D8;font-size:.8rem;margin-top:2px}
+#authGate .dlc .go{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#6C80FF,#9A7CFF 55%,#4FD1E8);color:#06091c;font-weight:800;font-size:.88rem;white-space:nowrap}
+@media (max-width:440px){#authGate .dlc{grid-template-columns:auto 1fr}#authGate .dlc .go{grid-column:1/-1;justify-content:center;padding:11px 14px}}
+@media (prefers-reduced-motion:reduce){#authGate .dlc::after{animation:none}}
+#authGate .warn{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,rgba(255,196,87,.14),rgba(255,120,90,.10));border:1px solid rgba(255,196,87,.45);color:#FFE4B0;font-size:.88rem;line-height:1.45}
+#authGate .warn b{color:#FFD27A}#authGate .warn svg{color:#FFC457;margin-top:1px}
 #authGate .pw{position:relative;display:block}#authGate .pw input{padding-right:52px}
 #authGate .pw .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;padding:0;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#AFC0FF;cursor:pointer}
 #authGate .pw .eye.on{color:#fff;background:#2A3260}#authGate button:disabled{opacity:.5}`;
@@ -366,9 +398,10 @@
     <form data-f="${mode}">${mode === "up" ? `<label>Prénom et nom<input id="agN" required maxlength="60" autocomplete="name" placeholder="Ex. Ama Kossi"></label>` : ""}
     <label>E-mail<input id="agE" type="email" required autocomplete="email" placeholder="ton.email@gmail.com"></label>
     <label>Mot de passe<span class="pw"><input id="agP" type="password" required minlength="6" autocomplete="${mode === "up" ? "new-password" : "current-password"}" placeholder="6 caractères minimum"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
+    <div class="warn" role="note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/></svg><div>${mode === "up" ? `<b>Important : n'oublie jamais ton mot de passe.</b> Choisis-en un dont tu te souviendras et note-le dans un endroit sûr. Ne le donne à personne, même pas à un camarade : c'est une règle de sécurité. Il protège tes notes, tes messages et ta progression.` : `<b>Ton mot de passe est secret.</b> Ne l'oublie en aucun cas et ne le donne jamais à personne, même pas à un camarade ou à quelqu'un qui dit venir de l'école. C'est une règle de sécurité.`}</div></div>
     <button class="p" type="submit">${mode === "up" ? "Créer mon compte" : "Se connecter"}</button></form>
     ${mode === "in" ? `<button class="l" data-x="forgot">Mot de passe oublié ?</button>` : ""}`}
-    ${!isNative() && CFG.apkUrl ? `<a class="dl" href="${esc(CFG.apkUrl)}" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Télécharger l'application Android</a>` : ""}</div>`;
+    ${!isNative() && CFG.apkUrl ? `<a class="dlc" href="${esc(CFG.apkUrl)}" rel="noopener"><img src="icons/icon-192.png" alt=""><span><b>Application Android</b><small>Gratuite · plein écran · marche même hors ligne</small></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Télécharger</span></a>` : ""}</div>`;
   }
   function showGate() { drawGate(); }
   function hideGate() { if (gate) { gate.remove(); gate = null; } const sp = document.getElementById("splash"); if (sp) sp.style.display = ""; }

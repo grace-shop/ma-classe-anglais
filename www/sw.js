@@ -1,8 +1,8 @@
 /* Ma Classe d'Anglais — cache hors-ligne des fichiers de l'application */
-const V = "mca-v3";
+const V = "mca-v4";
 const CORE = ["./", "index.html", "config.js", "claude-shim.js", "manifest.webmanifest", "vendor/three.min.js", "vendor/supabase.js", "icons/icon-192.png"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => Promise.all(CORE.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting())); });
-self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== V).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
+self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== V && !k.startsWith("mca-files")).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", (e) => {
   const u = new URL(e.request.url);
   if (e.request.method === "GET" && /(^|\.)cdn\.jsdelivr\.net$/.test(u.hostname) && /supabase/.test(u.pathname)) {   // librairie de connexion : cache d'abord, pour démarrer sans réseau
