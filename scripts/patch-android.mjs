@@ -34,10 +34,10 @@ gr = gr.replace(/versionCode\s+\d+/, "versionCode " + build).replace(/versionNam
 if (!gr.includes("EC_KEYSTORE")) gr = gr.replace(/android\s*\{/, `android {
     signingConfigs {
         debug {
-            storeFile file(System.getenv("EC_KEYSTORE") ?: "../../android-extras/english-classes.keystore")
-            storePassword "android"
-            keyAlias "androiddebugkey"
-            keyPassword "android"
+            storeFile file(System.getenv("EC_KEYSTORE"))
+            storePassword System.getenv("EC_KS_PASS")
+            keyAlias "englishclasses"
+            keyPassword System.getenv("EC_KS_PASS")
         }
     }`);
 writeFileSync(g, gr); console.log("✓ version Android", build, "· signature fixe");

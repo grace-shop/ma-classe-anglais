@@ -27,11 +27,20 @@ jobs:
           echo "{\"build\": $BUILD, \"sha\": \"${GITHUB_SHA::7}\"}" > www/version.json
           echo "{\"build\": $BUILD, \"sha\": \"${GITHUB_SHA::7}\", \"apk\": \"https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/ma-classe-anglais.apk\", \"date\": \"$(date -u +%Y-%m-%dT%H:%MZ)\"}" > apk-version.json
           cat apk-version.json
-      - name: Clé de signature fixe (mise à jour sans désinstaller)
+      - name: Clé de signature secrète (mise à jour sans désinstaller)
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
         run: |
-          mkdir -p ~/.android
-          if [ -n "${{ secrets.ANDROID_KEYSTORE_B64 }}" ]; then echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > ~/.android/debug.keystore; else cp android-extras/english-classes.keystore ~/.android/debug.keystore; fi
-          echo "EC_KEYSTORE=$HOME/.android/debug.keystore" >> $GITHUB_ENV
+          if [ -z "$KS_B64" ] || [ -z "$KS_PASS" ]; then
+            echo "::error::Ajoute les secrets ANDROID_KEYSTORE_B64 et ANDROID_KEYSTORE_PASS (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          mkdir -p "$RUNNER_TEMP/ks"
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/ks/release.keystore"
+          echo "EC_KEYSTORE=$RUNNER_TEMP/ks/release.keystore" >> $GITHUB_ENV
+          echo "::add-mask::$KS_PASS"
+          echo "EC_KS_PASS=$KS_PASS" >> $GITHUB_ENV
       - name: Installer Capacitor
         run: npm install --legacy-peer-deps
       - name: Créer le projet Android
