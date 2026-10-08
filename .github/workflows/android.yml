@@ -31,6 +31,7 @@ jobs:
         run: |
           mkdir -p ~/.android
           if [ -n "${{ secrets.ANDROID_KEYSTORE_B64 }}" ]; then echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > ~/.android/debug.keystore; else cp android-extras/english-classes.keystore ~/.android/debug.keystore; fi
+          echo "EC_KEYSTORE=$HOME/.android/debug.keystore" >> $GITHUB_ENV
       - name: Installer Capacitor
         run: npm install --legacy-peer-deps
       - name: Créer le projet Android

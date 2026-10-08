@@ -30,4 +30,14 @@ if (!s.includes("REQUEST_INSTALL_PACKAGES")) { s = s.replace("<application", '<u
 const g = "android/app/build.gradle", build = parseInt(process.env.BUILD || "1", 10) || 1;
 let gr = readFileSync(g, "utf8");
 gr = gr.replace(/versionCode\s+\d+/, "versionCode " + build).replace(/versionName\s+"[^"]*"/, 'versionName "1.' + build + '"');
-writeFileSync(g, gr); console.log("✓ version Android", build);
+// clé de signature fixe : chaque nouvelle version remplace l'ancienne sans désinstaller
+if (!gr.includes("EC_KEYSTORE")) gr = gr.replace(/android\s*\{/, `android {
+    signingConfigs {
+        debug {
+            storeFile file(System.getenv("EC_KEYSTORE") ?: "../../android-extras/english-classes.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+    }`);
+writeFileSync(g, gr); console.log("✓ version Android", build, "· signature fixe");
