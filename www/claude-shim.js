@@ -241,8 +241,8 @@
   };
   window.__avatarUpload = async (blob) => {
     const path = `${session.user.id}/photo-${Date.now().toString(36)}.jpg`;
-    const { error } = await sb.storage.from("avatars").upload(path, blob, { contentType: "image/jpeg", upsert: true });
-    if (error) throw new Error(/bucket not found/i.test(error.message || "") ? "La professeure doit d'abord exécuter le fichier supabase/messagerie.sql dans Supabase." : "Envoi de la photo impossible : " + error.message);
+    const { error } = await sb.storage.from("avatars").upload(path, blob, { contentType: "image/jpeg", upsert: false });
+    if (error) throw new Error(/bucket not found/i.test(error.message || "") ? "La professeure doit d'abord exécuter le fichier supabase/messagerie.sql dans Supabase." : /row-level security/i.test(error.message || "") ? "Envoi refusé : ton inscription doit d'abord être validée par la professeure." : "Envoi de la photo impossible : " + error.message);
     return sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;
   };
   window.__resetPwd = async (uid) => {
