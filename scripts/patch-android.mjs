@@ -6,6 +6,7 @@ if (!s.includes("RECORD_AUDIO")) s = s.replace("<application", `<uses-permission
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <queries>
         <intent><action android:name="android.speech.RecognitionService" /></intent>
@@ -23,3 +24,10 @@ s = s.replace('android:allowBackup="true"', 'android:allowBackup="false"');
 if (!s.includes("usesCleartextTraffic")) s = s.replace("<application", '<application android:usesCleartextTraffic="false"');
 if (!s.includes("android:allowBackup")) s = s.replace("<application", '<application android:allowBackup="false"');
 writeFileSync(f, s); console.log("✓ AndroidManifest.xml complété (sauvegarde cloud et trafic non chiffré désactivés)");
+
+// Mise à jour sans désinstaller : numéro de version croissant à chaque publication
+if (!s.includes("REQUEST_INSTALL_PACKAGES")) { s = s.replace("<application", '<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n    <application'); writeFileSync(f, s); }
+const g = "android/app/build.gradle", build = parseInt(process.env.BUILD || "1", 10) || 1;
+let gr = readFileSync(g, "utf8");
+gr = gr.replace(/versionCode\s+\d+/, "versionCode " + build).replace(/versionName\s+"[^"]*"/, 'versionName "1.' + build + '"');
+writeFileSync(g, gr); console.log("✓ version Android", build);

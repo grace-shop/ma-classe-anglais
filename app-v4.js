@@ -647,6 +647,11 @@ document.head.insertAdjacentHTML("beforeend",`<style>
 .v4grid .lockpk{opacity:.35;filter:grayscale(1)}
 @media (prefers-reduced-motion:reduce){.shx-chest.ready .shx-chest-ic{animation:none}}
 </style>`);
+
+/* =====================================================================
+   16. Mises à jour : bouton « Vérifier les mises à jour » (profil et espace prof)
+   ===================================================================== */
+{const _lo=logoutHTML;logoutHTML=function(){const v=window.__appBuild?` · version ${window.__appBuild}`:"";return`<div class="section"><div class="glass card row between"><div><h3 style="margin:0">Mises à jour</h3><p class="sub small" style="margin:0">L'application te prévient toute seule quand une nouvelle version est prête${esc(v)}.</p></div><button class="btn ghost sm" data-v4="checkUpd">${ic("refresh")}Vérifier</button></div></div>`+_lo()}}
 /* =====================================================================
    9. Événements
    ===================================================================== */
@@ -690,6 +695,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"joker":{const r=S.run,q=curQuiz();if(!r||!q||(S.me.jokers||0)<1)return;const cur=q.questions[r.i];const wrong=shuffle(cur.choices.map((_,i)=>i).filter(i=>i!==cur.answer)).slice(0,Math.min(2,cur.choices.length-2));
     r.fifty=r.fifty||{};r.fifty[r.i]=wrong;meWrite({jokers:(S.me.jokers||0)-1});beep("ok");render();return}
   case"rwIdea":{const it=RW_IDEAS[+el.dataset.i];if(!it)return;S.drafts.rw_title=it[0];S.drafts.rw_cost=String(it[1]);render();return}
+  case"checkUpd":if(window.__checkUpdate)window.__checkUpdate(true);else toast("Tu as la dernière version.","check");return;
   case"toLogin":{el.disabled=true;Promise.resolve(window.__appLogout&&window.__appLogout()).catch(()=>location.reload());return}
   }},true);
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);

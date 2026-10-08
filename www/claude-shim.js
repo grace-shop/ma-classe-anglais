@@ -403,6 +403,69 @@
   const STANDALONE = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
   window.__isIOS = IOS; window.__standaloneApp = STANDALONE;
   if (!isNative() && !STANDALONE && CFG.apkUrl) window.__appDownload = { apk: CFG.apkUrl, canInstall: false, ios: IOS };
+  /* ---------------- mises à jour : l'application propose elle-même la nouvelle version ---------------- */
+  const UPD = { shown: false };
+  const updBox = (title, text, btnLabel, onGo, later = true) => {
+    if (document.getElementById("updBox")) return;
+    const d = document.createElement("div"); d.id = "updBox";
+    d.style.cssText = "position:fixed;inset:0;z-index:9600;background:rgba(5,7,20,.72);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Manrope,system-ui,sans-serif";
+    d.innerHTML = `<div style="width:min(420px,100%);background:#141831;color:#F1F3FB;border:1px solid #2E3560;border-radius:24px;padding:24px 20px;box-shadow:0 30px 80px rgba(0,0,0,.6);display:grid;gap:14px;text-align:center;justify-items:center">
+      <img src="icons/icon-192.png" alt="" style="width:72px;height:72px;border-radius:20px;box-shadow:0 12px 30px rgba(70,80,220,.5)">
+      <b style="font-size:1.2rem">${title}</b><div id="updTxt" style="color:#C4CAE4;line-height:1.5;font-size:.95rem">${text}</div>
+      <div id="updBar" style="display:none;width:100%;height:8px;border-radius:99px;background:#2A3050;overflow:hidden"><i style="display:block;height:100%;width:0;background:linear-gradient(90deg,#8EA0FF,#6FE3F0);transition:width .2s"></i></div>
+      <button id="updGo" style="width:100%;font:inherit;font-weight:800;border:0;border-radius:14px;padding:14px;background:linear-gradient(135deg,#8EA0FF,#B49BFF 55%,#6FE3F0);color:#06091c;cursor:pointer">${btnLabel}</button>
+      ${later ? `<button id="updLater" style="font:inherit;font-weight:700;border:0;background:none;color:#93ABFF;cursor:pointer;padding:6px">Plus tard</button>` : ""}</div>`;
+    document.body.appendChild(d);
+    d.querySelector("#updGo").onclick = () => onGo(d);
+    const l = d.querySelector("#updLater"); if (l) l.onclick = () => d.remove();
+  };
+  const setUpd = (txt, pct) => { const t = document.getElementById("updTxt"); if (t && txt) t.innerHTML = txt; const b = document.getElementById("updBar"); if (b && pct != null) { b.style.display = "block"; b.firstElementChild.style.width = Math.round(pct) + "%"; } };
+  async function installApk(url) {
+    const FS = plug("Filesystem"), FO = plug("FileOpener"), BR = plug("Browser");
+    if (FS && FS.downloadFile && FO) {
+      try {
+        setUpd("Téléchargement de la nouvelle version…", 2);
+        let h = null; try { h = await FS.addListener("progress", (p) => { if (p && p.contentLength) setUpd(null, 2 + (p.bytes / p.contentLength) * 95); }); } catch (e) {}
+        const r = await FS.downloadFile({ url, path: "english-classes-maj.apk", directory: "CACHE", progress: true });
+        try { h && h.remove(); } catch (e) {}
+        setUpd("Touche « Mettre à jour » sur l'écran d'Android. Tes données sont conservées.", 100);
+        await FO.open({ filePath: r.path || r.uri, contentType: "application/vnd.android.package-archive", openWithDefault: true });
+        return;
+      } catch (e) { setUpd("Téléchargement direct impossible : on passe par le navigateur…", null); }
+    }
+    if (BR) BR.open({ url }); else location.href = url;
+  }
+  async function checkNativeUpdate(manual) {
+    if (!isNative()) return;
+    try {
+      const local = await (await fetch("version.json", { cache: "no-store" })).json().catch(() => ({ build: 0 }));
+      const H = plug("CapacitorHttp"), url = "https://github.com/grace-shop/ma-classe-anglais/releases/latest/download/apk-version.json?t=" + Date.now();
+      let remote = null;
+      if (H && H.get) { const r = await H.get({ url, headers: { "Cache-Control": "no-cache" } }); remote = typeof r.data === "string" ? JSON.parse(r.data) : r.data; }
+      else remote = await (await fetch(url, { cache: "no-store" })).json();
+      if (!remote || !remote.build) return;
+      if (remote.build > (local.build || 0)) {
+        if (UPD.shown && !manual) return; UPD.shown = true;
+        updBox("Nouvelle version disponible", "Une mise à jour d'English Classes est prête : nouvelles fonctions et corrections. Elle s'installe en un clic, <b>sans désinstaller</b>, et tu gardes tout ton travail.", "Mettre à jour maintenant", () => installApk(remote.apk || CFG.apkUrl));
+      } else if (manual) updBox("Tu es à jour", "Tu as déjà la dernière version d'English Classes.", "OK", (d) => d.remove(), false);
+    } catch (e) { if (manual) updBox("Vérification impossible", "Vérifie ta connexion à Internet puis réessaie.", "OK", (d) => d.remove(), false); }
+  }
+  window.__checkUpdate = (manual) => (isNative() ? checkNativeUpdate(manual) : (window.__swCheck ? window.__swCheck(manual) : null));
+  if (isNative()) { setTimeout(() => checkNativeUpdate(false), 6000); setInterval(() => checkNativeUpdate(false), 3 * 3600e3); document.addEventListener("visibilitychange", () => { if (!document.hidden) checkNativeUpdate(false); }); }
+  /* site web : quand une nouvelle version est en ligne, on propose de recharger */
+  if (!isNative() && "serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    let reloading = false;
+    const offer = () => { if (UPD.shown) return; UPD.shown = true; updBox("Nouvelle version disponible", "English Classes a été amélioré. Touche le bouton pour profiter de la nouvelle version.", "Mettre à jour maintenant", () => { reloading = true; location.reload(); }); };
+    const watch = (reg) => {
+      if (!reg) return;
+      reg.addEventListener("updatefound", () => { const w = reg.installing; if (w) w.addEventListener("statechange", () => { if (w.state === "activated" && navigator.serviceWorker.controller && !reloading) offer(); }); });
+    };
+    navigator.serviceWorker.getRegistration().then(watch).catch(() => {});
+    window.__swCheck = async (manual) => { try { const reg = await navigator.serviceWorker.getRegistration(); if (reg) { await reg.update(); watch(reg); } const v = await (await fetch("version.json?t=" + Date.now(), { cache: "no-store" })).json(); const cur = window.__appBuild || v.build; window.__appBuild = cur; if (v.build > cur) offer(); else if (manual) updBox("Tu es à jour", "Tu as déjà la dernière version d'English Classes.", "OK", (d) => d.remove(), false); } catch (e) {} };
+    fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then((r) => r.json()).then((v) => { window.__appBuild = v.build; }).catch(() => {});
+    setInterval(() => window.__swCheck(false), 30 * 60000);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) window.__swCheck(false); });
+  }
   /* guide d'installation sur iPhone / iPad (Safari → Partager → Sur l'écran d'accueil) */
   window.__iosGuide = () => {
     if (document.getElementById("iosGuide")) return;

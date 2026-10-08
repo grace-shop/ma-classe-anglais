@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - name: Réglages Supabase
@@ -18,6 +19,8 @@ jobs:
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+      - name: Numéro de version
+        run: echo "{\"build\": $(git rev-list --count HEAD), \"sha\": \"${GITHUB_SHA::7}\"}" > www/version.json && cat www/version.json
       - name: Publier sur la branche gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:

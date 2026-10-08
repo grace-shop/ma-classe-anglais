@@ -1203,7 +1203,7 @@ function studentView(){
   if(S.view?.type==="ep")return epView();if(S.view?.type==="shop")return shopView();if(S.view?.type==="talk")return talkView();
   return netBanner()+liveBanner()+({home:homeView,learn:learnView,prac:practiceView,talk:talkView,hw:hwListView,me:profileView}[S.tab]||homeView)()}
 const downloadHTML=()=>window.__appDownload?`<div class="section"><div class="dl-card2"><img class="dl-app" src="icons/icon-192.png" alt=""><div><h3>Ma Classe d'Anglais sur ton téléphone</h3><p>La vraie application Android : icône sur l'écran d'accueil, plein écran, micro pour parler à Nova, épreuves disponibles hors ligne.</p></div><div class="dl-feat"><span>Gratuite</span><span>Hors ligne</span><span>Micro et vocaux</span><span>Notifications</span></div><div class="dl-row"><a class="dl-go" href="${esc(window.__appDownload.apk)}" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span>Télécharger l'application<small>Android · fichier .apk</small></span></a>${window.__appDownload.canInstall?`<button class="dl-alt" data-a="pwaInstall">${ic("plus")}Ajouter à l'écran d'accueil</button>`:""}</div></div></div>`:"";
-const logoutHTML=()=>downloadHTML()+(window.__appLogout?`<div class="section"><div class="glass card row between"><div><h3>Se déconnecter</h3><p class="sub small" style="margin:0">${esc(S.who?.email||"")}</p></div><button class="btn danger sm" data-a="logout">${ic("x")}Se déconnecter</button></div></div>`:"");
+let logoutHTML=()=>downloadHTML()+(window.__appLogout?`<div class="section"><div class="glass card row between"><div><h3>Se déconnecter</h3><p class="sub small" style="margin:0">${esc(S.who?.email||"")}</p></div><button class="btn danger sm" data-a="logout">${ic("x")}Se déconnecter</button></div></div>`:"");
 const blobURL=id=>window.__blobURL?window.__blobURL(id):"/_blob/"+encodeURIComponent(id);
 function practiceView(){const k=S.prac||"quiz";return`<div class="section prac-top"><div><span class="eyebrow">S'entraîner</span><h2>Pratique</h2></div><div class="seg prac-seg" role="tablist" aria-label="Type d'entraînement">${[["quiz","Quiz","bolt"],["pics","Jeux d'images","camera"],["ep","Épreuves d'examen","file"],["prono","Prononciation","mic"]].map(([x,l,i])=>`<button role="tab" data-a="prac" data-k="${x}" aria-pressed="${k===x}">${ic(i)}${l}</button>`).join("")}</div></div>`+(k==="prono"?pronView():k==="ep"?epListView():k==="pics"?audBar()+picGamesHTML():quizListView())}
 function homeView(){const m=S.me,xp=m.xp||0,rank=rankOf(xp),into=xp%XP_PER_RANK,t=today();
@@ -3304,6 +3304,11 @@ document.head.insertAdjacentHTML("beforeend",`<style>
 .v4grid .lockpk{opacity:.35;filter:grayscale(1)}
 @media (prefers-reduced-motion:reduce){.shx-chest.ready .shx-chest-ic{animation:none}}
 </style>`);
+
+/* =====================================================================
+   16. Mises à jour : bouton « Vérifier les mises à jour » (profil et espace prof)
+   ===================================================================== */
+{const _lo=logoutHTML;logoutHTML=function(){const v=window.__appBuild?` · version ${window.__appBuild}`:"";return`<div class="section"><div class="glass card row between"><div><h3 style="margin:0">Mises à jour</h3><p class="sub small" style="margin:0">L'application te prévient toute seule quand une nouvelle version est prête${esc(v)}.</p></div><button class="btn ghost sm" data-v4="checkUpd">${ic("refresh")}Vérifier</button></div></div>`+_lo()}}
 /* =====================================================================
    9. Événements
    ===================================================================== */
@@ -3347,6 +3352,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"joker":{const r=S.run,q=curQuiz();if(!r||!q||(S.me.jokers||0)<1)return;const cur=q.questions[r.i];const wrong=shuffle(cur.choices.map((_,i)=>i).filter(i=>i!==cur.answer)).slice(0,Math.min(2,cur.choices.length-2));
     r.fifty=r.fifty||{};r.fifty[r.i]=wrong;meWrite({jokers:(S.me.jokers||0)-1});beep("ok");render();return}
   case"rwIdea":{const it=RW_IDEAS[+el.dataset.i];if(!it)return;S.drafts.rw_title=it[0];S.drafts.rw_cost=String(it[1]);render();return}
+  case"checkUpd":if(window.__checkUpdate)window.__checkUpdate(true);else toast("Tu as la dernière version.","check");return;
   case"toLogin":{el.disabled=true;Promise.resolve(window.__appLogout&&window.__appLogout()).catch(()=>location.reload());return}
   }},true);
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);
