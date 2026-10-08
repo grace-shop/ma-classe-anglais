@@ -83,7 +83,7 @@ begin
     from docs d
     where d.col = 'students' and d.id <> me::text
       and d.id ~ '^[0-9a-fA-F-]{36}$' and public.peer_ok(d.id::uuid)
-    order by 4 desc, 2 limit 1000;
+    order by 4 desc, 2 limit 5000;
 end $$;
 
 drop function if exists public.send_peer_message(uuid, text, jsonb);

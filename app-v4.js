@@ -228,7 +228,7 @@ function v4Target(kind){const f=document.querySelector(`form.v4bar[data-f="${kin
 async function v4SendFile(kind,target,file,name,k,dur){if(!window.__chatFiles){toast("L'envoi de fichiers n'est pas disponible ici.","x");return}
   if(!navigator.onLine){toast("Pas de réseau : réessaie quand tu es connecté.","x");return}
   if(!target)return;if(file.size>10*1024*1024){toast("Fichier trop lourd (10 Mo maximum).","x");return}
-  let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type))f=await shrinkImg(f,1600,.78);
+  let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type))f=await shrinkImg(f,1280,.72);
   const kk=k||(/^image\//.test(f.type)?"img":"file");V4.sending=true;V4.upl=kind;render();
   try{const up=await window.__chatFiles.upload(f,name||f.name||"fichier");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{})};
     if(kk!=="file")V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f);
@@ -240,7 +240,7 @@ async function recStart(kind,target){if(V4.rec||!target)return;let stream;
   try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}
   catch(e){toast(e&&(e.name==="NotAllowedError"||e.name==="SecurityError")?"Autorise le micro pour envoyer un vocal : touche le cadenas à côté de l'adresse (ou Paramètres du téléphone → Applications → English Classes → Autorisations → Micro).":"Micro indisponible sur cet appareil.","x");return}
   const mime=["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus"].find(t=>{try{return MediaRecorder.isTypeSupported(t)}catch(e){return false}})||"";
-  let mr;try{mr=new MediaRecorder(stream,mime?{mimeType:mime,audioBitsPerSecond:32000}:undefined)}catch(e){stream.getTracks().forEach(t=>t.stop());toast("L'enregistrement vocal n'est pas possible sur cet appareil.","x");return}
+  let mr;try{mr=new MediaRecorder(stream,mime?{mimeType:mime,audioBitsPerSecond:24000}:undefined)}catch(e){stream.getTracks().forEach(t=>t.stop());toast("L'enregistrement vocal n'est pas possible sur cet appareil.","x");return}
   const chunks=[];V4.panel=null;V4.rec={kind,target,mr,stream,chunks,start:Date.now(),sec:0,cancel:false};
   mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
   mr.onstop=()=>{stream.getTracks().forEach(t=>t.stop());const r=V4.rec;V4.rec=null;if(r)clearInterval(r.timer);render();if(!r||r.cancel)return;const sec=Math.round((Date.now()-r.start)/1000);if(sec<1){toast("Message vocal trop court.","x");return}

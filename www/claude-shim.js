@@ -105,18 +105,32 @@
     return { docs, size: docs.length, empty: !docs.length, forEach: (fn) => docs.forEach(fn) };
   }
   async function fetchRows(col, o) {
-    let q = sb.from("docs").select("path,id,data").eq("col", col);
-    for (const [f, op, v] of o.where || []) {
-      const c = "data->>" + f, s = String(v);
-      if (op === "==" || op === "eq") q = q.eq(c, s); else if (op === "!=" || op === "ne") q = q.neq(c, s);
-      else if (op === ">" || op === "gt") q = q.gt(c, s); else if (op === ">=" || op === "gte") q = q.gte(c, s);
-      else if (op === "<" || op === "lt") q = q.lt(c, s); else if (op === "<=" || op === "lte") q = q.lte(c, s);
-    }
-    q = o.order ? q.order("data->" + o.order[0], { ascending: o.order[1] !== "desc", nullsFirst: false }) : q.order("path");
-    q = q.limit(Math.min(o.limit || 1000, 1000));
+    const build = () => {
+      let q = sb.from("docs").select("path,id,data").eq("col", col);
+      for (const [f, op, v] of o.where || []) {
+        const c = "data->>" + f, s = String(v);
+        if (op === "==" || op === "eq") q = q.eq(c, s); else if (op === "!=" || op === "ne") q = q.neq(c, s);
+        else if (op === ">" || op === "gt") q = q.gt(c, s); else if (op === ">=" || op === "gte") q = q.gte(c, s);
+        else if (op === "<" || op === "lt") q = q.lt(c, s); else if (op === "<=" || op === "lte") q = q.lte(c, s);
+      }
+      return o.order ? q.order("data->" + o.order[0], { ascending: o.order[1] !== "desc", nullsFirst: false }).order("path") : q.order("path");
+    };
+    // sans limite demandée : on lit par paquets de 1000 (plus de plafond à 1000 élèves)
+    const PAGE = 1000, want = o.limit ? Math.min(o.limit, 50000) : 50000;
+    const all = async () => {
+      let rows = [];
+      for (let from = 0; from < want; from += PAGE) {
+        const to = Math.min(from + PAGE, want) - 1;
+        const { data, error } = await build().range(from, to);
+        if (error) return { data: null, error };
+        rows = rows.concat(data || []);
+        if (!data || data.length < to - from + 1) break;
+      }
+      return { data: rows, error: null };
+    };
     const ck = "r:" + uidKey() + ":" + col + "|" + JSON.stringify(o);
     const cached0 = await idb.get(ck);
-    const { data, error } = await (cached0 ? Promise.race([q, new Promise((r) => setTimeout(() => r({ data: cached0, error: null, stale: true }), 6000))]) : q);
+    const { data, error } = await (cached0 ? Promise.race([all(), new Promise((r) => setTimeout(() => r({ data: cached0, error: null, stale: true }), 6000))]) : all());
     if (error) { const m = mapErr(error); if (m.code === "unavailable") { const c = await idb.get(ck); if (c) return c; } throw m; }
     idb.set(ck, data || []); return data || [];
   }
