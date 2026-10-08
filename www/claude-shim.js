@@ -421,19 +421,24 @@
   };
   const setUpd = (txt, pct) => { const t = document.getElementById("updTxt"); if (t && txt) t.innerHTML = txt; const b = document.getElementById("updBar"); if (b && pct != null) { b.style.display = "block"; b.firstElementChild.style.width = Math.round(pct) + "%"; } };
   async function installApk(url) {
-    const FS = plug("Filesystem"), FO = plug("FileOpener"), BR = plug("Browser");
-    if (FS && FS.downloadFile && FO) {
-      try {
-        setUpd("Téléchargement de la nouvelle version…", 2);
-        let h = null; try { h = await FS.addListener("progress", (p) => { if (p && p.contentLength) setUpd(null, 2 + (p.bytes / p.contentLength) * 95); }); } catch (e) {}
-        const r = await FS.downloadFile({ url, path: "english-classes-maj.apk", directory: "CACHE", progress: true });
-        try { h && h.remove(); } catch (e) {}
-        setUpd("Touche « Mettre à jour » sur l'écran d'Android. Tes données sont conservées.", 100);
-        await FO.open({ filePath: r.path || r.uri, contentType: "application/vnd.android.package-archive", openWithDefault: true });
-        return;
-      } catch (e) { setUpd("Téléchargement direct impossible : on passe par le navigateur…", null); }
-    }
-    if (BR) BR.open({ url }); else location.href = url;
+    const FS = plug("Filesystem"), FO = plug("FileOpener"), BR = plug("Browser"), H = plug("CapacitorHttp");
+    const viaBrowser = (msg) => { setUpd(msg || "Le téléchargement s'ouvre dans le navigateur : ouvre ensuite le fichier et touche « Mettre à jour ».", null); if (BR) BR.open({ url }); else location.href = url; };
+    if (!(FS && FS.downloadFile && FO)) return viaBrowser();
+    try {
+      // GitHub redirige le lien vers son serveur de fichiers : on récupère d'abord l'adresse finale
+      let finalUrl = url;
+      if (H && H.request) { try { const r = await H.request({ url, method: "GET", headers: { Range: "bytes=0-0" } }); if (r && r.url && /^https:/.test(r.url)) finalUrl = r.url; } catch (e) {} }
+      setUpd("Téléchargement de la nouvelle version…", 2);
+      let h = null; try { h = await FS.addListener("progress", (p) => { if (p && p.contentLength) setUpd(null, 2 + (p.bytes / p.contentLength) * 95); }); } catch (e) {}
+      try { await FS.deleteFile({ path: "english-classes-maj.apk", directory: "CACHE" }); } catch (e) {}
+      const r = await FS.downloadFile({ url: finalUrl, path: "english-classes-maj.apk", directory: "CACHE", progress: true });
+      try { h && h.remove(); } catch (e) {}
+      // vérification : un vrai fichier d'application pèse plusieurs Mo
+      let size = 0; try { const st = await FS.stat({ path: "english-classes-maj.apk", directory: "CACHE" }); size = st.size || 0; } catch (e) {}
+      if (size && size < 2000000) throw new Error("fichier incomplet");
+      setUpd("Touche « Mettre à jour » sur l'écran d'Android. Tes données sont conservées.", 100);
+      await FO.open({ filePath: r.path || r.uri, contentType: "application/vnd.android.package-archive", openWithDefault: true });
+    } catch (e) { viaBrowser("Le téléchargement direct n'a pas marché : il s'ouvre dans le navigateur. Ouvre ensuite le fichier téléchargé et touche « Mettre à jour »."); }
   }
   async function checkNativeUpdate(manual) {
     if (!isNative()) return;
