@@ -5,13 +5,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
-  pages: write
-  id-token: write
 concurrency: { group: site, cancel-in-progress: true }
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: { name: github-pages, url: "${{ steps.pages.outputs.page_url }}" }
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
@@ -34,15 +31,3 @@ jobs:
           publish_branch: gh-pages
           force_orphan: true
           commit_message: "Site : ${{ github.sha }}"
-      # Si GitHub Pages est réglé sur « GitHub Actions », on publie aussi directement (sinon ces étapes sont ignorées)
-      - name: Préparer GitHub Pages
-        uses: actions/configure-pages@v5
-        continue-on-error: true
-      - name: Paquet du site
-        uses: actions/upload-pages-artifact@v3
-        continue-on-error: true
-        with: { path: ./www }
-      - name: Publication directe
-        id: pages
-        uses: actions/deploy-pages@v4
-        continue-on-error: true
