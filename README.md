@@ -1,4 +1,4 @@
-# Ma Classe d'Anglais
+# English Classes
 
 Application d'apprentissage de l'anglais pour le Togo : leçons du programme (CP1 → Terminale, université, adultes), quiz, jeux d'images 3D, conversation avec l'IA Nova, épreuves BEPC/BAC, suivi en temps réel par la professeure, notes trimestrielles, appel, espace parents.
 

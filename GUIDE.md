@@ -1,4 +1,4 @@
-# Ma Classe d'Anglais — installer votre propre application
+# English Classes — installer votre propre application
 
 Ce dossier contient **votre application à vous**, indépendante de Claude :
 

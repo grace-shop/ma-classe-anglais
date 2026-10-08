@@ -1,5 +1,5 @@
 // =====================================================================
-//  Ma Classe d'Anglais — serveur IA « Nova » (Supabase Edge Function)
+//  English Classes — serveur IA « Nova » (Supabase Edge Function)
 //  Reçoit les demandes de l'application, vérifie le compte de l'élève,
 //  applique la limite quotidienne, puis interroge Google Gemini.
 //  Secret obligatoire : GEMINI_API_KEY (Supabase → Edge Functions → Secrets)

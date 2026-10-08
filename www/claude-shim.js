@@ -1,5 +1,5 @@
 /* =====================================================================
-   Ma Classe d'Anglais — adaptateur « application autonome »
+   English Classes — adaptateur « application autonome »
    L'application a été écrite pour Claude (window.claude.use(...)).
    Ce fichier fournit exactement les mêmes fonctions, mais branchées sur
    Supabase (base de données, comptes, fichiers, présence) et sur le
@@ -390,7 +390,7 @@
     if (!gate) { const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st); gate = document.createElement("div"); gate.id = "authGate"; document.body.appendChild(gate); }
     const sp = document.getElementById("splash"); if (sp) sp.style.display = "none";
     const reset = mode === "newpass";
-    gate.innerHTML = `<div class="box" role="dialog" aria-labelledby="agT"><div class="logo">En</div><div><h1 id="agT">Ma Classe d'Anglais</h1><p>${reset ? "Choisis ton nouveau mot de passe." : "Connecte-toi pour retrouver ta classe, tes leçons et ta progression."}</p></div>
+    gate.innerHTML = `<div class="box" role="dialog" aria-labelledby="agT"><div class="logo" style="background:none;padding:0;overflow:hidden"><img src="icons/logo-3d.png" alt="English Classes" style="width:100%;height:100%;display:block" onerror="this.outerHTML='E'"></div><div><h1 id="agT">English Classes</h1><p>${reset ? "Choisis ton nouveau mot de passe." : "Connecte-toi pour retrouver ta classe, tes leçons et ta progression."}</p></div>
     ${note ? `<div class="msg ${note.ok ? "ok" : "err"}">${esc(note.t)}</div>` : ""}
     ${reset ? `<form data-f="newpass"><label>Nouveau mot de passe<span class="pw"><input id="agP" type="password" minlength="6" required autocomplete="new-password"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label><button class="p" type="submit">Enregistrer</button></form>` : `
     ${CFG.googleEnabled === false ? "" : `<button class="g" data-x="google">${G}Continuer avec Google</button><div class="or">ou avec ton e-mail</div>`}
@@ -448,7 +448,7 @@
     const total = Object.values(content).reduce((n, c) => n + Object.keys(c).length, 0);
     const box = document.createElement("div"); box.id = "authGate";
     const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
-    box.innerHTML = `<div class="box"><div class="logo">En</div><h1>Bienvenue !</h1><p>Votre base est vide. Installer le contenu de départ : ${Object.keys(content.lessons || {}).length} leçons du programme togolais, ${Object.keys(content.quizzes || {}).length} quiz, ${Object.keys(content.decks || {}).length} listes de vocabulaire et ${Object.keys(content.epreuves || {}).length} épreuves avec corrigés ?</p><div class="msg ok" id="agProg" hidden></div><button class="p" id="agGo">Installer le contenu (${total} éléments)</button><button class="l" id="agSkip">Plus tard</button></div>`;
+    box.innerHTML = `<div class="box"><div class="logo" style="background:none;padding:0;overflow:hidden"><img src="icons/logo-3d.png" alt="English Classes" style="width:100%;height:100%;display:block" onerror="this.outerHTML='E'"></div><h1>Bienvenue !</h1><p>Votre base est vide. Installer le contenu de départ : ${Object.keys(content.lessons || {}).length} leçons du programme togolais, ${Object.keys(content.quizzes || {}).length} quiz, ${Object.keys(content.decks || {}).length} listes de vocabulaire et ${Object.keys(content.epreuves || {}).length} épreuves avec corrigés ?</p><div class="msg ok" id="agProg" hidden></div><button class="p" id="agGo">Installer le contenu (${total} éléments)</button><button class="l" id="agSkip">Plus tard</button></div>`;
     document.body.appendChild(box);
     await new Promise((done) => {
       box.querySelector("#agSkip").onclick = () => { box.remove(); done(); };
@@ -487,7 +487,7 @@
   async function boot() {
     if (!CFG.supabaseUrl || !CFG.supabaseAnonKey || /VOTRE/.test(CFG.supabaseUrl)) {
       const sp = document.getElementById("splash"); if (sp) sp.style.display = "none";
-      document.body.insertAdjacentHTML("beforeend", `<div style="position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:radial-gradient(120% 80% at 50% -10%,#1A2150 0%,#0E1120 45%,#090B16 100%);color:#F1F3FB;font-family:Manrope,system-ui,sans-serif;padding:20px"><div style="max-width:440px;display:grid;gap:14px;padding:28px 24px;border-radius:26px;background:rgba(23,27,46,.9);border:1px solid #2A3050"><div style="width:62px;height:62px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(120deg,#4A5FD0,#93ABFF);font:italic 1.7rem Georgia,serif">En</div><h2 style="margin:0;font:400 1.9rem Georgia,serif">Ma Classe d'Anglais</h2><p style="margin:0;color:#C4CAE4;line-height:1.55">L'application est installée, il reste à la relier à sa base de données. Professeure : suivez les étapes 1 à 6 du guide (projet Supabase, puis variables <b>SUPABASE_URL</b> et <b>SUPABASE_ANON_KEY</b> sur GitHub).</p><p style="margin:0;color:#8D94B5;font-size:.9rem">Élèves : revenez un peu plus tard, votre classe ouvre bientôt.</p></div></div>`);
+      document.body.insertAdjacentHTML("beforeend", `<div style="position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:radial-gradient(120% 80% at 50% -10%,#1A2150 0%,#0E1120 45%,#090B16 100%);color:#F1F3FB;font-family:Manrope,system-ui,sans-serif;padding:20px"><div style="max-width:440px;display:grid;gap:14px;padding:28px 24px;border-radius:26px;background:rgba(23,27,46,.9);border:1px solid #2A3050"><div style="width:62px;height:62px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(120deg,#4A5FD0,#93ABFF);font:italic 1.7rem Georgia,serif">En</div><h2 style="margin:0;font:400 1.9rem Georgia,serif">English Classes</h2><p style="margin:0;color:#C4CAE4;line-height:1.55">L'application est installée, il reste à la relier à sa base de données. Professeure : suivez les étapes 1 à 6 du guide (projet Supabase, puis variables <b>SUPABASE_URL</b> et <b>SUPABASE_ANON_KEY</b> sur GitHub).</p><p style="margin:0;color:#8D94B5;font-size:.9rem">Élèves : revenez un peu plus tard, votre classe ouvre bientôt.</p></div></div>`);
       return;
     }
     if (!window.supabase) { try { await loadScript(CFG.supabaseJs || "vendor/supabase.js"); } catch (e) { await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"); } }

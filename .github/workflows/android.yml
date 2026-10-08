@@ -42,7 +42,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: android-latest
-          name: Application Android — dernière version
+          name: English Classes — application Android
           body: |
             Téléchargez **ma-classe-anglais.apk** sur votre téléphone Android, ouvrez-le et acceptez « Installer des applications inconnues ».
             Version construite automatiquement depuis le commit ${{ github.sha }}.
