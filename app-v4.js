@@ -210,7 +210,9 @@ async function v4Play(p,t){const A=V4.audio||(V4.audio=new Audio());if(V4.playin
   try{let u=V4.obj[p];if(!u){V4.playing=p;render();const b=await srcBlob({k:"m",id:p,t});u=V4.obj[p]=URL.createObjectURL(b)}A.src=u;A.onended=()=>{V4.playing=null;render()};V4.playing=p;await A.play();render()}
   catch(e){V4.playing=null;render();toast(navigator.onLine?"Lecture impossible sur cet appareil.":"Ce vocal n'est pas encore enregistré sur l'appareil.","x")}}
 function v4PanelHTML(kind,t){return`<div class="v4panel glass"><div class="v4tabs seg"><button type="button" data-v4="panel" data-k="${kind}" data-t="emo" aria-pressed="${t==="emo"}">Emojis</button><button type="button" data-v4="panel" data-k="${kind}" data-t="stk" aria-pressed="${t==="stk"}">Stickers 3D</button><button type="button" class="iconbtn sm" data-v4="panelClose" aria-label="Fermer">${ic("x")}</button></div>
-  ${t==="emo"?`<div class="v4grid emo">${V4EMO.map(x=>`<button type="button" data-v4="emo" data-k="${kind}" data-e="${x}" aria-label="${x}">${E(x)}</button>`).join("")}</div>`:`<div class="v4grid stk">${V4STK.map(c=>`<button type="button" data-v4="stk" data-k="${kind}" data-e="${c}" aria-label="Envoyer ce sticker"><img src="img/${c}.webp" alt="" loading="lazy"></button>`).join("")}</div>`}</div>`}
+  ${t==="emo"?`<div class="v4grid emo">${V4EMO.map(x=>`<button type="button" data-v4="emo" data-k="${kind}" data-e="${x}" aria-label="${x}">${E(x)}</button>`).join("")}</div>`:`<div class="v4grid stk">${v4Stickers().map(c=>`<button type="button" data-v4="stk" data-k="${kind}" data-e="${c}" aria-label="Envoyer ce sticker"><img src="img/${c}.webp" alt="" loading="lazy"></button>`).join("")}${v4LockedPacks().map(pk=>`<button type="button" class="lockpk" data-v4="packInfo" data-id="${pk.id}" aria-label="Pack ${esc(pk.t)} à débloquer" title="À débloquer dans la boutique"><img src="img/${pk.e[0]}.webp" alt="" loading="lazy"></button>`).join("")}</div>${v4LockedPacks().length&&S.mode==="student"?`<span class="small muted">${v4LockedPacks().length} pack${v4LockedPacks().length>1?"s":""} de stickers à débloquer dans la boutique (grisés).</span>`:""}`}</div>`}
+const v4Stickers=()=>{const own=(S.me&&S.me.owned)||{},all=[...V4STK];if(typeof SH_PACKS!=="undefined")for(const pk of SH_PACKS)if(own[pk.id]||S.mode==="teacher")for(const c of pk.e)if(!all.includes(c))all.push(c);return all};
+const v4LockedPacks=()=>{if(typeof SH_PACKS==="undefined"||S.mode!=="student")return[];const own=(S.me&&S.me.owned)||{};return SH_PACKS.filter(pk=>!own[pk.id])};
 const V4IN=k=>({peer:"peerInput",chat:"chatInput",staff:"staffInput"})[k]||"chatInput",V4F=k=>({peer:"peerchat",chat:"chat",staff:"staffchat"})[k]||"chat";
 function v4Bar(kind,target,ph){const inId=V4IN(kind),files=!!window.__chatFiles,rec=V4.rec&&V4.rec.kind===kind?V4.rec:null,pan=V4.panel&&V4.panel.kind===kind?V4.panel.t:null,busy=V4.sending||(kind==="peer"&&PR.sending);
   if(rec)return`<div class="v4rec" role="status"><span class="v4rec-dot" aria-hidden="true"></span><b>Enregistrement <span id="v4recT">${fmtDur(rec.sec)}</span></b><span class="v4wave" aria-hidden="true">${"<i></i>".repeat(18)}</span><button type="button" class="iconbtn" data-v4="recCancel" aria-label="Annuler le vocal" title="Annuler">${ic("trash")}</button><button type="button" class="btn sm" data-v4="recSend" aria-label="Envoyer le vocal">${ic("send")}</button></div>`;
@@ -561,6 +563,90 @@ const V4OID=new WeakMap();let V4OIDN=0;const v4oid=x=>{if(!x||typeof x!=="object
 {const _dv=dashView;let mk=null,mh="";dashView=function(){
   const k=[S.students,S.quizzes,S.homework,S.pending,S.eps,S.corriges,S.access,S.settings,S.staff].map(v4oid).join(",")+"|"+[S.profFilter,S.drafts.st_q,S.drafts.st_cls,S.drafts.st_on,S.stLim,S._peerSig,LITE,Math.floor(Date.now()/60000)].join("|");
   if(k===mk)return mh;mk=k;mh=_dv();return mh}}
+
+/* =====================================================================
+   15. Boutique motivante : coffre du jour (gagné en travaillant), turbo XP,
+       jokers 50/50, packs de stickers, mise en avant au classement,
+       avatars légendaires débloqués par l'effort
+   ===================================================================== */
+const SH_LOCK={"ava-lion":800,"ava-ninja":1000,"ava-mage-man":1200,"ava-mage-woman":1200,"ava-hero-man":1500,"ava-hero-woman":1500,"ava-robot":2000,"ava-alien":2000,"ava-prince":2500,"ava-princess":2500,"ava-unicorn":4000,"ava-dragon":5000};
+const SH_PACKS=[
+ {id:"stk-animals",t:"Animaux de la savane",price:200,e:["1f418","1f42f","1f43c","1f43b","1f98a","1f984","1f989","1f99c","1f9a9","1f422","1f42c","1f433","1f434","1f438","1f430","1f425","1f40a","1f419"]},
+ {id:"stk-food",t:"Fête et gourmandises",price:250,e:["1f370","1f36c","1f349","1f34c","1f34d","1f353","1f96d","1f965","1f35a","1f372","1f36f","1f951","1f381","1f388"]},
+ {id:"stk-fun",t:"Champions et musique",price:300,e:["1f3c5","1f3af","1f3ae","1f3b8","1f3a7","1f3a8","1f3b9","1f941","1f6b2","1f3d3","1f451","1f48e","1f3a4","1f3c6"]}];
+SH_PACKS.forEach(pk=>{pk.e=pk.e.filter(c=>{try{return EMO_SET.has(c)}catch(e){return false}})});
+const JOKER_PRICE=80,JOKER_MAX=5,SPOT_PRICE=350,SPOT_DAYS=7;
+const BOOSTS=[{id:"boost30",t:"Turbo XP ×2 · 30 min",min:30,price:250},{id:"boost60",t:"Turbo XP ×2 · 1 heure",min:60,price:400}];
+const boostLeft=()=>Math.max(0,((S.me&&S.me.boostUntil)||0)-Date.now());
+const spotLeft=m=>Math.max(0,((m&&m.spotUntil)||0)-Date.now());
+const shCoins=()=>coinsOf(S.me);
+function shSpend(price,patch,msg){const m=S.me;if(!m)return false;if(shCoins()<price){toast("Pas assez d'XP pour l'instant : continue à travailler !","x");return false}
+  meWrite({spent:(m.spent||0)+price,...patch});beep("win");if(!LITE)confetti();toast(msg+` (−${price} XP)`,"bag");return true}
+/* XP doublés pendant le turbo */
+{const _g=gain;gain=function(xp,activity,extra,anchor){if(xp>0&&boostLeft()>0)xp=xp*2;return _g(xp,activity,extra,anchor)}}
+/* coffre du jour : s'ouvre quand l'objectif du jour est atteint */
+const CHEST=[{k:"joker",t:"1 joker 50/50"},{k:"xp",t:"+40 XP bonus"},{k:"freeze",t:"1 gel de série"},{k:"boost",t:"Turbo XP ×2 pendant 15 min"}];
+const chestToday=()=>CHEST[(Math.floor(Date.now()/864e5))%CHEST.length];
+const chestReady=()=>{const m=S.me;return!!m&&m.lastDay===today()&&(m.dayXp||0)>=DAILY_GOAL&&m.chestDay!==today()};
+function chestOpen(){const m=S.me;if(!chestReady())return;const r=chestToday();let k=r.k;if(k==="freeze"&&(m.freezes||0)>=FREEZE_MAX)k="xp";
+  if(k==="xp"){meWrite({chestDay:today()});gain(40,"A ouvert le coffre du jour")}
+  else if(k==="joker")meWrite({chestDay:today(),jokers:Math.min(JOKER_MAX,(m.jokers||0)+1)});
+  else if(k==="freeze")meWrite({chestDay:today(),freezes:(m.freezes||0)+1});
+  else meWrite({chestDay:today(),boostUntil:Math.max(Date.now(),m.boostUntil||0)+15*60000});
+  beep("win");if(!LITE)confetti();celebrate&&setTimeout(()=>{try{celebrate("Coffre du jour",(CHEST.find(x=>x.k===k)||r).t+" ! Reviens demain pour un nouveau coffre.","gift")}catch(e){toast("Coffre ouvert : "+(CHEST.find(x=>x.k===k)||r).t,"gift")}},300)}
+function chestHTML(compact){const m=S.me;if(!m||isParent(m))return"";const done=m.chestDay===today(),ready=chestReady(),dx=m.lastDay===today()?(m.dayXp||0):0,r=chestToday();
+  if(compact&&!ready)return"";
+  return`<div class="section"><div class="glass card shx-chest ${ready?"ready":""}"><span class="shx-chest-ic" aria-hidden="true">${E("🎁")}</span><div style="display:grid;gap:4px;min-width:0"><span class="eyebrow">Coffre du jour · gratuit</span><h3 style="margin:0">${done?"Coffre ouvert ! Reviens demain":ready?"Ton coffre est prêt !":"Gagne "+DAILY_GOAL+" XP aujourd'hui pour l'ouvrir"}</h3><span class="small muted">Aujourd'hui : ${esc(r.t)}</span>${!done&&!ready?`<div class="bar" style="max-width:260px"><i style="width:${Math.min(100,Math.round(dx/DAILY_GOAL*100))}%"></i></div><span class="small muted">${dx} / ${DAILY_GOAL} XP</span>`:""}</div>${ready?`<button class="btn" data-v4="chest">${ic("gift")}Ouvrir</button>`:done?`<span class="chip ok">${ic("check")}Ouvert</span>`:""}</div></div>`}
+function shopExtraHTML(){const m=S.me,c=shCoins(),own=m.owned||{},bl=boostLeft(),jk=m.jokers||0,sp=spotLeft(m);
+  const nextLock=Object.entries(SH_LOCK).filter(([id,x])=>(m.xp||0)<x).sort((a,b)=>a[1]-b[1])[0],nl=nextLock&&shopItem(nextLock[0]);
+  return`${chestHTML(false)}
+  ${nl?`<div class="section"><div class="glass card row" style="gap:14px;flex-wrap:nowrap"><span class="shop-ava" style="flex:none">${avaHTML(nl.v)}</span><div style="display:grid;gap:6px;flex:1;min-width:0"><span class="eyebrow">Prochain avatar légendaire</span><b>${esc(nl.label)} · se débloque à ${nextLock[1]} XP gagnés</b><div class="bar"><i style="width:${Math.min(100,Math.round((m.xp||0)/nextLock[1]*100))}%"></i></div><span class="small muted">Encore ${nextLock[1]-(m.xp||0)} XP : chaque leçon, quiz ou devoir te rapproche !</span></div></div></div>`:""}
+  <div class="section"><div><span class="eyebrow">Pour aller plus vite</span><h2>Bonus de travail</h2><p class="sub">Des coups de pouce qui récompensent ceux qui travaillent.</p></div><div class="shx-grid">
+   ${BOOSTS.map(b=>`<div class="glass card shx"><span class="shx-ic" aria-hidden="true">${E("🚀")}</span><b>${b.t}</b><span class="small muted">Tous les XP gagnés comptent double pendant ${b.min} minutes. Idéal avant de réviser !</span>${bl?`<span class="chip ok">${ic("bolt")}Actif · encore ${Math.ceil(bl/60000)} min</span>`:`<button class="btn sm" data-v4="buyBoost" data-k="${b.id}" ${c<b.price?"disabled":""}>${ic("bolt")}${b.price}</button>`}</div>`).join("")}
+   <div class="glass card shx"><span class="shx-ic" aria-hidden="true">${E("🃏")}</span><b>Joker 50/50</b><span class="small muted">Dans un quiz, il retire deux mauvaises réponses. Tu en as <b>${jk}</b> / ${JOKER_MAX}.</span>${jk>=JOKER_MAX?`<span class="chip">Maximum atteint</span>`:`<button class="btn sm" data-v4="buyJoker" ${c<JOKER_PRICE?"disabled":""}>${ic("bolt")}${JOKER_PRICE}</button>`}</div>
+   <div class="glass card shx"><span class="shx-ic" aria-hidden="true">${E("👑")}</span><b>En vedette au classement</b><span class="small muted">Ton nom brille en or avec une couronne dans le classement de la classe pendant ${SPOT_DAYS} jours.</span>${sp?`<span class="chip ok">${ic("check")}Actif · ${Math.ceil(sp/864e5)} j</span>`:`<button class="btn sm" data-v4="buySpot" ${c<SPOT_PRICE?"disabled":""}>${ic("bolt")}${SPOT_PRICE}</button>`}</div>
+  </div></div>
+  <div class="section"><div><span class="eyebrow">Pour les messageries</span><h2>Packs de stickers 3D</h2><p class="sub">Débloque de nouveaux stickers à envoyer à tes camarades et à ta professeure.</p></div><div class="shx-grid">
+   ${SH_PACKS.map(pk=>`<div class="glass card shx"><div class="shx-stk">${pk.e.slice(0,6).map(c=>`<img src="img/${c}.webp" alt="" loading="lazy">`).join("")}</div><b>${esc(pk.t)}</b><span class="small muted">${pk.e.length} stickers</span>${own[pk.id]?`<span class="chip ok">${ic("check")}Débloqué</span>`:`<button class="btn sm" data-v4="buyPack" data-id="${pk.id}" ${c<pk.price?"disabled":""}>${ic("bolt")}${pk.price}</button>`}</div>`).join("")}
+  </div></div>`}
+{const _sv=shopView;shopView=function(){let h=_sv();const m=S.me;if(!m)return h;
+  // avatars légendaires : verrouillés tant que l'XP gagné n'est pas suffisant
+  for(const[id,need]of Object.entries(SH_LOCK)){if((m.xp||0)>=need||(m.owned||{})[id])continue;
+    h=h.replace(new RegExp(`<button class="btn sm" data-a="buy" data-id="${id}"[^>]*>[\\s\\S]*?</button>`),`<span class="chip">${ic("lock")}${need} XP gagnés</span>`)}
+  const k=h.indexOf('<div class="section"><div><span class="eyebrow">Dans la vraie vie</span>');const x=shopExtraHTML();return k>0?h.slice(0,k)+x+h.slice(k):h+x}}
+/* jokers dans les quiz */
+{const _qr=quizRunView;quizRunView=function(){let h=_qr();const r=S.run,q=curQuiz&&curQuiz();if(!r||!q||S.mode!=="student"||!S.me)return h;const cur=(q.questions||[])[r.i];
+  if(!cur||!Array.isArray(cur.choices)||cur.type==="type")return h;const hid=(r.fifty||{})[r.i];
+  if(hid)for(const i of hid)h=h.replace(`data-a="pick" data-i="${i}" `,`data-a="pick" data-i="${i}" disabled style="opacity:.18;pointer-events:none" `);
+  if(r.picked==null&&!r.exam&&!hid&&cur.choices.length>=3&&(S.me.jokers||0)>0)h=h.replace('<div class="choices">',`<div><button class="btn ghost sm" data-v4="joker">${E("🃏")} Joker 50/50 · ${S.me.jokers} restant${S.me.jokers>1?"s":""}</button></div><div class="choices">`);
+  return h}}
+/* classement : élèves en vedette */
+leaderboardHTML=function(rows,meId){let h=leaderboardHTML0(rows,meId);const now=Date.now();
+  const spot=id=>{const p=(S.board||[]).find(x=>x.id===id)||(typeof personOf==="function"?personOf(id):null);return p&&(p.spotUntil||0)>now};
+  rows=[...rows].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,20);const parts=h.split('<div class="it ');
+  return parts.map((seg,i)=>i===0?seg:(rows[i-1]&&spot(rows[i-1].id)?'<div class="it lb-spot '+seg.replace("</b>",` <span class="lb-crown">${E("👑")}</span></b>`):'<div class="it '+seg)).join("")};
+/* idées de récompenses pour la prof */
+const RW_IDEAS=[["Choisir sa place pendant une semaine",500],["+1 point à la prochaine interrogation",800],["Choisir la chanson d'anglais du vendredi",300],["Être le « teacher assistant » d'un cours",600],["Sortir 5 minutes plus tôt en récréation",700],["Un devoir en moins (au choix)",1200],["Certificat « English Star » remis devant la classe",1000],["Lire son texte en anglais devant la classe",250]];
+{const _rh=rewardsHTML;rewardsHTML=function(){const h=_rh();const k=h.indexOf('<p class="hint" style="margin:0">Idées');const ideas=`<div style="display:grid;gap:6px"><span class="small muted">Idées en un clic :</span><div class="row" style="gap:6px;flex-wrap:wrap">${RW_IDEAS.map(([t,c],i)=>`<button type="button" class="chip" data-v4="rwIdea" data-i="${i}" style="cursor:pointer">${esc(t)} · ${c} XP</button>`).join("")}</div></div>`;
+  return k>0?h.slice(0,k)+ideas+h.slice(k):h}}
+/* coffre prêt : rappel sur l'accueil */
+{const _hm2=homeView;homeView=function(){const h=_hm2(),c=chestHTML(true);if(!c)return h;const i=h.indexOf('<div class="section"',10);return i>0?h.slice(0,i)+c+h.slice(i):h+c}}
+document.head.insertAdjacentHTML("beforeend",`<style>
+.shx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.shx{display:grid;gap:8px;justify-items:start;align-content:start}
+.shx-ic{font-size:2.2rem;line-height:1}.shx-ic .e3d{width:54px;height:54px}
+.shx-stk{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:100%}.shx-stk img{width:100%;max-width:56px;aspect-ratio:1;object-fit:contain}
+.shx-chest{grid-template-columns:auto 1fr auto;align-items:center;gap:16px;border-color:var(--gold-soft)}
+.shx-chest-ic{font-size:3rem;line-height:1}.shx-chest-ic .e3d{width:64px;height:64px}
+.shx-chest.ready{box-shadow:0 0 0 2px #E3C173,0 18px 50px -18px rgba(227,193,115,.9)}
+.shx-chest.ready .shx-chest-ic{animation:shxBounce 1.4s ease-in-out infinite}
+@keyframes shxBounce{50%{transform:translateY(-6px) rotate(-6deg)}}
+@media (max-width:520px){.shx-chest{grid-template-columns:auto 1fr}.shx-chest>.btn,.shx-chest>.chip{grid-column:1/-1;justify-self:start}}
+.lb .it.lb-spot{background:linear-gradient(90deg,rgba(227,193,115,.28),rgba(227,193,115,.06));border-radius:14px;box-shadow:inset 0 0 0 1px rgba(227,193,115,.6)}
+.lb .it.lb-spot b{color:#E9C46A}.lb-crown .e3d{width:20px;height:20px;vertical-align:-4px}
+.v4grid .lockpk{opacity:.35;filter:grayscale(1)}
+@media (prefers-reduced-motion:reduce){.shx-chest.ready .shx-chest-ic{animation:none}}
+</style>`);
 /* =====================================================================
    9. Événements
    ===================================================================== */
@@ -595,6 +681,15 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"staffOpen":staffOpen(el.dataset.id);return;
   case"staffBack":SC.unsub?.();SC.unsub=null;SC.with=null;S.view=null;S.tab="msgs";S.msgsTab="staff";S.animate=true;render();return;
   case"iosGuide":window.__iosGuide&&window.__iosGuide();return;
+  case"chest":chestOpen();return;
+  case"buyBoost":{const b=BOOSTS.find(x=>x.id===el.dataset.k);if(!b||boostLeft()>0)return;shSpend(b.price,{boostUntil:Date.now()+b.min*60000},"Turbo activé : XP ×2 pendant "+b.min+" min");return}
+  case"buyJoker":{const n=S.me.jokers||0;if(n>=JOKER_MAX)return;shSpend(JOKER_PRICE,{jokers:n+1},"Joker 50/50 ajouté");return}
+  case"buySpot":if(spotLeft(S.me))return;if(shSpend(SPOT_PRICE,{spotUntil:Date.now()+SPOT_DAYS*864e5},"Tu es en vedette au classement pour "+SPOT_DAYS+" jours")){try{S.db.doc("board/"+S.uid).update({spotUntil:Date.now()+SPOT_DAYS*864e5}).catch(()=>{})}catch(e){}}return;
+  case"buyPack":{const pk=SH_PACKS.find(x=>x.id===el.dataset.id);if(!pk||(S.me.owned||{})[pk.id])return;shSpend(pk.price,{owned:{...(S.me.owned||{}),[pk.id]:Date.now()}},"Pack « "+pk.t+" » débloqué");return}
+  case"packInfo":toast("Débloque ce pack dans la boutique des XP (bouton XP en haut).","gift");return;
+  case"joker":{const r=S.run,q=curQuiz();if(!r||!q||(S.me.jokers||0)<1)return;const cur=q.questions[r.i];const wrong=shuffle(cur.choices.map((_,i)=>i).filter(i=>i!==cur.answer)).slice(0,Math.min(2,cur.choices.length-2));
+    r.fifty=r.fifty||{};r.fifty[r.i]=wrong;meWrite({jokers:(S.me.jokers||0)-1});beep("ok");render();return}
+  case"rwIdea":{const it=RW_IDEAS[+el.dataset.i];if(!it)return;S.drafts.rw_title=it[0];S.drafts.rw_cost=String(it[1]);render();return}
   case"toLogin":{el.disabled=true;Promise.resolve(window.__appLogout&&window.__appLogout()).catch(()=>location.reload());return}
   }},true);
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);
