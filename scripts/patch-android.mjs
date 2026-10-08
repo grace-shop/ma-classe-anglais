@@ -19,4 +19,7 @@ if (!s.includes('android:scheme="tg.maclasse.anglais"')) s = s.replace(/(<activi
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="tg.maclasse.anglais" android:host="login" />
             </intent-filter>`);
-writeFileSync(f, s); console.log("✓ AndroidManifest.xml complété");
+s = s.replace('android:allowBackup="true"', 'android:allowBackup="false"');
+if (!s.includes("usesCleartextTraffic")) s = s.replace("<application", '<application android:usesCleartextTraffic="false"');
+if (!s.includes("android:allowBackup")) s = s.replace("<application", '<application android:allowBackup="false"');
+writeFileSync(f, s); console.log("✓ AndroidManifest.xml complété (sauvegarde cloud et trafic non chiffré désactivés)");
