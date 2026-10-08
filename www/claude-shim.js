@@ -115,13 +115,16 @@
     q = o.order ? q.order("data->" + o.order[0], { ascending: o.order[1] !== "desc", nullsFirst: false }) : q.order("path");
     q = q.limit(Math.min(o.limit || 1000, 1000));
     const ck = "r:" + uidKey() + ":" + col + "|" + JSON.stringify(o);
-    const { data, error } = await q;
+    const cached0 = await idb.get(ck);
+    const { data, error } = await (cached0 ? Promise.race([q, new Promise((r) => setTimeout(() => r({ data: cached0, error: null, stale: true }), 6000))]) : q);
     if (error) { const m = mapErr(error); if (m.code === "unavailable") { const c = await idb.get(ck); if (c) return c; } throw m; }
     idb.set(ck, data || []); return data || [];
   }
   async function getRow(path) {
     const ck = "d:" + uidKey() + ":" + path;
-    const { data, error } = await sb.from("docs").select("path,id,data").eq("path", path).maybeSingle();
+    const cached0 = await idb.get(ck);
+    const q0 = sb.from("docs").select("path,id,data").eq("path", path).maybeSingle();
+    const { data, error } = await (cached0 !== undefined ? Promise.race([q0, new Promise((r) => setTimeout(() => r({ data: cached0, error: null }), 6000))]) : q0);
     if (error) { const m = mapErr(error); if (m.code === "unavailable") { const c = await idb.get(ck); if (c !== undefined) return withQueued(path, c); } throw m; }
     idb.set(ck, data || null); return withQueued(path, data);
   }
@@ -203,6 +206,20 @@
   };
 
   /* ---------------- copies d'élèves (photos / PDF des devoirs et épreuves) ---------------- */
+  window.__peer = {
+    dir: async () => { const { data, error } = await sb.rpc("peer_directory"); if (error) throw new Error(mapErr(error).message); return data || []; },
+    send: async (to, body) => { const { data, error } = await sb.rpc("send_peer_message", { p_to: to, p_body: body }); if (error) throw new Error(error.message || "Envoi impossible"); return data; },
+    read: async (from) => { const { error } = await sb.rpc("mark_peer_read", { p_from: from }); if (error) throw new Error(error.message); },
+    inbox: async () => { const { data, error } = await sb.from("peer_messages").select("id,sender,receiver,body,created_at,read_at").order("created_at", { ascending: false }).limit(400); if (error) throw new Error(mapErr(error).message); return data || []; },
+    all: async () => { const { data, error } = await sb.from("peer_messages").select("id,sender,receiver,body,created_at,hidden").order("created_at", { ascending: false }).limit(300); if (error) throw new Error(mapErr(error).message); return data || []; },
+    hide: async (id, on) => { const { error } = await sb.from("peer_messages").update({ hidden: !!on }).eq("id", id); if (error) throw new Error(mapErr(error).message); },
+    listen: (fn) => {
+      try {
+        const ch = sb.channel("peer-" + rid(8)).on("postgres_changes", { event: "INSERT", schema: "public", table: "peer_messages" }, (p) => { try { fn(p.new); } catch (e) {} }).subscribe();
+        return () => { try { sb.removeChannel(ch); } catch (e) {} };
+      } catch (e) { return () => {}; }
+    },
+  };
   window.__grade = async (body) => {
     const { data, error } = await sb.functions.invoke("grade", { body });
     if (error) {
@@ -331,7 +348,7 @@
 #authGate .or{display:flex;align-items:center;gap:10px;color:#8D94B5;font-size:.85rem}#authGate .or::before,#authGate .or::after{content:"";flex:1;height:1px;background:#2A3050}
 #authGate .msg{padding:10px 12px;border-radius:12px;font-size:.92rem}#authGate .msg.err{background:#3E1E27;color:#FFB3BF}#authGate .msg.ok{background:#163327;color:#8BE8BC}
 #authGate form{display:grid;gap:12px}
-#authGate .dl{display:flex;align-items:center;justify-content:center;gap:12px;padding:13px 16px;border-radius:18px;border:1px solid rgba(139,232,188,.5);background:linear-gradient(135deg,rgba(95,212,159,.24),rgba(74,95,208,.34));color:#EAFFF5;text-decoration:none;box-shadow:0 10px 26px rgba(40,160,110,.25),inset 0 1px 0 rgba(255,255,255,.15);transition:transform .15s,box-shadow .15s}#authGate .dl:hover,#authGate .dl:focus-visible{transform:translateY(-2px);box-shadow:0 14px 32px rgba(40,160,110,.42),inset 0 1px 0 rgba(255,255,255,.2)}#authGate .dl .dli{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#6D86FF,#4A5FD0 60%,#2FB88A)}#authGate .dl b{display:block;font-size:1rem}#authGate .dl small{display:block;font-weight:600;opacity:.78;font-size:.76rem}#authGate .pwwarn{display:grid;gap:6px;padding:12px 14px;border-radius:14px;background:#3A2B0F;border:1.5px solid #E3C173;color:#FFE9B3;font-size:.92rem;line-height:1.45}#authGate .pwwarn b{font-size:1rem;color:#FFD36E}#authGate .ck{display:flex;gap:10px;align-items:flex-start;font-weight:700;font-size:.9rem;color:#FFE9B3;cursor:pointer}#authGate .ck input{flex:none;width:20px;height:20px;margin-top:2px}
+#authGate .dl{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:14px;border:1px dashed #3B4366;color:#8BE8BC;font-weight:700;text-decoration:none}#authGate .dl:hover{border-color:#8BE8BC}
 #authGate .pw{position:relative;display:block}#authGate .pw input{padding-right:52px}
 #authGate .pw .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;padding:0;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#AFC0FF;cursor:pointer}
 #authGate .pw .eye.on{color:#fff;background:#2A3260}#authGate button:disabled{opacity:.5}`;
@@ -343,16 +360,15 @@
     const reset = mode === "newpass";
     gate.innerHTML = `<div class="box" role="dialog" aria-labelledby="agT"><div class="logo">En</div><div><h1 id="agT">Ma Classe d'Anglais</h1><p>${reset ? "Choisis ton nouveau mot de passe." : "Connecte-toi pour retrouver ta classe, tes leçons et ta progression."}</p></div>
     ${note ? `<div class="msg ${note.ok ? "ok" : "err"}">${esc(note.t)}</div>` : ""}
-    ${reset ? `<form data-f="newpass"><label>Nouveau mot de passe<span class="pw"><input id="agP" type="password" minlength="6" required autocomplete="new-password"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label><div class="pwwarn" role="note"><b>⚠️ Ne perds jamais ton mot de passe, en aucun cas.</b><span>Note-le tout de suite dans un endroit sûr (cahier, carnet). C'est la seule clé de ton compte : tes résultats, tes messages et ta progression en dépendent. Pour ta sécurité, ne le donne à personne, pas même à un ami. Si tu l'oublies, il faudra le changer par e-mail, et tu pourras perdre du temps.</span></div><button class="p" type="submit">Enregistrer</button></form>` : `
+    ${reset ? `<form data-f="newpass"><label>Nouveau mot de passe<span class="pw"><input id="agP" type="password" minlength="6" required autocomplete="new-password"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label><button class="p" type="submit">Enregistrer</button></form>` : `
     ${CFG.googleEnabled === false ? "" : `<button class="g" data-x="google">${G}Continuer avec Google</button><div class="or">ou avec ton e-mail</div>`}
     <div class="tabs"><button data-x="in" aria-pressed="${mode === "in"}">Se connecter</button><button data-x="up" aria-pressed="${mode === "up"}">Créer un compte</button></div>
-    <div class="pwwarn" role="note"><b>⚠️ Ne perds jamais ton mot de passe, en aucun cas.</b><span>Note-le tout de suite dans un endroit sûr (cahier, carnet). C'est la seule clé de ton compte : tes résultats, tes messages et ta progression en dépendent. Pour ta sécurité, ne le donne à personne, pas même à un ami. Si tu l'oublies, il faudra le changer par e-mail, et tu pourras perdre du temps.</span></div>
     <form data-f="${mode}">${mode === "up" ? `<label>Prénom et nom<input id="agN" required maxlength="60" autocomplete="name" placeholder="Ex. Ama Kossi"></label>` : ""}
     <label>E-mail<input id="agE" type="email" required autocomplete="email" placeholder="ton.email@gmail.com"></label>
     <label>Mot de passe<span class="pw"><input id="agP" type="password" required minlength="6" autocomplete="${mode === "up" ? "new-password" : "current-password"}" placeholder="6 caractères minimum"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
-    ${mode === "up" ? `<label class="ck"><input type="checkbox" id="agK" required><span>J'ai compris : je note mon mot de passe et je ne l'oublierai jamais.</span></label>` : ""}<button class="p" type="submit">${mode === "up" ? "Créer mon compte" : "Se connecter"}</button></form>
+    <button class="p" type="submit">${mode === "up" ? "Créer mon compte" : "Se connecter"}</button></form>
     ${mode === "in" ? `<button class="l" data-x="forgot">Mot de passe oublié ?</button>` : ""}`}
-    ${!isNative() && CFG.apkUrl ? `<a class="dl" href="${esc(CFG.apkUrl)}" rel="noopener"><span class="dli"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></span><span><b>Télécharger l'application</b><small>Android · fichier APK</small></span></a>` : ""}</div>`;
+    ${!isNative() && CFG.apkUrl ? `<a class="dl" href="${esc(CFG.apkUrl)}" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Télécharger l'application Android</a>` : ""}</div>`;
   }
   function showGate() { drawGate(); }
   function hideGate() { if (gate) { gate.remove(); gate = null; } const sp = document.getElementById("splash"); if (sp) sp.style.display = ""; }
@@ -393,8 +409,8 @@
   /* ---------------- contenu de départ (première connexion de la prof principale) ---------------- */
   async function offerStarterContent() {
     if (member.level !== "owner") return;
-    const { count } = await sb.from("docs").select("path", { count: "exact", head: true }).eq("col", "lessons");
-    if (count) return;
+    const { count, error: cErr } = await sb.from("docs").select("path", { count: "exact", head: true }).eq("col", "lessons");
+    if (cErr || count) return;
     let content; try { content = await (await fetch("content.json", { cache: "no-store" })).json(); } catch (e) { return; }
     const total = Object.values(content).reduce((n, c) => n + Object.keys(c).length, 0);
     const box = document.createElement("div"); box.id = "authGate";
@@ -412,15 +428,22 @@
           if (error) { pr.className = "msg err"; pr.textContent = "Erreur : " + error.message; go.disabled = false; return; }
           pr.textContent = `Installation… ${Math.min(i + 50, rows.length)} / ${rows.length}`;
         }
-        pr.textContent = "Contenu installé !"; setTimeout(() => { box.remove(); done(); }, 700);
+        pr.textContent = "Contenu installé !"; try { localStorage.setItem("mca_prog_togo-2026-10", "1"); } catch (e) {} setTimeout(() => { box.remove(); done(); }, 700);
       };
     });
   }
 
   /* ---------------- démarrage ---------------- */
   async function loadMember() {
-    const { data } = await sb.from("members").select("level,email").eq("uid", session.user.id).maybeSingle();
-    member = data || { level: "interact" };
+    const mk = "mca_member_" + session.user.id;
+    let got = null;
+    try {
+      const r = await Promise.race([sb.from("members").select("level,email").eq("uid", session.user.id).maybeSingle(), new Promise((res) => setTimeout(() => res({ timeout: true }), 5000))]);
+      if (r && !r.timeout && !r.error) got = r.data || { level: "interact" };
+    } catch (e) {}
+    if (got) { try { localStorage.setItem(mk, JSON.stringify(got)); } catch (e) {} member = got; return; }
+    let saved = null; try { saved = JSON.parse(localStorage.getItem(mk) || "null"); } catch (e) {}
+    member = saved || { level: "interact" };
   }
   let started = false;
   function brandAI() { const el = document.getElementById("aiSub"); if (el) el.textContent = "Assistant IA propulsé par Gemini"; }
@@ -435,7 +458,8 @@
       return;
     }
     if (!window.supabase) { try { await loadScript(CFG.supabaseJs || "vendor/supabase.js"); } catch (e) { await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"); } }
-    sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" } });
+    let devId = ""; try { devId = localStorage.getItem("mca_dev") || ""; if (!devId) { devId = "d" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem("mca_dev", devId); } } catch (e) {}
+    sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" }, global: { headers: devId ? { "x-device-id": devId } : {} } });
     const App = plug("App");
     if (isNative() && App) App.addListener("appUrlOpen", async ({ url }) => {
       if (!CFG.nativeRedirect || !url.startsWith(CFG.nativeRedirect)) return;
@@ -449,6 +473,14 @@
       if (s && mode !== "newpass") afterLogin();
     });
     const { data } = await sb.auth.getSession(); session = data.session;
+    if (!session) {                                    // jeton expiré et réseau coupé : on garde la session enregistrée
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (/^sb-.+-auth-token$/.test(k)) { const st = JSON.parse(localStorage.getItem(k) || "null"); if (st && st.user && st.user.id) { session = st; break; } }
+        }
+      } catch (e) {}
+    }
     if (session) afterLogin(); else showGate();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();

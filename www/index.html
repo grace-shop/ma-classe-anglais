@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Ma Classe d'Anglais</title><meta name="theme-color" content="#0E1120"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
+<title>Ma Classe d'Anglais</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="theme-color" content="#0E1120"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;background:#0E1120}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <script src="config.js"></script><script src="claude-shim.js"></script>
@@ -596,17 +596,6 @@ button.pill.xp{font:inherit;font-weight:700;font-size:.85rem;cursor:pointer}
 @media (max-width:560px){.roles{grid-template-columns:1fr 1fr;gap:10px}.role{padding:14px 12px;gap:6px;border-radius:18px}.role .ic{width:auto;height:auto}.role .ic .ic3d,.role .e3d{width:44px;height:44px}.role b{font-size:.95rem}.role span{font-size:.78rem}}
 .dl-card{grid-template-columns:auto 1fr auto;align-items:center;gap:16px;background:linear-gradient(120deg,rgba(74,95,208,.18),rgba(95,212,159,.08)),var(--glass-bg)}.dl-ic .e3d{width:52px;height:52px}
 @media (max-width:620px){.dl-card{grid-template-columns:auto 1fr}.dl-card>.row{grid-column:1/-1}}
-/* ===== dossiers d'élèves ===== */
-.folder{padding:0;overflow:hidden}.folder-h{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;padding:14px 18px;cursor:pointer;font:inherit;color:inherit}.folder-h:hover{background:var(--surface2)}.folder-h:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}.folder-ic{font-size:1.4rem;line-height:1}.folder-chev{margin-left:auto;color:var(--muted)}.folder .tablewrap{border:0;border-top:1px solid var(--line);border-radius:0;background:none;box-shadow:none}
-/* ===== bouton de téléchargement ===== */
-.dl2{position:relative;overflow:hidden;display:grid;gap:16px;padding:clamp(18px,3.5vw,28px);border-radius:26px;border:1px solid rgba(147,171,255,.35);background:radial-gradient(120% 140% at 0% 0%,rgba(74,95,208,.34),transparent 60%),radial-gradient(90% 120% at 100% 100%,rgba(95,212,159,.20),transparent 60%),var(--glass-bg);box-shadow:var(--shadow)}
-.dl2-top{display:flex;gap:16px;align-items:center}.dl2-ph{flex:none;width:64px;height:64px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(145deg,#6D86FF,#4A5FD0 55%,#2FB88A);box-shadow:0 10px 26px rgba(74,95,208,.45)}.dl2-ph svg{width:34px;height:34px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.dl2-t h3{margin:2px 0 4px;font-size:1.25rem}.dl2-t p{margin:0;color:var(--muted);font-size:.95rem;line-height:1.5}
-.dl2-f{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}.dl2-f li{padding:6px 12px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);font-size:.85rem}
-.dl2-a{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.dl2-btn{display:inline-flex;align-items:center;gap:12px;padding:12px 22px;border-radius:18px;text-decoration:none;color:#fff;background:linear-gradient(135deg,#5B74F0,#3B4FC4);box-shadow:0 12px 28px rgba(59,79,196,.5),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .15s,box-shadow .15s}
-.dl2-btn:hover,.dl2-btn:focus-visible{transform:translateY(-2px);box-shadow:0 16px 34px rgba(59,79,196,.6),inset 0 1px 0 rgba(255,255,255,.35)}.dl2-btn svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.dl2-btn b{display:block;font-size:1rem}.dl2-btn small{display:block;opacity:.8;font-size:.78rem}
-.dl2-alt{display:inline-flex;align-items:center;gap:8px;padding:12px 16px;border-radius:16px;border:1px solid var(--line);background:var(--surface2);color:inherit;font:inherit;font-weight:700;cursor:pointer}
-@media (max-width:480px){.dl2-btn{width:100%;justify-content:center}.dl2-top{align-items:flex-start}}
 /* ===== Lisibilité : tailles minimales et contraste des petits textes ===== */
 .eyebrow{font-size:.78rem;letter-spacing:.12em}
 .sub{font-size:1.02rem}
@@ -647,6 +636,69 @@ th{font-size:.76rem;letter-spacing:.1em}
 :root[data-lite="1"] .enter>*{animation:none!important}
 :root[data-lite="1"] .dot.on,:root[data-lite="1"] .bigplay,:root[data-lite="1"] #aiFab .orb{animation:none}
 :root[data-lite="1"] .card.click:hover,:root[data-lite="1"] .tilt:hover{transform:none}
+
+/* ===================================================================
+   v3 : interface stable, plein écran, téléphone + ordinateur
+   =================================================================== */
+html{overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100vh;min-height:100dvh;width:100%;max-width:100vw;overscroll-behavior:none;touch-action:pan-y pinch-zoom}
+.wrap{min-height:100vh;min-height:100dvh;overflow-x:clip}
+#main,#main>*{min-width:0;max-width:100%}
+.glass,.card,.section,.cols,.kpis,.list,.it,.txt{min-width:0}
+.tablewrap,.scrollx,.seg,.pills,.chips{touch-action:pan-x pan-y;max-width:100%}
+img,video,canvas,svg{max-width:100%}
+/* barre d'onglets : ne s'étire jamais (iPhone / Safari) */
+nav.tabs{height:auto;align-items:center;align-content:center}
+@media (max-width:1099px){nav.tabs{max-height:calc(92px + env(safe-area-inset-bottom,0px))!important}}
+@media (max-width:760px){
+  nav.tabs{position:fixed!important;top:auto!important;bottom:0!important;left:0!important;right:0!important;inset-block-start:auto!important;height:auto!important;transform:none!important;width:auto!important}
+  .wrap{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
+}
+/* espace prof : plus rien ne bouge */
+body[data-mode="teacher"] *,body[data-mode="teacher"] *::before,body[data-mode="teacher"] *::after{animation:none!important}
+/* bouton « Suspendre » à droite de chaque appareil */
+.it .devbtn{margin-left:auto;flex:none}
+.it .btn.sm{white-space:nowrap}
+@media (max-width:420px){.it{flex-wrap:wrap}.it .btn.sm{margin-left:auto}}
+
+/* ---- Style futuriste (thème nuit) ---- */
+:root[data-skin="nuit"] body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(130,150,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(130,150,255,.05) 1px,transparent 1px);
+  background-size:46px 46px;-webkit-mask-image:radial-gradient(75% 65% at 50% 28%,#000 0%,transparent 100%);mask-image:radial-gradient(75% 65% at 50% 28%,#000 0%,transparent 100%)}
+:root[data-skin="nuit"] .glass{background-image:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0) 42%);
+  box-shadow:0 0 0 1px rgba(125,145,255,.14),0 22px 60px -26px rgba(70,95,230,.55),inset 0 1px 0 rgba(255,255,255,.07)}
+:root[data-skin="nuit"] .glass:hover{box-shadow:0 0 0 1px rgba(150,170,255,.30),0 26px 70px -24px rgba(90,115,255,.65),inset 0 1px 0 rgba(255,255,255,.10)}
+:root[data-skin="nuit"] .btn:not(.ghost):not(.danger){background:linear-gradient(135deg,#6C80FF,#9A7CFF 55%,#4FD1E8);color:#06091c;border:0;font-weight:800;box-shadow:0 10px 28px -10px rgba(108,128,255,.9),inset 0 1px 0 rgba(255,255,255,.35)}
+:root[data-skin="nuit"] .btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+:root[data-skin="nuit"] .btn.ghost{border:1px solid rgba(140,160,255,.35);background:rgba(110,130,255,.08)}
+:root[data-skin="nuit"] .btn.ghost:hover{border-color:rgba(170,185,255,.7);background:rgba(110,130,255,.16)}
+:root[data-skin="nuit"] .btn,:root[data-skin="nuit"] .glass{transition:transform .18s,box-shadow .25s,filter .2s,border-color .2s,background .2s}
+:root[data-skin="nuit"] header.top .logo{box-shadow:0 0 22px rgba(120,140,255,.65)}
+:root[data-skin="nuit"] nav.tabs button[aria-current="true"]{background:linear-gradient(135deg,#5B6EF5,#8F6CFF 60%,#3FC6E0);box-shadow:0 8px 26px -6px rgba(110,125,255,.85),inset 0 1px 0 rgba(255,255,255,.25)}
+:root[data-skin="nuit"] h1,:root[data-skin="nuit"] h2{text-shadow:0 0 28px rgba(120,140,255,.28)}
+
+/* ---- Ordinateur : barre de navigation verticale à gauche ---- */
+@media (min-width:1100px){
+  nav.tabs{position:fixed!important;left:20px;right:auto;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;flex-direction:column;gap:6px;width:92px!important;max-width:92px;margin:0!important;padding:10px 8px!important;border-radius:28px!important;border-width:1px!important;z-index:30;max-height:none!important}
+  nav.tabs button{flex-direction:column;gap:5px;padding:12px 4px;font-size:.72rem;border-radius:18px;width:100%}
+  nav.tabs button svg{width:22px;height:22px}
+  nav.tabs .count{top:4px;right:8px}
+  .wrap{max-width:min(1180px,calc(100vw - 260px));margin-left:max(130px,calc((100vw - 1180px)/2));margin-right:auto}
+  header.top{border-radius:0 0 20px 20px}
+  #aiFab{bottom:26px;right:26px}
+}
+@media (min-width:1700px){.wrap{max-width:1320px;margin-left:max(130px,calc((100vw - 1320px)/2))}}
+.chip.ok{color:#3ad29f;border-color:rgba(58,210,159,.45)}
+/* en-tête compact sur petits écrans */
+.brand{min-width:0;flex:none}
+@media (max-width:480px){
+  header.top{gap:6px;padding-inline:12px}
+  .hdr-right{gap:3px;min-width:0;flex-wrap:wrap;justify-content:flex-end}
+  .hdr-right .iconbtn{width:32px;height:32px;border-radius:10px}
+  .hdr-right .iconbtn svg{width:18px;height:18px}
+  .hdr-right .pill{padding:4px 7px;font-size:.78rem;gap:3px}
+  .brand .logo{width:36px;height:36px;font-size:1rem}
+}
 </style>
 
 <canvas id="bg3d" aria-hidden="true"></canvas>
@@ -690,9 +742,14 @@ const vis=list=>S.mode==="teacher"?list.filter(x=>!x.teacherId||x.teacherId===S.
 function stOf(x){if(!x)return"pending";if(x.preview)return"active";const a=(S.mode==="student"&&x.id===S.uid)?S.myAccess:S.access[x.id];return a?.status||(S.settings.approve===false?"active":"pending")}
 function deviceLabel(){const u=navigator.userAgent||"";const os=/iPhone/.test(u)?"iPhone":/iPad/.test(u)?"iPad":/Android/.test(u)?"Android":/Windows/.test(u)?"Windows":/Mac OS X/.test(u)?"Mac":/Linux/.test(u)?"Linux":"Appareil";const br=/Edg\//.test(u)?"Edge":/OPR\//.test(u)?"Opera":/Chrome\//.test(u)?"Chrome":/Firefox\//.test(u)?"Firefox":/Safari\//.test(u)?"Safari":"Navigateur";return os+" · "+br}
 function deviceId(){let id=null;try{id=localStorage.getItem("mca_dev")}catch(e){}if(!id){id="d"+Math.random().toString(36).slice(2,10);try{localStorage.setItem("mca_dev",id)}catch(e){}}return id}
+const devBlockedOf=id=>((S.access[id]||{}).blockedDevices)||{};
+const devBlocked=()=>S.mode==="student"&&!!(S.myAccess&&S.myAccess.blockedDevices&&S.myAccess.blockedDevices[deviceId()]);
+async function devSet(id,dev,on){const cur=S.access[id]||{};
+  await write(()=>S.db.doc("access/"+id).set({...cur,status:cur.status||"active",at:cur.at||Date.now(),by:cur.by||S.uid,blockedDevices:{...(cur.blockedDevices||{}),[dev]:!!on}}));
+  toast(on?"Appareil suspendu : il n'a plus accès à la classe":"Appareil rétabli",on?"lock":"check")}
 function recentDevices(s,days=14){return Object.entries(s.devices||{}).filter(([k,d])=>d&&d.last&&Date.now()-d.last<days*864e5).sort((a,b)=>b[1].last-a[1].last)}
 const sharedFlag=s=>recentDevices(s).length>=3||(S.peerCount&&S.peerCount[s.id]>1);
-let devRecorded=false;function recordDevice(){if(devRecorded||!S.me||S.mode!=="student"||S.isOwner||S.isStaff)return;devRecorded=true;const id=deviceId(),prev=(S.me.devices||{})[id];const now=Date.now();
+let devRecorded=false;function recordDevice(){if(devRecorded||devBlocked()||!S.me||S.mode!=="student"||S.isOwner||S.isStaff)return;devRecorded=true;const id=deviceId(),prev=(S.me.devices||{})[id];const now=Date.now();
   const devs={...(S.me.devices||{})};devs[id]={label:deviceLabel(),first:prev?.first||now,last:now};const keep=Object.entries(devs).sort((a,b)=>b[1].last-a[1].last).slice(0,8);write(()=>meRef().update({devices:Object.fromEntries(keep)}))}
 function applyScope(){const pid=principalId(),mine=x=>(x.teacherId||pid)===S.uid||(!pid&&S.isOwner&&!x.teacherId);const all=S.allPeople.filter(mine);S.pending=all.filter(x=>stOf(x)==="pending");const ok=all.filter(x=>{const t=stOf(x);return t!=="pending"&&t!=="refused"});S.students=ok.filter(x=>!isParent(x));S.parents=ok.filter(isParent)}
 const SERIES=["A4","C","D","E","F1","F2","F3","F4","G1","G2","G3","Ti"];
@@ -892,12 +949,12 @@ function initMascot(){mascot=(function(){const api={jump(){},canvas:null};if(!wi
   const orbs=[0,1,2].map(i=>{const o=new T.Mesh(new T.SphereGeometry(.09,16,16),new T.MeshStandardMaterial({color:[0x4b6bd6,0xd8b46a,0xb4546f][i],metalness:.4,roughness:.3}));sc.add(o);return o});
   let mx=0,my=0,jumpT=-10;addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
   api.jump=()=>{jumpT=clk.getElapsedTime()};const clk=new T.Clock();
-  function frame(){const t=clk.getElapsedTime(),j=t-jumpT;bot.position.y=Math.sin(t*1.6)*.12+(j<1?Math.sin(j*Math.PI)*.9:0);
-    bot.rotation.y+=((mx*1.1)+(j<1?j*Math.PI*2:0)-bot.rotation.y)*.12;bot.rotation.x+=(my*.6-bot.rotation.x)*.08;
+  function frame(){const calm=document.body.dataset.mode==="teacher",t=calm?2.4:clk.getElapsedTime(),j=calm?9:t-jumpT;bot.position.y=Math.sin(t*1.6)*.12+(j<1?Math.sin(j*Math.PI)*.9:0);
+    if(calm){bot.rotation.y=0;bot.rotation.x=0}else{bot.rotation.y+=((mx*1.1)+(j<1?j*Math.PI*2:0)-bot.rotation.y)*.12;bot.rotation.x+=(my*.6-bot.rotation.x)*.08}
     const blink=(t%4)<.12;eyes.forEach(e=>e.scale.y=blink?.15:1.35);
     ring.rotation.z=t*.5;ring2.rotation.z=-t*.35;
     orbs.forEach((o,i)=>{const a=t*(.8+i*.25)+i*2.1;o.position.set(Math.cos(a)*2.05,Math.sin(a*1.3)*.5,Math.sin(a)*2.05)});r.render(sc,cam)}
-  (function loop(){if(cv.isConnected&&!document.hidden)frame();if(!reduceMotion)requestAnimationFrame(loop)})();if(reduceMotion)setInterval(()=>{if(cv.isConnected)frame()},1000);
+  let lastCalm=0;(function loop(){if(cv.isConnected&&!document.hidden){if(document.body.dataset.mode!=="teacher"){frame()}else if(performance.now()-lastCalm>400){frame();lastCalm=performance.now()}}if(!reduceMotion)requestAnimationFrame(loop)})();if(reduceMotion)setInterval(()=>{if(cv.isConnected)frame()},1000);
   return api})()}
 const mascotHTML=tips=>mascot.canvas&&!LITE?`<div class="mascot-wrap"><div id="mascotSlot"></div><div class="bubble">${esc(tips[Math.floor(Date.now()/600000)%tips.length])}</div></div>`:"";
 
@@ -1028,7 +1085,7 @@ function touch(activity,extra={}){if(!S.me||S.mode!=="student")return;const ad=a
   claude.use("downloads").then(d=>{S.dl=d;render()});
   aiInit();
   claude.use("room").then(room=>{if(!room)return;S.room=room;
-    room.onPeers(list=>{const p={},cnt={};for(const x of list||[]){const st=x.state||x.presence||x;if(st&&st.uid){p[st.uid]={doing:String(st.doing||"")};cnt[st.uid]=(cnt[st.uid]||0)+1}}S.peers=p;S.peerCount=cnt;if(S.mode==="teacher"&&!S.view)render()});
+    room.onPeers(list=>{const p={},cnt={};for(const x of list||[]){const st=x.state||x.presence||x;if(st&&st.uid){p[st.uid]={doing:String(st.doing||"")};cnt[st.uid]=(cnt[st.uid]||0)+1}}const sig=JSON.stringify([p,cnt]);if(sig===S._peerSig)return;S._peerSig=sig;S.peers=p;S.peerCount=cnt;if(S.mode==="teacher"&&!S.view)render()});
     if(S.uid&&!S.isOwner)room.presence({uid:S.uid,doing:"Connecté"})});
   render();
 })();
@@ -1043,7 +1100,7 @@ function render(){
   $("#roleTag").textContent=S.mode==="teacher"?"Espace prof":isParent(S.me)?"Espace parent":"Espace élève";
   const soundBtn=`<button class="iconbtn" data-a="toggleLite" aria-label="${LITE?"Désactiver":"Activer"} le mode économie de données" title="Mode économie de données : ${LITE?"activé":"désactivé"}" aria-pressed="${LITE}">${ic(LITE?"leaf":"bolt2")}</button><button class="iconbtn" data-a="skinNext" aria-label="Changer de thème" title="Changer de thème">${ic("palette")}</button><button class="iconbtn" data-a="sound" aria-label="${S.sound?"Couper le son":"Activer le son"}">${ic(S.sound?"speaker":"mute")}</button>`;
   let hdr="";
-  if(S.mode==="student"&&S.me){hdr=`<button class="iconbtn" data-a="openChat" aria-label="Messages avec la professeure" title="Messages">${ic("chat")}${studentUnread(S.me)?`<span class="unread"></span>`:""}</button>`+(isParent(S.me)?"":`<span class="pill fire">${ic("flame")}${liveStreak(S.me)}${(S.me.freezes||0)?`<span class="frz" title="Gels de série">${ic("snow")}${S.me.freezes}</span>`:""}</span><button class="pill xp" data-a="openShop" title="Boutique : dépense tes XP">${ic("bolt")}${S.me.xp||0}</button>`)}
+  if(S.mode==="student"&&S.me){hdr=`${peerBtn()}<button class="iconbtn" data-a="openChat" aria-label="Messages avec la professeure" title="Messages">${ic("chat")}${studentUnread(S.me)?`<span class="unread"></span>`:""}</button>`+(isParent(S.me)?"":`<span class="pill fire">${ic("flame")}${liveStreak(S.me)}${(S.me.freezes||0)?`<span class="frz" title="Gels de série">${ic("snow")}${S.me.freezes}</span>`:""}</span><button class="pill xp" data-a="openShop" title="Boutique : dépense tes XP">${ic("bolt")}${S.me.xp||0}</button>`)}
   if(S.isOwner||S.isStaff)hdr+=`<button class="iconbtn" data-a="switch" aria-label="${S.mode==="teacher"?"Voir comme un élève":"Revenir à l'espace prof"}" title="${S.mode==="teacher"?"Voir comme un élève":"Revenir à l'espace prof"}">${ic(S.mode==="teacher"?"eye":"users")}</button>`;
   $("#hdr").innerHTML=hdr+soundBtn;
   if(S.mode==="student"&&(S.tab==="quiz"||S.tab==="ep")){S.prac=S.tab;S.tab="prac"}const tabs=tabsFor();if(!S.tab||!tabs.some(t=>t[0]===S.tab))S.tab=tabs[0][0];
@@ -1052,9 +1109,9 @@ function render(){
   $("#tabs").innerHTML=tabs.map(([k,l,i,n])=>`<button data-a="tab" data-k="${k}" aria-current="${S.tab===k}">${ic(i)}<span>${l}</span>${n?`<span class="count">${n}</span>`:""}</button>`).join("");
   let h;
   if(S.offline)h=offlineView();
-  else if(S.mode==="student")h=!S.uid?noAccessView():!S.meLoaded?`<div class="empty">Chargement…</div>`:(!S.me&&S.myReq)?pendingTeacherView():!S.me?(S.settings.closed&&!S.isOwner&&!S.isStaff?closedView():joinView()):stOf(S.me)==="pending"?waitingView():stOf(S.me)==="blocked"?blockedView():devBlockedMe()?deviceBlockedView():stOf(S.me)==="refused"?refusedView():studentView();
+  else if(S.mode==="student")h=!S.uid?noAccessView():!S.meLoaded?`<div class="empty">Chargement…</div>`:(devBlocked()||(S.myAccess&&S.myAccess.status==="blocked"))?blockedView():(!S.me&&S.myReq)?pendingTeacherView():!S.me?(S.settings.closed&&!S.isOwner&&!S.isStaff?closedView():joinView()):stOf(S.me)==="pending"?waitingView():stOf(S.me)==="blocked"?blockedView():stOf(S.me)==="refused"?refusedView():studentView();
   else h=teacherView();
-  if(S.micHelp&&S.mode==="student")h=micHelpHTML()+h;const main=$("#main");main.className=S.animate?"enter":"";main.innerHTML=h;S.animate=false;if(S.mode==="student")setTimeout(dailyWordsEnsure,0);
+  if(S.micHelp&&S.mode==="student")h=micHelpHTML()+h;const main=$("#main");document.body.dataset.mode=S.mode||"";const same=!S.animate&&main.__ok&&main.__h===h;main.className=S.animate?"enter":"";if(!same){const sy=window.scrollY;main.innerHTML=h;main.__h=h;main.__ok=1;if(sy>0)window.scrollTo(0,sy)}S.animate=false;
   const slot=$("#mascotSlot");if(slot&&mascot.canvas)slot.appendChild(mascot.canvas);upgradeIcons(main);
   renderAI(true);
   if(S.offline||S.mode==="teacher"||S.meLoaded)hideSplash();
@@ -1071,7 +1128,6 @@ function ringSVG(p,size=104,stroke=9){const r=(size-stroke)/2,c=2*Math.PI*r;retu
 /* ============ onboarding ============ */
 function offlineView(){return`<div class="section"><div class="glass hero"><div><span class="eyebrow">Aperçu</span><h2>Ta classe d'anglais <span class="gradtext">nouvelle génération</span></h2><p class="sub">Ouvre cette page depuis son lien Claude pour accéder à la classe : leçons, quiz, vocabulaire et suivi en direct.</p></div></div></div>`}
 function noAccessView(){return`<div class="section" style="max-width:640px;margin-inline:auto"><div class="glass card" style="padding:clamp(22px,4vw,36px);gap:18px"><div class="logo" style="width:56px;height:56px;font-size:1.6rem">En</div><div><span class="eyebrow">Connexion</span><h2>Connecte-toi pour <span class="gradtext">entrer</span></h2><p class="sub">Chaque élève, étudiant, adulte ou parent a son propre compte : tes résultats et tes messages restent privés.</p></div>
-  <div class="note"><b>⚠️ Important : ne perds jamais ton mot de passe.</b><br>Note-le dans un endroit sûr dès maintenant. C'est la seule clé de ton compte : tes résultats, tes messages et ta progression en dépendent. Pour ta sécurité, ne le donne à personne.</div>
   <ol style="margin:0;padding-left:20px;display:grid;gap:8px"><li>Ouvre le lien d'invitation reçu par e-mail.</li><li>Connecte-toi avec ton adresse e-mail (le compte est gratuit).</li><li>Reviens ici : choisis ta catégorie et commence.</li></ol>
   <p class="hint" style="margin:0">Déjà connecté et toujours bloqué ? Demande à la professeure de t'inviter avec ton adresse e-mail.</p></div></div>`}
 function whoHTML(){const w=S.who;if(!w)return"";return`<div class="who">${w.avatarUrl?`<img src="${esc(w.avatarUrl)}" alt="" onerror="this.style.display='none'">`:avatar(S.uid||"moi",w.name||"?",40)}<div style="min-width:0"><span class="eyebrow">Connecté avec ton compte</span><div><b>${esc(w.name||"Compte connecté")}</b></div></div><span class="chip ok" style="margin-left:auto">${ic("check")}Connecté</span></div>`}
@@ -1080,7 +1136,8 @@ function teacherPick(){const T=S.staff.filter(d=>d.role==="principal"||d.role===
   return`<label>Ton professeur d'anglais<select id="j_teacher">${T.map(t=>`<option value="${t.id}">${esc(t.name||"Professeur")}${t.role==="principal"?" (prof principale)":""}${t.subject?" · "+esc(t.subject):""}</option>`).join("")}</select><span class="hint">Tu verras les cours, devoirs et messages de ce professeur.</span></label>`}
 function lockCard(icon,tone,eyebrow,title,text,extra=""){return`<div class="section" style="max-width:600px;margin-inline:auto"><div class="glass card" style="padding:clamp(22px,4vw,32px);gap:16px"><span class="ic ${tone}" style="width:56px;height:56px">${ic(icon)}</span><div><span class="eyebrow">${eyebrow}</span><h2>${title}</h2><p class="sub">${text}</p></div>${extra}</div></div>`}
 function waitingView(){const m=S.me;return lockCard("clock","t-gold","Inscription envoyée",`Bienvenue, ${esc((m.name||"").split(" ")[0])} !`,`Ton professeur doit valider ton inscription${m.teacherId?" ("+esc(staffName(m.teacherId))+")":""}. Dès qu'il l'accepte, ton espace s'ouvre automatiquement ici. Cette vérification protège la classe : seuls les vrais élèves y entrent.`,`<div class="note small">Ton compte est personnel : ne le prête à personne. Ton professeur voit les appareils utilisés pour se connecter.</div>`)}
-function blockedView(){return lockCard("lock","t-coral","Accès suspendu","Ton accès est suspendu","Ton professeur a suspendu ton accès à la classe. Si tu penses que c'est une erreur, parle-lui en classe.")}
+function blockedView(){return devBlocked()?lockCard("lock","t-coral","Appareil suspendu","Cet appareil est suspendu","Ta professeure a suspendu l'accès depuis cet appareil. Si c'est ton téléphone, parle-lui en classe pour le rétablir.")
+  :lockCard("lock","t-coral","Accès suspendu","Ton accès est suspendu","Ton professeur a suspendu ton accès à la classe. Si tu penses que c'est une erreur, parle-lui en classe.")}
 function refusedView(){return lockCard("x","t-coral","Inscription refusée","Inscription non acceptée","Ton professeur n'a pas validé cette inscription. Si tu fais bien partie de la classe, parle-lui en classe.")}
 function closedView(){return lockCard("lock","t-gold","Inscriptions fermées","Les inscriptions sont fermées","La professeure a fermé les nouvelles inscriptions pour le moment. Demande-lui de les rouvrir si tu fais partie de la classe.")}
 function pendingTeacherView(){const r=S.myReq||{};return`<div class="section" style="max-width:600px;margin-inline:auto"><div class="glass card" style="padding:clamp(22px,4vw,32px);gap:16px"><span class="ic t-gold" style="width:56px;height:56px">${ic("clock")}</span><div><span class="eyebrow">Équipe pédagogique</span><h2>Demande envoyée</h2><p class="sub">Bonjour ${esc(r.name||"")}, ta demande pour rejoindre l'équipe a bien été envoyée à la prof principale. Dès qu'elle l'accepte, ton espace professeur s'ouvre automatiquement ici.</p></div>${S.canEdit?"":`${window.__STANDALONE?"":`<div class="note">Pour pouvoir gérer tes élèves, la prof principale doit aussi t'inviter avec ton adresse e-mail en tant qu'<b>Éditeur</b> (menu Partager).</div>`}`}<div><button class="btn ghost sm" data-a="cancelReq">${ic("x")}Annuler ma demande</button></div></div></div>`}
@@ -1137,11 +1194,12 @@ const knownOf=d=>((S.me?.deckProgress||{})[d.id]?.known||[]);
 function studentView(){
   if(isParent(S.me)){if(S.view?.type==="chat"||S.tab==="pmsg"){if(S.chatFor!==S.uid)subChat(S.uid);return`<div class="section" style="max-width:720px;margin-inline:auto"><div class="row">${ic("chat")}<div><span class="eyebrow">Messagerie privée</span><h2>La professeure</h2></div></div><p class="sub">Seuls vous et la professeure voyez cette conversation.</p>${chatHTML(S.uid,"student")}</div>`}return S.tab==="me"?parentProfileView():parentHomeView()}
   if(S.liveOn&&liveOpen(S.live))return liveStudentView();if(S.srs)return srsRunView();if(S.run)return quizRunView();if(S.deck)return deckRunView();
+  if(S.view?.type==="peers"&&peerOn())return peersView();if(S.view?.type==="peer"&&peerOn())return peerChatView();
   if(S.view?.type==="chat")return`<div class="section" style="max-width:720px;margin-inline:auto">${backBtn()}<div class="row">${ic("chat")}<div><span class="eyebrow">Messagerie privée</span><h2>Ma professeure</h2></div></div><p class="sub">Seuls toi et ta professeure voyez cette conversation.</p>${chatHTML(S.uid,"student")}</div>`;
   if(S.view?.type==="lesson")return lessonView();if(S.view?.type==="hw")return hwView();
   if(S.view?.type==="ep")return epView();if(S.view?.type==="shop")return shopView();if(S.view?.type==="talk")return talkView();
   return netBanner()+liveBanner()+({home:homeView,learn:learnView,prac:practiceView,talk:talkView,hw:hwListView,me:profileView}[S.tab]||homeView)()}
-const downloadHTML=()=>window.__appDownload?`<div class="section"><div class="dl2"><div class="dl2-top"><span class="dl2-ph" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="3"/><path d="M10 5.5h4"/><circle cx="12" cy="18" r=".7"/></svg></span><div class="dl2-t"><span class="eyebrow">Application Android</span><h3>Ma Classe d'Anglais dans ta poche</h3><p>Une vraie application : icône sur l'écran d'accueil, plein écran et micro pour parler à Nova.</p></div></div><ul class="dl2-f"><li>⚡ S'ouvre en un geste</li><li>🎙️ Parle à Nova</li><li>📲 Plein écran</li></ul><div class="dl2-a"><a class="dl2-btn" href="${esc(window.__appDownload.apk)}" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span><b>Télécharger l'application</b><small>Android · fichier APK</small></span></a>${window.__appDownload.canInstall?`<button class="dl2-alt" data-a="pwaInstall">${ic("plus")}Ajouter à l'écran d'accueil</button>`:""}</div></div></div>`:"";
+const downloadHTML=()=>window.__appDownload?`<div class="section"><div class="glass card dl-card"><span class="dl-ic" aria-hidden="true">${E("📱")}</span><div style="display:grid;gap:4px;min-width:0"><h3 style="margin:0">L'application sur ton téléphone</h3><p class="sub small" style="margin:0">Installe Ma Classe d'Anglais comme une vraie application Android : icône sur l'écran d'accueil, plein écran, micro pour parler à Nova.</p></div><div class="row"><a class="btn sm" href="${esc(window.__appDownload.apk)}" rel="noopener">${ic("download")}Télécharger (Android)</a>${window.__appDownload.canInstall?`<button class="btn ghost sm" data-a="pwaInstall">${ic("plus")}Ajouter à l'écran d'accueil</button>`:""}</div></div></div>`:"";
 const logoutHTML=()=>downloadHTML()+(window.__appLogout?`<div class="section"><div class="glass card row between"><div><h3>Se déconnecter</h3><p class="sub small" style="margin:0">${esc(S.who?.email||"")}</p></div><button class="btn danger sm" data-a="logout">${ic("x")}Se déconnecter</button></div></div>`:"");
 const blobURL=id=>window.__blobURL?window.__blobURL(id):"/_blob/"+encodeURIComponent(id);
 function practiceView(){const k=S.prac||"quiz";return`<div class="section prac-top"><div><span class="eyebrow">S'entraîner</span><h2>Pratique</h2></div><div class="seg prac-seg" role="tablist" aria-label="Type d'entraînement">${[["quiz","Quiz","bolt"],["pics","Jeux d'images","camera"],["ep","Épreuves d'examen","file"],["prono","Prononciation","mic"]].map(([x,l,i])=>`<button role="tab" data-a="prac" data-k="${x}" aria-pressed="${k===x}">${ic(i)}${l}</button>`).join("")}</div></div>`+(k==="prono"?pronView():k==="ep"?epListView():k==="pics"?audBar()+picGamesHTML():quizListView())}
@@ -1175,7 +1233,7 @@ function homeView(){const m=S.me,xp=m.xp||0,rank=rankOf(xp),into=xp%XP_PER_RANK,
   ${w?`<div class="section"><div class="glass wotd"><span class="medal">${ic("star")}</span><div style="min-width:0"><span class="eyebrow">Mot du jour · ${esc(w.level)}</span><div class="w gradtext">${esc(w.en)}</div><div class="muted">${esc(w.fr)}${w.ex?` · <i>${esc(w.ex)}</i>`:""}</div></div><div class="row">${sayBtn(w.en+(w.ex?". "+w.ex:""))}${wDone?`<span class="chip ok">${ic("check")}Appris</span>`:`<button class="btn sm" data-a="wotd">${ic("check")}Je l'ai appris · +5 XP</button>`}</div></div></div>`:""}
   ${S.anns.length?`<div class="section">${S.anns.filter(teacherOk).slice(0,2).map(a=>`<div class="glass ann"><span class="ic">${ic("mega")}</span><div><span class="eyebrow">Message de ta prof · ${fmtDate(a.createdAt)}</span><div style="white-space:pre-wrap;margin-top:4px">${esc(a.text)}</div></div></div>`).join("")}</div>`:""}
   <div class="section"><div class="head"><div><span class="eyebrow">Récompenses</span><h2>Mes badges <span class="muted small mono">${earned.length}/${BADGES.length}</span></h2></div><button class="btn ghost sm" data-a="tab" data-k="me">Voir tout${ic("right")}</button></div>
-  <div class="badges">${BADGES.slice(0,4).map(badgeHTML).join("")}</div></div>${dailyWordsHTML()}${shopTeaser()}${downloadHTML()}`}
+  <div class="badges">${BADGES.slice(0,4).map(badgeHTML).join("")}</div></div>${shopTeaser()}${downloadHTML()}`}
 function badgeHTML(b){const got=(S.me?.badges||{})[b.id];return`<div class="glass badge ${got?"":"locked"}"><span class="medal ${b.tone}">${ic(b.icon)}</span><b>${b.name}</b><span>${got?"Obtenu le "+fmtDate(got):b.desc}</span></div>`}
 function programmeHTML(read){const mine=myProgClass(S.me);if(!mine)return"";const pc=S.progClass&&PROG_CLASSES.includes(S.progClass)?S.progClass:mine,units=progUnits(pc),done=units.filter(u=>read[u.id]).length,group=PROG_GROUP[S.me.profile]||[mine];
   const exam={"CM2":"CEPD","3e":"BEPC","1re":"BAC I","Tle":"BAC II"}[pc];
@@ -1234,7 +1292,7 @@ function lessonView(){const l=S.lessons.find(x=>x.id===S.view.id);if(!l)return b
   ${q?`<div class="glass card" style="background:var(--glass2)"><span class="eyebrow">Mets-toi à l'épreuve</span><h3>${esc(q.title)}</h3><div><button class="btn" data-a="startQuiz" data-id="${q.id}">${ic("bolt")}Lancer le quiz</button></div></div>`:""}</div></div>`}
 function hwView(){const h=S.homework.find(x=>x.id===S.view.id);if(!h)return backBtn()+`<div class="empty">Ce devoir a été retiré.</div>`;
   const sub=(S.me.submissions||{})[h.id],fb=(S.me.feedback||{})[h.id];
-  return`<div class="section" style="max-width:720px">${backBtn("Tous les devoirs")}<div class="glass card" style="padding:clamp(20px,4vw,32px);gap:16px"><div class="row">${lvlChip(h.level)}<span class="chip">${ic("clock")}Pour le ${fmtDate(h.due)}</span></div><h2>${esc(h.title)}</h2>${h.instructions?`<div class="lesson-body">${lessonHTML(h.instructions)}</div>`:""}${h.fileId?`<div>${fileView(h.fileId,h.fileType,"Ouvrir le devoir"+(h.fileName?" ("+h.fileName+")":""))}</div>`:""}${h.corrigeVisible&&h.corrigePublic&&(h.corrigePublic.text||h.corrigePublic.fileId)?`<div class="feedback" style="border-color:#BFE3D0"><b>Corrigé publié par ta professeure</b>${h.corrigePublic.text?`<div class="lesson-body" style="font-size:1rem">${lessonHTML(h.corrigePublic.text)}</div>`:""}${h.corrigePublic.fileId?`<div>${fileView(h.corrigePublic.fileId,h.corrigePublic.fileType,"Ouvrir le corrigé")}</div>`:""}</div>`:""}
+  return`<div class="section" style="max-width:720px">${backBtn("Tous les devoirs")}<div class="glass card" style="padding:clamp(20px,4vw,32px);gap:16px"><div class="row">${lvlChip(h.level)}<span class="chip">${ic("clock")}Pour le ${fmtDate(h.due)}</span></div><h2>${esc(h.title)}</h2><div class="lesson-body">${lessonHTML(h.instructions)}</div>
   ${fb?`<div class="feedback"><b>Note : <span class="mono">${esc(fb.grade)}/20 · ${mention(fb.grade)}</span></b>${fb.auto?` <span class="chip">Corrigé par Nova</span>`:""}<div style="white-space:pre-wrap">${esc(fb.comment||"")}</div></div>`:""}
   ${sub?`<div class="glass card" style="background:var(--surface2)"><span class="eyebrow">Ta réponse · ${fmtDate(sub.at)}</span>${sub.text?`<div style="white-space:pre-wrap">${esc(sub.text)}</div>`:""}${copyTiles(sub.files)}</div>`:""}
   ${fb?"":`<form class="form" data-f="submitHw" data-id="${h.id}"><label>${sub?"Modifier ta réponse":"Ta réponse en anglais"}<textarea id="hw_${h.id}" maxlength="8000" placeholder="Write your answer here…"></textarea><span class="hint" id="wc_${h.id}">0 mot</span></label>${fileBtnsHTML("hw_"+h.id)}${h.autoCorrect?`<span class="hint">${ic("spark")} ${h.autoMode==="draft"?"Nova prépare une correction que ta prof validera avant de te l'envoyer.":"Nova corrigera ta copie automatiquement dès que tu la rends."}</span>`:""}<div><button class="btn" type="submit">${ic("rocket")}${sub?"Renvoyer":"Rendre le devoir"}</button></div></form>`}</div></div>`}
@@ -1577,7 +1635,7 @@ function picQuestion(x,pool,lvl){const P=picParts(x),q={q:P.q,pic:x.pic,say:P.sa
   const ch=[right];for(const o of src){if(ch.length>=(lvl==="easy"?3:4))break;let t=picParts({...o,f:x.kind==="action"||x.kind==="job"?x.f:o.f})[key];if(!ch.includes(t))ch.push(t)}
   const order=shuffle([...ch.keys()]);q.choices=order.map(i=>ch[i]);q.answer=order.indexOf(0);return q}
 function teacherPicQ(p,all,lvl){const DQ={noun:"What is it?",action:"What is the person doing?",job:"What does this person do?",place:"What place is it?"};
-  const q={q:p.prompt||DQ[p.kind]||"What can you see?",picId:p.picId,pic:p.picId?undefined:p.pic,say:p.answer,fr:p.fr||"",explain:p.fr?`${p.answer} = ${p.fr}`:""};
+  const q={q:p.prompt||DQ[p.kind]||"What can you see?",picId:p.picId,say:p.answer,fr:p.fr||"",explain:p.fr?`${p.answer} = ${p.fr}`:""};
   if(lvl==="hard"){q.type="type";q.accept=[p.answer,...(p.alt||[])];return q}
   const others=shuffle(all.filter(o=>o.id!==p.id&&o.answer!==p.answer).map(o=>o.answer));if(others.length<2){const map={noun:"nouns",action:"actions",job:"jobs",place:"places"};for(const x of shuffle(picPool(map[p.kind]||"nouns")).slice(0,4))others.push(picParts(x).say)}
   const ch=[p.answer,...[...new Set(others)].slice(0,3)],order=shuffle([...ch.keys()]);q.choices=order.map(i=>ch[i]);q.answer=order.indexOf(0);return q}
@@ -1594,7 +1652,7 @@ function picGamesHTML(){const modes=picModesFor(),hard=S.picHard??picHardDefault
   return`<div class="section"><div class="head"><div><span class="eyebrow">Apprendre avec les images · ${modes.length} jeux</span><h2>Jeux d'<span class="gradtext">images</span></h2><p class="sub">Regarde l'image, devine le mot ou décris ce que la personne fait. Chaque série est différente, avec la prononciation de la bonne réponse. +10 XP par bonne réponse.</p></div><div class="seg" role="group" aria-label="Difficulté"><button data-a="picHard" data-k="0" aria-pressed="${!hard}">Avec choix</button><button data-a="picHard" data-k="1" aria-pressed="${hard}">J'écris la réponse</button></div></div>
   <div class="pgrid">${modes.map(m=>{const b=best(m.k);return`<button class="pcard tilt" data-a="startPic" data-k="${m.k}"><span class="pcard-emo" aria-hidden="true">${E(m.pic)}</span><span class="pcard-en">${esc(m.en)}</span><b>${esc(m.t)}</b><span class="small muted">${esc(m.d)}</span>${b!=null?`<span class="chip ${b>=80?"ok":"warn"}">Record ${b} %</span>`:`<span class="chip">Nouveau</span>`}</button>`}).join("")}</div></div>`}
 function picFormHTML(lvlSel,audSel){const d=S.picDraft;
-  return`${picSugHTML()}<form class="form" data-f="pic"><div class="scanbox"><div class="row"><label class="btn ghost sm filebtn">${ic("camera")}Prendre ou choisir une photo<input type="file" id="pic_file" accept="image/*" hidden></label>${d?`<button class="btn ghost sm" type="button" data-a="picClear">${ic("x")}Retirer</button>`:""}</div>${d?.url?`<img src="${d.url}" alt="Aperçu de la photo" style="max-height:260px;max-width:100%;border-radius:14px;object-fit:contain;background:#fff;justify-self:start">`:`<span class="hint">Une photo nette : un objet, une personne qui fait quelque chose, un lieu du quartier, le marché… Elle est allégée automatiquement pour les petites connexions.</span>`}</div>
+  return`<form class="form" data-f="pic"><div class="scanbox"><div class="row"><label class="btn ghost sm filebtn">${ic("camera")}Prendre ou choisir une photo<input type="file" id="pic_file" accept="image/*" hidden></label>${d?`<button class="btn ghost sm" type="button" data-a="picClear">${ic("x")}Retirer</button>`:""}</div>${d?.url?`<img src="${d.url}" alt="Aperçu de la photo" style="max-height:260px;max-width:100%;border-radius:14px;object-fit:contain;background:#fff;justify-self:start">`:`<span class="hint">Une photo nette : un objet, une personne qui fait quelque chose, un lieu du quartier, le marché… Elle est allégée automatiquement pour les petites connexions.</span>`}</div>
   <div class="two"><label>Type de question<select id="pic_kind"><option value="noun">Qu'est-ce que c'est ? (un nom)</option><option value="action">Que fait la personne ? (une action)</option><option value="job">Quel est son métier ?</option><option value="place">Quel est ce lieu ?</option><option value="free">Question libre</option></select></label><label>Niveau${lvlSel("pic_level")}</label></div>
   <label>Question posée (facultatif)<input id="pic_q" maxlength="120" placeholder="What is the woman doing?"></label>
   <label>Bonne réponse en anglais<input id="pic_ans" required maxlength="140" placeholder="She is selling tomatoes."></label>
@@ -1682,32 +1740,32 @@ function talkClean(r){if(!r||typeof r!=="object"||!cleanStr(r.reply))throw{code:
 async function talkAsk(start){const T=S.talk;if(!T||T.busy||!AI.sample)return;T.busy=true;T.err=null;render();talkScroll();
   try{const r=talkClean(await AI.sample.json(talkPrompt(start),{cache:false,modelTier:"quick"}));if(S.talk!==T)return;
     if(!start){const me=[...T.turns].reverse().find(t=>t.role==="me");if(me){me.corr=r.corr;me.praise=r.corr?"":r.praise}}
-    T.turns.push({role:"ai",text:r.reply,fr:r.fr,sugg:r.sugg,words:r.words});talkSaveLog(T);if(TALK_VOICE&&canSpeak)speak(r.reply,"en")}
+    T.turns.push({role:"ai",text:r.reply,fr:r.fr,sugg:r.sugg,words:r.words});if(TALK_VOICE&&canSpeak)speak(r.reply,"en")}
   catch(e){if(S.talk===T)T.err=e&&e.code==="invalid_json"?"Nova s'est embrouillé. Touche « Réessayer ».":e&&e.code==="rate_limited"?"Nova ne peut pas répondre pour l'instant : la limite d'utilisation de ton compte Claude est peut-être atteinte, ou l'application est ouverte dans plusieurs onglets. Ferme les autres onglets et réessaie dans quelques minutes.":aiErr(e&&e.code)}
   if(S.talk===T){T.busy=false;render();talkScroll()}}
 function talkScroll(){setTimeout(()=>{try{const el=document.getElementById("talkEnd");if(el)el.scrollIntoView({block:"end",behavior:reduceMotion?"auto":"smooth"})}catch(e){}},60)}
 function talkStart(k){S.talk={sc:k,turns:[],busy:false,strict:!!S.talkStrict,at:Date.now()};S.view=null;S.tab="talk";S.animate=true;scrollTo(0,0);touch("Parle anglais avec Nova : "+(TALK_SC.find(x=>x.k===k)?.en||""));talkAsk(true)}
 function talkSend(text){const T=S.talk;text=String(text||"").trim();if(!T||T.busy||!text)return;T.turns.push({role:"me",text:text.slice(0,600)});for(const t of T.turns)t.showSugg=false;delete S.drafts.talkIn;talkAsk(false)}
 function talkReward(T){const n=T.turns.filter(t=>t.role==="me").length;if(!n||T.rewarded)return 0;T.rewarded=true;const fixes=T.turns.filter(t=>t.corr).length,xp=Math.min(n,10)*5+(n>=5?20:0),sc=TALK_SC.find(x=>x.k===T.sc);
-  const entry={id:T.at,sc:T.sc,title:sc?.t||"Conversation",at:Date.now(),n,fixes,score:T.summary?.score||null,level:T.summary?.level||"",mistakes:T.turns.filter(t=>t.corr).slice(-3).map(t=>({wrong:t.corr.you||"",right:t.corr.better}))};
+  const entry={sc:T.sc,title:sc?.t||"Conversation",at:Date.now(),n,fixes,score:T.summary?.score||null,level:T.summary?.level||"",mistakes:T.turns.filter(t=>t.corr).slice(-3).map(t=>({wrong:t.corr.you||"",right:t.corr.better}))};
   gain(xp,`A parlé anglais avec Nova (${sc?.en||"chat"}) : ${n} message${n>1?"s":""}`,{talks:[...(S.me?.talks||[]),entry].slice(-40)});return xp}
 async function talkFinish(){const T=S.talk;if(!T||T.busy)return;const n=T.turns.filter(t=>t.role==="me").length;if(!n){S.talk=null;S.view=null;S.tab="talk";render();return}
   T.busy=true;T.ending=true;render();talkScroll();
   try{const r=await AI.sample.json(talkSummaryPrompt(),{cache:false});const arr=(a,k)=>Array.isArray(a)?a.filter(Boolean).slice(0,k):[];
     T.summary={score:Math.max(1,Math.min(5,Math.round(+r.score||3))),level:cleanStr(r.level,4),strengths:arr(r.strengths,3).map(x=>cleanStr(x,240)),work:arr(r.work_on,3).map(x=>cleanStr(x,240)),mistakes:arr(r.mistakes,5).filter(x=>x.wrong&&x.right).map(x=>({wrong:cleanStr(x.wrong,200),right:cleanStr(x.right,200)})),words:arr(r.words,6).filter(w=>w.en).map(w=>({en:cleanStr(w.en,60),fr:cleanStr(w.fr,60)})),advice:cleanStr(r.advice,400),praise:cleanStr(r.praise_en,200)}}
   catch(e){T.summary={score:null,level:"",strengths:[],work:[],mistakes:T.turns.filter(t=>t.corr).slice(-5).map(t=>({wrong:t.corr.you,right:t.corr.better})),words:T.turns.flatMap(t=>t.words||[]).slice(0,6),advice:"",praise:"Well done for practising!"}}
-  T.busy=false;T.xp=talkReward(T);talkSaveLog(T);render();scrollTo(0,0);if(T.summary.praise&&TALK_VOICE&&canSpeak)speak(T.summary.praise,"en");beep("win")}
+  T.busy=false;T.xp=talkReward(T);render();scrollTo(0,0);if(T.summary.praise&&TALK_VOICE&&canSpeak)speak(T.summary.praise,"en");beep("win")}
 function talkCardHTML(){if(!AI.sample||AI.disabled||isParent(S.me))return"";const last=(S.me?.talks||[]).slice(-1)[0];
   return`<div class="section"><div class="glass card talk-card" data-a="openTalk" tabindex="0" role="button"><div class="talk-orb" aria-hidden="true"><span>${E("💬")}</span></div><div style="display:grid;gap:4px;min-width:0"><span class="eyebrow">Nouveau · conversation avec l'IA</span><h3 style="margin:0">Parle anglais avec Nova</h3><span class="small muted">Discute en anglais : Nova te répond, corrige tes phrases et te pose des questions. Au marché, à l'école, en entretien…${last?` Dernière fois : ${esc(last.title)}, ${fmtDate(last.at)}.`:""}</span></div><span class="btn sm">${ic("chat")}Commencer</span></div></div>`}
-function talkPickerHTML(){const list=talkScFor(),allH=[...(S.me?.talks||[])].reverse(),hist=S.talkAll?allH:allH.slice(0,5);
+function talkPickerHTML(){const list=talkScFor(),hist=[...(S.me?.talks||[])].reverse().slice(0,5);
   return`<div class="section"><div class="glass hero talk-hero"><div style="display:grid;gap:10px"><span class="eyebrow">Conversation avec l'IA</span><h2>Parle anglais <span class="gradtext">avec Nova</span></h2><p class="sub">Choisis une situation. Nova joue le rôle, te répond en anglais, corrige tes phrases avec une explication en français et te pose des questions pour te faire parler. +5 XP par message, +20 XP si tu tiens 5 échanges.</p>
   <div class="row"><div class="seg" role="group" aria-label="Corrections"><button data-a="talkStrict" data-k="0" aria-pressed="${!S.talkStrict}">Fautes importantes</button><button data-a="talkStrict" data-k="1" aria-pressed="${!!S.talkStrict}">Toutes les fautes</button></div><button class="btn ghost sm" data-a="talkVoice" aria-pressed="${TALK_VOICE}">${ic(TALK_VOICE?"speaker":"mute")}Nova parle ${TALK_VOICE?"à voix haute":"(muet)"}</button></div></div>
   <div class="hero-side"><div class="talk-orb big" aria-hidden="true"><span>${E("🗣️")}</span></div></div></div></div>
   <div class="section"><div><span class="eyebrow">Situations · ${list.length}</span><h2>Où veux-tu parler aujourd'hui ?</h2></div><div class="pgrid">${list.map(x=>`<button class="pcard tilt" data-a="talkStart" data-k="${x.k}"><span class="pcard-emo" aria-hidden="true">${E(x.e)}</span><span class="pcard-en">${esc(x.en)}</span><b>${esc(x.t)}</b><span class="small muted">${esc(x.d)}</span></button>`).join("")}</div></div>
-  ${hist.length?`<div class="section"><div><span class="eyebrow">Historique · touche une conversation pour la rouvrir</span><h2>Mes conversations <span class="muted mono small">${allH.length}</span></h2></div><div class="glass list">${hist.map(h=>`<div class="it click" role="button" tabindex="0" data-a="talkOpen" data-id="${h.id||""}" data-at="${h.at}"><span class="ic t-cyan" style="width:36px;height:36px;border-radius:10px;display:grid;place-items:center">${ic("chat")}</span><div class="txt"><b>${esc(h.title)}</b><div class="small muted">${fmtDate(h.at)} · ${h.n} message${h.n>1?"s":""} · ${h.fixes} correction${h.fixes>1?"s":""}${h.level?" · niveau estimé "+esc(h.level):""}</div></div>${h.score?`<span class="chip warn">${"★".repeat(h.score)}${"☆".repeat(5-h.score)}</span>`:""}</div>`).join("")}</div>${allH.length>5?`<div style="text-align:center"><button class="btn ghost sm" data-a="talkAll">${S.talkAll?"Réduire la liste":"Voir tout ("+allH.length+")"}</button></div>`:""}</div>`:""}`}
+  ${hist.length?`<div class="section"><div><span class="eyebrow">Historique</span><h2>Mes conversations</h2></div><div class="glass list">${hist.map(h=>`<div class="it"><span class="ic t-cyan" style="width:36px;height:36px;border-radius:10px;display:grid;place-items:center">${ic("chat")}</span><div class="txt"><b>${esc(h.title)}</b><div class="small muted">${fmtDate(h.at)} · ${h.n} message${h.n>1?"s":""} · ${h.fixes} correction${h.fixes>1?"s":""}${h.level?" · niveau estimé "+esc(h.level):""}</div></div>${h.score?`<span class="chip warn">${"★".repeat(h.score)}${"☆".repeat(5-h.score)}</span>`:""}</div>`).join("")}</div></div>`:""}`}
 function talkSummaryHTML(T){const s=T.summary,sc=TALK_SC.find(x=>x.k===T.sc);
   return`<div class="section" style="max-width:760px;margin-inline:auto"><div class="glass card talk-sum"><span class="eyebrow">Bilan · ${esc(sc?.t||"")}</span><h2>${s.score?`<span class="stars">${"★".repeat(s.score)}<span class="muted">${"☆".repeat(5-s.score)}</span></span>`:"Bravo !"}</h2>${s.praise?`<p class="talk-praise">« ${esc(s.praise)} » ${sayBtn(s.praise)}</p>`:""}
-  <div class="row">${T.xp?`<span class="pill xp">${ic("bolt")}+${T.xp} XP</span>`:""}${s.level?`<span class="chip lvl">Niveau estimé ${esc(s.level)}</span>`:""}<span class="chip">${T.nOld||T.turns.filter(t=>t.role==="me").length} messages</span></div>
+  <div class="row">${T.xp?`<span class="pill xp">${ic("bolt")}+${T.xp} XP</span>`:""}${s.level?`<span class="chip lvl">Niveau estimé ${esc(s.level)}</span>`:""}<span class="chip">${T.turns.filter(t=>t.role==="me").length} messages</span></div>
   ${s.strengths.length?`<div><b class="row" style="color:var(--ok-ink)">${ic("check")}Tes points forts</b><ul>${s.strengths.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
   ${s.work.length?`<div><b class="row" style="color:var(--warn-ink)">${ic("target")}À travailler</b><ul>${s.work.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
   ${s.mistakes.length?`<div><b>Tes fautes à retenir</b><div class="glass list" style="margin-top:8px">${s.mistakes.map(x=>`<div class="it"><div class="txt"><s class="wrong-txt">${esc(x.wrong)}</s><div class="right-txt">${esc(x.right)}</div></div>${sayBtn(x.right)}</div>`).join("")}</div></div>`:""}
@@ -1793,7 +1851,7 @@ setInterval(()=>{const r=S.run;if(!r||!r.exam||r.finished)return;const left=Math
 const quizToText=qs=>(qs||[]).map(x=>x.type==="type"?`${x.q}\n= ${(x.accept||[]).join(" / ")}`:[x.q,...x.choices.map((c,i)=>(i===x.answer?"* ":"- ")+c)].join("\n")).join("\n\n");
 const deckToText=cs=>(cs||[]).map(c=>c.ex?`${c.en} | ${c.fr} | ${c.ex}`:`${c.en} | ${c.fr}`).join("\n");
 const KIND_FORM={lessons:"lesson",quizzes:"quiz",decks:"deck",homework:"hw",epreuves:"ep"};
-const FORM_FIELDS={lesson:["l_title","l_level","l_aud","l_cls","l_unit","l_theme","l_gram","l_body"],quiz:["q_title","q_level","q_aud","q_lesson","q_body","q_exam","q_min"],deck:["d_title","d_level","d_aud","d_body"],hw:["h_title","h_level","h_aud","h_due","h_body","h_auto","h_amode","h_cor","h_pdf","h_pub"],ep:["e_pdf","e_title","e_exam","e_year","e_level","e_aud","e_min","e_sujet","e_cor","e_auto","e_amode"]};
+const FORM_FIELDS={lesson:["l_title","l_level","l_aud","l_cls","l_unit","l_theme","l_gram","l_body"],quiz:["q_title","q_level","q_aud","q_lesson","q_body","q_exam","q_min"],deck:["d_title","d_level","d_aud","d_body"],hw:["h_title","h_level","h_aud","h_due","h_body","h_auto","h_amode"],ep:["e_title","e_exam","e_year","e_level","e_aud","e_min","e_sujet","e_cor","e_auto","e_amode"]};
 function startEdit(kind,id){const x=S[{lessons:"lessons",quizzes:"quizzes",decks:"decks",homework:"homework",epreuves:"eps"}[kind]].find(y=>y.id===id);if(!x)return;const f=KIND_FORM[kind];
   for(const k of FORM_FIELDS[f])delete S.drafts[k];
   const D=S.drafts,au=x.audience||"tous";D.l_aud=D.q_aud=D.d_aud=D.h_aud=D.e_aud=au;
@@ -1801,9 +1859,9 @@ function startEdit(kind,id){const x=S[{lessons:"lessons",quizzes:"quizzes",decks
   if(f==="lesson"){D.l_title=x.title;D.l_level=x.level;D.l_body=x.body||"";D.l_cls=x.classe||"";D.l_unit=x.unit?String(x.unit):"";D.l_theme=x.theme||"";D.l_gram=x.grammar||""}
   if(f==="quiz"){D.q_title=x.title;D.q_level=x.level;D.q_lesson=x.lessonId||"";D.q_body=quizToText(x.questions);D.q_exam=x.exam?"1":"";D.q_min=String(x.minutes||10)}
   if(f==="deck"){D.d_title=x.title;D.d_level=x.level;D.d_body=deckToText(x.cards)}
-  if(f==="hw"){D.h_title=x.title;D.h_level=x.level;D.h_due=x.due||"";D.h_body=x.instructions||"";D.h_auto=x.autoCorrect?"1":"";D.h_amode=x.autoMode||"live";D.h_cor=(S.corriges[id]||{}).text||"";D.h_pub=x.corrigeVisible?"1":""}
+  if(f==="hw"){D.h_title=x.title;D.h_level=x.level;D.h_due=x.due||"";D.h_body=x.instructions||"";D.h_auto=x.autoCorrect?"1":"";D.h_amode=x.autoMode||"live"}
   S.create=f;S.editing={kind,id,title:x.title};scrollTo({top:0,behavior:reduceMotion?"auto":"smooth"})}
-function cancelEdit(){clearScan("sujet");clearScan("cor");clearScan("hw");if(S.editing)for(const k of FORM_FIELDS[KIND_FORM[S.editing.kind]])delete S.drafts[k];S.editing=null}
+function cancelEdit(){clearScan("sujet");clearScan("cor");if(S.editing)for(const k of FORM_FIELDS[KIND_FORM[S.editing.kind]])delete S.drafts[k];S.editing=null}
 function saveContent(col,data){const ed=S.editing&&S.editing.kind===col?S.editing:null;
   return write(()=>ed?S.db.doc(col+"/"+ed.id).update(data):S.db.collection(col).add({...data,teacherId:S.uid,createdAt:Date.now()})).then(()=>{const was=!!ed;if(ed)S.editing=null;return was})}
 
@@ -1869,126 +1927,9 @@ function epFormHTML(lvlSel,audSel){const ed=S.editing&&S.editing.kind==="epreuve
   ${scanBlock("sujet","Sujet",prev?.fileId?(prev.fileName||"sujet"):"")}
   ${autoChk("e_auto","Nova corrige avec le sujet, ton corrigé (qui reste privé) et la copie de l'élève.")}${S.drafts.e_auto==="1"?`<label>Quand l'élève voit la note<select id="e_amode"><option value="live"${(S.drafts.e_amode||"live")==="live"?" selected":""}>Tout de suite</option><option value="draft"${S.drafts.e_amode==="draft"?" selected":""}>Brouillon : je valide avant</option></select></label>`:""}
   <div class="editbar" style="display:grid;gap:12px;background:var(--surface2);border-color:var(--line)"><span class="row">${ic("lock")}<b>Corrigé</b><span class="hint">Visible par toi seulement, sauf si tu décides de le publier.</span></span>
-  ${corGenBtn("ep")}<label>Corrigé (texte)<textarea id="e_cor" style="min-height:160px" placeholder="Réponses attendues, barème… ou laisse Nova le rédiger"></textarea></label>${corDlBar("ep")}
+  <label>Corrigé (texte)<textarea id="e_cor" style="min-height:160px" placeholder="Réponses attendues, barème…"></textarea></label>
   ${scanBlock("cor","Corrigé",pc?.fileId?(pc.fileName||"corrigé"):"")}</div>
   <div><button class="btn" type="submit" id="e_submit">${ic("rocket")}${ed?"Enregistrer les modifications":"Publier l'épreuve"}</button></div></form>`}
-
-
-/* ============ Élèves rangés en dossiers ============ */
-const stRow=s=>{const x=stats(s),sk=s.lastDay===today()||s.lastDay===yesterday()?(s.streak||0):0;return`
-    <tr class="click" data-a="openStudent" data-id="${s.id}"><td><div class="row" style="flex-wrap:nowrap">${avatar(s.id,s.name)}<b>${esc(s.name)}</b><span class="dot ${online(s)?"on":""}"></span>${stOf(s)==="blocked"?`<span class="chip bad">Suspendu</span>`:""}${sharedFlag(s)?`<span class="chip warn">${ic("device")}À vérifier</span>`:""}</div></td><td>${lvlChip(s.level)}</td><td class="small">${esc(PROFILES[s.profile]||"—")}${s.classe?`<br><span class="muted">${esc(s.classe)}</span>`:""}</td><td class="num" style="color:var(--ink)">${s.xp||0}</td><td class="num">${sk?`<span class="flame">${sk}</span>`:"—"}</td><td>${x.avg!=null?`<div class="row" style="flex-wrap:nowrap"><div class="mini"><i style="width:${x.avg}%"></i></div><span class="num small">${x.avg} %</span></div>`:"—"}</td><td class="num">${x.subs}/${S.homework.length}</td><td class="small muted">${ago(s.lastActive)}</td></tr>`};
-const stGrpKey=s=>{const g=S.drafts.st_grp||"classe";return g==="niveau"?(s.level||"Sans niveau"):g==="profil"?(PROFILES[s.profile]||"Sans profil"):(s.classe||"Sans classe")};
-function stFolders(F){if(!F.length)return`<div class="empty">Aucun élève ne correspond à ta recherche.</div>`;
-  const m=new Map();for(const s of F){const k=stGrpKey(s);if(!m.has(k))m.set(k,[]);m.get(k).push(s)}
-  const sans=/^Sans /,keys=[...m.keys()].sort((a,b)=>(sans.test(a)-sans.test(b))||a.localeCompare(b,"fr",{numeric:true})),searching=!!(S.drafts.st_q||"").trim()||stOnOff();
-  return`<div style="display:grid;gap:10px">${keys.map(k=>{const L=m.get(k),open=searching||(S.stOpen&&S.stOpen[k]!==undefined?S.stOpen[k]:keys.length===1),lim=(S.stFLim&&S.stFLim[k])||ST_STEP,on=L.filter(online).length;
-    return`<div class="glass folder${open?" open":""}"><button class="folder-h" type="button" data-a="stFolder" data-k="${esc(k)}" aria-expanded="${open}"><span class="folder-ic" aria-hidden="true">${open?"📂":"📁"}</span><b>${esc(k)}</b><span class="chip">${L.length} élève${L.length>1?"s":""}</span>${on?`<span class="chip ok"><span class="dot on"></span>${on} en ligne</span>`:""}<span class="folder-chev" aria-hidden="true">${open?"▾":"▸"}</span></button>${open?`<div class="tablewrap"><table><thead><tr><th>Élève</th><th>Niveau</th><th>Profil</th><th>XP</th><th>Série</th><th>Moyenne</th><th>Devoirs</th><th>Activité</th></tr></thead><tbody>${L.slice(0,lim).map(stRow).join("")}</tbody></table></div>${L.length>lim?`<div style="text-align:center;padding:10px"><button class="btn ghost sm" data-a="stFMore" data-k="${esc(k)}">Afficher plus (${L.length-lim} restant${L.length-lim>1?"s":""})</button></div>`:""}`:""}</div>`}).join("")}</div>`}
-
-/* ============ Appareils : suspendre / limiter ============ */
-const devAcc=sid=>S.access[sid]||{};
-const devState=(sid,k)=>{const a=devAcc(sid);if(a.blockedDevices&&a.blockedDevices[k])return"blocked";if(a.deviceLimit&&!(a.allowedDevices&&a.allowedDevices[k]))return"pending";return"ok"};
-function devRow(s,k,d){const st=devState(s.id,k),lim=!!devAcc(s.id).deviceLimit;
-  return`<div class="it"><span class="ic t-cyan" style="width:36px;height:36px">${ic("device")}</span><div class="txt"><b>${esc(d.label||"Appareil")}</b> ${st==="blocked"?`<span class="chip bad">Suspendu</span>`:st==="pending"?`<span class="chip warn">Non autorisé</span>`:lim?`<span class="chip ok">Autorisé</span>`:""}<div class="small muted">Première connexion le ${fmtDate(d.first)} · dernière ${ago(d.last)}</div></div>${st==="ok"?`<button class="btn ghost sm" data-a="devBlock" data-id="${s.id}" data-d="${esc(k)}">${ic("lock")}Suspendre</button>`:`<button class="btn sm" data-a="devAllow" data-id="${s.id}" data-d="${esc(k)}">${ic("check")}Rétablir</button>`}</div>`}
-function devLimitBar(s){const lim=devAcc(s.id).deviceLimit||0;
-  return`<div style="display:grid;gap:8px"><div class="row small" style="gap:8px"><b>Nombre d'appareils autorisés :</b>${[1,2,3].map(n=>`<button class="btn ${lim===n?"":"ghost "}sm" data-a="devLimit" data-id="${s.id}" data-n="${n}" aria-pressed="${lim===n}">${n}</button>`).join("")}${lim?`<button class="btn ghost sm" data-a="devLimit" data-id="${s.id}" data-n="0">Sans limite</button>`:""}</div><p class="hint" style="margin:0">${lim?"Les "+lim+" appareils utilisés le plus récemment sont autorisés. Tout nouvel appareil est bloqué jusqu'à ce que tu le rétablisses.":"Choisis un nombre : les appareils les plus récents sont gardés, les autres sont suspendus. Tu peux aussi suspendre un téléphone précis dans la liste."}</p></div>`}
-const devBlockedMe=()=>{if(S.mode!=="student"||S.isOwner||S.isStaff||!S.uid||!S.myAccess)return false;const a=S.myAccess,id=deviceId();return!!(a.blockedDevices&&a.blockedDevices[id])||!!(a.deviceLimit&&!(a.allowedDevices&&a.allowedDevices[id]))};
-const deviceBlockedView=()=>lockCard("lock","t-coral","Appareil non autorisé","Cet appareil est suspendu","Ton professeur limite le nombre de téléphones ou de navigateurs pour ce compte. Utilise ton appareil habituel, ou demande à ton professeur d'autoriser celui-ci.");
-
-/* ============ Nova : historique complet des conversations ============ */
-function talkSaveLog(T){if(!S.uid||!T||!T.turns.some(t=>t.role==="me"))return;const clip=(x,n)=>String(x||"").slice(0,n);
-  const turns=T.turns.slice(-60).map(t=>t.role==="ai"?{role:"ai",text:clip(t.text,900),fr:clip(t.fr,900),words:(t.words||[]).slice(0,4).map(w=>({en:clip(w.en,60),fr:clip(w.fr,60)}))}:{role:"me",text:clip(t.text,600),corr:t.corr?{you:clip(t.corr.you,300),better:clip(t.corr.better,300),why:clip(t.corr.why,400)}:null,praise:clip(t.praise,200)}),sc=TALK_SC.find(x=>x.k===T.sc);
-  write(()=>S.db.doc("students/"+S.uid+"/talkLogs/"+T.at).set({sc:T.sc,title:sc?.t||"Conversation",at:T.at,turns,updatedAt:Date.now()}))}
-async function talkOpen(id,at){const entry=(S.me?.talks||[]).find(x=>(id&&String(x.id)===String(id))||x.at===at);let log=null;
-  if(id){try{const d=await S.db.doc("students/"+S.uid+"/talkLogs/"+id).get();if(d.exists)log=d.data()}catch(e){console.warn(e)}}
-  if(log&&Array.isArray(log.turns)&&log.turns.length)S.talk={sc:log.sc,turns:log.turns.map(t=>({...t})),busy:false,strict:!!S.talkStrict,at:log.at||+id,rewarded:true};
-  else if(entry){S.talk={sc:entry.sc,turns:[],busy:false,at:entry.at,rewarded:true,nOld:entry.n,summary:{score:entry.score||null,level:entry.level||"",strengths:[],work:[],mistakes:entry.mistakes||[],words:[],advice:"Cette ancienne conversation a été enregistrée avant la sauvegarde complète : seul son bilan est disponible.",praise:""}}}
-  else{toast("Conversation introuvable.","x");return}
-  S.view=null;S.tab="talk";S.animate=true;scrollTo(0,0);render()}
-
-/* ============ Corrigé généré par l'IA : PDF / image ============ */
-const hwPrevName=()=>{const ed=S.editing&&S.editing.kind==="homework"?S.homework.find(x=>x.id===S.editing.id):null;return ed?.fileId?(ed.fileName||"devoir"):""};
-const corGenBtn=k=>AI.sample&&!AI.disabled?`<div class="row"><button class="btn sm" type="button" data-a="corGen" data-k="${k}" ${S.corBusy?"disabled":""}>${ic("spark")}${S.corBusy===k?"Nova rédige le corrigé…":"Générer le corrigé avec Nova"}</button><span class="hint">Nova lit le sujet (texte ou photo) et propose un corrigé que tu peux modifier.</span></div>`:"";
-const corDlBar=k=>{const pid=k==="hw"?"h_pdf":"e_pdf";return`<div class="row"><button class="btn ghost sm" type="button" data-a="corPdf" data-k="${k}">${ic("download")}Télécharger en PDF</button><button class="btn ghost sm" type="button" data-a="corPng" data-k="${k}">${ic("download")}Télécharger en image</button></div><label class="row small" style="gap:8px;flex-wrap:nowrap;align-items:flex-start;cursor:pointer"><input id="${pid}" type="checkbox"${S.drafts[pid]==="1"?" checked":""}><span>Joindre ce corrigé en PDF à l'enregistrement (tu pourras ensuite le publier aux élèves).</span></label>`};
-const corrigeHW=()=>`<div class="editbar" style="display:grid;gap:12px;background:var(--surface2);border-color:var(--line)"><span class="row">${ic("lock")}<b>Corrigé</b><span class="hint">Facultatif · visible par toi seulement, sauf si tu le publies.</span></span>${corGenBtn("hw")}<label>Corrigé (texte)<textarea id="h_cor" style="min-height:140px" placeholder="Réponses attendues, barème… ou laisse Nova le rédiger"></textarea></label>${corDlBar("hw")}<label class="row small" style="gap:8px;flex-wrap:nowrap;align-items:flex-start;cursor:pointer"><input id="h_pub" type="checkbox"${S.drafts.h_pub==="1"?" checked":""}><span>Publier ce corrigé aux élèves avec le devoir.</span></label></div>`;
-const corTxt=k=>(document.getElementById(k==="hw"?"h_cor":"e_cor")?.value||"").trim();
-const corTitle=k=>(document.getElementById(k==="hw"?"h_title":"e_title")?.value||"").trim()||"Sujet";
-async function corGen(k){if(!AI.sample||S.corBusy)return;const hw=k==="hw",subj=(document.getElementById(hw?"h_body":"e_sujet")?.value||"").trim(),sc=S.scan[hw?"hw":"sujet"],useImg=!!(sc&&sc.blob&&!sc.isPdf&&AI.canImg);
-  if(!subj&&!useImg){toast("Ajoute d'abord le texte du sujet, ou une photo (puis « Transcrire le texte avec l'IA »).","x");return}
-  S.corBusy=k;render();const lvl=document.getElementById(hw?"h_level":"e_level")?.value||"";
-  try{const prompt=`Tu es professeur d'anglais au Togo. Voici ${hw?"un devoir donné à des élèves":"un sujet d'examen"}${lvl?" (niveau "+lvl+")":""} :\n\n${subj||"(le sujet est sur l'image jointe)"}\n\nRédige le CORRIGÉ complet pour la professeure : pour chaque question, la réponse attendue, avec une courte explication en français quand c'est utile, puis un barème proposé${hw?"":" (total sur 20)"}. Garde la numérotation du sujet. Mets les titres des parties en **gras** et laisse une ligne vide entre les parties. Pas d'introduction ni de conclusion. Réponds uniquement avec le corrigé.`;
-    const r=await AI.sample(prompt,useImg?{images:[sc.blob],cache:false}:{cache:false});
-    S.drafts[hw?"h_cor":"e_cor"]=(r.text||"").trim();S.drafts[hw?"h_pdf":"e_pdf"]="1";toast("Corrigé rédigé : relis-le avant de le publier","spark")}
-  catch(e){toast(aiErr(e&&e.code),"x");if(e&&e.code==="images_unavailable")AI.canImg=false}
-  S.corBusy=null;render()}
-const CP1252={"€":128,"‚":130,"ƒ":131,"„":132,"…":133,"†":134,"‡":135,"ˆ":136,"‰":137,"Š":138,"‹":139,"Œ":140,"Ž":142,"‘":145,"’":146,"“":147,"”":148,"•":149,"–":150,"—":151,"˜":152,"™":153,"š":154,"›":155,"œ":156,"ž":158,"Ÿ":159};
-const pdfBytes=t=>{const o=[];for(const ch of String(t)){const c=ch.codePointAt(0);o.push(CP1252[ch]||(c<256?c:63))}return o};
-const pdfEsc=b=>{const o=[];for(const c of b){if(c===40||c===41||c===92)o.push(92);o.push(c)}return o};
-function corLayout(title,text,ctx,maxW,base,fam){const out=[],fit=(t,bold,size)=>{ctx.font=(bold?"bold ":"")+size+"px "+fam;const ws=t.split(/\s+/).filter(Boolean),r=[];let cur="";for(const w of ws){const n=cur?cur+" "+w:w;if(ctx.measureText(n).width*1.04>maxW&&cur){r.push(cur);cur=w}else cur=n}if(cur)r.push(cur);return r};
-  for(const l of fit(title,true,base*1.45))out.push({t:l,bold:true,size:base*1.45,lead:base*1.9});out.push({t:"",size:base,lead:base*.8});
-  for(const raw of String(text||"").split("\n")){const line=raw.trim();if(!line){out.push({t:"",size:base,lead:base*.7});continue}
-    const hd=/^\*\*.+\*\*:?$/.test(line),t=line.replace(/\*\*/g,"").replace(/^#+\s*/,"");for(const l of fit(t,hd,base))out.push({t:l,bold:hd,size:base,lead:base*1.4})}
-  return out}
-function makePdf(title,text){const W=595,H=842,M=56,ctx=document.createElement("canvas").getContext("2d"),lines=corLayout(title,text,ctx,W-2*M,11,"Helvetica, Arial, sans-serif");
-  const pages=[[]];let y=H-M;for(const l of lines){if(y-l.lead<M){pages.push([]);y=H-M}y-=l.lead;pages[pages.length-1].push({...l,y})}
-  const asc=t=>Array.from(t,c=>c.charCodeAt(0)),parts=[],offs=[];let len=0;const push=a=>{const u=Uint8Array.from(a);parts.push(u);len+=u.length};
-  const obj=(n,body)=>{offs[n]=len;push(asc(n+" 0 obj\n"));push(body);push(asc("\nendobj\n"))},N=4+pages.length*2;push(asc("%PDF-1.4\n"));
-  obj(1,asc("<< /Type /Catalog /Pages 2 0 R >>"));obj(2,asc("<< /Type /Pages /Kids ["+pages.map((_,i)=>(5+i*2)+" 0 R").join(" ")+"] /Count "+pages.length+" >>"));
-  obj(3,asc("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"));obj(4,asc("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"));
-  pages.forEach((pg,i)=>{let ops=[];for(const l of pg){if(!l.t)continue;ops=ops.concat(asc("BT /F"+(l.bold?2:1)+" "+l.size.toFixed(1)+" Tf "+M+" "+l.y.toFixed(1)+" Td ("),pdfEsc(pdfBytes(l.t)),asc(") Tj ET\n"))}
-    obj(5+i*2,asc("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 "+W+" "+H+"] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents "+(6+i*2)+" 0 R >>"));
-    obj(6+i*2,asc("<< /Length "+ops.length+" >>\nstream\n").concat(ops,asc("\nendstream")))});
-  const xr=len;let t="xref\n0 "+(N+1)+"\n0000000000 65535 f \n";for(let n=1;n<=N;n++)t+=String(offs[n]).padStart(10,"0")+" 00000 n \n";
-  t+="trailer\n<< /Size "+(N+1)+" /Root 1 0 R >>\nstartxref\n"+xr+"\n%%EOF";push(asc(t));return new Blob(parts,{type:"application/pdf"})}
-function makePng(title,text){return new Promise(res=>{const W=1240,M=90,fam="Arial, Helvetica, sans-serif",c=document.createElement("canvas"),x=c.getContext("2d"),lines=corLayout(title,text,x,W-2*M,30,fam),H=Math.max(1754,Math.round(M*2+lines.reduce((a,l)=>a+l.lead,0)));
-  c.width=W;c.height=H;x.fillStyle="#fff";x.fillRect(0,0,W,H);x.fillStyle="#16213A";let y=M;for(const l of lines){y+=l.lead;if(!l.t)continue;x.font=(l.bold?"bold ":"")+l.size+"px "+fam;x.fillText(l.t,M,y-l.lead*.25)}
-  c.toBlob(b=>res(b),"image/png")})}
-
-
-/* ============ Jeux d'images : suggestions de Nova (images nouvelles, prêtes à publier) ============ */
-const picNorm=t=>String(t||"").toLowerCase().replace(/[^a-z' ]/g," ").replace(/\b(a|an|the|he|she|it|they|is|are|this|his|her)\b/g," ").replace(/\s+/g," ").trim();
-async function picSuggest(){if(!AI.sample||AI.disabled||S.picSug?.busy)return;S.picSug={busy:true,items:[],day:today()};render();
-  try{const have=new Set();[...Object.values(PB.nouns).flat(),...PB.actions,...PB.jobs,...PB.feelings,...PB.weather,...PB.places,...PB.colors].forEach(x=>{if(x&&x.en)String(x.en).split("/").forEach(w=>have.add(picNorm(w)))});vis(S.pictures).forEach(x=>have.add(picNorm(x.answer)));
-    const list=[...have].filter(Boolean).slice(0,600).join(", ");
-    const r=await AI.sample.json(`Tu es professeur d'anglais au Togo. Crée 8 NOUVEAUX jeux d'images pour des élèves de niveau A1 à B1, variés : objets du quotidien, aliments et plantes d'Afrique de l'Ouest, animaux, actions, métiers, lieux du quartier. Chaque jeu = UN seul emoji qui représente très clairement la réponse, une question en anglais et la bonne réponse en anglais. N'utilise AUCUN des mots déjà présents dans l'application : ${list}.\nRègles : kind vaut noun, action, job ou place. noun : question « What is it? », réponse « a mango ». action : question « What is the woman doing? », réponse « She is cooking. ». job : question « What does he do? », réponse « He is a farmer. ». place : question « What place is it? », réponse « It is a market. ». alts = 1 à 3 variantes acceptées, courtes (ex. « mango »). fr = traduction française. level vaut A1, A2 ou B1.\nRéponds uniquement avec ce JSON : {"items":[{"emoji":"🥭","kind":"noun","question":"What is it?","answer":"a mango","alts":["mango"],"fr":"une mangue","level":"A1"}]}`,{cache:false});
-    const seen=new Set(),items=[];for(const x of(Array.isArray(r.items)?r.items:[])){const emoji=String(x.emoji||"").trim(),ans=cleanStr(x.answer,140),key=picNorm(ans);
-      if(!emoji||[...emoji].length>8||!ans||!PIC_KINDS_OK.includes(x.kind)||have.has(key)||seen.has(key))continue;seen.add(key);
-      items.push({emoji,kind:x.kind,question:cleanStr(x.question,120)||undefined,answer:ans,alts:(Array.isArray(x.alts)?x.alts:[]).map(a=>cleanStr(a,80)).filter(Boolean).slice(0,3),fr:cleanStr(x.fr,140),level:["A1","A2","B1"].includes(x.level)?x.level:"A1"})}
-    if(items.length<2)throw{code:"empty"};S.picSug={items:items.slice(0,8),day:today()}}
-  catch(e){S.picSug={items:[],day:today(),err:e&&e.code==="empty"?"Nova n'a pas trouvé assez d'images nouvelles. Touche « Nouvelles idées ».":aiErr(e&&e.code)}}
-  render()}
-const PIC_KINDS_OK=["noun","action","job","place"];
-const picDoc=it=>({pic:it.emoji,kind:it.kind,prompt:it.question||"",answer:it.answer,alt:it.alts,fr:it.fr,level:it.level,audience:"tous",teacherId:S.uid,createdAt:Date.now(),ai:true});
-async function picPublish(i){const it=S.picSug?.items?.[i];if(!it)return;S.picSug.items.splice(i,1);render();await write(()=>S.db.collection("pictures").add(picDoc(it)));toast("Image publiée dans les jeux d'images","camera")}
-async function picPublishAll(){const all=[...(S.picSug?.items||[])];if(!all.length)return;S.picSug.items=[];render();for(const it of all)await write(()=>S.db.collection("pictures").add(picDoc(it)));toast(all.length+" images publiées dans les jeux d'images","camera")}
-function picSugHTML(){if(!AI.sample||AI.disabled)return"";const P=S.picSug||{};
-  return`<div class="glass card" style="gap:12px;border-color:#D9DDF3"><div class="row between"><span class="row">${ic("spark")}<b>Nouvelles images proposées par Nova</b></span><div class="row"><button class="btn ghost sm" type="button" data-a="picSugNew" ${P.busy?"disabled":""}>${ic("refresh")}Nouvelles idées</button>${(P.items||[]).length>1?`<button class="btn sm" type="button" data-a="picSugAll">${ic("rocket")}Tout publier (${P.items.length})</button>`:""}</div></div>
-  ${P.busy?`<span class="ai-think"><i></i><i></i><i></i> Nova prépare des images que l'application n'a pas encore…</span>`:P.err?`<div class="note small">${esc(P.err)}</div>`:(P.items||[]).length?`<div class="pgrid">${P.items.map((it,i)=>`<div class="glass card" style="gap:8px;text-align:center"><div style="font-size:3rem;line-height:1.1">${E(it.emoji)}</div><div class="small muted">${esc(it.question||"")}</div><b>${esc(it.answer)}</b><div class="small muted">${esc(it.fr)}</div><div class="row" style="justify-content:center"><span class="chip">${esc(it.level)}</span></div><div class="row" style="justify-content:center"><button class="btn sm" type="button" data-a="picSugPub" data-i="${i}">${ic("check")}Publier</button><button class="iconbtn" type="button" data-a="picSugDrop" data-i="${i}" aria-label="Retirer cette suggestion">${ic("x")}</button></div></div>`).join("")}</div>`:`<p class="hint" style="margin:0">Plus de suggestions pour l'instant : touche « Nouvelles idées ».</p>`}
-  <p class="hint" style="margin:0">Ces images n'existent pas encore dans l'application : tu n'as qu'à appuyer sur Publier. Tu peux aussi ajouter ta propre photo juste en dessous.</p></div>`}
-
-/* ============ Mots : liste générée par Nova (formulaire de la prof) ============ */
-async function aiFillDeck(){if(!AI.sample||S.dfill)return;const topic=(document.getElementById("d_title")?.value||"").trim();if(!topic){toast("Écris d'abord le titre de la liste (le thème).","x");return}
-  const lvl=document.getElementById("d_level")?.value||"A1",aud=document.getElementById("d_aud")?.value||"tous";S.dfill=true;render();
-  try{const r=await AI.sample(`Écris une liste de 15 mots ou expressions d'anglais sur le thème « ${topic} », niveau ${lvl}, public : ${AUDIENCES[aud]||"tous"} (système scolaire togolais). Format EXACT, sans rien d'autre : une ligne par mot, « anglais | français | phrase d'exemple courte en anglais ». Exemple :\napple | pomme | I eat an apple every day.\nto borrow | emprunter | Can I borrow your pen?`,{cache:false});
-    const lines=String(r.text||"").split("\n").map(l=>l.replace(/^[-*\d.)\s]+/,"").trim()).filter(l=>l.split("|").length>=2);const prev=(S.drafts.d_body||"").trim();S.drafts.d_body=(prev?prev+"\n":"")+lines.join("\n");toast(lines.length+" mots prêts : relis-les avant de publier","spark")}
-  catch(e){toast(aiErr(e&&e.code),"x")}S.dfill=false;render()}
-
-/* ============ Mots du jour : une liste par élève, générée chaque jour ============ */
-const DW_N=5;
-async function dailyWordsEnsure(){if(S.dwBusy||!S.me||S.mode!=="student"||isParent(S.me)||!AI.sample||AI.disabled||stOf(S.me)!=="active"||devBlockedMe())return;
-  const dw=S.me.dailyWords;if(dw&&dw.day===today())return;if(S.dwTried===today())return;S.dwTried=today();S.dwBusy=true;render();
-  const keep=(dw?.list||[]).filter(w=>!w.known).map(w=>({...w,days:(w.days||1)+1})),need=Math.max(0,DW_N-keep.length),seen=[...(S.me.dwDone||[]),...keep.map(w=>w.en)].map(x=>String(x).toLowerCase());
-  try{let fresh=[];
-    if(need>0){const r=await AI.sample.json(`Tu es professeur d'anglais au Togo. Propose ${need+2} mots ou expressions NOUVEAUX et utiles pour un élève (niveau ${S.me.level||"A1"}, profil : ${PROFILES[S.me.profile]||"élève"}), liés à la vie quotidienne, à l'école ou au travail. Évite ces mots déjà vus : ${seen.slice(-120).join(", ")||"aucun"}. Réponds uniquement avec ce JSON : {"words":[{"en":"to borrow","fr":"emprunter","ex":"Can I borrow your pen?"}]} (ex = phrase d'exemple courte, au niveau de l'élève).`,{cache:false,modelTier:"quick"});
-      fresh=(Array.isArray(r.words)?r.words:[]).filter(w=>w&&w.en&&w.fr&&!seen.includes(String(w.en).toLowerCase())).slice(0,need).map(w=>({en:cleanStr(w.en,60),fr:cleanStr(w.fr,80),ex:cleanStr(w.ex||"",160),days:1}))}
-    if(keep.length+fresh.length)await write(()=>meRef().update({dailyWords:{day:today(),list:[...keep,...fresh]}}))}
-  catch(e){console.warn(e)}
-  S.dwBusy=false;render()}
-function dailyWordsHTML(){if(!S.me||isParent(S.me)||!AI.sample||AI.disabled)return"";const dw=S.me.dailyWords,hd=`<span class="eyebrow">Mots du jour · pour toi</span>`;
-  if(!dw||!(dw.list||[]).length)return S.dwBusy?`<div class="section"><div class="glass card">${hd}<span class="ai-think"><i></i><i></i><i></i> Nova prépare tes mots du jour…</span></div></div>`:`<div class="section"><div class="glass card">${hd}<p class="muted small" style="margin:0">Les mots du jour ne sont pas disponibles pour le moment.</p><div><button class="btn ghost sm" data-a="dwRetry">${ic("refresh")}Réessayer</button></div></div></div>`;
-  const L=dw.list,k=L.filter(w=>w.known).length;
-  return`<div class="section"><div class="glass card" style="gap:12px"><div class="row between"><div>${hd}<h3 style="margin:0">Mes ${L.length} mots à apprendre</h3></div><span class="chip ${k===L.length?"ok":""}">${k}/${L.length} appris</span></div>
-  <div class="list" style="padding:0">${L.map((w,i)=>`<div class="it"><div class="txt"><b>${esc(w.en)}</b> <button class="iconbtn sm" type="button" data-say="${esc(w.en)}" aria-label="Écouter ${esc(w.en)}">${ic("speaker")}</button><div>${esc(w.fr)}</div>${w.ex?`<div class="small muted"><i>${esc(w.ex)}</i></div>`:""}${(w.days||1)>1&&!w.known?`<span class="chip warn">Encore là : jour ${w.days}</span>`:""}</div>${w.known?`<span class="chip ok">${ic("check")}Appris</span>`:`<button class="btn sm" type="button" data-a="dwKnow" data-i="${i}">${ic("check")}Je le sais</button>`}</div>`).join("")}</div>
-  <p class="hint" style="margin:0">Un mot que tu n'as pas encore appris reste ici jusqu'à ce que tu le saches. Demain, de nouveaux mots remplacent ceux que tu as appris.</p></div></div>`}
 
 /* ============ document scanner (photo -> clean HD) ============ */
 function loadImg(file){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(file)})}
@@ -2031,7 +1972,7 @@ function scanBlock(k,label,prevName){if(!S.assets)return`<p class="hint">L'envoi
   <div class="row between"><div class="seg">${SCAN_MODES.map(([m,l])=>`<button type="button" data-a="scanMode" data-k="${k}" data-m="${m}" aria-pressed="${sc.mode===m}">${l}</button>`).join("")}</div><div class="row"><button class="iconbtn" type="button" data-a="scanRot" data-k="${k}" data-r="-90" aria-label="Tourner à gauche">${ic("rotl")}</button><button class="iconbtn" type="button" data-a="scanRot" data-k="${k}" data-r="90" aria-label="Tourner à droite">${ic("rotr")}</button></div></div>
   <div class="row">${AI.sample&&AI.canImg?`<button class="btn sm" type="button" data-a="scanAI" data-k="${k}" ${sc.busy||sc.ocr?"disabled":""}>${ic("spark")}${sc.ocr?"Transcription en cours…":"Transcrire le texte avec l'IA"}</button>`:""}<button class="btn ghost sm" type="button" data-a="scanClear" data-k="${k}">${ic("x")}Retirer la photo</button></div>`}</div>`}
 async function scanTranscribe(k){const sc=S.scan[k];if(!sc||!sc.blob||!AI.sample)return;sc.ocr=true;render();
-  const what=k==="sujet"?"un sujet d'examen d'anglais":k==="hw"?"un devoir d'anglais donné aux élèves":"le corrigé d'un examen d'anglais",field=k==="sujet"?"e_sujet":k==="hw"?"h_body":"e_cor";
+  const what=k==="sujet"?"un sujet d'examen d'anglais":"le corrigé d'un examen d'anglais",field=k==="sujet"?"e_sujet":"e_cor";
   try{const r=await AI.sample(`Voici la photo de ${what}. Recopie fidèlement tout le texte visible, dans l'ordre, en gardant la numérotation, les consignes et le barème. Mets les titres des parties en **gras** (par exemple **A. Comprehension (8 pts)**). Laisse une ligne vide entre les parties. N'ajoute rien, ne réponds pas aux questions et ne commente pas. Si un passage est illisible, écris [illisible]. Réponds uniquement avec le texte recopié.`,{images:[sc.blob],cache:false});
     const prev=(S.drafts[field]||"").trim();S.drafts[field]=prev?prev+"\n\n"+r.text.trim():r.text.trim();toast("Texte transcrit : vérifie-le avant de publier","spark")}
   catch(e){toast(aiErr(e.code),"x");if(e.code==="images_unavailable")AI.canImg=false}
@@ -2110,1122 +2051,6 @@ async function aiFillQuiz(){if(!AI.sample)return;const topic=(document.getElemen
     const prev=(S.drafts.q_body||"").trim();S.drafts.q_body=(prev?prev+"\n\n":"")+r.text.trim();toast(parseQuiz(S.drafts.q_body).length+" questions prêtes : relis-les avant de publier","spark")}
   catch(e){toast(aiErr(e.code),"x")}S.qfill=false;render()}
 
-/* Programme togolais d'anglais (APC) : leçons, quiz, vocabulaire, devoirs.
-   Formats = ceux du Studio : quiz (* bonne réponse, - fausse, "= a / b" réponse écrite), vocabulaire (anglais | français | exemple). */
-const CURRICULUM_TOGO=[
-{c:"CP1",u:1,lv:"A1",t:"Hello! Colours and greetings",th:"Salutations et couleurs",g:"Hello / My name is",
-body:`Au CP, on apprend l'anglais par l'oreille : on écoute, on répète, on chante.
-
-**Hello!** = Bonjour ! **Good morning** = Bonjour (le matin). **Goodbye** = Au revoir.
-
-Pour se présenter : **My name is** Koffi. (Je m'appelle Koffi.)
-
-Les couleurs : **red** (rouge), **blue** (bleu), **green** (vert), **yellow** (jaune), **black** (noir), **white** (blanc).
-
-Joue avec ton voisin : « Hello! My name is ... »`,
-quiz:`Comment dit-on « Bonjour » en anglais ?
-* Hello
-- Goodbye
-- Red
-
-Que veut dire « Goodbye » ?
-* Au revoir
-- Bonjour
-- Merci
-
-Quelle est la couleur « red » ?
-* Rouge
-- Bleu
-- Vert
-
-My name ___ Ama.
-* is
-- are
-- am
-
-Écris « blue » en français.
-= bleu`,
-deck:`hello | bonjour | Hello, teacher!
-goodbye | au revoir | Goodbye, Mama!
-red | rouge | The apple is red.
-blue | bleu | The sky is blue.
-green | vert | The leaf is green.
-yellow | jaune | The sun is yellow.
-black | noir | The board is black.
-white | blanc | The chalk is white.`,
-hw:{t:"My name and my favourite colour",b:"Écris (ou dessine) : Hello! My name is ... My favourite colour is ... (3 phrases courtes)."}},
-
-{c:"CE1",u:1,lv:"A1",t:"Numbers and days of the week",th:"Chiffres et jours",g:"How many...? / Today is...",
-body:`Les chiffres : **one** (1), **two** (2), **three** (3), **four** (4), **five** (5), **six** (6), **seven** (7), **eight** (8), **nine** (9), **ten** (10).
-
-Les jours de la semaine : **Monday**, **Tuesday**, **Wednesday**, **Thursday**, **Friday**, **Saturday**, **Sunday**.
-
-Questions utiles :
-How many pencils? — **Five** pencils.
-What day is it today? — Today is **Monday**.`,
-quiz:`Quel chiffre est « seven » ?
-* 7
-- 6
-- 9
-
-Quel jour vient après Monday ?
-* Tuesday
-- Sunday
-- Friday
-
-How many fingers on one hand?
-* Five
-- Two
-- Ten
-
-Today ___ Friday.
-* is
-- are
-- am
-
-Écris « trois » en anglais.
-= three`,
-deck:`one | un | one book
-two | deux | two pens
-three | trois | three mangoes
-five | cinq | five fingers
-ten | dix | ten pupils
-Monday | lundi | Today is Monday.
-Friday | vendredi | Friday is a school day.
-Sunday | dimanche | I go to church on Sunday.`,
-hw:{t:"My week",b:"Écris les 7 jours de la semaine en anglais, puis complète : Today is ... I have ... books in my bag."}},
-
-{c:"CM1",u:1,lv:"A1",t:"Animals and my house",th:"Animaux et maison",g:"There is / There are",
-body:`Les animaux : **dog** (chien), **cat** (chat), **goat** (chèvre), **chicken** (poulet), **cow** (vache), **bird** (oiseau).
-
-Les pièces de la maison : **kitchen** (cuisine), **bedroom** (chambre), **living room** (salon), **bathroom** (douche).
-
-**There is** + un seul : There is a dog in the yard.
-**There are** + plusieurs : There are three chickens in the yard.`,
-quiz:`Comment dit-on « chèvre » ?
-* goat
-- cow
-- cat
-
-There ___ two goats.
-* are
-- is
-- am
-
-La « kitchen » est…
-* la cuisine
-- la chambre
-- le salon
-
-There ___ a cat on the bed.
-* is
-- are
-- be
-
-Écris « chien » en anglais.
-= dog`,
-deck:`dog | chien | The dog is big.
-cat | chat | The cat is sleeping.
-goat | chèvre | There is a goat in the yard.
-chicken | poulet | I have four chickens.
-cow | vache | The cow gives milk.
-kitchen | cuisine | Mama is in the kitchen.
-bedroom | chambre | My bedroom is small.
-house | maison | This is my house.`,
-hw:{t:"My house and my animals",b:"Décris ta maison en 4 phrases avec There is / There are. Exemple : There is a kitchen. There are two bedrooms."}},
-
-{c:"6e",u:1,lv:"A1",t:"School and classroom objects",th:"The school",g:"Imperative / this is / these are",
-body:`**Classroom objects** : a **book**, a **pen**, a **pencil**, a **ruler**, a **bag**, a **desk**, a **blackboard**.
-
-**L'impératif** donne un ordre ou une consigne. On utilise le verbe seul :
-**Sit down.** (Assieds-toi.) **Listen.** (Écoute.) **Open your book.** **Don't talk!** (Ne parle pas !)
-
-**This is** un objet proche : This is a pen. **These are** plusieurs objets : These are pens.
-
-Questions : What is this? — It is a book. How many pens? — Three pens.`,
-quiz:`Choisis l'impératif correct pour « Assieds-toi ».
-* Sit down.
-- You sit down.
-- Sitting down.
-
-___ is my bag.
-* This
-- These
-- Those
-
-These ___ my pencils.
-* are
-- is
-- am
-
-« Don't talk! » veut dire…
-* Ne parle pas !
-- Parle !
-- Écoute !
-
-Écris « règle (outil) » en anglais.
-= ruler`,
-deck:`book | livre | Open your book.
-pen | stylo | I write with a pen.
-pencil | crayon | This is my pencil.
-ruler | règle | The ruler is on the desk.
-bag | sac | My bag is heavy.
-blackboard | tableau | Look at the blackboard.
-teacher | professeur | The teacher is kind.
-classroom | salle de classe | Our classroom is clean.`,
-hw:{t:"My school bag",b:"Liste 6 objets de ton sac en anglais et écris 3 phrases : This is my ... These are my ..."}},
-
-{c:"6e",u:2,lv:"A1",t:"My family and my body",th:"Family, body, daily life",g:"Present simple, present continuous, possessives",
-body:`**La famille** : **father**, **mother**, **brother**, **sister**, **grandmother**, **uncle**, **aunt**.
-
-**Adjectifs possessifs** : my, your, his, her, our, their. This is **my** father. **His** name is Kodjo.
-**Génitif** : Ama**'s** book = le livre d'Ama.
-
-**Présent simple** (habitudes) : I **go** to school every day. She **goes** to school. (he/she/it + **s**)
-**Présent continu** (maintenant) : I **am reading** now. (be + verbe-**ing**)
-
-**Le corps** : head, arm, leg, hand, foot, eye, ear, mouth.`,
-quiz:`She ___ to school every day.
-* goes
-- go
-- going
-
-Look! The children ___ now.
-* are playing
-- play
-- plays
-
-This is Ama's book signifie :
-* C'est le livre d'Ama.
-- C'est Ama qui lit.
-- Ama a deux livres.
-
-___ name is Kofi. (il)
-* His
-- Her
-- Their
-
-Écris « jambe » en anglais.
-= leg`,
-deck:`father | père | My father is a driver.
-mother | mère | My mother sells tomatoes.
-brother | frère | I have one brother.
-sister | soeur | My sister is ten.
-head | tête | Touch your head.
-hand | main | Wash your hands.
-leg | jambe | My leg hurts.
-eye | oeil | She has big eyes.`,
-hw:{t:"My family",b:"Présente ta famille en 6 phrases : This is my mother. Her name is ... She sells ... Utilise my / his / her."}},
-
-{c:"5e",u:1,lv:"A1",t:"Village life, town life and traditions",th:"Village, town, ceremonies",g:"Past simple",
-body:`**Vocabulaire** : **village**, **town**, **market**, **ceremony**, **festival**, **chief**, **farm**.
-
-**Le passé simple** raconte un événement fini.
-Verbes réguliers : verbe + **ed** : walk → **walked**, play → **played**.
-Verbes irréguliers : go → **went**, see → **saw**, eat → **ate**, have → **had**, buy → **bought**.
-
-Négation : I **did not** (didn't) **go**. Question : **Did** you **go** to the market?
-
-Exemple : Last Sunday, we **went** to the village. We **ate** fufu and we **danced** at the ceremony.`,
-quiz:`Yesterday I ___ to the market.
-* went
-- go
-- goed
-
-They ___ football last Saturday.
-* played
-- play
-- plays
-
-Did you ___ the festival?
-* see
-- saw
-- seen
-
-She didn't ___ rice.
-* eat
-- ate
-- eaten
-
-Écris le passé de « buy ».
-= bought`,
-deck:`village | village | I live in a small village.
-town | ville | The town is big.
-market | marché | We buy yams at the market.
-ceremony | cérémonie | The ceremony was beautiful.
-festival | festival | We love the festival.
-chief | chef traditionnel | The chief spoke first.
-farm | ferme / champ | My uncle has a farm.
-last Sunday | dimanche dernier | Last Sunday, we visited Kara.`,
-hw:{t:"A day I will never forget",b:"Raconte au passé simple (8 phrases) une cérémonie ou un voyage au village : Last ..., we went to ..."}},
-
-{c:"5e",u:2,lv:"A2",t:"Health, sport and travel",th:"Hospital, sport, transport",g:"Be going to / will, comparatives, for / since",
-body:`**Le futur**
-**Be going to** = projet décidé : I **am going to** visit the hospital tomorrow.
-**Will** = décision soudaine, prédiction : It **will** rain tonight.
-
-**Comparatifs** : tall → tall**er** than ; **more** interesting **than** ; good → **better** ; bad → **worse**.
-**Superlatifs** : the tall**est**, **the most** beautiful, **the best**.
-
-**For / since** : I have lived here **for** five years. (durée) I have lived here **since** 2019. (point de départ)
-
-**Vocabulaire** : hospital, nurse, medicine, airport, station, ticket, football.`,
-quiz:`Tomorrow, I ___ visit my aunt. (projet)
-* am going to
-- went
-- was
-
-Lomé is ___ than Kpalimé.
-* bigger
-- more big
-- biggest
-
-She is ___ player in the team.
-* the best
-- better
-- good
-
-I have lived here ___ 2018.
-* since
-- for
-- during
-
-Complète : I have waited ___ two hours.
-= for`,
-deck:`hospital | hôpital | She works at the hospital.
-nurse | infirmière | The nurse is kind.
-medicine | médicament | Take your medicine.
-airport | aéroport | The airport is far.
-station | gare | We wait at the station.
-ticket | billet | I bought a ticket.
-better | meilleur | This road is better.
-tomorrow | demain | Tomorrow I will travel.`,
-hw:{t:"My plans for the holidays",b:"Écris 8 phrases : 4 avec be going to (tes projets) et 2 comparatifs (ex. Lomé is bigger than Aného)."}},
-
-{c:"4e",u:1,lv:"A2",t:"Food, cooking and nature",th:"Food and environment",g:"Quantifiers: much, many, some, any",
-body:`**Aliments** : rice, beans, cassava, yam, fish, tomato, pepper, oil, water.
-
-**Dénombrables** (on peut compter) : **many** tomatoes. **Non dénombrables** : **much** water, **much** rice.
-**Some** dans les phrases affirmatives : I have **some** rice.
-**Any** dans les négations et questions : I don't have **any** oil. Do you have **any** fish?
-**A lot of** marche partout : A lot of people eat cassava.
-
-**How much** rice? (non dénombrable) **How many** tomatoes? (dénombrable)
-
-Recette simple : **Wash** the rice. **Boil** water. **Add** salt. **Cook** for twenty minutes.`,
-quiz:`How ___ tomatoes do you need?
-* many
-- much
-- some
-
-There isn't ___ water.
-* much
-- many
-- a few
-
-I have ___ rice for lunch.
-* some
-- any
-- many
-
-Do you have ___ fish?
-* any
-- some
-- a
-
-« Boil » veut dire…
-* faire bouillir
-- laver
-- couper
-
-Écris « poivre / piment » en anglais.
-= pepper`,
-deck:`rice | riz | We eat rice today.
-beans | haricots | Beans are cheap.
-cassava | manioc | She sells cassava.
-yam | igname | Yam is expensive.
-fish | poisson | Fish is tasty.
-oil | huile | Add a little oil.
-boil | faire bouillir | Boil the water.
-environment | environnement | Protect the environment.`,
-hw:{t:"My favourite recipe",b:"Décris comment préparer un plat togolais en 6 étapes (Wash, Boil, Add, Cook...). Utilise some, any, much, many."}},
-
-{c:"4e",u:2,lv:"A2",t:"Jobs and basic technology",th:"Jobs, phones, computers",g:"Present perfect, can / must / should",
-body:`**Métiers** : **teacher**, **doctor**, **farmer**, **driver**, **engineer**, **tailor**, **trader**.
-
-**Present perfect** = have / has + participe passé : I **have finished** my homework. She **has never travelled** by plane.
-Mots utiles : **already**, **yet**, **ever**, **never**, **just**.
-
-**Modaux**
-**Can** (capacité, permission) : I **can** use a computer.
-**Must** (obligation) : You **must** wear a helmet.
-**Should** (conseil) : You **should** study every day.
-**Mustn't** = interdiction. **Don't have to** = pas obligé.
-
-**Technologie** : phone, computer, internet, message, screen, battery.`,
-quiz:`I ___ my homework already.
-* have finished
-- finished
-- am finishing
-
-She has ___ been to Accra.
-* never
-- not
-- no
-
-You ___ wear a helmet on a motorbike.
-* must
-- can
-- might
-
-You ___ study every day. (conseil)
-* should
-- must not
-- will
-
-« You mustn't smoke » veut dire…
-* Il est interdit de fumer.
-- Tu n'es pas obligé de fumer.
-- Tu peux fumer.
-
-Écris « ingénieur » en anglais.
-= engineer`,
-deck:`teacher | enseignant | My aunt is a teacher.
-doctor | médecin | The doctor helps people.
-farmer | cultivateur | The farmer plants maize.
-driver | chauffeur | He is a taxi driver.
-engineer | ingénieur | She wants to be an engineer.
-computer | ordinateur | I use a computer.
-phone | téléphone | My phone is new.
-battery | batterie | The battery is low.`,
-hw:{t:"My dream job",b:"Écris 8 phrases sur le métier que tu veux faire : I want to be... I should study... I must... I have already..."}},
-
-{c:"3e",u:1,lv:"A2",t:"Children's rights and citizenship",th:"Rights and duties",g:"Reported speech (direct → indirect)",
-body:`**Droits** : the right to **education**, to **health**, to **play**, to **be protected**. **Devoirs** : respect, obey the law, help others.
-
-**Discours direct** : Ama said, « I **am** happy. »
-**Discours indirect** : Ama said that she **was** happy.
-
-Règles principales (verbe introducteur au passé) :
-- présent → passé : am → **was**, go → **went**
-- will → **would** ; can → **could**
-- **I** → he/she ; **my** → his/her ; **now** → **then** ; **today** → **that day** ; **tomorrow** → **the next day**
-
-Questions : « Where do you live? » → He asked me **where I lived**. (pas d'inversion)`,
-quiz:`« I am tired », said Kofi. → Kofi said that he ___ tired.
-* was
-- is
-- will be
-
-« I will come tomorrow. » → She said she ___ come the next day.
-* would
-- will
-- can
-
-« Where do you live? » → He asked me where I ___.
-* lived
-- do live
-- live
-
-Dans le discours indirect, « now » devient…
-* then
-- today
-- later
-
-Complète : « I can swim. » → He said he ___ swim.
-= could`,
-deck:`right | droit | Every child has the right to learn.
-duty | devoir (obligation) | Respect is a duty.
-education | éducation | Education is important.
-protect | protéger | We protect children.
-citizen | citoyen | A good citizen obeys the law.
-law | loi | The law protects us.
-to say | dire | She said that she was ready.
-to ask | demander | He asked me my name.`,
-hw:{t:"Reported speech practice",b:"Transforme en discours indirect : 1) « I am hungry », said Ama. 2) « I will help you », said Kofi. 3) « Where is the school? » asked Eli. Puis écris 3 droits de l'enfant."}},
-
-{c:"3e",u:2,lv:"B1",t:"Environment, media and communication",th:"Protect the environment, media",g:"Conditionals type 1 and 2, passive voice",
-body:`**Environnement** : pollution, waste, tree, forest, recycle, plastic.
-
-**Conditionnel type 1** (possible) : **If** we **plant** trees, the air **will be** cleaner.
-**Conditionnel type 2** (imaginaire) : **If** I **were** president, I **would** protect the forests.
-
-**Voix passive** : be + participe passé.
-Active : People **burn** plastic. → Passive : Plastic **is burned** (by people).
-Passé : The tree **was cut** yesterday.
-
-**Médias** : newspaper, radio, television, social media, news.`,
-quiz:`If it rains, we ___ at home.
-* will stay
-- would stay
-- stayed
-
-If I ___ rich, I would build a school.
-* were
-- am
-- will be
-
-English is ___ all over the world.
-* spoken
-- speak
-- speaking
-
-The tree ___ cut yesterday.
-* was
-- is
-- were
-
-Mets au passif : « They sell fish. » → Fish ___ sold.
-= is`,
-deck:`pollution | pollution | Pollution kills fish.
-waste | déchets | Don't throw waste on the road.
-forest | forêt | The forest is green.
-recycle | recycler | We recycle plastic bags.
-plastic | plastique | Plastic is dangerous.
-newspaper | journal | My father reads a newspaper.
-radio | radio | I listen to the radio.
-news | actualités | The news is on at eight.`,
-hw:{t:"Save our environment",b:"Écris un petit texte de 10 phrases : 3 conditionnelles (If ... will / would) et 3 phrases au passif sur la pollution."}},
-
-{c:"2nde",u:1,lv:"B1",t:"Public health: malaria, HIV/AIDS and hygiene",th:"Health and hygiene",g:"Past continuous, past perfect, linking words",
-body:`**Santé publique** : malaria, mosquito net, vaccine, HIV/AIDS, hygiene, symptoms, prevention.
-
-**Past continuous** : I **was sleeping** when the phone rang. (action en cours dans le passé)
-**Past perfect** : When I arrived, the nurse **had** already **left**. (avant un autre moment du passé)
-
-**Connecteurs** : **however** (cependant), **although** (bien que), **therefore** (donc), **because** (parce que), **moreover** (de plus).
-Although malaria is dangerous, it **can be prevented**. Mosquitoes bite at night; **therefore** we sleep under a net.`,
-quiz:`I ___ when you called.
-* was sleeping
-- slept
-- have slept
-
-When we arrived, the film ___ already started.
-* had
-- has
-- was
-
-___ it was raining, they went out.
-* Although
-- Because
-- Therefore
-
-Malaria is dangerous; ___, we use mosquito nets.
-* therefore
-- although
-- but also
-
-Quel mot veut dire « de plus » ?
-* moreover
-- however
-- because`,
-deck:`malaria | paludisme | Malaria is spread by mosquitoes.
-mosquito net | moustiquaire | Sleep under a mosquito net.
-vaccine | vaccin | The vaccine protects children.
-hygiene | hygiène | Hygiene saves lives.
-symptom | symptôme | Fever is a symptom.
-prevention | prévention | Prevention is better than cure.
-however | cependant | However, it is possible.
-therefore | donc | Therefore, we must act.`,
-hw:{t:"A health campaign",b:"Rédige un paragraphe de 12 phrases pour sensibiliser ton quartier au paludisme. Utilise au moins 4 connecteurs (however, although, therefore, moreover)."}},
-
-{c:"2nde",u:2,lv:"B1",t:"Writing an informal letter",th:"Letters and structured paragraphs",g:"Letter format, paragraph structure",
-body:`**Une lettre informelle** (à un ami) :
-1. Adresse et date en haut à droite.
-2. **Dear Kofi,**
-3. Introduction : **How are you? I hope you are fine.**
-4. Corps : 2 paragraphes (une idée par paragraphe).
-5. Conclusion : **Write back soon. / Give my love to your family.**
-6. **Best wishes, / Yours, / Love,** + prénom.
-
-**Un paragraphe** = idée principale + 2 ou 3 détails + conclusion.
-Connecteurs : **first**, **then**, **after that**, **finally**.
-
-Exemple : « I am writing to tell you about my school trip. **First**, we visited Kara... »`,
-quiz:`Comment commence une lettre informelle ?
-* Dear Kofi,
-- To whom it may concern,
-- Sir,
-
-Quelle formule finit une lettre à un ami ?
-* Write back soon.
-- Yours faithfully.
-- I remain.
-
-Un paragraphe contient…
-* une idée principale avec des détails
-- une seule phrase courte
-- une liste de mots
-
-Quel mot sert à ordonner des actions ?
-* finally
-- although
-- because of
-
-Complète : « I hope you ___ fine. »
-= are`,
-deck:`dear | cher | Dear Ama,
-to write back | répondre | Please write back soon.
-first | d'abord | First, we left home.
-then | ensuite | Then we arrived.
-after that | après cela | After that, we ate.
-finally | enfin | Finally, we went home.
-best wishes | meilleurs voeux | Best wishes, Kofi.
-trip | voyage | The school trip was fun.`,
-hw:{t:"A letter to a friend",b:"Écris une lettre informelle de 120 mots à un ami : parle de ton école, de ta famille et invite-le pour les vacances."}},
-
-{c:"1re",u:1,lv:"B1",t:"Governance, politics and gender equality",th:"Commonwealth, democracy, gender",g:"Complex sentences, relative clauses",
-body:`**Gouvernance** : government, election, democracy, president, parliament, the **Commonwealth**.
-**Genre et société** : gender equality, women's rights, equal opportunities, job.
-
-**Propositions relatives** : **who** (personne), **which** (chose), **whose** (possession), **where** (lieu).
-The woman **who** leads the school is my aunt. The law **which** protects women is new.
-
-**Subordonnées** : **although**, **while**, **as soon as**, **so that**.
-Girls should go to school **so that** they can get good jobs.
-
-Argumenter : **In my opinion**, **I strongly believe that**, **On the one hand... on the other hand...**`,
-quiz:`The man ___ lives next door is a teacher.
-* who
-- which
-- where
-
-The law ___ protects women is important.
-* which
-- whose
-- who
-
-___ I strongly believe that girls need education.
-* In my opinion,
-- Because of
-- However of
-
-Girls should study ___ they can get good jobs.
-* so that
-- although
-- unless
-
-Le mot « election » veut dire…
-* élection
-- électricité
-- éducation`,
-deck:`government | gouvernement | The government builds schools.
-election | élection | The election was peaceful.
-democracy | démocratie | Democracy gives people a voice.
-Commonwealth | Commonwealth | Togo joined the Commonwealth in 2022.
-gender equality | égalité de genre | Gender equality is a right.
-equal | égal | We are equal.
-opportunity | opportunité | Everyone needs an opportunity.
-in my opinion | à mon avis | In my opinion, school is vital.`,
-hw:{t:"Women and work in Togo",b:"Rédige un texte argumentatif de 150 mots : « Women and men should have the same job opportunities. » Utilise au moins 3 relatives et 3 connecteurs."}},
-
-{c:"1re",u:2,lv:"B2",t:"Cybercrime and the Internet",th:"Science, technology, internet",g:"Conditional type 3, summary writing",
-body:`**Vocabulaire** : internet, cybercrime, scam, password, hacker, privacy, social media, online.
-
-**Conditionnel type 3** (regret, passé impossible) : **If** he **had used** a strong password, he **would not have been hacked**.
-Structure : **If + past perfect, would have + participe passé.**
-
-**Résumé de texte** : lis, repère l'idée de chaque paragraphe, écris avec **tes propres mots** (environ 1/3 de la longueur du texte).
-
-**Conseils en ligne** : never share your password; do not click on strange links; protect your privacy.`,
-quiz:`If she ___ the link, she would not have lost her money.
-* had not clicked
-- did not click
-- has not clicked
-
-If I had known, I ___ you.
-* would have told
-- would tell
-- will tell
-
-Un « scam » est…
-* une arnaque
-- un jeu
-- une application
-
-Dans un résumé, on écrit…
-* avec ses propres mots
-- en recopiant tout
-- en ajoutant son opinion
-
-Complète : « Never share your ___ . » (mot de passe)
-= password`,
-deck:`cybercrime | cybercriminalité | Cybercrime is increasing.
-scam | arnaque | The message was a scam.
-password | mot de passe | Use a strong password.
-hacker | pirate informatique | The hacker stole data.
-privacy | vie privée | Protect your privacy.
-online | en ligne | I study online.
-link | lien | Don't click on that link.
-to protect | protéger | Protect your account.`,
-hw:{t:"Staying safe online",b:"Écris un conseil de 8 phrases à des lycéens sur la sécurité sur Internet (2 phrases au conditionnel type 3)."}},
-
-{c:"Tle",u:1,lv:"B2",t:"Globalisation, migration and development",th:"Globalisation, emigration, sustainable development",g:"Registers, formal writing, linking ideas",
-body:`**Vocabulaire** : globalisation, trade, migration, emigrant, immigrant, development, sustainable, poverty.
-
-**Registres** : informel (**kids**, **gonna**, **can't**) ≠ formel (**children**, **going to**, **cannot**). À l'examen, utilise un registre **formel** : pas de contractions, vocabulaire précis.
-
-**Plan d'une dissertation (essay)** :
-1. **Introduction** : présente le sujet et ta thèse.
-2. **Développement** : 2 ou 3 paragraphes, un argument + un exemple chacun.
-3. **Conclusion** : résume et ouvre.
-
-Connecteurs : **Firstly**, **Furthermore**, **In addition**, **On the contrary**, **To sum up**.`,
-quiz:`Quel mot est formel ?
-* children
-- kids
-- guys
-
-Quelle partie présente la thèse ?
-* l'introduction
-- la conclusion
-- le titre
-
-« To sum up » sert à…
-* conclure
-- commencer
-- donner un exemple
-
-Une personne qui quitte son pays est…
-* an emigrant
-- an immigrant
-- a citizen
-
-Complète : « Sustainable ___ protects the future. » (développement)
-= development`,
-deck:`globalisation | mondialisation | Globalisation connects countries.
-trade | commerce | Trade helps economies.
-emigrant | émigré | An emigrant leaves his country.
-immigrant | immigré | An immigrant arrives in a new country.
-sustainable | durable | Sustainable energy is clean.
-poverty | pauvreté | Poverty must end.
-furthermore | de plus | Furthermore, it is cheaper.
-to sum up | en résumé | To sum up, we must act.`,
-hw:{t:"Essay: Is globalisation good for Africa?",b:"Rédige une dissertation de 250 mots avec introduction, 2 arguments avec exemples et conclusion. Registre formel."}},
-
-{c:"Tle",u:2,lv:"B2",t:"Human rights, peace and democracy",th:"Human rights, democracy, peace",g:"Debate and critical analysis",
-body:`**Vocabulaire** : human rights, freedom, justice, peace, conflict, election, equality, debate.
-
-**Donner son opinion** : **I agree / I disagree**, **I am convinced that**, **I would argue that**.
-**Nuancer** : **to some extent**, **it depends on**, **there is some truth in...**
-**Répondre à un argument** : **That may be true, but...**, **On the other hand...**
-
-**Analyse critique d'un document** : 1) Qui écrit ? 2) Pour qui ? 3) Quel est le message ? 4) Quels arguments ? 5) Mon avis.
-
-Exemple : « Freedom of speech is essential in a democracy, **but** it must respect other people's rights. »`,
-quiz:`Quelle phrase exprime un désaccord ?
-* I disagree with this idea.
-- I am convinced of it.
-- That is true.
-
-« To some extent » signifie…
-* dans une certaine mesure
-- jamais
-- toujours
-
-Dans une analyse de document, on commence par…
-* identifier l'auteur et le public
-- recopier le texte
-- donner sa note
-
-« Freedom » veut dire…
-* liberté
-- loi
-- égalité
-
-Complète : « Human ___ must be respected. » (droits)
-= rights`,
-deck:`human rights | droits humains | Human rights protect everyone.
-freedom | liberté | Freedom of speech matters.
-justice | justice | We want justice.
-peace | paix | Peace brings development.
-conflict | conflit | Conflict destroys lives.
-debate | débat | We had a debate today.
-to agree | être d'accord | I agree with you.
-to some extent | dans une certaine mesure | To some extent, you are right.`,
-hw:{t:"Debate: Democracy and peace",b:"Prépare un discours de 2 minutes (environ 200 mots) : « Democracy is the best way to keep peace. » Donne 3 arguments."}},
-
-{c:"Université",u:1,lv:"B1",t:"Business English for students (ESP)",th:"English for Specific Purposes",g:"Professional vocabulary, formal emails",
-body:`**Business English** s'adapte à ta filière : gestion, droit, économie, sciences, informatique, médecine.
-
-**Vocabulaire clé** : **meeting**, **deadline**, **invoice**, **budget**, **customer**, **contract**, **profit**, **to negotiate**.
-
-**Mail formel** :
-Subject: Request for information
-**Dear Mr Mensah,**
-**I am writing to ask about** ...
-**Could you please send** me the price list?
-**I look forward to hearing from you.**
-**Yours sincerely,** Ama Koffi
-
-Politesse : **Could you...?**, **Would you mind...?**, **I would appreciate it if...**`,
-quiz:`Une « deadline » est…
-* une date limite
-- un budget
-- une réunion
-
-Quelle formule est polie ?
-* Could you please send the report?
-- Send me the report now.
-- You send report.
-
-« I look forward to hearing from you » se place…
-* à la fin du mail
-- au début
-- dans l'objet
-
-« Invoice » signifie…
-* facture
-- contrat
-- profit
-
-Complète : « Dear Mr Mensah, I am ___ to ask about the price. »
-= writing`,
-deck:`meeting | réunion | The meeting starts at ten.
-deadline | date limite | The deadline is Friday.
-invoice | facture | Please pay the invoice.
-budget | budget | Our budget is small.
-customer | client | The customer is satisfied.
-contract | contrat | He signed the contract.
-profit | bénéfice | The company made a profit.
-to negotiate | négocier | We negotiate the price.`,
-hw:{t:"A formal email",b:"Écris un mail formel de 100 mots à une entreprise pour demander un stage. Utilise Dear..., I am writing to..., Yours sincerely."}},
-
-{c:"Adultes",u:1,lv:"B1",t:"English at work: emails, meetings, presentations",th:"Professional English",g:"Polite requests, meetings vocabulary",
-body:`**Au travail**, l'anglais sert surtout à écrire des mails, participer à des réunions et présenter un projet.
-
-**Demander poliment** : **Could you...?**, **Would it be possible to...?**, **I would be grateful if...**
-**En réunion** : **Let's start.**, **I'd like to add...**, **Can we move on to the next point?**, **Let's summarise.**
-**Présenter** : **Good morning, everyone. Today I will talk about...**, **First, ... Second, ... Finally, ...**, **Thank you for your attention.**
-
-**Certifications** : TOEFL, IELTS, TOEIC mesurent ton niveau (A1 à C2).`,
-quiz:`Quelle phrase est la plus polie ?
-* Would it be possible to meet on Monday?
-- Meet me Monday.
-- Monday meet.
-
-« Let's move on to the next point » sert à…
-* passer au sujet suivant
-- finir la réunion
-- refuser
-
-Pour terminer une présentation, on dit…
-* Thank you for your attention.
-- Goodbye teacher.
-- See you never.
-
-Le TOEIC est…
-* un test d'anglais professionnel
-- une langue
-- un contrat
-
-Complète : « Today I will ___ about our new project. » (parler)
-= talk`,
-deck:`schedule | emploi du temps | Here is my schedule.
-colleague | collègue | My colleague is helpful.
-client | client | I meet a client today.
-to attend | assister à | I attend the meeting.
-report | rapport | I wrote the report.
-to summarise | résumer | Let's summarise the points.
-presentation | présentation | My presentation is ready.
-certificate | certificat | She has an IELTS certificate.`,
-hw:{t:"Introduce yourself at a meeting",b:"Écris une présentation de 100 mots : ton nom, ton métier, ton projet. Termine par Thank you for your attention."}}
-];
-
-/* Épreuves types ORIGINALES, au format des épreuves d'anglais du Togo (BEPC 2026 : 6 + 6 + 8 pts ; BAC : compréhension, langue, traduction, expression écrite)
-   et des devoirs APC (Items 1 à 6 + production écrite). Les textes sont écrits pour l'application : aucun sujet officiel n'est recopié. */
-const EPREUVES_TOGO=[
-{t:"Devoir type 6e : My friend Ama (APC)",exam:"Devoir surveillé",year:"2026",lv:"A1",min:90,
-sujet:`CLASSE DE 6e · Durée : 1 h 30 · Format APC (réagir à un texte, produire un texte)
-
-I. LA RÉACTION À UN TEXTE ÉCRIT
-Contexte : Nous avons tous un ami ou une amie que nous connaissons bien.
-
-TEXT: My friend Ama
-My friend is Ama. She is twelve and she lives in Lomé with her mother, her father and her little brother Kodjo. Her mother is a nurse at the hospital. Her father drives a taxi. Ama goes to school every morning at seven o'clock. She has a blue bag, three books and two pens. After school, she helps her mother in the kitchen. On Saturday, she plays football with her friends. Ama likes oranges and her favourite colour is yellow.
-
-Item 1: Fill in the gaps with information from the text. (4 pts)
-1. Ama is ........ years old.
-2. Her mother is a ........ at the hospital.
-3. Her father ........ a taxi.
-4. Ama goes to school at ........ o'clock.
-
-Item 2: Answer these questions on the text. (6 pts)
-1. Who does Ama live with?
-2. What does Ama have in her bag?
-3. What does she do on Saturday?
-
-Item 3: Match the words in column A with the definitions in column B. (2 pts)
-Column A: 1. Kodjo  2. nurse  3. yellow  4. taxi
-Column B: a. a colour  b. a person who works at the hospital  c. Ama's brother  d. a car that carries passengers
-
-Item 4: Choose the correct answer to fill in the gaps. (2 pts)
-1. Ama ........ to school every morning. (go – goes – going)
-2. Her brother ........ small. (is – are – am)
-3. Ama and her friends ........ football on Saturday. (play – plays – playing)
-4. Ama has ........ pens. (two – second – twice)
-
-II. PRODUCTION D'UN TEXTE (6 pts)
-Writing: Write a paragraph of 6 to 8 sentences about your best friend. Answer the questions in order, with complete sentences.
-- What is his/her name?
-- How old is he/she?
-- Where does he/she live?
-- What does he/she like?`,
-cor:`CORRIGÉ ET BARÈME (sur 20)
-Item 1 (4 pts, 1 pt par réponse) : 1. twelve  2. nurse  3. drives  4. seven
-Item 2 (6 pts, 2 pts par réponse) : 1. She lives with her mother, her father and her little brother (Kodjo).  2. She has a blue bag, three books and two pens (réponse acceptée avec « She has... »).  3. She plays football with her friends.
-Item 3 (2 pts) : 1-c  2-b  3-a  4-d
-Item 4 (2 pts) : 1. goes  2. is  3. play  4. two
-Production écrite (6 pts) : pertinence 2 (répond aux 4 questions dans l'ordre), cohérence 2 (phrases complètes, enchaînement), correction 1,5 (présent simple, orthographe), présentation 0,5.
-Modèle : My best friend is Kofi. He is thirteen. He lives in Kara with his family. He likes football and mangoes. His favourite colour is green. We play together after school.`},
-
-{t:"BEPC blanc n°1 : Anglais (format BEPC 2026)",exam:"BEPC",year:"2026",lv:"A2",min:120,
-sujet:`BEPC BLANC · ANGLAIS · DURÉE : 2 H
-I. READING COMPREHENSION (6 marks)
-Read the text carefully then answer the questions.
-
-TEXT
-Every year, many towns in West Africa face floods during the rainy season. One of the main causes is the waste that people throw into the gutters. When the rain comes, the water cannot flow and it enters houses and markets. Moreover, burning plastic bags pollutes the air and makes children sick. To solve this problem, citizens can sort their waste, plant trees and clean their neighbourhood once a month. Schools can also teach pupils the importance of a clean environment. In some districts, young people have created clubs which collect plastic bottles and sell them to recycling companies. These clubs protect the environment and give jobs to the youth. However, they need the support of the government and of every inhabitant. If everybody takes action, our towns will be cleaner and healthier.
-
-QUESTIONS
-1) Floods are caused only by the rain: True / False? Justify.
-2) Choose the correct answer. Burning plastic bags: a) cleans the air  b) pollutes the air and makes children sick  c) helps farmers.
-3) What can citizens do to solve the problem? (short answer)
-4) Complete this sentence according to the text: "In some districts, young people have created clubs which ........"
-5) Mention one advantage of these clubs.
-6) According to you, what can your school do to protect the environment? Justify your opinion.
-
-II. LINGUISTIC COMPETENCE (6 marks)
-A. VOCABULARY
-1. Find in the text the opposite of "dirtier".  ........ (hint: paragraph end)
-2. Derive a noun from the verb "to pollute".
-3. Give a synonym of "inhabitant".
-*Fill in the gaps with: school, vote, recycle, phones.
-Today, many young people use ....4.... to learn English. They also ....5.... plastic to protect nature. At ....6...., pupils learn about the environment.
-
-B. GRAMMAR
-*Choose the correct answer to complete:
-1) They have lived in this town ........ ten years. (ago, since, for)
-*Put the verb in brackets into its correct form:
-2) If it rains tomorrow, we (not / go) to the market.
-*Turn this sentence into the negative form:
-3) The children cleaned the street yesterday.
-*Give the appropriate tag:
-4) Plastic bags pollute the air, ........ ?
-*Turn this sentence into the passive voice:
-5) People throw waste into the gutters.
-*Put in reported speech:
-6) "I will plant a tree", said Ama.
-
-III. WRITING (8 marks)
-In your town, many accidents happen on the roads because motorbike riders do not respect traffic rules. Write an essay of about fifteen lines explaining how people can reduce road accidents.
-Relevance: 2,5 · Coherence: 2,5 · Accuracy: 2 · Perfection: 1`,
-cor:`CORRIGÉ ET BARÈME (sur 20)
-I. COMPRÉHENSION (6 pts)
-1) False. Waste thrown into the gutters is also a cause. (1)
-2) b (1)
-3) They can sort their waste, plant trees and clean their neighbourhood once a month. (1)
-4) ... collect plastic bottles and sell them to recycling companies. (1)
-5) They protect the environment / they give jobs to the youth. (1)
-6) Réponse libre justifiée (ex. organise a cleaning day, plant trees in the schoolyard). (1)
-II. LANGUE (6 pts)
-A. Vocabulaire (3 pts, 0,5 par réponse) : 1. cleaner (acceptée : « cleaner » est le contraire de « dirtier »)  2. pollution  3. resident / citizen  4. phones  5. recycle  6. school
-B. Grammaire (3 pts, 0,5 par réponse) : 1. for  2. we will not (won't) go  3. The children did not (didn't) clean the street yesterday.  4. don't they?  5. Waste is thrown into the gutters (by people).  6. Ama said (that) she would plant a tree.
-III. EXPRESSION ÉCRITE (8 pts) : pertinence 2,5 · cohérence 2,5 · correction 2 · perfection 1.
-Idées attendues : respect traffic lights and speed limits, wear a helmet, do not drink and drive, driving schools, police controls, awareness campaigns. Structure : introduction, 2 ou 3 idées avec exemples, conclusion.`},
-
-{t:"Devoir type 2nde : Mobile money (APC)",exam:"Devoir surveillé",year:"2026",lv:"B1",min:180,
-sujet:`CLASSE DE SECONDE · Durée : 3 h
-COMPÉTENCES : réagir à un texte ; produire un texte de type particulier.
-
-I. LA RÉACTION À UN TEXTE ÉCRIT
-Contexte : Le téléphone portable a changé la manière dont nous gérons l'argent.
-
-TEXT: Mobile money, a new way to pay
-Ten years ago, many young traders in West Africa carried cash all day and feared robbers. Today, a simple mobile phone allows them to receive and send money in seconds. This service, called mobile money, has changed daily life. A seamstress can be paid by a customer who lives in another town, and a student can receive school fees from his uncle abroad. However, mobile money also has risks. Some people have lost their savings because they shared their secret code with strangers. Others have been deceived by false messages announcing a prize. For this reason, users must keep their code private and verify every message. Banks and phone companies also have a duty to inform and protect customers. When used wisely, mobile money is a powerful tool for development.
-
-Critères d'évaluation : tu montreras que tu as compris le texte en reconnaissant ses détails, en répondant de façon autonome, en maîtrisant son vocabulaire et certaines structures grammaticales, en reformulant des phrases et en traduisant un passage en français.
-
-ITEM 1: Say whether these statements are "right" or "wrong" according to the text. (2,5 pts)
-1. Mobile money allows people to send money quickly.
-2. Mobile money has no risks.
-3. A student can receive school fees through mobile money.
-4. Users should share their code with their friends.
-5. Banks and phone companies have no role to play.
-
-ITEM 2: Answer these questions based on the text. (3 pts)
-1. What did young traders fear ten years ago?
-2. How have some people lost their savings?
-3. What must users do to stay safe?
-
-ITEM 3: Find in the text words meaning the same or almost the same as the following. (2 pts)
-1. tricked  2. obligation  3. very strong  4. to give information to
-
-ITEM 4: Choose the correct answer to fill in the gaps. (2,5 pts)
-1. If you share your code, you ........ your money. (will lose – would lose – lost)
-2. He wishes he ........ the message before sending the money. (checked – had checked – has checked)
-3. When I called, she ........ money to her uncle. (was sending – sent – has sent)
-4. By next year, mobile money ........ more popular. (will have become – became – is becoming)
-5. ........ it was risky, many people used it. (Although – Because – Unless)
-
-ITEM 5: Rewrite the sentences using the prompts given. Do not change their meaning. (3 pts)
-1. "I will send the money tomorrow," said Kofi. → Kofi said that ........
-2. People should not share their code. → Their code ........
-3. She didn't read the message, so she lost her money. → If she ........
-4. It's a pity he forgot his code. → He wishes ........
-5. He had hardly sent the money when the phone rang. → Hardly ........
-
-ITEM 6: Translate this passage into French. (2 pts)
-FROM: "Today, a simple mobile phone ..." DOWN TO: "... in another town."
-
-II. PRODUCTION D'UN TEXTE (5 pts)
-Contexte : Ton ami veut utiliser le mobile money pour la première fois.
-Writing: Write an explanatory text of about 15 lines to show him how to use it safely.`,
-cor:`CORRIGÉ ET BARÈME (sur 20)
-Item 1 (2,5) : 1. right  2. wrong  3. right  4. wrong  5. wrong
-Item 2 (3) : 1. They feared robbers.  2. They shared their secret code with strangers.  3. They must keep their code private and verify every message.
-Item 3 (2) : 1. deceived  2. duty  3. powerful  4. inform
-Item 4 (2,5) : 1. will lose  2. had checked  3. was sending  4. will have become  5. Although
-Item 5 (3) : 1. ... he would send the money the next day.  2. ... should not be shared.  3. ... had read the message, she wouldn't have lost her money.  4. ... he hadn't forgotten his code.  5. Hardly had he sent the money when the phone rang.
-Item 6 (2) : « Aujourd'hui, un simple téléphone portable leur permet de recevoir et d'envoyer de l'argent en quelques secondes. Ce service, appelé mobile money, a changé la vie quotidienne. Une couturière peut être payée par une cliente qui habite dans une autre ville. »
-Production (5) : pertinence 1,5 · cohérence 1,5 · correction 1,5 · présentation 0,5. Texte explicatif attendu : First, ... Then, ... Finally, ... (never share your code, check the sender, keep the receipt message, contact the operator).`},
-
-{t:"Devoir type 1re : A lost habit? (APC)",exam:"Devoir surveillé",year:"2026",lv:"B1",min:180,
-sujet:`CLASSE DE PREMIÈRE · Durée : 3 h
-COMPÉTENCES : réagir de façon précise à un texte ; produire un texte de type particulier.
-
-I. LA RÉACTION À UN TEXTE ÉCRIT
-Contexte : La lecture recule chez les jeunes alors qu'elle reste un outil essentiel de réussite.
-
-TEXT: Reading, a lost habit?
-Not long ago, families in many African towns gathered in the evening to listen to stories told by grandparents. These stories carried values and taught children how to behave. Today, television, social media and video games take most of young people's free time. As a result, fewer teenagers read books for pleasure, and their writing skills suffer. Teachers complain that pupils cannot express their ideas clearly. Yet reading remains one of the best ways to enlarge vocabulary, to improve spelling and to develop imagination. Some schools have therefore opened libraries and organised reading clubs where pupils present the books they have enjoyed. In the same spirit, a few young writers publish short stories online in local languages and in English. If parents encouraged their children to read for twenty minutes a day, the results would be remarkable.
-
-ITEM 1: Select the correct answer (A, B, C or D). (2,5 pts)
-1. In the past, the evening stories were told by ........ A. teachers  B. grandparents  C. politicians  D. radio presenters
-2. Today, most of young people's free time goes to ........ A. farming  B. church  C. screens and games  D. housework
-3. As a consequence, teenagers' ........ suffer. A. writing skills  B. muscles  C. eyes  D. songs
-4. Reading helps pupils to ........ A. sleep faster  B. enlarge their vocabulary  C. avoid school  D. travel abroad
-5. Some schools have opened ........ A. banks  B. shops  C. libraries and reading clubs  D. factories
-
-ITEM 2: Answer these questions. (3 pts)
-1. What did the old evening stories teach children?
-2. Why do teachers complain?
-3. What would happen if parents encouraged reading twenty minutes a day?
-
-ITEM 3: Find in the text words meaning the same or almost the same as: (2 pts)
-1. came together  2. to make bigger  3. extraordinary  4. to get worse
-
-ITEM 4: Supply the right tense or form of the verb in brackets. (2,5 pts)
-1. Teenagers would rather they (to read) more books.
-2. By 2030, this school (to open) three libraries.
-3. The pupils (to enjoy) the book before presenting it.
-4. Reading improves spelling, ........ ? (tag)
-5. He (to read) when the power cut off.
-
-ITEM 5: Rewrite the sentences using the prompts. (3 pts)
-1. It's a pity young people don't read. → I wish ........
-2. If parents had encouraged reading, the results would have been better. → Had ........
-3. Reading is not only fun, it is also useful. → Not only ........
-4. People say that television harms children. → Television ........
-5. They started the club three years ago. → It's three years ........
-
-ITEM 6: Translate into French. (2 pts)
-FROM "Not long ago ..." DOWN TO "... how to behave."
-
-II. PRODUCTION D'UN TEXTE ARGUMENTATIF (5 pts)
-Writing: "Social media does more harm than good to teenagers." Do you agree? Write an argumentative text of about 15 lines, with convincing arguments and examples.`,
-cor:`CORRIGÉ ET BARÈME (sur 20)
-Item 1 (2,5) : 1. B  2. C  3. A  4. B  5. C
-Item 2 (3) : 1. They taught children values and how to behave.  2. Because pupils cannot express their ideas clearly.  3. The results would be remarkable.
-Item 3 (2) : 1. gathered  2. enlarge  3. remarkable  4. suffer
-Item 4 (2,5) : 1. read  2. will have opened  3. had enjoyed  4. doesn't it?  5. was reading
-Item 5 (3) : 1. ... young people read.  2. ... parents encouraged reading, the results would have been better.  3. Not only is reading fun, but it is also useful.  4. ... is said to harm children.  5. ... since they started the club.
-Item 6 (2) : « Il n'y a pas si longtemps, dans de nombreuses villes africaines, les familles se réunissaient le soir pour écouter les histoires racontées par les grands-parents. Ces histoires transmettaient des valeurs et apprenaient aux enfants comment se comporter. »
-Production (5) : pertinence 1,5 · cohérence 1,5 · correction 1,5 · perfection 0,5. Plan : opinion, 2 arguments avec exemples (on the one hand / on the other hand), conclusion.`},
-
-{t:"BAC II blanc : Anglais, séries A4 / C / D",exam:"BAC II",year:"2026",lv:"B2",min:180,
-sujet:`BACCALAURÉAT BLANC · ANGLAIS · DURÉE : 3 H
-SECTION ONE: READING COMPREHENSION (5 pts)
-Read the following text carefully and answer the questions below.
-
-TEXT: Water, a precious resource
-Water covers most of the planet, but only a small part of it can be drunk safely. In many African villages, women and girls walk several kilometres every day to fetch water, losing hours that they could spend at school or at work. Dirty water also spreads diseases such as cholera and typhoid, which kill thousands of children each year. To face this challenge, governments and NGOs have built boreholes, and communities have formed committees to maintain them. Yet climate change makes the situation more difficult: rains are becoming irregular and some rivers dry up. Experts therefore advise people to harvest rainwater, to avoid wasting water and to protect rivers from pollution. Water is not only a necessity; it is a right, and everyone must contribute to preserving it for future generations.
-
-QUESTIONS
-1) Only a small part of the planet's water can be drunk safely. True or False? (0,5)
-2) According to the text, why do women and girls lose hours every day? (1)
-3) Name two diseases spread by dirty water. (1)
-4) Quote a passage from the text to show that communities take action. (1)
-5) In your opinion, what can we do to save water? (1,5)
-
-SECTION TWO: LINGUISTIC COMPETENCE (4 pts)
-A. GRAMMAR (2 pts)
-° Choose the correct answer from the parentheses to complete.
-1) (how much, how many) water do you drink a day?
-° Write the correct form of the verb in parentheses.
-2) It is high time we (to protect) our rivers.
-3) Pupils are used to (to fetch) water early in the morning.
-° Add a suitable question tag.
-4) Let's save water, ........ ?
-5) Nobody wasted water, ........ ?
-° Ask questions based on the underlined words.
-6) The well is __200 metres__ from here.
-7) They built the borehole __in 2019__.
-8) The pump broke down __because it was old__.
-B. VOCABULARY (2 pts)
-° Match the bold words of the text with the corresponding definition.
-1) Something that one absolutely needs.
-2) To collect (rain) for later use.
-3) Groups of people chosen to manage something.
-4) Using too much of something carelessly.
-° Derive a verb from these words.
-1) pollution  2) preservation  3) contribution  4) maintenance
-
-SECTION THREE: TRANSLATION (3 pts)
-Translate the following passage into French:
-Young people should understand that wasting water means harming the whole community. We have to consider every well and every river as our own property and take care of them. There is no health without clean water. If we love our children, we must make sure that water is protected and shared fairly.
-
-SECTION FOUR: WRITING (8 pts)
-TOPIC I (4 pts): In a well-structured paragraph, give the advantages of teaching pupils how to save water at school.
-TOPIC II (4 pts): During the dry season, the people of your village suffer from a lack of water. As a journalist, write an article entitled "Water for All" to be published in your national newspaper. Your name is Kossi Mensah.
-Relevance 1,25 · Coherence 1,25 · Accuracy 1 · Perfection 0,5 (par sujet)`,
-cor:`CORRIGÉ ET BARÈME (sur 20)
-SECTION 1 (5 pts)
-1) True (0,5)
-2) Because they walk several kilometres to fetch water, time they could spend at school or at work. (1)
-3) Cholera and typhoid. (1)
-4) « communities have formed committees to maintain them » (1)
-5) Réponse libre justifiée (close taps, repair leaks, harvest rainwater, protect rivers). (1,5)
-SECTION 2 (4 pts, 0,25 par réponse)
-A. 1) how much  2) protected  3) fetching  4) shall we?  5) did they?  6) How far is the well from here?  7) When did they build the borehole?  8) Why did the pump break down?
-B. Définitions : 1) necessity  2) harvest  3) committees  4) wasting. Verbes : 1) pollute  2) preserve  3) contribute  4) maintain
-SECTION 3 (3 pts) : « Les jeunes devraient comprendre que gaspiller l'eau, c'est nuire à toute la communauté. Nous devons considérer chaque puits et chaque rivière comme notre propre bien et en prendre soin. Il n'y a pas de santé sans eau potable. Si nous aimons nos enfants, nous devons veiller à ce que l'eau soit protégée et partagée équitablement. »
-SECTION 4 (8 pts)
-Topic I : paragraphe structuré (idée principale, 2 avantages avec exemples, conclusion).
-Topic II : article de journal : titre, auteur (Kossi Mensah), situation (what, where, when), causes, conséquences, solutions proposées.
-Grille : pertinence 1,25 · cohérence 1,25 · correction 1 · perfection 0,5 par sujet.`}
-];
-
-/* ============ Programme officiel du Togo : import en un clic ============ */
-const progDue=n=>{const d=new Date(Date.now()+n*864e5);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
-async function importProg(){if(S.progBusy)return;S.progBusy=true;S.progMsg="Import en cours…";render();
-  const now=Date.now();let nl=0,nq=0,nd=0,nh=0,k=0;
-  try{for(const u of CURRICULUM_TOGO){k++;S.progMsg="Import "+k+"/"+CURRICULUM_TOGO.length+" · "+u.c;render();
-    let L=S.lessons.find(l=>l.classe===u.c&&l.title===u.t),lid=L?L.id:"";
-    if(!L){const ref=S.db.collection("lessons").doc();lid=ref.id;await write(()=>ref.set({title:u.t,level:u.lv,audience:"tous",classe:u.c,unit:u.u,theme:u.th,grammar:u.g,body:u.body,teacherId:S.uid,createdAt:now+k}));nl++}
-    if(!S.quizzes.find(q=>q.lessonId===lid&&lid)){const qs=parseQuiz(u.quiz);if(qs.length){await write(()=>S.db.collection("quizzes").doc().set({title:"Quiz : "+u.t,level:u.lv,audience:"tous",questions:qs,lessonId:lid,exam:false,minutes:10,classe:u.c,teacherId:S.uid,createdAt:now+k}));nq++}}
-    const dt="Vocabulaire : "+u.t;if(!S.decks.find(d=>d.title===dt)){const cards=parseDeck(u.deck);if(cards.length){await write(()=>S.db.collection("decks").doc().set({title:dt,level:u.lv,audience:"tous",cards,classe:u.c,teacherId:S.uid,createdAt:now+k}));nd++}}
-    if(u.hw&&!S.homework.find(h=>h.title===u.hw.t)){await write(()=>S.db.collection("homework").doc().set({title:u.hw.t,level:u.lv,audience:"tous",due:progDue(14+u.u*7),instructions:u.hw.b,autoCorrect:false,autoMode:"live",fileId:"",fileName:"",fileType:"",classe:u.c,teacherId:S.uid,createdAt:now+k}));nh++}}
-    let ne=0;for(const e of EPREUVES_TOGO){S.progMsg="Épreuves : "+e.t;render();
-      if(S.eps.find(x=>x.title===e.t))continue;
-      const ref=S.db.collection("epreuves").doc();
-      await write(()=>ref.set({title:e.t,exam:e.exam,year:e.year,level:e.lv,audience:"tous",minutes:e.min,autoCorrect:false,autoMode:"live",sujet:e.sujet,fileId:"",fileName:"",fileType:"",teacherId:S.uid,createdAt:now+100+ne,corrigeVisible:false}));
-      await write(()=>S.db.doc("corriges/"+ref.id).set({text:e.cor,fileId:"",fileName:"",fileType:""}));ne++}
-    toast(nl+" leçons, "+nq+" quiz, "+nd+" listes, "+nh+" devoirs, "+ne+" épreuves ajoutés","book")}
-  catch(e){console.warn(e);toast("Import interrompu : relance, les contenus déjà ajoutés sont ignorés.","x")}
-  S.progBusy=false;S.progMsg="";render()}
-const progImportCard=()=>`<div class="glass card" style="gap:10px;margin-bottom:16px"><div class="row"><span class="ic t-gold">${ic("book")}</span><div><b>Programme officiel du Togo (APC)</b><div class="small muted">Du CP1 aux Adultes : ${CURRICULUM_TOGO.length} unités (leçon, quiz, vocabulaire, devoir) et ${EPREUVES_TOGO.length} épreuves types au format BEPC / BAC, avec corrigés privés.</div></div></div><div class="row"><button class="btn sm" data-a="importProg" ${S.progBusy?"disabled":""}>${ic("rocket")}${S.progBusy?esc(S.progMsg||"Import…"):"Importer le programme"}</button></div><p class="hint" style="margin:0">Sans risque : ce qui existe déjà n'est pas dupliqué. Tu peux ensuite modifier ou supprimer chaque contenu.</p></div>`;
-
 /* ============ teacher ============ */
 const online=s=>!!S.peers[s.id]||(s.lastActive&&Date.now()-s.lastActive<3*60000);
 function stats(s){const a=s.attempts||[];return{n:a.length,avg:a.length?Math.round(a.reduce((x,y)=>x+pct(y.score,y.total),0)/a.length):null,subs:Object.keys(s.submissions||{}).length}}
@@ -3236,7 +2061,47 @@ function profFilterHTML(){if(!S.students.length)return"";const cnt=k=>S.students
 function teacherView(){if(S.view?.type==="student")return studentDetail();if(S.view?.type==="ep")return epView();
   if(S.view?.type==="chat"){const s=person(S.view.id);return`<div class="section" style="max-width:760px;margin-inline:auto">${backBtn()}<div class="row">${s?avatar(s.id,s.name,48):""}<div><span class="eyebrow">Conversation privée</span><h2>${esc(s?.name||"Élève")}</h2></div>${s?`<button class="btn ghost sm" data-a="openStudent" data-id="${s.id}" style="margin-left:auto">Voir sa fiche</button>`:""}</div>${chatHTML(S.view.id,"teacher")}</div>`}
   return({dash:dashView,content:contentView,grade:gradeView,tools:toolsView,msgs:msgsView,class:classView}[S.tab]||dashView)()}
-function msgsView(){const st=[...S.students,...S.parents].sort((a,b)=>(b.lastMsgAt||0)-(a.lastMsgAt||0));
+/* ---- Messages entre élèves ---- */
+const PR={dir:[],inbox:[],loaded:false,err:"",with:null,sending:false,un:null,timer:null,mod:null,modErr:""};
+const peerOn=()=>S.mode==="student"&&!!S.me&&!isParent(S.me)&&stOf(S.me)==="active"&&S.me.profile!=="primaire"&&S.settings.peerChat!==false&&!(S.myAccess&&S.myAccess.noChat)&&!devBlocked()&&!!window.__peer;
+const peerName=id=>(PR.dir.find(x=>x.uid===id)||{}).name||"Camarade";
+const peerUnread=()=>PR.inbox.filter(m=>m.receiver===S.uid&&!m.read_at).length;
+const peerBtn=()=>peerOn()?`<button class="iconbtn" data-a="openPeers" aria-label="Messages entre élèves" title="Camarades" style="position:relative">${ic("users")}${peerUnread()?`<span class="chip warn" style="position:absolute;top:-6px;right:-6px;min-width:18px;padding:0 5px;font-size:.68rem">${peerUnread()}</span>`:""}</button>`:"";
+async function peerRefresh(){if(!peerOn())return;
+  try{const[d,i]=await Promise.all([window.__peer.dir(),window.__peer.inbox()]);PR.dir=d;PR.inbox=i;PR.loaded=true;PR.err=""}
+  catch(e){PR.loaded=true;PR.err=navigator.onLine?"Impossible de charger les messages pour le moment.":"Pas de réseau : tes messages arriveront dès que tu seras connecté."}
+  render()}
+function peerStart(){if(PR.un||!peerOn())return;peerRefresh();
+  PR.un=window.__peer.listen(m=>{if(m.receiver!==S.uid&&m.sender!==S.uid)return;if(!PR.inbox.some(x=>x.id===m.id))PR.inbox.unshift(m);
+    if(m.receiver===S.uid){if(PR.with===m.sender&&document.visibilityState==="visible"){window.__peer.read(m.sender).catch(()=>{});m.read_at=new Date().toISOString()}
+      else{const n=peerName(m.sender);toast("Message de "+n,"chat");notifyNow("Message de "+n,String(m.body).slice(0,80))}}render()});
+  PR.timer=setInterval(()=>{if(document.visibilityState==="visible"&&peerOn())peerRefresh()},45000)}
+setInterval(()=>{if(peerOn()&&!PR.un)peerStart()},3000);
+function peerMarkRead(id){window.__peer.read(id).then(()=>{for(const m of PR.inbox)if(m.sender===id&&m.receiver===S.uid&&!m.read_at)m.read_at=new Date().toISOString();render()}).catch(()=>{})}
+function peersView(){const me=S.uid,last={},un={};
+  for(const m of PR.inbox){const o=m.sender===me?m.receiver:m.sender;if(!last[o])last[o]=m;if(m.receiver===me&&!m.read_at)un[m.sender]=(un[m.sender]||0)+1}
+  const q=(S.drafts.peer_q||"").trim().toLowerCase(),t=m=>m?+new Date(m.created_at):0;
+  const rows=PR.dir.filter(x=>!q||x.name.toLowerCase().includes(q)).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid]})).sort((a,b)=>(b.un-a.un)||(t(b.last)-t(a.last))||(b.on-a.on)||a.name.localeCompare(b.name));
+  return`<div class="section" style="max-width:720px;margin-inline:auto">${backBtn()}<div class="row">${ic("users")}<div><span class="eyebrow">Camarades</span><h2>Messages entre élèves</h2></div></div>
+  <p class="sub">Écris à tes camarades de classe. Sois gentil et respectueux : ta professeure peut lire ces messages.</p>
+  ${PR.err?`<div class="glass card small">${esc(PR.err)}</div>`:""}
+  <input id="peer_q" type="search" placeholder="Chercher un camarade…" value="${esc(S.drafts.peer_q||"")}" aria-label="Chercher un camarade">
+  ${!PR.loaded?`<div class="empty">Chargement…</div>`:rows.length?`<div class="glass list">${rows.map(x=>`<div class="it click" data-a="openPeer" data-id="${x.uid}" style="cursor:pointer">${avatar(x.uid,x.name)}<div class="txt"><b>${esc(x.name)}${x.on?` <span class="chip ok">En ligne</span>`:""}</b><span>${x.last?esc((x.last.sender===me?"Toi : ":"")+String(x.last.body).slice(0,60)):esc(x.classe||"Dis bonjour !")}</span></div>${x.un?`<span class="chip warn">${x.un}</span>`:""}</div>`).join("")}</div>`:`<div class="empty"><b>Aucun camarade disponible pour l'instant.</b><br>Tes camarades apparaîtront ici dès qu'ils auront rejoint la classe de ta professeure.</div>`}</div>`}
+function peerChatView(){const id=S.view.id,me=S.uid,nm=peerName(id),msgs=PR.inbox.filter(m=>(m.sender===me&&m.receiver===id)||(m.sender===id&&m.receiver===me)).slice().reverse();
+  return`<div class="section" style="max-width:720px;margin-inline:auto"><div><button class="back" data-a="peerBack">${ic("left")}Camarades</button></div><div class="row">${avatar(id,nm,48)}<div><span class="eyebrow">Camarade</span><h2>${esc(nm)}${S.peers[id]?` <span class="chip ok">En ligne</span>`:""}</h2></div></div>
+  <div class="glass chat"><div class="msgs" id="chatScroll">${msgs.length?msgs.map(m=>`<div class="msg ${m.sender===me?"mine":""}"><div>${esc(m.body)}</div><span>${fmtTime(+new Date(m.created_at))}</span></div>`).join(""):`<div class="muted" style="margin:auto;text-align:center">Aucun message pour l'instant.<br>Dis bonjour à ${esc(nm.split(" ")[0])} !</div>`}</div>
+  <form class="chatbar" data-f="peerchat" data-s="${id}"><input id="peerInput" placeholder="Écris un message…" maxlength="500" autocomplete="off" aria-label="Message"><button class="btn" type="submit" aria-label="Envoyer" ${PR.sending?"disabled":""}>${ic("send")}</button></form></div>
+  <p class="hint">Ta professeure peut lire cette conversation. Reste poli et respectueux.</p></div>`}
+/* modération (professeure) */
+let PMOD_LOAD=false;
+async function peerModLoad(){if(!window.__peer||PMOD_LOAD)return;PMOD_LOAD=true;try{PR.mod=await window.__peer.all();PR.modErr=""}catch(e){PR.modErr="Impossible de charger les messages.";if(!PR.mod)PR.mod=[]}PMOD_LOAD=false;render()}
+const msgsTabsHTML=()=>`<div class="section" style="margin-bottom:0"><div class="seg">${[["conv","Élèves et parents"],["peers","Entre élèves"]].map(([k,l])=>`<button data-a="msgsTab" data-k="${k}" aria-pressed="${(S.msgsTab||"conv")===k}">${l}</button>`).join("")}</div></div>`;
+function peerModView(){if(PR.mod===null&&!PMOD_LOAD)peerModLoad();const L=PR.mod||[],nm=id=>(person(id)||{}).name||"Élève";
+  return`<div class="section"><div><span class="eyebrow">Modération</span><h2>Messages entre élèves</h2><p class="sub">Tu vois les messages de tes élèves. « Masquer » retire un message de la vue des élèves. Tu peux couper le chat d'un élève dans sa fiche, ou pour toute la classe dans l'onglet Classe.</p></div>
+  ${PR.modErr?`<div class="glass card small">${esc(PR.modErr)}</div>`:""}
+  ${PR.mod===null?`<div class="empty">Chargement…</div>`:L.length?`<div class="glass list">${L.map(m=>`<div class="it"><div class="txt"><b>${esc(nm(m.sender))} → ${esc(nm(m.receiver))} <span class="small muted">· ${fmtTime(+new Date(m.created_at))}</span>${m.hidden?` <span class="chip bad">Masqué</span>`:""}</b><span style="white-space:pre-wrap">${esc(m.body)}</span></div><button class="btn ghost sm" data-a="peerHide" data-id="${m.id}" data-on="${m.hidden?0:1}">${m.hidden?"Rétablir":"Masquer"}</button></div>`).join("")}</div>`:`<div class="empty"><b>Aucun message entre élèves pour l'instant.</b></div>`}</div>`}
+function msgsView(){return msgsTabsHTML()+((S.msgsTab||"conv")==="peers"?peerModView():msgsView0())}
+function msgsView0(){const st=[...S.students,...S.parents].sort((a,b)=>(b.lastMsgAt||0)-(a.lastMsgAt||0));
   return`<div class="section"><div><span class="eyebrow">Messagerie</span><h2>Conversations</h2><p class="sub">Chaque conversation est privée entre toi et l'élève ou le parent.</p></div>
   ${st.length?`<div class="glass list">${st.map(s=>`<div class="thread" data-a="openChat" data-id="${s.id}" tabindex="0">${avatar(s.id,s.name)}<div class="txt"><b>${esc(s.name)}${isParent(s)?` <span class="chip">Parent${s.childName?" de "+esc(s.childName):""}</span>`:""}</b><span>${s.lastMsgAt?esc((s.lastMsgFrom==="teacher"?"Toi : ":"")+(s.lastMsgText||"Nouveau message")):"Aucun message"}</span></div><div class="row small muted">${s.lastMsgAt?fmtTime(s.lastMsgAt):""}${teacherUnread(s)?`<span class="chip bad">Nouveau</span>`:""}</div></div>`).join("")}</div>`:`<div class="empty">Les conversations apparaîtront quand des élèves auront rejoint la classe.</div>`}</div>`}
 /* ---- Liste d'élèves : recherche, filtres, pagination ---- */
@@ -3245,7 +2110,7 @@ const stOnOff=()=>S.drafts.st_on==="1";
 function stFiltered(st){const q=(S.drafts.st_q||"").trim().toLowerCase(),cl=S.drafts.st_cls||"",on=stOnOff();
   return [...st].filter(s=>(!q||(s.name||"").toLowerCase().includes(q))&&(!cl||(s.classe||"")===cl)&&(!on||online(s))).sort((a,b)=>(b.lastActive||0)-(a.lastActive||0))}
 function stToolbar(st,n){const cls=[...new Set(st.map(s=>s.classe).filter(Boolean))].sort();
-  return`<div class="row" style="gap:10px;flex-wrap:wrap;margin-bottom:12px"><input id="st_q" type="search" placeholder="Chercher un élève…" value="${esc(S.drafts.st_q||"")}" style="flex:1;min-width:170px">${cls.length>1?`<select id="st_cls"><option value="">Toutes les classes</option>${cls.map(c=>`<option value="${esc(c)}"${S.drafts.st_cls===c?" selected":""}>${esc(c)}</option>`).join("")}</select>`:""}<select id="st_grp" aria-label="Ranger les élèves par"><option value="classe"${(S.drafts.st_grp||"classe")==="classe"?" selected":""}>📁 Par classe</option><option value="niveau"${S.drafts.st_grp==="niveau"?" selected":""}>📁 Par niveau</option><option value="profil"${S.drafts.st_grp==="profil"?" selected":""}>📁 Par profil</option></select><label class="row small" style="gap:6px;flex-wrap:nowrap"><input id="st_on" type="checkbox"${stOnOff()?" checked":""}>En ligne</label><span class="chip">${n} / ${st.length}</span></div>`}
+  return`<div class="row" style="gap:10px;flex-wrap:wrap;margin-bottom:12px"><input id="st_q" type="search" placeholder="Chercher un élève…" value="${esc(S.drafts.st_q||"")}" style="flex:1;min-width:170px">${cls.length>1?`<select id="st_cls"><option value="">Toutes les classes</option>${cls.map(c=>`<option value="${esc(c)}"${S.drafts.st_cls===c?" selected":""}>${esc(c)}</option>`).join("")}</select>`:""}<label class="row small" style="gap:6px;flex-wrap:nowrap"><input id="st_on" type="checkbox"${stOnOff()?" checked":""}>En ligne</label><span class="chip">${n} / ${st.length}</span></div>`}
 function moreBtn(shown,total,act){return total>shown?`<div style="text-align:center;margin-top:12px"><button class="btn ghost sm" data-a="${act}">Afficher plus (${total-shown} restant${total-shown>1?"s":""})</button></div>`:""}
 
 /* ---- Copies d'élèves : photo / fichier à joindre au devoir ou à l'épreuve ---- */
@@ -3420,7 +2285,8 @@ function dashView(){const st=S.profFilter?S.students.filter(s=>s.profile===S.pro
   <div class="section" style="margin:0"><div><span class="eyebrow">Classement XP</span><h2>Top élèves</h2></div>${leaderboardHTML(st.map(s=>({id:s.id,name:s.name,xp:s.xp,streak:s.lastDay===today()||s.lastDay===yesterday()?s.streak:0})).slice(0,8))}</div></div>`:""}
   ${regularityHTML(st)}${chartHTML(st)}
   <div class="section"><div class="head"><div><span class="eyebrow">Suivi individuel</span><h2>Mes élèves</h2></div></div>
-  ${st.length?`${stToolbar(st,F.length)}${stFolders(F)}`:
+  ${st.length?`${stToolbar(st,F.length)}<div class="glass tablewrap"><table><thead><tr><th>Élève</th><th>Niveau</th><th>Profil</th><th>XP</th><th>Série</th><th>Moyenne</th><th>Devoirs</th><th>Activité</th></tr></thead><tbody>${FL.map(s=>{const x=stats(s),sk=s.lastDay===today()||s.lastDay===yesterday()?(s.streak||0):0;return`
+    <tr class="click" data-a="openStudent" data-id="${s.id}"><td><div class="row" style="flex-wrap:nowrap">${avatar(s.id,s.name)}<b>${esc(s.name)}</b><span class="dot ${online(s)?"on":""}"></span>${stOf(s)==="blocked"?`<span class="chip bad">Suspendu</span>`:""}${sharedFlag(s)?`<span class="chip warn">${ic("device")}À vérifier</span>`:""}</div></td><td>${lvlChip(s.level)}</td><td class="small">${esc(PROFILES[s.profile]||"—")}${s.classe?`<br><span class="muted">${esc(s.classe)}</span>`:""}</td><td class="num" style="color:var(--ink)">${s.xp||0}</td><td class="num">${sk?`<span class="flame">${sk}</span>`:"—"}</td><td>${x.avg!=null?`<div class="row" style="flex-wrap:nowrap"><div class="mini"><i style="width:${x.avg}%"></i></div><span class="num small">${x.avg} %</span></div>`:"—"}</td><td class="num">${x.subs}/${S.homework.length}</td><td class="small muted">${ago(s.lastActive)}</td></tr>`}).join("")}</tbody></table></div>${F.length?moreBtn(FL.length,F.length,"stMore"):`<div class="empty">Aucun élève ne correspond à ta recherche.</div>`}`:
   `<div class="empty"><b>Aucun élève inscrit pour l'instant.</b><br>Va dans l'onglet <b>Classe</b> pour savoir comment inviter tes élèves.</div>`}</div>
   ${hard.length?`<div class="section"><div><span class="eyebrow">Analyse</span><h2>Points difficiles</h2><p class="sub">La question la plus ratée de chaque quiz. Idéal pour préparer ton prochain cours.</p></div><div class="grid">${hard.map(h=>`<div class="glass card"><div class="row between"><span class="eyebrow">${esc(h.quiz)}</span><span class="chip bad mono">${h.rate} % d'erreurs</span></div><h3>${esc(h.q)}</h3></div>`).join("")}</div></div>`:""}`}
 function chartHTML(st){const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(dayStr(d))}
@@ -3444,19 +2310,39 @@ function studentDetail(){const s=S.students.find(x=>x.id===S.view.id);if(!s)retu
   <form class="glass card form" data-f="appr" data-id="${s.id}"><label>Appréciation pour le bulletin<textarea id="ap_${s.id}" style="min-height:90px" maxlength="1500" placeholder="Élève sérieux et motivé. Doit encore travailler les verbes irréguliers.">${esc(s.appreciation||"")}</textarea><span class="hint">Elle apparaît sur le bulletin téléchargeable que tu peux transmettre aux parents.</span></label><div><button class="btn ghost sm" type="submit">${ic("check")}Enregistrer l'appréciation</button></div></form></div>
   ${(()=>{const ex=S.quizzes.filter(q=>q.exam);if(!ex.length)return"";return`<div class="section"><div><span class="eyebrow">Évaluations</span><h2>Examens</h2></div><div class="glass list">${ex.map(q=>{const att=(s.attempts||[]).filter(a=>a.quizId===q.id&&a.exam).pop(),started=examTaken(s,q.id);
     return`<div class="it"><span class="ic t-coral" style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center">${ic("timer")}</span><div class="txt"><b>${esc(q.title)}</b><div class="small muted">${started?(att&&att.at>=started?`${att.score}/${att.total} · ${pct(att.score,att.total)} % · ${fmtDate(att.at)}`:"Commencé mais pas terminé"):"Pas encore passé"}</div></div>${started?`<button class="btn ghost sm" data-a="resetExam" data-id="${s.id}" data-q="${q.id}">${ic("refresh")}Autoriser une nouvelle tentative</button>`:""}</div>`}).join("")}</div></div>`})()}
-  <div class="section"><div><span class="eyebrow">Sécurité</span><h2>Appareils et accès</h2></div><div class="glass card">${recentDevices(s,60).length?`<div class="list" style="padding:0">${recentDevices(s,60).map(([k,d])=>devRow(s,k,d)).join("")}</div>`:`<p class="muted small" style="margin:0">Aucun appareil enregistré pour l'instant.</p>`}${devLimitBar(s)}
+  <div class="section"><div><span class="eyebrow">Sécurité</span><h2>Appareils et accès</h2></div><div class="glass card">${recentDevices(s,60).length?`<div class="list" style="padding:0">${recentDevices(s,60).map(([k,d])=>`<div class="it"><span class="ic t-cyan" style="width:36px;height:36px">${ic("device")}</span><div class="txt"><b>${esc(d.label||"Appareil")}${devBlockedOf(s.id)[k]?` <span class="chip bad">Suspendu</span>`:""}</b><div class="small muted">Première connexion le ${fmtDate(d.first)} · dernière ${ago(d.last)}</div></div>${devBlockedOf(s.id)[k]?`<button class="btn sm" data-a="devUnblock" data-id="${s.id}" data-dev="${esc(k)}">${ic("check")}Rétablir</button>`:`<button class="btn ghost sm devbtn" data-a="devBlock" data-id="${s.id}" data-dev="${esc(k)}">${ic("lock")}Suspendre</button>`}</div>`).join("")}</div>`:`<p class="muted small" style="margin:0">Aucun appareil enregistré pour l'instant.</p>`}
   ${sharedFlag(s)?`<div class="note small">Ce compte a été utilisé sur plusieurs appareils récemment${S.peerCount?.[s.id]>1?", dont deux en même temps":""}. Vérifie avec l'élève qu'il ne prête pas son compte.</div>`:""}
-  <div class="row">${stOf(s)==="blocked"?`<button class="btn sm" data-a="unblockSt" data-id="${s.id}">${ic("check")}Rétablir l'accès</button>`:S.confirm==="block"+s.id?`<button class="btn danger sm" data-a="blockSt" data-id="${s.id}">Confirmer la suspension</button><button class="btn ghost sm" data-a="cancelDel">Annuler</button>`:`<button class="btn ghost sm" data-a="askBlock" data-id="${s.id}">${ic("lock")}Suspendre l'accès</button>`}</div><p class="hint" style="margin:0">Pour couper complètement l'accès, retire aussi son adresse e-mail dans le menu Partager.</p></div></div>
+  <div class="row">${stOf(s)==="blocked"?`<button class="btn sm" data-a="unblockSt" data-id="${s.id}">${ic("check")}Rétablir l'accès</button>`:S.confirm==="block"+s.id?`<button class="btn danger sm" data-a="blockSt" data-id="${s.id}">Confirmer la suspension</button><button class="btn ghost sm" data-a="cancelDel">Annuler</button>`:`<button class="btn ghost sm" data-a="askBlock" data-id="${s.id}">${ic("lock")}Suspendre l'accès</button>`}<button class="btn ghost sm" data-a="toggleNoChat" data-id="${s.id}">${ic("chat")}${(S.access[s.id]||{}).noChat?"Réactiver le chat entre élèves":"Désactiver le chat entre élèves"}</button></div><p class="hint" style="margin:0">Pour couper complètement l'accès, retire aussi son adresse e-mail dans le menu Partager.</p></div></div>
   ${(()=>{const ts=triSummary(s),ct=curTri(),at=attOf(s.id,ct.y,ct.t),cs=certsOf(s);return`<div class="section"><div><span class="eyebrow">Bulletin trimestriel · ${esc(ct.y)}</span><h2>Moyennes, rang et présence</h2></div><div class="kpis">${[1,2,3].map(t=>{const e=ts.find(x=>x.t===t);return`<div class="glass kpi"><b>${fmt2(e?.avg)}</b><span>T${t}${e?.rank?" · "+rankTxt(e.rank,e.ex)+" / "+e.of:""}</span></div>`}).join("")}<div class="glass kpi"><b style="color:var(--bad-ink)">${at.A}</b><span>Absences (T${ct.t})</span></div><div class="glass kpi"><b style="color:var(--warn-ink)">${at.R}</b><span>Retards (T${ct.t})</span></div><div class="glass kpi"><b>${cs.length}</b><span>Certificats</span></div></div>${at.list.length?`<p class="small muted" style="margin:0">Dernières absences : ${at.list.slice(0,8).map(x=>fmtDate(x.date)+(x.k==="R"?" (retard)":"")).join(", ")}</p>`:""}</div>`})()}
   ${(s.talks||[]).length?`<div class="section"><div><span class="eyebrow">Oral · IA</span><h2>Conversations avec Nova <span class="muted mono small">${s.talks.length}</span></h2></div><div class="glass list">${[...s.talks].reverse().slice(0,8).map(h=>`<div class="it"><span class="ic t-cyan" style="width:36px;height:36px;border-radius:10px;display:grid;place-items:center">${ic("chat")}</span><div class="txt"><b>${esc(h.title)}</b><div class="small muted">${fmtDate(h.at)} · ${h.n} messages · ${h.fixes} correction(s)${h.level?" · niveau estimé "+esc(h.level):""}</div>${(h.mistakes||[]).length?`<div class="small">${h.mistakes.map(m=>`<s class="wrong-txt">${esc(m.wrong)}</s> → <span class="right-txt">${esc(m.right)}</span>`).join("<br>")}</div>`:""}</div>${h.score?`<span class="chip warn">${"★".repeat(h.score)}</span>`:""}</div>`).join("")}</div></div>`:""}
   ${regularityCard(s,"Régularité de "+esc(s.name.split(" ")[0]))}<div class="section"><div><span class="eyebrow">Badges</span><h2>${Object.keys(s.badges||{}).length} débloqué(s)</h2></div><div class="row">${BADGES.filter(b=>(s.badges||{})[b.id]).map(b=>`<span class="chip warn">${ic(b.icon)}${b.name}</span>`).join("")||`<span class="muted">Aucun pour l'instant.</span>`}</div></div>
   <div class="section"><div><span class="eyebrow">Historique</span><h2>Quiz</h2></div>${a.length?`<div class="glass tablewrap"><table><thead><tr><th>Quiz</th><th>Score</th><th>Date</th></tr></thead><tbody>${a.slice(0,40).map(r=>`<tr><td>${esc(r.title)}</td><td class="num">${r.score}/${r.total} · ${pct(r.score,r.total)} %</td><td>${fmtDate(r.at)} ${new Date(r.at).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}</td></tr>`).join("")}</tbody></table></div>`:`<div class="empty">Pas encore de quiz.</div>`}</div>`}
-function contentView(){const c=S.confirm,cr=S.create;
+/* ---- Programme officiel du Togo : installer les nouveautés (sans toucher à l'existant) ---- */
+const PROG_BATCH="togo-2026-10";let PROGC=null,PROGLOAD=false,PROGBUSY=false;
+const progFlag=()=>{try{return localStorage.getItem("mca_prog_"+PROG_BATCH)==="1"}catch(e){return false}};
+async function progLoad(){if(PROGC!==null||PROGLOAD)return;PROGLOAD=true;try{PROGC=await(await fetch("content.json",{cache:"no-store"})).json()}catch(e){PROGC=false}PROGLOAD=false;render()}
+function progMissing(){if(!PROGC)return[];
+  const has={lessons:new Set(S.lessons.map(x=>x.id)),quizzes:new Set(S.quizzes.map(x=>x.id)),decks:new Set((S.decks||[]).map(x=>x.id)),epreuves:new Set(S.eps.map(x=>x.id)),corriges:new Set(Object.keys(S.corriges||{}))};
+  const epIds=new Set(Object.entries(PROGC.epreuves||{}).filter(([k,v])=>v.batch===PROG_BATCH).map(([k])=>k)),out=[];
+  for(const[col,docs]of Object.entries(PROGC))for(const[id,d]of Object.entries(docs)){const mine=col==="corriges"?epIds.has(id):d.batch===PROG_BATCH;if(mine&&!(has[col]&&has[col].has(id)))out.push([col,id])}
+  return out}
+async function installProg(){if(PROGBUSY||!PROGC)return;PROGBUSY=true;S.progMsg="Installation…";render();
+  const list=progMissing();let n=0;
+  try{for(let i=0;i<list.length;i+=8){const chunk=list.slice(i,i+8);await Promise.all(chunk.map(([col,id],j)=>S.db.doc(col+"/"+id).set({...PROGC[col][id],createdAt:Date.now()-(i+j)*1000})));n=Math.min(list.length,i+8);S.progMsg="Installation… "+n+" / "+list.length;render()}
+    try{localStorage.setItem("mca_prog_"+PROG_BATCH,"1")}catch(e){}toast(list.length+" éléments installés","check")}
+  catch(e){toast("Installation interrompue après "+n+" éléments : appuie de nouveau pour continuer.","x")}
+  PROGBUSY=false;S.progMsg="";render()}
+function progCard(){if(S.mode!=="teacher"||!S.isOwner||progFlag())return"";
+  if(PROGC===null){progLoad();return""}if(!PROGC)return"";
+  const miss=progMissing();if(!miss.length&&!PROGBUSY)return"";const cnt=k=>miss.filter(m=>m[0]===k).length;
+  return`<div class="section"><div class="glass card" style="gap:12px"><div class="row" style="gap:12px;flex-wrap:nowrap;align-items:flex-start"><span class="ic t-gold" style="flex:none">${ic("gift")}</span><div><b>Nouveau : programme officiel du Togo</b><div class="small muted">${cnt("lessons")} leçons, ${cnt("quizzes")} quiz, ${cnt("decks")} listes de vocabulaire et ${cnt("epreuves")} épreuves avec corrigés, de la 6e à l'université et pour les adultes. Tes contenus actuels ne sont pas modifiés.</div></div></div><div><button class="btn" data-a="installProg" ${PROGBUSY?"disabled":""}>${ic("download")}${PROGBUSY?esc(S.progMsg||"Installation…"):"Installer les nouveautés"}</button></div></div></div>`}
+function contentView(){return progCard()+contentView0()}
+function contentView0(){const c=S.confirm,cr=S.create;
   const item=(kind,x,extra,icon,tone)=>`<div class="glass card"><div class="row between"><span class="ic ${tone}" style="width:36px;height:36px">${ic(icon)}</span>${c===kind+x.id?`<div class="row"><button class="btn danger sm" data-a="del" data-k="${kind}" data-id="${x.id}">Confirmer</button><button class="btn ghost sm" data-a="cancelDel">Annuler</button></div>`:!canEditContent(x)?`<span class="chip">Banque commune</span>`:`<div class="row"><button class="iconbtn" data-a="editItem" data-k="${kind}" data-id="${x.id}" aria-label="Modifier" title="Modifier">${ic("edit")}</button><button class="iconbtn" data-a="askDel" data-k="${kind}" data-id="${x.id}" aria-label="Supprimer" title="Supprimer">${ic("trash")}</button></div>`}</div><h3>${esc(x.title)}</h3><div class="row">${lvlChip(x.level)}${audChip(x)}${exChip(x)}${extra||""}</div>${kind==="epreuves"?`<div><button class="btn ghost sm" data-a="openEp" data-id="${x.id}">${ic("eye")}Ouvrir l’épreuve et le corrigé</button></div>`:""}</div>`;
   const lvlSel=id=>`<select id="${id}">${LEVELS.map(l=>`<option value="${l}">${l} · ${LEVEL_NAMES[l]}</option>`).join("")}</select>`;
   const audSel=id=>`<label>Public visé<select id="${id}">${Object.entries(AUDIENCES).map(([k,l])=>`<option value="${k}">${l}</option>`).join("")}</select><span class="hint">Chaque apprenant ne voit que le contenu de son profil, plus ce qui est pour « Tout le monde ».</span></label>`;
   const nq=parseQuiz(S.drafts.q_body||"").length,nd=parseDeck(S.drafts.d_body||"").length;
-  return`<div class="section"><div><span class="eyebrow">Studio</span><h2>Créer du <span class="gradtext">contenu</span></h2><p class="sub">Ce que tu publies apparaît immédiatement chez tous tes élèves.</p></div>${S.editing?"":progImportCard()}
+  return`<div class="section"><div><span class="eyebrow">Studio</span><h2>Créer du <span class="gradtext">contenu</span></h2><p class="sub">Ce que tu publies apparaît immédiatement chez tous tes élèves.</p></div>
   ${S.editing?"":`<div class="seg">${[["lesson","Leçon","book"],["quiz","Quiz ou examen","bolt"],["deck","Vocabulaire","cards"],["pic","Image","camera"],["hw","Devoir","pen"],["ep","Épreuve","file"]].map(([k,l,i])=>`<button data-a="create" data-k="${k}" aria-pressed="${cr===k}">${l}</button>`).join("")}</div>`}
   <div class="glass card" style="padding:clamp(18px,3vw,26px)">
   ${S.editing?`<div class="editbar"><span class="row">${ic("edit")}Tu modifies « ${esc(S.editing.title)} »</span><button class="btn ghost sm" data-a="cancelEdit">Annuler la modification</button></div>`:""}
@@ -3468,13 +2354,13 @@ function contentView(){const c=S.confirm,cr=S.create;
 
 Traduis : « Je suis fatigué ».
 = I am tired / I'm tired</pre><p class="hint" id="q_preview">${nq?`${nq} question(s) reconnue(s).`:"Aucune question reconnue pour l'instant."}</p><div><button class="btn" type="submit">${ic("rocket")}${S.editing?"Enregistrer les modifications":S.drafts.q_exam==="1"?"Publier l'examen":"Publier le quiz"}</button></div></form>`:""}
-  ${cr==="deck"?`<form class="form" data-f="deck"><div class="two"><label>Titre<input id="d_title" required maxlength="120" placeholder="Food and drinks"></label><label>Niveau${lvlSel("d_level")}</label></div>${audSel("d_aud")}<label>Mots<textarea id="d_body" required style="min-height:220px"></textarea><span class="hint">Un mot par ligne : anglais | français | exemple (facultatif).</span></label>${AI.sample&&!AI.disabled?`<button class="btn ghost sm" type="button" data-a="aiFillDeck" style="justify-self:start" ${S.dfill?"disabled":""}>${ic("spark")}${S.dfill?"Nova rédige la liste…":"Générer la liste avec Nova (selon le titre)"}</button>`:""}<pre class="fmt">apple | pomme | I eat an apple every day.
+  ${cr==="deck"?`<form class="form" data-f="deck"><div class="two"><label>Titre<input id="d_title" required maxlength="120" placeholder="Food and drinks"></label><label>Niveau${lvlSel("d_level")}</label></div>${audSel("d_aud")}<label>Mots<textarea id="d_body" required style="min-height:220px"></textarea><span class="hint">Un mot par ligne : anglais | français | exemple (facultatif).</span></label><pre class="fmt">apple | pomme | I eat an apple every day.
 to borrow | emprunter | Can I borrow your pen?</pre><p class="hint" id="d_preview">${nd?`${nd} mot(s) reconnu(s).`:"Aucun mot reconnu pour l'instant."}</p><div><button class="btn" type="submit">${ic("rocket")}${S.editing?"Enregistrer les modifications":"Publier la liste"}</button></div></form>`:""}
-  ${cr==="hw"?`<form class="form" data-f="hw"><div class="two"><label>Titre<input id="h_title" required maxlength="120" placeholder="My dream holiday"></label><label>À rendre le<input id="h_due" type="date" required></label></div><label>Niveau${lvlSel("h_level")}</label>${audSel("h_aud")}<label>Consignes<textarea id="h_body" placeholder="Write 80 words about… (ou joins une photo / un fichier juste en dessous)"></textarea></label>${scanBlock("hw","Devoir",hwPrevName())}${corrigeHW()}${autoChk("h_auto","Nova note et commente chaque copie dès que l'élève la rend. Tu peux toujours modifier la note ensuite.")}${S.drafts.h_auto==="1"?`<label>Quand l'élève voit la note<select id="h_amode"><option value="live"${(S.drafts.h_amode||"live")==="live"?" selected":""}>Tout de suite</option><option value="draft"${S.drafts.h_amode==="draft"?" selected":""}>Brouillon : je valide avant</option></select></label>`:""}<div><button class="btn" type="submit">${ic("rocket")}${S.editing?"Enregistrer les modifications":"Publier le devoir"}</button></div></form>`:""}
+  ${cr==="hw"?`<form class="form" data-f="hw"><div class="two"><label>Titre<input id="h_title" required maxlength="120" placeholder="My dream holiday"></label><label>À rendre le<input id="h_due" type="date" required></label></div><label>Niveau${lvlSel("h_level")}</label>${audSel("h_aud")}<label>Consignes<textarea id="h_body" required placeholder="Write 80 words about…"></textarea></label>${autoChk("h_auto","Nova note et commente chaque copie dès que l'élève la rend. Tu peux toujours modifier la note ensuite.")}${S.drafts.h_auto==="1"?`<label>Quand l'élève voit la note<select id="h_amode"><option value="live"${(S.drafts.h_amode||"live")==="live"?" selected":""}>Tout de suite</option><option value="draft"${S.drafts.h_amode==="draft"?" selected":""}>Brouillon : je valide avant</option></select></label>`:""}<div><button class="btn" type="submit">${ic("rocket")}${S.editing?"Enregistrer les modifications":"Publier le devoir"}</button></div></form>`:""}
   ${cr==="ep"?epFormHTML(lvlSel,audSel):""}
   ${cr==="pic"&&!S.editing?picFormHTML(lvlSel,audSel):""}
   </div></div>
-  <div class="section"><div><span class="eyebrow">Jeux d'images</span><h2>Mes photos <span class="muted mono small">${vis(S.pictures).length}</span></h2><p class="sub">Elles s'ajoutent aux ${Object.values(PB.nouns).reduce((n,a)=>n+a.length,0)+PB.actions.length+PB.jobs.length+PB.feelings.length+PB.weather.length+PB.places.length} images intégrées (objets, actions, métiers, émotions, météo, lieux).</p></div>${vis(S.pictures).length?`<div class="pthumbs">${vis(S.pictures).map(x=>`<div class="glass pthumb">${x.picId?`<img src="${esc(blobURL(x.picId))}" alt="" loading="lazy">`:`<span style="font-size:2.6rem;line-height:1.3;text-align:center">${E(x.pic)}</span>`}<div class="small"><b>${esc(x.answer)}</b><div class="muted">${esc(x.prompt||"")} ${esc(x.level||"")}</div></div>${c==="pictures"+x.id?`<div class="row"><button class="btn danger sm" data-a="del" data-k="pictures" data-id="${x.id}">Confirmer</button><button class="btn ghost sm" data-a="cancelDel">Annuler</button></div>`:canEditContent(x)?`<button class="iconbtn" data-a="askDel" data-k="pictures" data-id="${x.id}" aria-label="Supprimer">${ic("trash")}</button>`:""}</div>`).join("")}</div>`:`<div class="empty">Aucune photo. Choisis « Image » ci-dessus pour photographier un objet, une scène du marché, une personne au travail…</div>`}</div>
+  <div class="section"><div><span class="eyebrow">Jeux d'images</span><h2>Mes photos <span class="muted mono small">${vis(S.pictures).length}</span></h2><p class="sub">Elles s'ajoutent aux ${Object.values(PB.nouns).reduce((n,a)=>n+a.length,0)+PB.actions.length+PB.jobs.length+PB.feelings.length+PB.weather.length+PB.places.length} images intégrées (objets, actions, métiers, émotions, météo, lieux).</p></div>${vis(S.pictures).length?`<div class="pthumbs">${vis(S.pictures).map(x=>`<div class="glass pthumb"><img src="${esc(blobURL(x.picId))}" alt="" loading="lazy"><div class="small"><b>${esc(x.answer)}</b><div class="muted">${esc(x.prompt||"")} ${esc(x.level||"")}</div></div>${c==="pictures"+x.id?`<div class="row"><button class="btn danger sm" data-a="del" data-k="pictures" data-id="${x.id}">Confirmer</button><button class="btn ghost sm" data-a="cancelDel">Annuler</button></div>`:canEditContent(x)?`<button class="iconbtn" data-a="askDel" data-k="pictures" data-id="${x.id}" aria-label="Supprimer">${ic("trash")}</button>`:""}</div>`).join("")}</div>`:`<div class="empty">Aucune photo. Choisis « Image » ci-dessus pour photographier un objet, une scène du marché, une personne au travail…</div>`}</div>
   <div class="section"><div><span class="eyebrow">Banque de sujets</span><h2>Épreuves <span class="muted mono small">${vis(S.eps).length}</span></h2></div>${vis(S.eps).length?`<div class="grid">${vis(S.eps).map(x=>item("epreuves",x,`<span class="chip">${esc(x.exam||"")}${x.year?" "+esc(x.year):""}</span>${S.corriges[x.id]&&(S.corriges[x.id].text||S.corriges[x.id].fileId)?`<span class="chip warn">${ic("lock")}Corrigé</span>`:`<span class="chip bad">Sans corrigé</span>`}`,"file","t-gold")).join("")}</div>`:`<div class="empty">Aucune épreuve publiée.</div>`}</div>
   <div class="section"><div><span class="eyebrow">Bibliothèque</span><h2>Leçons <span class="muted mono small">${vis(S.lessons).length}</span></h2></div><div class="seg">${["","hors",...PROG_CLASSES].map(c=>`<button data-a="lessonFilter" data-k="${c}" aria-pressed="${S.lessonFilter===c}">${c===""?"Toutes":c==="hors"?"Hors programme":c} <span class="muted">${c===""?vis(S.lessons).length:c==="hors"?vis(S.lessons).filter(l=>!l.classe).length:vis(S.lessons).filter(l=>l.classe===c).length}</span></button>`).join("")}</div>
   ${(()=>{const L=(S.lessonFilter===""?vis(S.lessons):S.lessonFilter==="hors"?vis(S.lessons).filter(l=>!l.classe):progUnits(S.lessonFilter));return L.length?`<div class="grid">${L.map(x=>item("lessons",x,x.classe?`<span class="chip warn">${esc(x.classe)}${x.unit?" · U"+esc(x.unit):""}</span>`:"","book","t-cyan")).join("")}</div>`:`<div class="empty">Aucune leçon ici.</div>`})()}</div>
@@ -3497,6 +2383,7 @@ function pendingHTML(){const P=S.pending||[];if(!P.length)return"";return`<div c
 function securityHTML(){const all=[...S.students,...S.parents],flagged=all.filter(sharedFlag),blocked=all.filter(x=>stOf(x)==="blocked");
   return`<div class="section"><div><span class="eyebrow">Sécurité</span><h2>Protection de la classe</h2><p class="sub">Qui peut entrer, et comment repérer un compte prêté à quelqu'un d'autre.</p></div>
   ${S.isOwner?`<div class="glass card"><div class="row between" style="flex-wrap:nowrap"><div><h3>Valider chaque nouvelle inscription</h3><p class="sub small" style="margin:0">Recommandé. Un nouvel élève ou parent reste en attente tant que son professeur ne l'a pas accepté.</p></div><button class="toggle" role="switch" aria-checked="${S.settings.approve!==false}" aria-label="Valider les inscriptions" data-a="toggleApprove"></button></div>
+   <div class="row between" style="flex-wrap:nowrap"><div><h3>Messages entre élèves</h3><p class="sub small" style="margin:0">Les élèves de ta classe (du collège à l'âge adulte) peuvent s'écrire. Tu lis et tu peux masquer les messages dans l'onglet Messages.</p></div><button class="toggle" role="switch" aria-checked="${S.settings.peerChat!==false}" aria-label="Messages entre élèves" data-a="togglePeer"></button></div>
    <div class="row between" style="flex-wrap:nowrap"><div><h3>Fermer les inscriptions</h3><p class="sub small" style="margin:0">Une fois la classe complète, plus personne ne peut s'inscrire, même avec une invitation.</p></div><button class="toggle" role="switch" aria-checked="${!!S.settings.closed}" aria-label="Fermer les inscriptions" data-a="toggleClosed"></button></div></div>`:""}
   ${flagged.length?`<div class="glass card" style="border-color:var(--rose-soft)"><b class="row">${ic("device")} Comptes à vérifier : ${flagged.length}</b><p class="sub small" style="margin:0">Ces comptes ont été utilisés sur 3 appareils ou plus en 14 jours, ou sont connectés sur deux appareils en même temps. C'est peut-être un compte prêté.</p><div class="list" style="padding:0">${flagged.map(x=>`<div class="it">${avatar(x.id,x.name)}<div class="txt"><b>${esc(x.name)}</b><div class="small muted">${S.peerCount?.[x.id]>1?"Connecté sur "+S.peerCount[x.id]+" appareils en ce moment · ":""}${recentDevices(x).length} appareil(s) en 14 jours</div></div><button class="btn ghost sm" data-a="openStudent" data-id="${x.id}">Voir</button></div>`).join("")}</div></div>`:`<div class="glass card"><span class="row small">${ic("shield")} Aucun compte suspect pour l'instant.</span></div>`}
   ${blocked.length?`<div class="glass card"><b>Accès suspendus : ${blocked.length}</b><div class="list" style="padding:0">${blocked.map(x=>`<div class="it">${avatar(x.id,x.name)}<div class="txt"><b>${esc(x.name)}</b></div><button class="btn ghost sm" data-a="unblockSt" data-id="${x.id}">Rétablir l'accès</button></div>`).join("")}</div></div>`:""}
@@ -3527,7 +2414,7 @@ function classViewInner(){const c=S.confirm;
 
 /* ============ events ============ */
 document.addEventListener("input",e=>{const el=e.target;if(!el.id||el.type==="file")return;S.drafts[el.id]=el.type==="checkbox"?(el.checked?"1":""):el.value;
-  if(el.id==="st_q"||el.id==="st_cls"||el.id==="st_grp"||el.id==="st_on"||el.id==="gv_q"||el.id==="gv_all"){S.stLim=ST_STEP;S.gvLim=GV_STEP;render();return}
+  if(el.id==="peer_q"||el.id==="st_q"||el.id==="st_cls"||el.id==="st_on"||el.id==="gv_q"||el.id==="gv_all"){S.stLim=ST_STEP;S.gvLim=GV_STEP;render();return}
   if(el.id==="q_exam"){render();return}
   if(/_prof$/.test(el.id)){delete S.drafts[el.id.replace(/_prof$/,"_cls")];render();return}
   if(el.id==="q_body"){const n=parseQuiz(el.value).length,p=$("#q_preview");if(p)p.textContent=n?`${n} question(s) reconnue(s).`:"Aucune question reconnue pour l'instant."}
@@ -3548,7 +2435,7 @@ document.addEventListener("click",e=>{const say_=e.target.closest("[data-say]");
   case"switch":S.mode=S.mode==="teacher"?"student":"teacher";S.tab=null;S.view=null;S.run=null;S.deck=null;S.animate=true;break;
   case"sound":S.sound=!S.sound;try{localStorage.setItem("mca_sound",S.sound?"1":"0")}catch(err){}break;
   case"say":say(el.dataset.t);return;
-  case"back":if(S.view?.type==="chat")closeChat();S.view=null;S.animate=true;break;
+  case"back":if(S.view?.type==="chat")closeChat();PR.with=null;S.view=null;S.animate=true;break;
   case"openLesson":{S.view={type:"lesson",id};S.animate=true;scrollTo(0,0);const l=S.lessons.find(x=>x.id===id);if(l&&S.me&&S.mode==="student"){if(!(S.me.lessonsRead||{})[id])gain(20,"Lit la leçon : "+l.title,{lessonsRead:{[id]:Date.now()}});else touch("Relit la leçon : "+l.title)}break}
   case"openHw":{S.view={type:"hw",id};S.animate=true;scrollTo(0,0);const h=S.homework.find(x=>x.id===id);if(h)touch("Regarde le devoir : "+h.title);break}
   case"openStudent":S.view={type:"student",id};S.animate=true;scrollTo(0,0);break;
@@ -3603,16 +2490,20 @@ document.addEventListener("click",e=>{const say_=e.target.closest("[data-say]");
   case"toggleLite":setLite(!LITE);toast(LITE?"Mode économie de données activé":"Mode économie de données désactivé","leaf");break;
   case"skin":applySkin(el.dataset.k,true);toast("Thème : "+SKINS.find(x=>x[0]===SKIN)[1],"palette");break;
   case"skinNext":{const i=SKINS.findIndex(x=>x[0]===SKIN);applySkin(SKINS[(i+1)%SKINS.length][0],true);toast("Thème : "+SKINS.find(x=>x[0]===SKIN)[1],"palette");break}
-  case"approveSt":write(()=>S.db.doc("access/"+id).update({status:"active",at:Date.now(),by:S.uid})).then(()=>toast("Inscription acceptée","check"));break;
-  case"refuseSt":write(()=>S.db.doc("access/"+id).update({status:"refused",at:Date.now(),by:S.uid})).then(()=>toast("Inscription refusée","x"));break;
+  case"approveSt":write(()=>S.db.doc("access/"+id).set({status:"active",at:Date.now(),by:S.uid})).then(()=>toast("Inscription acceptée","check"));break;
+  case"refuseSt":write(()=>S.db.doc("access/"+id).set({status:"refused",at:Date.now(),by:S.uid})).then(()=>toast("Inscription refusée","x"));break;
   case"askBlock":S.confirm="block"+id;break;
-  case"blockSt":S.confirm=null;write(()=>S.db.doc("access/"+id).update({status:"blocked",at:Date.now(),by:S.uid})).then(()=>toast("Accès suspendu","lock"));break;
-  case"unblockSt":write(()=>S.db.doc("access/"+id).update({status:"active",at:Date.now(),by:S.uid})).then(()=>toast("Accès rétabli","check"));break;
+  case"blockSt":S.confirm=null;write(()=>S.db.doc("access/"+id).set({status:"blocked",at:Date.now(),by:S.uid})).then(()=>toast("Accès suspendu","lock"));break;
+  case"unblockSt":write(()=>S.db.doc("access/"+id).set({status:"active",at:Date.now(),by:S.uid})).then(()=>toast("Accès rétabli","check"));break;
   case"toggleApprove":{const v=S.settings.approve===false;write(()=>S.db.doc("settings/main").set({...S.settings,approve:v})).then(()=>toast(v?"Validation des inscriptions activée":"Validation des inscriptions désactivée","shield"));break}
   case"toggleClosed":{const v=!S.settings.closed;write(()=>S.db.doc("settings/main").set({...S.settings,closed:v})).then(()=>toast(v?"Inscriptions fermées":"Inscriptions ouvertes","shield"));break}
   case"pickRole":S.drafts.j_role=el.dataset.k||"";S.animate=true;break;
   case"showAll":S.showAll=!S.showAll;S.animate=true;break;
-  case"profFilter":S.profFilter=el.dataset.k||"";S.stLim=ST_STEP;break;case"pronMic":pronListen();return;case"pronHear":speak(S.pron?.target||"","en");return;case"pronWord":speak(el.dataset.w||"","en");return;case"pronNext":pronNext();break;case"pronAI":pronAI();return;case"notifOn":notifEnable();return;case"notifOff":notifOff().then(render);return;case"stMore":S.stLim=(S.stLim||ST_STEP)+ST_STEP;break;case"gvMore":S.gvLim=(S.gvLim||GV_STEP)+GV_STEP;break;case"cpRm":(PEND[el.dataset.k]||[]).splice(+el.dataset.i,1);break;case"openCopy":openCopy(el.dataset.p,el.dataset.t);return;
+  case"profFilter":S.profFilter=el.dataset.k||"";S.stLim=ST_STEP;break;case"pronMic":pronListen();return;case"pronHear":speak(S.pron?.target||"","en");return;case"pronWord":speak(el.dataset.w||"","en");return;case"pronNext":pronNext();break;case"pronAI":pronAI();return;case"notifOn":notifEnable();return;case"notifOff":notifOff().then(render);return;case"devBlock":devSet(el.dataset.id,el.dataset.dev,true);return;case"devUnblock":devSet(el.dataset.id,el.dataset.dev,false);return;case"installProg":installProg();return;case"openPeers":S.view={type:"peers"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeer":{const id=el.dataset.id;S.view={type:"peer",id};PR.with=id;S.animate=true;peerMarkRead(id);scrollTo(0,0);break}case"peerBack":PR.with=null;S.view={type:"peers"};S.animate=true;break;
+  case"msgsTab":S.msgsTab=el.dataset.k;if(el.dataset.k==="peers")peerModLoad();break;case"peerHide":{const id=el.dataset.id,on=el.dataset.on==="1";window.__peer.hide(id,on).then(()=>{const m=(PR.mod||[]).find(x=>x.id===id);if(m)m.hidden=on;render()}).catch(e=>toast(e.message||"Impossible de masquer","x"));return}
+  case"togglePeer":{const on=S.settings.peerChat===false;write(()=>S.db.doc("settings/main").set({...S.settings,peerChat:on})).then(()=>toast(on?"Messages entre élèves activés":"Messages entre élèves désactivés","check"));break}
+  case"toggleNoChat":{const id=el.dataset.id,cur=S.access[id]||{};write(()=>S.db.doc("access/"+id).set({...cur,status:cur.status||"active",at:cur.at||Date.now(),by:cur.by||S.uid,noChat:!cur.noChat})).then(()=>toast(!cur.noChat?"Chat désactivé pour cet élève":"Chat réactivé pour cet élève","check"));return}
+  case"stMore":S.stLim=(S.stLim||ST_STEP)+ST_STEP;break;case"gvMore":S.gvLim=(S.gvLim||GV_STEP)+GV_STEP;break;case"cpRm":(PEND[el.dataset.k]||[]).splice(+el.dataset.i,1);break;case"openCopy":openCopy(el.dataset.p,el.dataset.t);return;
   case"toggleCor":{const e=S.eps.find(x=>x.id===id),c=S.corriges[id];if(!e)break;
     if(!e.corrigeVisible){if(!c||(!c.text&&!c.fileId)){toast("Ajoute d'abord un corrigé.","x");break}write(()=>S.db.doc("epreuves/"+id).update({corrigeVisible:true,corrigePublic:{text:c.text||"",fileId:c.fileId||"",fileName:c.fileName||"",fileType:c.fileType||""}})).then(()=>toast("Corrigé publié aux élèves","eye"))}
     else write(()=>S.db.doc("epreuves/"+id).update({corrigeVisible:false,corrigePublic:null})).then(()=>toast("Corrigé masqué aux élèves","lock"));break}
@@ -3645,19 +2536,6 @@ document.addEventListener("click",e=>{const say_=e.target.closest("[data-say]");
   case"logout":if(window.__appLogout)window.__appLogout();return;
   case"prac":S.prac=el.dataset.k;S.animate=true;break;
   case"talkStart":talkStart(el.dataset.k);return;
-  case"talkOpen":talkOpen(el.dataset.id,+el.dataset.at);return;
-  case"talkAll":S.talkAll=!S.talkAll;break;
-  case"corGen":corGen(el.dataset.k);return;
-  case"corPdf":{const k=el.dataset.k,t=corTxt(k);if(!t){toast("Le corrigé est vide : écris-le ou fais-le rédiger par Nova.","x");return}saveFile("corrige-"+safeName(corTitle(k))+".pdf",makePdf("Corrigé : "+corTitle(k),t));return}
-  case"corPng":{const k=el.dataset.k,t=corTxt(k);if(!t){toast("Le corrigé est vide : écris-le ou fais-le rédiger par Nova.","x");return}makePng("Corrigé : "+corTitle(k),t).then(b=>saveFile("corrige-"+safeName(corTitle(k))+".png",b));return}
-  case"stFolder":{const k=el.dataset.k;S.stOpen=S.stOpen||{};S.stOpen[k]=el.getAttribute("aria-expanded")!=="true";break}
-  case"stFMore":{const k=el.dataset.k;S.stFLim=S.stFLim||{};S.stFLim[k]=(S.stFLim[k]||ST_STEP)+ST_STEP;break}
-  case"importProg":importProg();break;
-  case"devBlock":write(()=>S.db.doc("access/"+id).update({blockedDevices:{[el.dataset.d]:true},allowedDevices:{[el.dataset.d]:null}})).then(()=>toast("Appareil suspendu","lock"));break;
-  case"devAllow":write(()=>S.db.doc("access/"+id).update({blockedDevices:{[el.dataset.d]:null},allowedDevices:{[el.dataset.d]:true}})).then(()=>toast("Appareil autorisé","check"));break;
-  case"devLimit":{const n=+el.dataset.n,st=S.students.find(x=>x.id===id);if(!st)break;const patch={deviceLimit:n||null};
-    if(n){const devs=recentDevices(st,60),al={},bl={};devs.forEach(([k],i)=>{al[k]=i<n?true:null;if(i<n)bl[k]=null});patch.allowedDevices=al;patch.blockedDevices=bl}
-    write(()=>S.db.doc("access/"+id).update(patch)).then(()=>toast(n?"Limite : "+n+" appareil"+(n>1?"s":""):"Limite retirée","device"));break}
   case"talkNew":S.talk=null;S.animate=true;scrollTo(0,0);break;
   case"talkLeave":if(S.talk&&!S.talk.summary)talkReward(S.talk);S.talk=null;S.animate=true;break;
   case"talkFinish":talkFinish();return;
@@ -3699,14 +2577,7 @@ document.addEventListener("click",e=>{const say_=e.target.closest("[data-say]");
   case"endSrs":if(S.srs&&!S.srs.done&&Object.keys(S.srs.res).length)finishSrs();S.srs=null;S.animate=true;break;
   case"srsFlip":{S.srs.flipped=!S.srs.flipped;const f=srsCard(S.srs.items[S.srs.i]);if(S.srs.flipped&&f&&canSpeak)say(f.c.en+(f.c.ex?". "+f.c.ex:""));break}
   case"srsAns":{const st=S.srs,k=st.items[st.i];st.res[k]=el.dataset.k==="1";beep(st.res[k]?"ok":"bad");st.i++;st.flipped=false;if(st.i>=st.items.length)finishSrs();else{const f=srsCard(st.items[st.i]);if(f&&canSpeak)setTimeout(()=>say(f.c.en),250)}break}
-  case"create":S.create=el.dataset.k;if(S.create==="pic"&&(!S.picSug||S.picSug.day!==today()))setTimeout(picSuggest,0);break;
-  case"picSugNew":picSuggest();return;
-  case"picSugPub":picPublish(+el.dataset.i);return;
-  case"picSugAll":picPublishAll();return;
-  case"picSugDrop":{S.picSug?.items?.splice(+el.dataset.i,1);break}
-  case"aiFillDeck":aiFillDeck();return;
-  case"dwKnow":{const i=+el.dataset.i,dw=S.me?.dailyWords;if(!dw||!(dw.list||[])[i]||dw.list[i].known)break;const list=dw.list.map((w,j)=>j===i?{...w,known:true,at:Date.now()}:w),done=[...(S.me.dwDone||[]),dw.list[i].en].slice(-200);gain(2,"A appris le mot « "+dw.list[i].en+" »",{dailyWords:{...dw,list},dwDone:done},el);break}
-  case"dwRetry":S.dwTried=null;dailyWordsEnsure();return;
+  case"create":S.create=el.dataset.k;break;
   case"askDel":S.confirm=el.dataset.k+id;break;
   case"cancelDel":S.confirm=null;break;
   case"del":{const k=el.dataset.k;S.confirm=null;write(()=>S.db.doc(k+"/"+id).delete()).then(()=>{if(k==="epreuves")return write(()=>S.db.doc("corriges/"+id).delete())}).then(()=>toast("Supprimé","trash"));break}
@@ -3736,20 +2607,10 @@ document.addEventListener("submit",e=>{e.preventDefault();const f=e.target,k=f.d
     saveContent("quizzes",d).then(ed=>{clear(FORM_FIELDS.quiz);toast(ed?"Quiz modifié":exam?`Examen publié (${questions.length} questions, ${mins} min)`:`Quiz publié (${questions.length} questions)`,exam?"timer":"bolt");render()})}
   else if(k==="deck"){const cards=parseDeck(document.getElementById("d_body").value);if(!cards.length){toast("Aucun mot reconnu : utilise anglais | français.","x");return}
     saveContent("decks",{title:v("d_title"),level:v("d_level"),audience:v("d_aud")||"tous",cards}).then(ed=>{clear(FORM_FIELDS.deck);toast(ed?"Liste modifiée":`Liste publiée (${cards.length} mots)`,"cards");render()})}
-  else if(k==="hw"){(async()=>{try{
-    const ed=S.editing&&S.editing.kind==="homework"?S.homework.find(x=>x.id===S.editing.id):null,sc=S.scan.hw;let up=null;
-    if(sc&&sc.blob){if(sc.busy)throw{code:"busy"};if(!S.assets)throw{code:"no_assets"};const type=sc.type||"image/jpeg";const r=await S.assets.upload(sc.blob,{type});up={id:r.id,name:sc.name,type}}
-    const ins=document.getElementById("h_body").value.trim();
-    if(!ins&&!up&&!ed?.fileId){toast("Écris les consignes ou ajoute une photo / un fichier.","x");return}
-    const ct=(document.getElementById("h_cor")?.value||"").trim();let cf=null;
-    if(ct&&document.getElementById("h_pdf")?.checked&&S.assets){const r=await S.assets.upload(makePdf("Corrigé : "+(v("h_title")||"Devoir"),ct),{type:"application/pdf"});cf={fileId:r.id,fileName:"corrige-"+safeName(v("h_title"))+".pdf",fileType:"application/pdf"}}
-    const data={title:v("h_title"),level:v("h_level"),audience:v("h_aud")||"tous",due:v("h_due"),instructions:ins,autoCorrect:!!document.getElementById("h_auto")?.checked,autoMode:S.drafts.h_amode==="draft"?"draft":"live",fileId:up?up.id:(ed?.fileId||""),fileName:up?up.name:(ed?.fileName||""),fileType:up?up.type:(ed?.fileType||"")};
-    let id;if(ed){id=ed.id;await write(()=>S.db.doc("homework/"+id).update(data))}else{const ref=S.db.collection("homework").doc();id=ref.id;await write(()=>ref.set({...data,teacherId:S.uid,createdAt:Date.now()}))}
-    if(ct||cf){const prevC=S.corriges[id]||{},c={text:ct,fileId:cf?cf.fileId:(prevC.fileId||""),fileName:cf?cf.fileName:(prevC.fileName||""),fileType:cf?cf.fileType:(prevC.fileType||"")},pub=!!document.getElementById("h_pub")?.checked;
-      await write(()=>S.db.doc("corriges/"+id).set(c));await write(()=>S.db.doc("homework/"+id).update({corrigeVisible:pub,corrigePublic:pub?c:null}))}
-    S.editing=null;clear(FORM_FIELDS.hw);clearScan("hw");toast(ed?"Devoir modifié":"Devoir publié","pen")}
-    catch(err){const c=err&&err.code;toast(c==="too_large"?"Fichier trop lourd (20 Mo maximum).":c==="unsupported_type"?"Format non accepté : utilise un PDF ou une image.":c==="no_assets"?"L'envoi de fichiers n'est pas disponible ici.":c==="busy"?"Attends la fin de l'amélioration de la photo.":"Enregistrement impossible. Réessaie.","x")}
-    finally{render()}})()}
+  else if(k==="hw"){saveContent("homework",{title:v("h_title"),level:v("h_level"),audience:v("h_aud")||"tous",due:v("h_due"),instructions:document.getElementById("h_body").value.trim(),autoCorrect:!!document.getElementById("h_auto")?.checked,autoMode:S.drafts.h_amode==="draft"?"draft":"live"}).then(ed=>{clear(FORM_FIELDS.hw);toast(ed?"Devoir modifié":"Devoir publié","pen");render()})}
+  else if(k==="peerchat"){const to=f.dataset.s,text=v("peerInput");if(!text||PR.sending)return;if(!navigator.onLine){toast("Pas de réseau : réessaie quand tu es connecté.","x");return}
+    PR.sending=true;delete S.drafts.peerInput;f.reset();render();
+    window.__peer.send(to,text).then(id=>{PR.inbox.unshift({id:id||("tmp"+Date.now()),sender:S.uid,receiver:to,body:text,created_at:new Date().toISOString(),read_at:null})}).catch(e=>{toast(e.message||"Envoi impossible","x");S.drafts.peerInput=text}).finally(()=>{PR.sending=false;render()})}
   else if(k==="chat"){const sid=f.dataset.s,text=v("chatInput");if(!text)return;const at=Date.now(),from=S.mode==="teacher"?"teacher":"student";delete S.drafts.chatInput;f.reset();
     write(()=>S.db.collection("students/"+sid+"/msgs").add({from,text,at})).then(()=>write(()=>S.db.doc("students/"+sid).update(from==="teacher"?{lastMsgAt:at,lastMsgFrom:"teacher",lastMsgText:text.slice(0,80),teacherReadAt:at}:{lastMsgAt:at,lastMsgFrom:"student",lastMsgText:text.slice(0,80),studentReadAt:at,lastActive:at,activity:"A écrit à la prof"})));
     if(from==="student")presence("Écrit un message");return}
@@ -3769,8 +2630,7 @@ document.addEventListener("submit",e=>{e.preventDefault();const f=e.target,k=f.d
   else if(k==="ep"){(async()=>{const btn=$("#e_submit");if(btn)btn.disabled=true;
     try{const up=async k=>{const sc=S.scan[k];if(!sc||!sc.blob)return null;if(sc.busy)throw{code:"busy"};if(!S.assets)throw{code:"no_assets"};const type=sc.type||"image/jpeg";const r=await S.assets.upload(sc.blob,{type});return{id:r.id,name:sc.name,type}};
       const ed=S.editing&&S.editing.kind==="epreuves"?S.editing:null,prev=ed?S.eps.find(x=>x.id===ed.id):null,prevC=ed?(S.corriges[ed.id]||{}):{};
-      const suj=await up("sujet");let cor=await up("cor");
-      if(!cor&&document.getElementById("e_pdf")?.checked){const tx=(document.getElementById("e_cor")?.value||"").trim();if(tx&&S.assets){const r=await S.assets.upload(makePdf("Corrigé : "+v("e_title"),tx),{type:"application/pdf"});cor={id:r.id,name:"corrige-"+safeName(v("e_title"))+".pdf",type:"application/pdf"}}}
+      const suj=await up("sujet"),cor=await up("cor");
       const data={title:v("e_title"),exam:v("e_exam"),year:v("e_year"),level:v("e_level"),audience:v("e_aud")||"tous",minutes:Math.max(0,parseInt(v("e_min"))||0),autoCorrect:!!document.getElementById("e_auto")?.checked,autoMode:S.drafts.e_amode==="draft"?"draft":"live",sujet:(document.getElementById("e_sujet")?.value||"").trim(),fileId:suj?suj.id:(prev?.fileId||""),fileName:suj?suj.name:(prev?.fileName||""),fileType:suj?suj.type:(prev?.fileType||"")};
       if(!data.sujet&&!data.fileId){toast("Ajoute le texte du sujet ou un fichier.","x");return}
       const corr={text:(document.getElementById("e_cor")?.value||"").trim(),fileId:cor?cor.id:(prevC.fileId||""),fileName:cor?cor.name:(prevC.fileName||""),fileType:cor?cor.type:(prevC.fileType||"")};
