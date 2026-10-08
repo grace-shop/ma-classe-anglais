@@ -502,6 +502,24 @@ for(const n of["joinView","waitingView","blockedView","refusedView","closedView"
   return h+`<div class="section"><div class="glass card" style="gap:10px"><div class="row"><span class="ic t-gold">${ic("lock")}</span><div><h3 style="margin:0">Mot de passe oublié ?</h3><p class="sub small" style="margin:0">Crée un mot de passe provisoire pour ${esc(String(s.name||"").split(" ")[0])}, à lui donner en main propre. Il pourra ensuite se connecter avec.</p></div></div>
   ${R&&R.pw?`<div class="note"><b>Nouveau mot de passe : <span class="mono" style="font-size:1.2rem;letter-spacing:1px">${esc(R.pw)}</span></b><br><span class="small">Donne-le uniquement à l'élève. L'ancien mot de passe ne marche plus.</span></div>`:R&&R.err?`<div class="note small">${esc(R.err)}</div>`:""}
   <div class="row">${R&&R.ask?`<button class="btn danger sm" data-v4="pwdGo" data-id="${s.id}" ${R.busy?"disabled":""}>${R.busy?"Patiente…":"Oui, réinitialiser"}</button><button class="btn ghost sm" data-v4="pwdCancel">Annuler</button>`:`<button class="btn ghost sm" data-v4="pwdAsk" data-id="${s.id}">${ic("refresh")}Réinitialiser le mot de passe</button>`}</div></div></div>`}}
+
+/* =====================================================================
+   12. Photo de profil (vraie photo de l'apprenant) + la prof peut la retirer
+   ===================================================================== */
+async function squareJpeg(file,size=400){const bmp=await createImageBitmap(file),m=Math.min(bmp.width,bmp.height),c=document.createElement("canvas");c.width=c.height=size;
+  c.getContext("2d").drawImage(bmp,(bmp.width-m)/2,(bmp.height-m)/2,m,m,0,0,size,size);return await new Promise(r=>c.toBlob(r,"image/jpeg",.82))}
+async function photoSet(file){if(!window.__avatarUpload){toast("Les photos de profil ne sont pas disponibles ici.","x");return}if(!isImg(file.type)){toast("Choisis une photo (JPG ou PNG).","x");return}
+  if(!navigator.onLine){toast("Pas de réseau : réessaie quand tu es connecté.","x");return}V4.photoBusy=true;render();
+  try{const b=await squareJpeg(file);const url=await window.__avatarUpload(b);await write(()=>meRef().update({photo:url}));try{await write(()=>S.db.doc("board/"+S.uid).update({photo:url}))}catch(e){}toast("Photo de profil enregistrée","camera")}
+  catch(e){toast((e&&e.message)||"Envoi impossible.","x")}V4.photoBusy=false;render()}
+function photoCardHTML(){const m=S.me;if(!m||!window.__avatarUpload)return"";
+  return`<div class="section"><div class="glass card" style="grid-template-columns:auto 1fr;align-items:center;gap:16px"><div>${avatar(S.uid,m.name,84)}</div><div style="display:grid;gap:8px"><div><h3 style="margin:0">Ma photo de profil</h3><p class="sub small" style="margin:0">Mets une vraie photo de toi : tes camarades et ta professeure la verront. Une photo correcte et respectueuse, s'il te plaît.</p></div>
+  <div class="row" style="gap:8px"><label class="btn sm" style="cursor:pointer">${ic("camera")}${V4.photoBusy?"Envoi…":m.photo?"Changer ma photo":"Ajouter ma photo"}<input type="file" id="v4photo" accept="image/*" hidden ${V4.photoBusy?"disabled":""}></label>${m.photo?`<button class="btn ghost sm" data-v4="photoRm">${ic("trash")}Retirer</button>`:""}</div>
+  ${m.photo?`<span class="hint">Ta photo s'affiche à la place de ton avatar de la boutique.</span>`:""}</div></div></div>`}
+{const _pv=profileView;profileView=function(){const h=_pv();const c=photoCardHTML();if(!c)return h;const i=h.indexOf('<div class="section"',10);return i>0?h.slice(0,i)+c+h.slice(i):c+h}}
+{const _sd2=studentDetail;studentDetail=function(){const h=_sd2();const s=S.students.find(x=>x.id===S.view?.id);if(!s||!s.photo)return h;
+  return h+`<div class="section"><div class="glass card row between"><div class="row">${avatar(s.id,s.name,56)}<div><h3 style="margin:0">Photo de profil</h3><p class="sub small" style="margin:0">Si la photo n'est pas convenable, tu peux la retirer.</p></div></div><button class="btn ghost sm" data-v4="photoRmFor" data-id="${s.id}">${ic("trash")}Retirer la photo</button></div></div>`}}
+document.addEventListener("change",e=>{const el=e.target;if(el&&el.id==="v4photo"){const f=el.files&&el.files[0];el.value="";if(f)photoSet(f);e.stopPropagation()}},true);
 /* =====================================================================
    9. Événements
    ===================================================================== */
@@ -531,6 +549,8 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"wdTest":wdTest();return;
   case"pwdAsk":V4.pwd={id:el.dataset.id,ask:true};render();return;case"pwdCancel":V4.pwd=null;render();return;
   case"pwdGo":{const id=el.dataset.id;V4.pwd={id,ask:true,busy:true};render();window.__resetPwd(id).then(pw=>{V4.pwd={id,pw}}).catch(e=>{V4.pwd={id,err:e.message}}).finally(render);return}
+  case"photoRm":write(()=>meRef().update({photo:""})).then(()=>{try{S.db.doc("board/"+S.uid).update({photo:""}).catch(()=>{})}catch(e){}toast("Photo retirée","trash")});return;
+  case"photoRmFor":write(()=>S.db.doc("students/"+el.dataset.id).update({photo:""})).then(()=>{try{S.db.doc("board/"+el.dataset.id).update({photo:""}).catch(()=>{})}catch(e){}toast("Photo retirée","trash")});return;
   case"toLogin":{el.disabled=true;Promise.resolve(window.__appLogout&&window.__appLogout()).catch(()=>location.reload());return}
   }},true);
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);

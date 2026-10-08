@@ -1,5 +1,6 @@
 -- =====================================================================
 --  MESSAGERIE COMPLÈTE : camarades + vocaux, photos, fichiers, stickers
+--  + PHOTOS DE PROFIL des apprenants
 --  À exécuter dans Supabase > SQL Editor (peut être relancé sans risque).
 --  Remplace et complète supabase/peer.sql (inutile de lancer peer.sql avant).
 --  Règles appliquées par le SERVEUR :
@@ -156,5 +157,23 @@ do $$ begin
       using (bucket_id = 'chat' and public.my_level() >= 2);
     create policy "chat_delete" on storage.objects for delete to authenticated
       using (bucket_id = 'chat' and ((storage.foldername(name))[1] = auth.uid()::text or public.my_level() >= 3));
+  end if;
+end $$;
+
+-- ---------- Photos de profil : dossier PUBLIC « avatars » (chacun ne modifie que sa photo) ----------
+do $$ begin
+  if exists (select 1 from information_schema.schemata where schema_name = 'storage') then
+    insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+    values ('avatars', 'avatars', true, 1048576, array['image/jpeg','image/png','image/webp'])
+    on conflict (id) do update set public = true, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
+    drop policy if exists "avatars_insert_own" on storage.objects;
+    drop policy if exists "avatars_update_own" on storage.objects;
+    drop policy if exists "avatars_delete" on storage.objects;
+    create policy "avatars_insert_own" on storage.objects for insert to authenticated
+      with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text and public.my_level() >= 2);
+    create policy "avatars_update_own" on storage.objects for update to authenticated
+      using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+    create policy "avatars_delete" on storage.objects for delete to authenticated
+      using (bucket_id = 'avatars' and ((storage.foldername(name))[1] = auth.uid()::text or public.my_level() >= 3));
   end if;
 end $$;
