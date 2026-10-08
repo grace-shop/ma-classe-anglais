@@ -20,7 +20,9 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
       - name: Numéro de version
-        run: echo "{\"build\": $(git rev-list --count HEAD), \"sha\": \"${GITHUB_SHA::7}\"}" > www/version.json && cat www/version.json
+        run: |
+          echo "{\"build\": $(git rev-list --count HEAD), \"sha\": \"${GITHUB_SHA::7}\"}" > www/version.json
+          cat www/version.json
       - name: Publier sur la branche gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
