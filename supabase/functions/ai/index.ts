@@ -14,8 +14,8 @@ const CORS = {
 };
 const MODELS: Record<string, string> = {
   quick: Deno.env.get("GEMINI_MODEL_QUICK") ?? "gemini-3.5-flash-lite",
-  default: Deno.env.get("GEMINI_MODEL") ?? "gemini-3.8-flash",
-  complex: Deno.env.get("GEMINI_MODEL_COMPLEX") ?? Deno.env.get("GEMINI_MODEL") ?? "gemini-3.8-flash",
+  default: Deno.env.get("GEMINI_MODEL") ?? "gemini-3.5-flash",
+  complex: Deno.env.get("GEMINI_MODEL_COMPLEX") ?? Deno.env.get("GEMINI_MODEL") ?? "gemini-3.5-flash",
 };
 const SYSTEM = `Tu es Nova, l'assistant d'une application d'apprentissage de l'anglais utilisée au Togo par des élèves (souvent mineurs), des étudiants, des adultes, des parents et des professeurs. Sois bienveillant, exact et adapté à l'âge. Refuse poliment tout contenu inapproprié pour des élèves. Suis précisément les consignes de format données dans chaque demande.`;
 
@@ -74,25 +74,34 @@ Deno.serve(async (req) => {
     if (im?.data && /^image\/(jpeg|png|webp|gif)$/.test(im.mime)) lastUser.parts.push({ inline_data: { mime_type: im.mime, data: im.data } });
   }
 
-  const model = MODELS[body.modelTier ?? "default"] ?? MODELS.default;
-  const payload = {
-    systemInstruction: { parts: [{ text: SYSTEM }] },
-    contents,
-    generationConfig: { temperature: 0.7, maxOutputTokens: 8192, ...(body.json ? { responseMimeType: "application/json" } : {}) },
-  };
-
-  // 4. Appel à Gemini
-  let res: Response;
-  try {
-    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-      body: JSON.stringify(payload),
-    });
-  } catch (_e) {
-    return fail("upstream_error", "Impossible de joindre Gemini.", 502);
+  const first = MODELS[body.modelTier ?? "default"] ?? MODELS.default;
+  // Si un modèle est saturé (503/429), lent ou retiré (404), on essaie le suivant : Nova répond presque toujours.
+  const chain = [...new Set([first, "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-flash-latest"])];
+  let res: Response | null = null;
+  let out: any = {};
+  let model = first;
+  for (const m of chain) {
+    for (const variant of [0, 1]) {
+      const gen: Record<string, unknown> = { temperature: 0.7, maxOutputTokens: 8192, ...(body.json ? { responseMimeType: "application/json" } : {}) };
+      if (variant === 0) gen.thinkingConfig = { thinkingBudget: 0 };   // réponses beaucoup plus rapides
+      try {
+        res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+          body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM }] }, contents, generationConfig: gen }),
+          signal: AbortSignal.timeout(25000),
+        });
+      } catch (_e) { res = null; break; }
+      out = await res.json().catch(() => ({}));
+      model = m;
+      console.log(`modèle ${m}, variante ${variant}, statut ${res.status}`);
+      if (res.ok) break;
+      if (res.status === 400 && variant === 0) continue;   // ce modèle refuse le réglage « sans réflexion » : on réessaie sans
+      break;
+    }
+    if (res && (res.ok || res.status === 401 || res.status === 403)) break;
   }
-  const out = await res.json().catch(() => ({}));
+  if (!res) return fail("upstream_error", "Impossible de joindre Gemini.", 502);
   if (!res.ok) {
     const msg = out?.error?.message ?? `Erreur Gemini ${res.status}`;
     if (res.status === 429) return fail("rate_limited", "Gemini est saturé ou le quota du projet est atteint. Réessaie dans un moment.", 429);
