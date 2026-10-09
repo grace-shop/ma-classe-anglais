@@ -23,9 +23,9 @@
   /* ---------------- erreurs ---------------- */
   function mapErr(e) {
     const m = String((e && (e.message || e.details)) || e || "");
-    if (e && (e.code === "42501" || /row-level security|permission denied/i.test(m))) return { code: "invalid_argument", message: "Accès refusé" };
+    if (e && (e.code === "42501" || /row-level security|permission denied/i.test(m))) return { code: "invalid_argument", message: "Access denied" };
     if (e && e.code === "23514") return { code: "quota_exceeded", message: m };
-    return { code: "unavailable", message: m || "Erreur réseau" };
+    return { code: "unavailable", message: m || "Network error" };
   }
 
 
@@ -86,7 +86,7 @@
         else { const { error } = await sb.rpc("doc_update", { p_path: it.path, p_patch: it.patch }); err = error; }
         if (err && isNet(mapErr(err))) break;           // toujours pas de réseau : on réessaiera
         q = qRead().filter((x) => x.id !== it.id);
-        if (err) console.warn("écriture abandonnée", it.path, err.message);
+        if (err) console.warn("write dropped", it.path, err.message);
         qWrite(q); pokeRunners(it.path);
       }
     } finally { flushing = false; }
@@ -220,7 +220,7 @@
   const meta = () => (session && session.user && session.user.user_metadata) || {};
   const userApi = {
     id: async () => session.user.id,
-    me: async () => ({ id: session.user.id, name: meta().full_name || meta().name || (session.user.email || "").split("@")[0] || "Utilisateur", avatarUrl: meta().avatar_url || meta().picture || "", email: window.__isTelEmail(session.user.email) ? window.__telOf(session.user.email) : (session.user.email || "") }),
+    me: async () => ({ id: session.user.id, name: meta().full_name || meta().name || (session.user.email || "").split("@")[0] || "User", avatarUrl: meta().avatar_url || meta().picture || "", email: window.__isTelEmail(session.user.email) ? window.__telOf(session.user.email) : (session.user.email || "") }),
     isOwner: async () => member.level === "owner",
     canEdit: async () => member.level === "admin" || member.level === "owner",
     can: async (n) => (n === "data.write" ? true : null),
@@ -246,7 +246,7 @@
   /* ---------------- copies d'élèves (photos / PDF des devoirs et épreuves) ---------------- */
   window.__peer = {
     dir: async () => { const { data, error } = await sb.rpc("peer_directory"); if (error) throw new Error(mapErr(error).message); return data || []; },
-    send: async (to, body, att) => { const args = { p_to: to, p_body: body || "" }; if (att) args.p_att = att; const { data, error } = await sb.rpc("send_peer_message", args); if (error) throw new Error(/function .*send_peer_message|p_att|schema cache/i.test(error.message || "") ? "La professeure doit d'abord exécuter le fichier supabase/messagerie.sql dans Supabase." : (error.message || "Envoi impossible")); return data; },
+    send: async (to, body, att) => { const args = { p_to: to, p_body: body || "" }; if (att) args.p_att = att; const { data, error } = await sb.rpc("send_peer_message", args); if (error) throw new Error(/function .*send_peer_message|p_att|schema cache/i.test(error.message || "") ? "The teacher must first run the file supabase/messagerie.sql in Supabase." : (error.message || "Could not send")); return data; },
     read: async (from) => { const { error } = await sb.rpc("mark_peer_read", { p_from: from }); if (error) throw new Error(error.message); },
     inbox: async () => { const { data, error } = await sb.from("peer_messages").select("*").order("created_at", { ascending: false }).limit(400); if (error) throw new Error(mapErr(error).message); return data || []; },
     all: async () => { const { data, error } = await sb.from("peer_messages").select("*").order("created_at", { ascending: false }).limit(300); if (error) throw new Error(mapErr(error).message); return data || []; },
@@ -267,8 +267,8 @@
         "application/msword": "doc", "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx", "application/vnd.ms-powerpoint": "ppt", "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx" })[type] || (String(name || "").split(".").pop() || "bin").slice(0, 5);
       const path = `${session.user.id}/${Date.now().toString(36)}-${rid(8)}.${ext}`;
       const { error } = await sb.storage.from("chat").upload(path, blob, { contentType: type, upsert: false });
-      if (error) throw { code: "upload_failed", message: /bucket not found/i.test(error.message || "") ? "La professeure doit d'abord exécuter le fichier supabase/messagerie.sql dans Supabase." : /mime|type/i.test(error.message || "") ? "Ce type de fichier n'est pas accepté." : /size|large/i.test(error.message || "") ? "Fichier trop lourd (10 Mo maximum)." : error.message };
-      return { p: path, t: type, n: String(name || "fichier").slice(0, 80), s: blob.size };
+      if (error) throw { code: "upload_failed", message: /bucket not found/i.test(error.message || "") ? "The teacher must first run the file supabase/messagerie.sql in Supabase." : /mime|type/i.test(error.message || "") ? "This type of file is not allowed." : /size|large/i.test(error.message || "") ? "File too big (10 MB maximum)." : error.message };
+      return { p: path, t: type, n: String(name || "file").slice(0, 80), s: blob.size };
     },
     url: async (path) => {
       const c = CHATURL[path]; if (c && c.until > Date.now()) return c.url;
@@ -280,14 +280,14 @@
   window.__avatarUpload = async (blob) => {
     const path = `${session.user.id}/photo-${Date.now().toString(36)}.jpg`;
     const { error } = await sb.storage.from("avatars").upload(path, blob, { contentType: "image/jpeg", upsert: false });
-    if (error) throw new Error(/bucket not found/i.test(error.message || "") ? "La professeure doit d'abord exécuter le fichier supabase/messagerie.sql dans Supabase." : /row-level security/i.test(error.message || "") ? "Envoi refusé : ton inscription doit d'abord être validée par la professeure." : "Envoi de la photo impossible : " + error.message);
+    if (error) throw new Error(/bucket not found/i.test(error.message || "") ? "The teacher must first run the file supabase/messagerie.sql in Supabase." : /row-level security/i.test(error.message || "") ? "Sending refused: the teacher must first approve your registration." : "Could not send the photo: " + error.message);
     return sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;
   };
   window.__resetPwd = async (uid) => {
     const { data: { session: s } } = await sb.auth.getSession();
     const res = await fetch(CFG.supabaseUrl.replace(/\/$/, "") + "/functions/v1/ai", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (s ? s.access_token : ""), apikey: CFG.supabaseAnonKey }, body: JSON.stringify({ action: "reset_password", uid }) });
     const out = await res.json().catch(() => ({}));
-    if (!res.ok || !out.password) throw new Error((out.error && out.error.message) || (res.status === 404 ? "Mets d'abord à jour la fonction « ai » dans Supabase (nouveau code sur GitHub)." : "Réinitialisation impossible pour le moment."));
+    if (!res.ok || !out.password) throw new Error((out.error && out.error.message) || (res.status === 404 ? "First update the “ai” function in Supabase (new code on GitHub)." : "Password reset is not possible right now."));
     return out.password;
   };
   window.__grade = async (body) => {
@@ -354,7 +354,7 @@
   /* ---------------- IA Nova (serveur « ai » → Gemini) ---------------- */
   const blobToB64 = (b) => new Promise((res) => { const r = new FileReader(); r.onload = () => res({ mime: b.type || "image/jpeg", data: String(r.result).split(",")[1] }); r.readAsDataURL(b); });
   async function callAI(input, opts = {}, json = false) {
-    if (opts.signal && opts.signal.aborted) throw { code: "cancelled", message: "Annulé" };
+    if (opts.signal && opts.signal.aborted) throw { code: "cancelled", message: "Cancelled" };
     const body = { input, json, modelTier: opts.modelTier || "default" };
     if (opts.images && opts.images.length) body.images = await Promise.all(opts.images.slice(0, 4).map(blobToB64));
     const { data: { session: s } } = await sb.auth.getSession();
@@ -368,10 +368,10 @@
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + (s ? s.access_token : ""), apikey: CFG.supabaseAnonKey },
         body: JSON.stringify(body),
       });
-    } catch (e) { clearTimeout(tmr); if (timedOut) { window.__lastAIErr = "Nova met trop de temps à répondre. Vérifie ta connexion et réessaie."; throw { code: "upstream_error", message: window.__lastAIErr }; } window.__lastAIErr = e && e.name === "AbortError" ? null : (navigator.onLine === false ? "Pas de connexion à Internet." : "Nova est injoignable. Professeure : dans Supabase, vérifie que la fonction « ai » est déployée et que « Verify JWT » est désactivé."); throw e && e.name === "AbortError" ? { code: "cancelled", message: "Annulé" } : { code: "upstream_error", message: navigator.onLine === false ? "Pas de connexion à Internet." : "Nova est injoignable : le serveur « ai » n'est pas encore prêt (professeure : voir le guide, étape Nova)." }; }
+    } catch (e) { clearTimeout(tmr); if (timedOut) { window.__lastAIErr = "Nova is taking too long to answer. Check your connection and try again."; throw { code: "upstream_error", message: window.__lastAIErr }; } window.__lastAIErr = e && e.name === "AbortError" ? null : (navigator.onLine === false ? "No Internet connection." : "Nova cannot be reached. Teacher: in Supabase, check that the “ai” function is deployed and that “Verify JWT” is turned off."); throw e && e.name === "AbortError" ? { code: "cancelled", message: "Cancelled" } : { code: "upstream_error", message: navigator.onLine === false ? "No Internet connection." : "Nova cannot be reached: the “ai” server is not ready yet (teacher: see the guide, Nova step)." }; }
     const out = await res.json().catch(() => ({})); clearTimeout(tmr);
-    if (!res.ok || out.error) { window.__lastAIErr = (out.error && out.error.message) || (res.status === 404 ? "Le serveur de Nova (fonction « ai ») est introuvable dans Supabase." : res.status === 401 ? "Nova refuse la connexion : dans Supabase, désactive « Verify JWT » pour la fonction « ai »." : "Nova a rencontré une erreur (" + res.status + ")."); } else window.__lastAIErr = null;
-    if (!res.ok || out.error) throw { code: (out.error && out.error.code) || "upstream_error", message: (out.error && out.error.message) || "Erreur " + res.status };
+    if (!res.ok || out.error) { window.__lastAIErr = (out.error && out.error.message) || (res.status === 404 ? "The Nova server (“ai” function) was not found in Supabase." : res.status === 401 ? "Nova refused the connection: in Supabase, turn off “Verify JWT” for the “ai” function." : "Nova had an error (" + res.status + ")."); } else window.__lastAIErr = null;
+    if (!res.ok || out.error) throw { code: (out.error && out.error.code) || "upstream_error", message: (out.error && out.error.message) || "Error " + res.status };
     if (opts.onText) { try { opts.onText({ text: out.text, delta: out.text }); } catch (e) {} }
     return { text: out.text, truncated: !!out.truncated, modelTierApplied: body.modelTier };
   }
@@ -381,7 +381,7 @@
     return JSON.parse(i >= 0 ? src.slice(i) : src);
   }
   const sampleApi = (input, opts) => callAI(input, opts, false);
-  sampleApi.json = async (input, opts) => { const r = await callAI(input, opts, true); try { return parseJSON(r.text); } catch (e) { throw { code: "invalid_json", message: "Réponse illisible", text: r.text }; } };
+  sampleApi.json = async (input, opts) => { const r = await callAI(input, opts, true); try { return parseJSON(r.text); } catch (e) { throw { code: "invalid_json", message: "Unreadable answer", text: r.text }; } };
   sampleApi.limits = async () => ({ images: { maxCount: 4 }, inputBytes: 4000000 });
 
   /* ---------------- le pont attendu par l'application ---------------- */
@@ -414,7 +414,7 @@
       <b style="font-size:1.2rem">${title}</b><div id="updTxt" style="color:#C4CAE4;line-height:1.5;font-size:.95rem">${text}</div>
       <div id="updBar" style="display:none;width:100%;height:8px;border-radius:99px;background:#2A3050;overflow:hidden"><i style="display:block;height:100%;width:0;background:linear-gradient(90deg,#8EA0FF,#6FE3F0);transition:width .2s"></i></div>
       <button id="updGo" style="width:100%;font:inherit;font-weight:800;border:0;border-radius:14px;padding:14px;background:linear-gradient(135deg,#8EA0FF,#B49BFF 55%,#6FE3F0);color:#06091c;cursor:pointer">${btnLabel}</button>
-      ${later ? `<button id="updLater" style="font:inherit;font-weight:700;border:0;background:none;color:#93ABFF;cursor:pointer;padding:6px">Plus tard</button>` : ""}</div>`;
+      ${later ? `<button id="updLater" style="font:inherit;font-weight:700;border:0;background:none;color:#93ABFF;cursor:pointer;padding:6px">Later</button>` : ""}</div>`;
     document.body.appendChild(d);
     d.querySelector("#updGo").onclick = () => onGo(d);
     const l = d.querySelector("#updLater"); if (l) l.onclick = () => d.remove();
@@ -422,13 +422,13 @@
   const setUpd = (txt, pct) => { const t = document.getElementById("updTxt"); if (t && txt) t.innerHTML = txt; const b = document.getElementById("updBar"); if (b && pct != null) { b.style.display = "block"; b.firstElementChild.style.width = Math.round(pct) + "%"; } };
   async function installApk(url) {
     const FS = plug("Filesystem"), FO = plug("FileOpener"), BR = plug("Browser"), H = plug("CapacitorHttp");
-    const viaBrowser = (msg) => { setUpd(msg || "Le téléchargement s'ouvre dans le navigateur : ouvre ensuite le fichier et touche « Mettre à jour ».", null); if (BR) BR.open({ url }); else location.href = url; };
+    const viaBrowser = (msg) => { setUpd(msg || "The download opens in the browser: then open the file and tap “Update”.", null); if (BR) BR.open({ url }); else location.href = url; };
     if (!(FS && FS.downloadFile && FO)) return viaBrowser();
     try {
       // GitHub redirige le lien vers son serveur de fichiers : on récupère d'abord l'adresse finale
       let finalUrl = url;
       if (H && H.request) { try { const r = await H.request({ url, method: "GET", headers: { Range: "bytes=0-0" } }); if (r && r.url && /^https:/.test(r.url)) finalUrl = r.url; } catch (e) {} }
-      setUpd("Téléchargement de la nouvelle version…", 2);
+      setUpd("Downloading the new version…", 2);
       let h = null; try { h = await FS.addListener("progress", (p) => { if (p && p.contentLength) setUpd(null, 2 + (p.bytes / p.contentLength) * 95); }); } catch (e) {}
       try { await FS.deleteFile({ path: "english-classes-maj.apk", directory: "CACHE" }); } catch (e) {}
       const r = await FS.downloadFile({ url: finalUrl, path: "english-classes-maj.apk", directory: "CACHE", progress: true });
@@ -436,9 +436,9 @@
       // vérification : un vrai fichier d'application pèse plusieurs Mo
       let size = 0; try { const st = await FS.stat({ path: "english-classes-maj.apk", directory: "CACHE" }); size = st.size || 0; } catch (e) {}
       if (size && size < 2000000) throw new Error("fichier incomplet");
-      setUpd("Touche « Mettre à jour » sur l'écran d'Android. Tes données sont conservées.", 100);
+      setUpd("Tap “Update” on the Android screen. Your data is kept.", 100);
       await FO.open({ filePath: r.path || r.uri, contentType: "application/vnd.android.package-archive", openWithDefault: true });
-    } catch (e) { viaBrowser("Le téléchargement direct n'a pas marché : il s'ouvre dans le navigateur. Ouvre ensuite le fichier téléchargé et touche « Mettre à jour »."); }
+    } catch (e) { viaBrowser("The direct download did not work: it opens in the browser. Then open the downloaded file and tap “Update”."); }
   }
   async function checkNativeUpdate(manual) {
     if (!isNative()) return;
@@ -451,22 +451,22 @@
       if (!remote || !remote.build) return;
       if (remote.build > (local.build || 0)) {
         if (UPD.shown && !manual) return; UPD.shown = true;
-        updBox("Nouvelle version disponible", "Une mise à jour d'English Classes est prête : nouvelles fonctions et corrections. Elle s'installe en un clic, <b>sans désinstaller</b>, et tu gardes tout ton travail.", "Mettre à jour maintenant", () => installApk(remote.apk || CFG.apkUrl));
-      } else if (manual) updBox("Tu es à jour", "Tu as déjà la dernière version d'English Classes.", "OK", (d) => d.remove(), false);
-    } catch (e) { if (manual) updBox("Vérification impossible", "Vérifie ta connexion à Internet puis réessaie.", "OK", (d) => d.remove(), false); }
+        updBox("New version available", "An update of English Classes is ready: new features and fixes. It installs in one click, <b>without uninstalling</b>, and you keep all your work.", "Update now", () => installApk(remote.apk || CFG.apkUrl));
+      } else if (manual) updBox("You are up to date", "You already have the latest version of English Classes.", "OK", (d) => d.remove(), false);
+    } catch (e) { if (manual) updBox("Could not check", "Check your Internet connection and try again.", "OK", (d) => d.remove(), false); }
   }
   window.__checkUpdate = (manual) => (isNative() ? checkNativeUpdate(manual) : (window.__swCheck ? window.__swCheck(manual) : null));
   if (isNative()) { setTimeout(() => checkNativeUpdate(false), 6000); setInterval(() => checkNativeUpdate(false), 3 * 3600e3); document.addEventListener("visibilitychange", () => { if (!document.hidden) checkNativeUpdate(false); }); }
   /* site web : quand une nouvelle version est en ligne, on propose de recharger */
   if (!isNative() && "serviceWorker" in navigator && location.protocol.startsWith("http")) {
     let reloading = false;
-    const offer = () => { if (UPD.shown) return; UPD.shown = true; updBox("Nouvelle version disponible", "English Classes a été amélioré. Touche le bouton pour profiter de la nouvelle version.", "Mettre à jour maintenant", () => { reloading = true; location.reload(); }); };
+    const offer = () => { if (UPD.shown) return; UPD.shown = true; updBox("New version available", "English Classes has been improved. Tap the button to get the new version.", "Update now", () => { reloading = true; location.reload(); }); };
     const watch = (reg) => {
       if (!reg) return;
       reg.addEventListener("updatefound", () => { const w = reg.installing; if (w) w.addEventListener("statechange", () => { if (w.state === "activated" && navigator.serviceWorker.controller && !reloading) offer(); }); });
     };
     navigator.serviceWorker.getRegistration().then(watch).catch(() => {});
-    window.__swCheck = async (manual) => { try { const reg = await navigator.serviceWorker.getRegistration(); if (reg) { await reg.update(); watch(reg); } const v = await (await fetch("version.json?t=" + Date.now(), { cache: "no-store" })).json(); const cur = window.__appBuild || v.build; window.__appBuild = cur; if (v.build > cur) offer(); else if (manual) updBox("Tu es à jour", "Tu as déjà la dernière version d'English Classes.", "OK", (d) => d.remove(), false); } catch (e) {} };
+    window.__swCheck = async (manual) => { try { const reg = await navigator.serviceWorker.getRegistration(); if (reg) { await reg.update(); watch(reg); } const v = await (await fetch("version.json?t=" + Date.now(), { cache: "no-store" })).json(); const cur = window.__appBuild || v.build; window.__appBuild = cur; if (v.build > cur) offer(); else if (manual) updBox("You are up to date", "You already have the latest version of English Classes.", "OK", (d) => d.remove(), false); } catch (e) {} };
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then((r) => r.json()).then((v) => { window.__appBuild = v.build; }).catch(() => {});
     setInterval(() => window.__swCheck(false), 30 * 60000);
     document.addEventListener("visibilitychange", () => { if (!document.hidden) window.__swCheck(false); });
@@ -480,14 +480,14 @@
     const d = document.createElement("div"); d.id = "iosGuide";
     d.style.cssText = "position:fixed;inset:0;z-index:9500;background:rgba(5,7,20,.72);display:flex;align-items:flex-end;justify-content:center;padding:12px;font-family:Manrope,system-ui,sans-serif";
     d.innerHTML = `<div style="width:min(440px,100%);background:#141831;color:#F1F3FB;border:1px solid #2E3560;border-radius:24px;padding:22px 20px calc(20px + env(safe-area-inset-bottom));box-shadow:0 30px 80px rgba(0,0,0,.6);display:grid;gap:14px">
-      <div style="display:flex;gap:12px;align-items:center"><img src="icons/apple-touch-icon.png" alt="" style="width:52px;height:52px;border-radius:13px"><div><b style="font-size:1.1rem">Installer English Classes sur iPhone</b><div style="color:#AEB6D8;font-size:.85rem">Gratuit · 30 secondes · icône sur l'écran d'accueil</div></div></div>
-      ${notSafari ? `<div style="background:#3E2E12;color:#FFD27A;border-radius:12px;padding:10px 12px;font-size:.88rem">Ouvre d'abord ce site dans <b>Safari</b> (copie l'adresse et colle-la dans Safari), puis suis les étapes.</div>` : ""}
+      <div style="display:flex;gap:12px;align-items:center"><img src="icons/apple-touch-icon.png" alt="" style="width:52px;height:52px;border-radius:13px"><div><b style="font-size:1.1rem">Install English Classes on iPhone</b><div style="color:#AEB6D8;font-size:.85rem">Free · 30 seconds · icon on your home screen</div></div></div>
+      ${notSafari ? `<div style="background:#3E2E12;color:#FFD27A;border-radius:12px;padding:10px 12px;font-size:.88rem">First open this site in <b>Safari</b> (copy the address and paste it in Safari), then follow the steps.</div>` : ""}
       <ol style="margin:0;padding-left:22px;display:grid;gap:10px;line-height:1.45">
-        <li>Touche le bouton <b>Partager</b> ${share} en bas de l'écran (en haut sur iPad).</li>
-        <li>Fais défiler et choisis <b>« Sur l'écran d'accueil »</b> ${plus}.</li>
-        <li>Touche <b>« Ajouter »</b> en haut à droite.</li>
-        <li>Ouvre <b>English Classes</b> depuis ton écran d'accueil : elle s'ouvre en plein écran, comme une vraie application.</li></ol>
-      <button id="iosGuideOk" style="font:inherit;font-weight:800;border:0;border-radius:14px;padding:13px;background:linear-gradient(135deg,#8EA0FF,#B49BFF 55%,#6FE3F0);color:#06091c;cursor:pointer">J'ai compris</button></div>`;
+        <li>Tap the <b>Share</b> button ${share} at the bottom of the screen (at the top on iPad).</li>
+        <li>Scroll down and choose <b>“Add to Home Screen”</b> ${plus}.</li>
+        <li>Tap <b>“Add”</b> at the top right.</li>
+        <li>Open <b>English Classes</b> from your home screen: it opens in full screen, like a real app.</li></ol>
+      <button id="iosGuideOk" style="font:inherit;font-weight:800;border:0;border-radius:14px;padding:13px;background:linear-gradient(135deg,#8EA0FF,#B49BFF 55%,#6FE3F0);color:#06091c;cursor:pointer">Got it</button></div>`;
     d.addEventListener("click", (e) => { if (e.target === d || e.target.id === "iosGuideOk") d.remove(); });
     document.body.appendChild(d);
   };
@@ -541,35 +541,35 @@
   const telEmail = (v) => telDigits(v) + "@" + TEL_DOMAIN;
   window.__isTelEmail = (e) => String(e || "").toLowerCase().endsWith("@" + TEL_DOMAIN);
   window.__telOf = (e) => { const d = String(e || "").split("@")[0]; return d.startsWith("228") && d.length === 11 ? "+228 " + d.slice(3).replace(/(\d\d)(?=\d)/g, "$1 ") : "+" + d; };
-  const loginId = () => { const raw = ((document.getElementById("agE") || {}).value || "").trim(); if (idMode !== "tel") return { email: raw }; const d = telDigits(raw); return telOk(d) ? { email: telEmail(raw) } : { err: "Numéro invalide : écris ton numéro de téléphone, par exemple 90 12 34 56." }; };
+  const loginId = () => { const raw = ((document.getElementById("agE") || {}).value || "").trim(); if (idMode !== "tel") return { email: raw }; const d = telDigits(raw); return telOk(d) ? { email: telEmail(raw) } : { err: "Invalid number: write your phone number, for example 90 12 34 56." }; };
   const G = `<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2c-2 1.5-4.5 2.4-7.2 2.4-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
   function drawGate() {
     if (!gate) { const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st); gate = document.createElement("div"); gate.id = "authGate"; document.body.appendChild(gate); }
     const sp = document.getElementById("splash"); if (sp) sp.style.display = "none";
     const reset = mode === "newpass";
-    gate.innerHTML = `<div class="box" role="dialog" aria-labelledby="agT"><div class="logo" style="background:none;padding:0;overflow:hidden"><img src="icons/logo-3d.png" alt="English Classes" style="width:100%;height:100%;display:block" onerror="this.outerHTML='E'"></div><div><h1 id="agT">English Classes</h1><p>${reset ? "Choisis ton nouveau mot de passe." : "Connecte-toi pour retrouver ta classe, tes leçons et ta progression."}</p></div>
+    gate.innerHTML = `<div class="box" role="dialog" aria-labelledby="agT"><div class="logo" style="background:none;padding:0;overflow:hidden"><img src="icons/logo-3d.png" alt="English Classes" style="width:100%;height:100%;display:block" onerror="this.outerHTML='E'"></div><div><h1 id="agT">English Classes</h1><p>${reset ? "Choose your new password." : "Log in to find your class, your lessons and your progress."}</p></div>
     ${note ? `<div class="msg ${note.ok ? "ok" : "err"}">${esc(note.t)}</div>` : ""}
-    ${reset ? `<form data-f="newpass"><label>Nouveau mot de passe<span class="pw"><input id="agP" type="password" minlength="6" required autocomplete="new-password"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label><button class="p" type="submit">Enregistrer</button></form>` : `
-    ${CFG.googleEnabled === false ? "" : `<button class="g" data-x="google">${G}Continuer avec Google</button><div class="or">ou avec ton e-mail</div>`}
-    <div class="tabs"><button data-x="in" aria-pressed="${mode === "in"}">Se connecter</button><button data-x="up" aria-pressed="${mode === "up"}">Créer un compte</button></div>
-    <form data-f="${mode}">${mode === "up" ? `<label>Prénom et nom<input id="agN" required maxlength="60" autocomplete="name" placeholder="Ex. Ama Kossi"></label>` : ""}
-    <div class="idsw" role="group" aria-label="Se connecter avec"><button type="button" data-x="idEmail" aria-pressed="${idMode !== "tel"}">E-mail</button><button type="button" data-x="idTel" aria-pressed="${idMode === "tel"}">Téléphone</button></div>
-    ${idMode === "tel" ? `<label>Numéro de téléphone<input id="agE" type="tel" inputmode="tel" required autocomplete="tel" placeholder="90 12 34 56" maxlength="20"></label>` : `<label>E-mail<input id="agE" type="email" required autocomplete="email" placeholder="ton.email@gmail.com"></label>`}
-    <label>Mot de passe<span class="pw"><input id="agP" type="password" required minlength="6" autocomplete="${mode === "up" ? "new-password" : "current-password"}" placeholder="6 caractères minimum"><button type="button" class="eye" data-x="eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
-    <div class="warn" role="note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/></svg><div>${mode === "up" ? `<b>Important : n'oublie jamais ton mot de passe.</b> Choisis-en un dont tu te souviendras et note-le dans un endroit sûr. Ne le donne à personne, même pas à un camarade : c'est une règle de sécurité. Il protège tes notes, tes messages et ta progression.` : `<b>Ton mot de passe est secret.</b> Ne l'oublie en aucun cas et ne le donne jamais à personne, même pas à un camarade ou à quelqu'un qui dit venir de l'école. C'est une règle de sécurité.`}</div></div>
-    <button class="p" type="submit">${mode === "up" ? "Créer mon compte" : "Se connecter"}</button></form>
-    ${mode === "in" ? `<button class="l" data-x="forgot">Mot de passe oublié ?</button>` : ""}`}
-    ${!isNative() && !window.__standaloneApp && window.__isIOS ? `<a class="dlc" href="#" data-x="ios"><img src="icons/icon-192.png" alt=""><span><b>Application iPhone</b><small>Gratuite · s'installe depuis Safari en 30 secondes</small></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1"/></svg>Installer</span></a>` : ""}
-    ${!isNative() && !window.__standaloneApp && !window.__isIOS && CFG.apkUrl ? `<a class="dlc" href="${esc(CFG.apkUrl)}" rel="noopener"><img src="icons/icon-192.png" alt=""><span><b>Application Android</b><small>Gratuite · plein écran · marche même hors ligne</small></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Télécharger</span></a>` : ""}</div>`;
+    ${reset ? `<form data-f="newpass"><label>New password<span class="pw"><input id="agP" type="password" minlength="6" required autocomplete="new-password"><button type="button" class="eye" data-x="eye" aria-label="Show password" title="Show password"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label><button class="p" type="submit">Save</button></form>` : `
+    ${CFG.googleEnabled === false ? "" : `<button class="g" data-x="google">${G}Continue with Google</button><div class="or">or with your e-mail</div>`}
+    <div class="tabs"><button data-x="in" aria-pressed="${mode === "in"}">Log in</button><button data-x="up" aria-pressed="${mode === "up"}">Create an account</button></div>
+    <form data-f="${mode}">${mode === "up" ? `<label>First and last name<input id="agN" required maxlength="60" autocomplete="name" placeholder="E.g. Ama Kossi"></label>` : ""}
+    <div class="idsw" role="group" aria-label="Log in with"><button type="button" data-x="idEmail" aria-pressed="${idMode !== "tel"}">E-mail</button><button type="button" data-x="idTel" aria-pressed="${idMode === "tel"}">Phone</button></div>
+    ${idMode === "tel" ? `<label>Phone number<input id="agE" type="tel" inputmode="tel" required autocomplete="tel" placeholder="90 12 34 56" maxlength="20"></label>` : `<label>E-mail<input id="agE" type="email" required autocomplete="email" placeholder="your.email@gmail.com"></label>`}
+    <label>Password<span class="pw"><input id="agP" type="password" required minlength="6" autocomplete="${mode === "up" ? "new-password" : "current-password"}" placeholder="At least 6 characters"><button type="button" class="eye" data-x="eye" aria-label="Show password" title="Show password"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
+    <div class="warn" role="note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/></svg><div>${mode === "up" ? `<b>Important: never forget your password.</b> Choose one you will remember and write it down in a safe place. Do not give it to anyone, not even a classmate: this is a safety rule. It protects your marks, your messages and your progress.` : `<b>Your password is secret.</b> Never forget it and never give it to anyone, not even a classmate or someone who says they are from the school. This is a safety rule.`}</div></div>
+    <button class="p" type="submit">${mode === "up" ? "Create my account" : "Log in"}</button></form>
+    ${mode === "in" ? `<button class="l" data-x="forgot">Forgot password?</button>` : ""}`}
+    ${!isNative() && !window.__standaloneApp && window.__isIOS ? `<a class="dlc" href="#" data-x="ios"><img src="icons/icon-192.png" alt=""><span><b>iPhone app</b><small>Free · installs from Safari in 30 seconds</small></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1"/></svg>Install</span></a>` : ""}
+    ${!isNative() && !window.__standaloneApp && !window.__isIOS && CFG.apkUrl ? `<a class="dlc" href="${esc(CFG.apkUrl)}" rel="noopener"><img src="icons/icon-192.png" alt=""><span><b>Android app</b><small>Free · full screen · works even offline</small></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Download</span></a>` : ""}</div>`;
   }
   function showGate() { drawGate(); }
   function hideGate() { if (gate) { gate.remove(); gate = null; } const sp = document.getElementById("splash"); if (sp) sp.style.display = ""; }
   const say = (t, ok) => { note = { t, ok }; drawGate(); };
-  const frErr = (m) => /Invalid login/i.test(m) ? "E-mail ou mot de passe incorrect." : /already registered|already exists/i.test(m) ? (idMode === "tel" ? "Un compte existe déjà avec ce numéro : connecte-toi." : "Un compte existe déjà avec cet e-mail : connecte-toi.") : /Email not confirmed/i.test(m) ? "Confirme d'abord ton e-mail grâce au lien reçu." : /Password should/i.test(m) ? "Le mot de passe doit contenir au moins 6 caractères." : /rate limit/i.test(m) ? "Trop d'essais. Attends quelques minutes." : m;
+  const frErr = (m) => /Invalid login/i.test(m) ? "Wrong e-mail or password." : /already registered|already exists/i.test(m) ? (idMode === "tel" ? "An account already exists with this number: please log in." : "An account already exists with this e-mail: please log in.") : /Email not confirmed/i.test(m) ? "First confirm your e-mail with the link you received." : /Password should/i.test(m) ? "The password must have at least 6 characters." : /rate limit/i.test(m) ? "Too many tries. Wait a few minutes." : m;
   document.addEventListener("click", async (e) => {
     const b = e.target.closest && e.target.closest("#authGate [data-x]"); if (!b) return; e.preventDefault();
     const x = b.dataset.x;
-    if (x === "eye") { const inp = b.parentNode.querySelector("input"); const show = inp.type === "password"; inp.type = show ? "text" : "password"; b.classList.toggle("on", show); b.setAttribute("aria-label", show ? "Masquer le mot de passe" : "Afficher le mot de passe"); inp.focus(); return; }
+    if (x === "eye") { const inp = b.parentNode.querySelector("input"); const show = inp.type === "password"; inp.type = show ? "text" : "password"; b.classList.toggle("on", show); b.setAttribute("aria-label", show ? "Hide password" : "Show password"); inp.focus(); return; }
     if (x === "in" || x === "up") { mode = x; note = null; drawGate(); return; }
     if (x === "ios") { window.__iosGuide(); return; }
     if (x === "idEmail" || x === "idTel") { idMode = x === "idTel" ? "tel" : "email"; try { localStorage.setItem("mca_idmode", idMode); } catch (e) {} note = null; drawGate(); const f = document.getElementById("agE"); if (f) f.focus(); return; }
@@ -581,11 +581,11 @@
       return;
     }
     if (x === "forgot") {
-      if (idMode === "tel") return say("Avec un numéro de téléphone, demande à ta professeure de réinitialiser ton mot de passe : elle le fait depuis ta fiche, dans son espace.");
+      if (idMode === "tel") return say("With a phone number, ask your teacher to reset your password: she can do it from your profile, in her space.");
       const email = (document.getElementById("agE") || {}).value || "";
-      if (!email) return say("Écris d'abord ton e-mail, puis touche « Mot de passe oublié ».");
+      if (!email) return say("First write your e-mail, then tap “Forgot password”.");
       const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: isNative() ? CFG.nativeRedirect : location.origin + location.pathname });
-      return error ? say(frErr(error.message)) : say("Un lien pour changer ton mot de passe vient d'être envoyé à " + email + ".", true);
+      return error ? say(frErr(error.message)) : say("A link to change your password has just been sent to " + email + ".", true);
     }
   });
   document.addEventListener("submit", async (e) => {
@@ -595,10 +595,10 @@
     try {
       const id = f.dataset.f === "newpass" ? {} : loginId();
       if (id.err) { say(id.err); return; }
-      if (f.dataset.f === "in") { const { error } = await sb.auth.signInWithPassword({ email: id.email, password: v("agP") }); if (error) say(idMode === "tel" && /Invalid login/i.test(error.message) ? "Numéro ou mot de passe incorrect." : frErr(error.message)); }
+      if (f.dataset.f === "in") { const { error } = await sb.auth.signInWithPassword({ email: id.email, password: v("agP") }); if (error) say(idMode === "tel" && /Invalid login/i.test(error.message) ? "Wrong number or password." : frErr(error.message)); }
       else if (f.dataset.f === "up") {
         const { data, error } = await sb.auth.signUp({ email: id.email, password: v("agP"), options: { data: { full_name: v("agN"), ...(idMode === "tel" ? { phone: "+" + telDigits(v("agE")) } : {}) }, emailRedirectTo: isNative() ? CFG.nativeRedirect : location.origin + location.pathname } });
-        if (error) say(frErr(error.message)); else if (!data.session) { mode = "in"; say(idMode === "tel" ? "Compte créé ! Connecte-toi maintenant avec ton numéro et ton mot de passe." : "Compte créé ! Ouvre l'e-mail de confirmation, puis connecte-toi.", true); }
+        if (error) say(frErr(error.message)); else if (!data.session) { mode = "in"; say(idMode === "tel" ? "Account created! Now log in with your number and your password." : "Account created! Open the confirmation e-mail, then log in.", true); }
       } else if (f.dataset.f === "newpass") { const { error } = await sb.auth.updateUser({ password: v("agP") }); if (error) say(frErr(error.message)); else { mode = "in"; note = null; hideGate(); location.reload(); } }
     } finally { if (btn) btn.disabled = false; }
   }, true);
@@ -612,7 +612,7 @@
     const total = Object.values(content).reduce((n, c) => n + Object.keys(c).length, 0);
     const box = document.createElement("div"); box.id = "authGate";
     const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
-    box.innerHTML = `<div class="box"><div class="logo" style="background:none;padding:0;overflow:hidden"><img src="icons/logo-3d.png" alt="English Classes" style="width:100%;height:100%;display:block" onerror="this.outerHTML='E'"></div><h1>Bienvenue !</h1><p>Votre base est vide. Installer le contenu de départ : ${Object.keys(content.lessons || {}).length} leçons du programme togolais, ${Object.keys(content.quizzes || {}).length} quiz, ${Object.keys(content.decks || {}).length} listes de vocabulaire et ${Object.keys(content.epreuves || {}).length} épreuves avec corrigés ?</p><div class="msg ok" id="agProg" hidden></div><button class="p" id="agGo">Installer le contenu (${total} éléments)</button><button class="l" id="agSkip">Plus tard</button></div>`;
+    box.innerHTML = `<div class="box"><div class="logo" style="background:none;padding:0;overflow:hidden"><img src="icons/logo-3d.png" alt="English Classes" style="width:100%;height:100%;display:block" onerror="this.outerHTML='E'"></div><h1>Welcome!</h1><p>Your database is empty. Install the starter content: ${Object.keys(content.lessons || {}).length} lessons from the Togolese curriculum, ${Object.keys(content.quizzes || {}).length} quizzes, ${Object.keys(content.decks || {}).length} vocabulary lists and ${Object.keys(content.epreuves || {}).length} exam papers with answer keys?</p><div class="msg ok" id="agProg" hidden></div><button class="p" id="agGo">Install the content (${total} items)</button><button class="l" id="agSkip">Later</button></div>`;
     document.body.appendChild(box);
     await new Promise((done) => {
       box.querySelector("#agSkip").onclick = () => { box.remove(); done(); };
@@ -622,10 +622,10 @@
         for (const [col, docs] of Object.entries(content)) for (const [id, data] of Object.entries(docs)) rows.push({ path: col + "/" + id, data: { ...data, createdAt: data.createdAt || now - (k++) * 1000 } });
         for (let i = 0; i < rows.length; i += 50) {
           const { error } = await sb.from("docs").upsert(rows.slice(i, i + 50), { onConflict: "path" });
-          if (error) { pr.className = "msg err"; pr.textContent = "Erreur : " + error.message; go.disabled = false; return; }
-          pr.textContent = `Installation… ${Math.min(i + 50, rows.length)} / ${rows.length}`;
+          if (error) { pr.className = "msg err"; pr.textContent = "Error: " + error.message; go.disabled = false; return; }
+          pr.textContent = `Installing… ${Math.min(i + 50, rows.length)} / ${rows.length}`;
         }
-        pr.textContent = "Contenu installé !"; try { localStorage.setItem("mca_prog_togo-2026-10", "1"); } catch (e) {} setTimeout(() => { box.remove(); done(); }, 700);
+        pr.textContent = "Content installed!"; try { localStorage.setItem("mca_prog_togo-2026-10", "1"); } catch (e) {} setTimeout(() => { box.remove(); done(); }, 700);
       };
     });
   }
@@ -643,7 +643,7 @@
     member = saved || { level: "interact" };
   }
   let started = false;
-  function brandAI() { const el = document.getElementById("aiSub"); if (el) el.textContent = "Assistant IA propulsé par Gemini"; }
+  function brandAI() { const el = document.getElementById("aiSub"); if (el) el.textContent = "AI assistant powered by Gemini"; }
   async function afterLogin() {
     if (started) return; started = true;
     hideGate(); brandAI(); await loadMember(); await offerStarterContent().catch(() => {}); resolveReady();
@@ -651,7 +651,7 @@
   async function boot() {
     if (!CFG.supabaseUrl || !CFG.supabaseAnonKey || /VOTRE/.test(CFG.supabaseUrl)) {
       const sp = document.getElementById("splash"); if (sp) sp.style.display = "none";
-      document.body.insertAdjacentHTML("beforeend", `<div style="position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:radial-gradient(120% 80% at 50% -10%,#1A2150 0%,#0E1120 45%,#090B16 100%);color:#F1F3FB;font-family:Manrope,system-ui,sans-serif;padding:20px"><div style="max-width:440px;display:grid;gap:14px;padding:28px 24px;border-radius:26px;background:rgba(23,27,46,.9);border:1px solid #2A3050"><div style="width:62px;height:62px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(120deg,#4A5FD0,#93ABFF);font:italic 1.7rem Georgia,serif">En</div><h2 style="margin:0;font:400 1.9rem Georgia,serif">English Classes</h2><p style="margin:0;color:#C4CAE4;line-height:1.55">L'application est installée, il reste à la relier à sa base de données. Professeure : suivez les étapes 1 à 6 du guide (projet Supabase, puis variables <b>SUPABASE_URL</b> et <b>SUPABASE_ANON_KEY</b> sur GitHub).</p><p style="margin:0;color:#8D94B5;font-size:.9rem">Élèves : revenez un peu plus tard, votre classe ouvre bientôt.</p></div></div>`);
+      document.body.insertAdjacentHTML("beforeend", `<div style="position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:radial-gradient(120% 80% at 50% -10%,#1A2150 0%,#0E1120 45%,#090B16 100%);color:#F1F3FB;font-family:Manrope,system-ui,sans-serif;padding:20px"><div style="max-width:440px;display:grid;gap:14px;padding:28px 24px;border-radius:26px;background:rgba(23,27,46,.9);border:1px solid #2A3050"><div style="width:62px;height:62px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(120deg,#4A5FD0,#93ABFF);font:italic 1.7rem Georgia,serif">En</div><h2 style="margin:0;font:400 1.9rem Georgia,serif">English Classes</h2><p style="margin:0;color:#C4CAE4;line-height:1.55">The app is installed; now it must be connected to its database. Teacher: follow steps 1 to 6 of the guide (Supabase project, then the <b>SUPABASE_URL</b> and <b>SUPABASE_ANON_KEY</b> variables on GitHub).</p><p style="margin:0;color:#8D94B5;font-size:.9rem">Students: come back a little later, your class opens soon.</p></div></div>`);
       return;
     }
     if (!window.supabase) { try { await loadScript(CFG.supabaseJs || "vendor/supabase.js"); } catch (e) { await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"); } }

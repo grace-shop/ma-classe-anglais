@@ -1,8 +1,8 @@
 {
   "name": "English Classes",
   "short_name": "English Classes",
-  "description": "Apprendre l'anglais au Togo : leçons du programme, quiz, jeux d'images, conversation avec Nova et suivi de la professeure.",
-  "lang": "fr",
+  "description": "Learn English in Togo: syllabus lessons, quizzes, picture games, conversations with Nova and teacher follow-up.",
+  "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

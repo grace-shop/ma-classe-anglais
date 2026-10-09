@@ -17,7 +17,7 @@ const MODELS: Record<string, string> = {
   default: Deno.env.get("GEMINI_MODEL") ?? "gemini-3.5-flash",
   complex: Deno.env.get("GEMINI_MODEL_COMPLEX") ?? Deno.env.get("GEMINI_MODEL") ?? "gemini-3.5-flash",
 };
-const SYSTEM = `Tu es Nova, l'assistant d'une application d'apprentissage de l'anglais utilisée au Togo par des élèves (souvent mineurs), des étudiants, des adultes, des parents et des professeurs. Sois bienveillant, exact et adapté à l'âge. Refuse poliment tout contenu inapproprié pour des élèves. Suis précisément les consignes de format données dans chaque demande.`;
+const SYSTEM = `You are Nova, the assistant of an English-learning app used in Togo by pupils (often minors), university students, adults, parents and teachers. Be kind, accurate and age-appropriate. Politely refuse any content that is not suitable for pupils. Follow exactly the format instructions given in each request. ALWAYS answer ONLY in English, never in French or any other language, even if the user writes in French. Use clear, simple English adapted to the learner (A1–B2); for explanations, corrections, hints and feedback, use very simple English (A1–A2 level) unless asked otherwise.`;
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
@@ -36,46 +36,46 @@ function serviceKey(): string {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return fail("invalid_request", "POST uniquement", 405);
+  if (req.method !== "POST") return fail("invalid_request", "POST only", 405);
 
 
   // 1. Qui demande ?
   const jwt = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
   const admin = createClient(Deno.env.get("SUPABASE_URL")!, serviceKey());
   const { data: auth, error: authErr } = await admin.auth.getUser(jwt);
-  if (authErr || !auth?.user) return fail("session_expired", "Reconnecte-toi pour utiliser Nova.", 401);
+  if (authErr || !auth?.user) return fail("session_expired", "Please sign in again to use Nova.", 401);
 
   let body: { input?: string | Turn[]; json?: boolean; modelTier?: string; images?: { mime: string; data: string }[]; action?: string; uid?: string };
-  try { body = await req.json(); } catch { return fail("invalid_request", "Requête illisible."); }
-  if (JSON.stringify(body).length > 6_000_000) return fail("prompt_too_large", "Demande trop longue.", 413);
+  try { body = await req.json(); } catch { return fail("invalid_request", "Unreadable request."); }
+  if (JSON.stringify(body).length > 6_000_000) return fail("prompt_too_large", "Request too long.", 413);
 
   // Professeure : réinitialiser le mot de passe d'un élève (comptes créés avec un numéro de téléphone)
   if (body.action === "reset_password") {
     const { data: me } = await admin.from("members").select("level").eq("uid", auth.user.id).maybeSingle();
-    if (!me || !["admin", "owner"].includes(me.level)) return fail("invalid_request", "Réservé aux professeurs.", 403);
+    if (!me || !["admin", "owner"].includes(me.level)) return fail("invalid_request", "Teachers only.", 403);
     const target = String(body.uid || "");
-    if (!/^[0-9a-f-]{36}$/i.test(target) || target === auth.user.id) return fail("invalid_request", "Compte invalide.");
+    if (!/^[0-9a-f-]{36}$/i.test(target) || target === auth.user.id) return fail("invalid_request", "Invalid account.");
     const { data: tm } = await admin.from("members").select("level").eq("uid", target).maybeSingle();
-    if (tm && ["admin", "owner"].includes(tm.level) && me.level !== "owner") return fail("invalid_request", "Seule la professeure principale peut faire cela pour un professeur.", 403);
+    if (tm && ["admin", "owner"].includes(tm.level) && me.level !== "owner") return fail("invalid_request", "Only the main teacher can do this for a teacher account.", 403);
     const abc = "abcdefghjkmnpqrstuvwxyz23456789"; const r = new Uint32Array(8); crypto.getRandomValues(r);
     const temp = Array.from(r, (x) => abc[x % abc.length]).join("");
     const { error } = await admin.auth.admin.updateUserById(target, { password: temp });
-    if (error) return fail("upstream_error", "Réinitialisation impossible : " + error.message, 500);
+    if (error) return fail("upstream_error", "Could not reset the password: " + error.message, 500);
     return json({ password: temp });
   }
 
   const key = Deno.env.get("GEMINI_API_KEY");
-  if (!key) return fail("sampling_disabled", "La clé GEMINI_API_KEY n'est pas configurée sur le serveur.", 500);
+  if (!key) return fail("sampling_disabled", "The GEMINI_API_KEY key is not set on the server.", 500);
 
   // 2. Limite quotidienne par personne (réglable dans la table app_config)
   const { data: count, error: limErr } = await admin.rpc("ai_take", { p_uid: auth.user.id });
-  if (limErr) return fail("upstream_error", "Compteur indisponible : " + limErr.message, 500);
-  if (typeof count === "number" && count < 0) return fail("rate_limited", "Limite d'utilisation de Nova atteinte pour aujourd'hui. Réessaie demain.", 429);
+  if (limErr) return fail("upstream_error", "Usage counter unavailable: " + limErr.message, 500);
+  if (typeof count === "number" && count < 0) return fail("rate_limited", "You have reached today's Nova limit. Please try again tomorrow.", 429);
 
   // 3. Conversation au format Gemini
   const turns: Turn[] = typeof body.input === "string" ? [{ role: "user", content: body.input }]
     : Array.isArray(body.input) ? body.input : [];
-  if (!turns.length) return fail("invalid_request", "Message vide.");
+  if (!turns.length) return fail("invalid_request", "Empty message.");
   const contents: { role: string; parts: Record<string, unknown>[] }[] = [];
   for (const t of turns) {
     const role = t.role === "assistant" ? "model" : "user";
@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
     if (last && last.role === role) last.parts.push({ text });
     else contents.push({ role, parts: [{ text }] });
   }
-  if (contents[0].role !== "user") contents.unshift({ role: "user", parts: [{ text: "Bonjour." }] });
+  if (contents[0].role !== "user") contents.unshift({ role: "user", parts: [{ text: "Hello." }] });
   const lastUser = [...contents].reverse().find((c) => c.role === "user")!;
   for (const im of (body.images ?? []).slice(0, 4)) {
     if (im?.data && /^image\/(jpeg|png|webp|gif)$/.test(im.mime)) lastUser.parts.push({ inline_data: { mime_type: im.mime, data: im.data } });
@@ -110,25 +110,25 @@ Deno.serve(async (req) => {
       } catch (_e) { res = null; break; }
       out = await res.json().catch(() => ({}));
       model = m;
-      console.log(`modèle ${m}, variante ${variant}, statut ${res.status}`);
+      console.log(`model ${m}, variant ${variant}, status ${res.status}`);
       if (res.ok) break;
       if (res.status === 400 && variant === 0) continue;   // ce modèle refuse le réglage « sans réflexion » : on réessaie sans
       break;
     }
     if (res && (res.ok || res.status === 401 || res.status === 403)) break;
   }
-  if (!res) return fail("upstream_error", "Impossible de joindre Gemini.", 502);
+  if (!res) return fail("upstream_error", "Could not reach Gemini.", 502);
   if (!res.ok) {
-    const msg = out?.error?.message ?? `Erreur Gemini ${res.status}`;
-    if (res.status === 429) return fail("rate_limited", "Gemini est saturé ou le quota du projet est atteint. Réessaie dans un moment.", 429);
+    const msg = out?.error?.message ?? `Gemini error ${res.status}`;
+    if (res.status === 429) return fail("rate_limited", "Gemini is busy or the project quota has been reached. Please try again in a moment.", 429);
     if (res.status === 400) return fail("invalid_request", msg, 400);
-    if (res.status === 403 || res.status === 401) return fail("sampling_disabled", "Clé Gemini refusée : " + msg, 500);
+    if (res.status === 403 || res.status === 401) return fail("sampling_disabled", "Gemini key rejected: " + msg, 500);
     return fail("upstream_error", msg, 502);
   }
-  if (out?.promptFeedback?.blockReason) return fail("refused", "Nova ne peut pas répondre à cette demande.", 400);
+  if (out?.promptFeedback?.blockReason) return fail("refused", "Nova cannot answer this request.", 400);
   const cand = out?.candidates?.[0];
-  if (cand?.finishReason === "SAFETY" || cand?.finishReason === "PROHIBITED_CONTENT") return fail("refused", "Nova ne peut pas répondre à cette demande.", 400);
+  if (cand?.finishReason === "SAFETY" || cand?.finishReason === "PROHIBITED_CONTENT") return fail("refused", "Nova cannot answer this request.", 400);
   const text = (cand?.content?.parts ?? []).filter((p: { thought?: boolean }) => !p.thought).map((p: { text?: string }) => p.text ?? "").join("");
-  if (!text.trim()) return fail("empty_completion", "Nova n'a rien répondu. Reformule ta demande.", 502);
+  if (!text.trim()) return fail("empty_completion", "Nova gave no answer. Please rephrase your request.", 502);
   return json({ text, truncated: cand?.finishReason === "MAX_TOKENS", model });
 });

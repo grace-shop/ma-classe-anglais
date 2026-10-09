@@ -79,7 +79,7 @@ begin
   if me is null or public.my_level() <> 2 or not public.peer_enabled() or not public.peer_ok(me) then return; end if;
   select coalesce(data->>'teacherId', '') into mt from docs where path = 'students/' || me::text;
   return query
-    select d.id::uuid, coalesce(d.data->>'name', 'Élève'), coalesce(d.data->>'classe', ''), coalesce(d.data->>'teacherId', '') = coalesce(mt, '')
+    select d.id::uuid, coalesce(d.data->>'name', 'Student'), coalesce(d.data->>'classe', ''), coalesce(d.data->>'teacherId', '') = coalesce(mt, '')
     from docs d
     where d.col = 'students' and d.id <> me::text
       and d.id ~ '^[0-9a-fA-F-]{36}$' and public.peer_ok(d.id::uuid)
@@ -91,28 +91,28 @@ create or replace function public.send_peer_message(p_to uuid, p_body text, p_at
 language plpgsql security definer set search_path = public as $$
 declare me uuid := auth.uid(); b text := btrim(coalesce(p_body, '')); n int; id uuid; k text; a jsonb := null;
 begin
-  if me is null or public.my_level() <> 2 then raise exception 'Accès refusé'; end if;
-  if not public.peer_enabled() then raise exception 'Le chat entre élèves est désactivé par ta professeure'; end if;
-  if p_to = me then raise exception 'Tu ne peux pas t''écrire à toi-même'; end if;
-  if not public.peer_ok(me) then raise exception 'Le chat est désactivé pour ton compte'; end if;
-  if not public.peer_ok(p_to) then raise exception 'Cet élève ne peut pas recevoir de messages'; end if;
+  if me is null or public.my_level() <> 2 then raise exception 'Access denied'; end if;
+  if not public.peer_enabled() then raise exception 'Your teacher has turned off chat between students'; end if;
+  if p_to = me then raise exception 'You cannot write to yourself'; end if;
+  if not public.peer_ok(me) then raise exception 'Chat is turned off for your account'; end if;
+  if not public.peer_ok(p_to) then raise exception 'This student cannot receive messages'; end if;
   if p_att is not null and jsonb_typeof(p_att) = 'object' then
     k := p_att->>'k';
     if k = 'sticker' then
-      if coalesce(p_att->>'e', '') !~ '^[0-9a-f-]{2,60}$' then raise exception 'Sticker invalide'; end if;
+      if coalesce(p_att->>'e', '') !~ '^[0-9a-f-]{2,60}$' then raise exception 'Invalid sticker'; end if;
       a := jsonb_build_object('k', 'sticker', 'e', p_att->>'e');
     elsif k in ('voice', 'img', 'file') then
-      if coalesce(p_att->>'p', '') not like me::text || '/%' then raise exception 'Fichier invalide'; end if;
+      if coalesce(p_att->>'p', '') not like me::text || '/%' then raise exception 'Invalid file'; end if;
       a := jsonb_build_object('k', k, 'p', p_att->>'p', 't', left(coalesce(p_att->>'t', ''), 120), 'n', left(coalesce(p_att->>'n', ''), 80),
                               's', coalesce((p_att->>'s')::bigint, 0), 'd', coalesce((p_att->>'d')::int, 0));
-    else raise exception 'Pièce jointe invalide'; end if;
+    else raise exception 'Invalid attachment'; end if;
   end if;
-  if char_length(b) < 1 and a is null then raise exception 'Message vide'; end if;
-  if char_length(b) > 1000 then raise exception 'Message trop long (1000 caractères maximum)'; end if;
+  if char_length(b) < 1 and a is null then raise exception 'Empty message'; end if;
+  if char_length(b) > 1000 then raise exception 'Message too long (1000 characters maximum)'; end if;
   select count(*) into n from peer_messages where sender = me and created_at > now() - interval '1 minute';
-  if n >= 15 then raise exception 'Tu écris trop vite : attends une minute'; end if;
+  if n >= 15 then raise exception 'You are writing too fast: wait one minute'; end if;
   select count(*) into n from peer_messages where sender = me and created_at > now() - interval '1 day';
-  if n >= 400 then raise exception 'Limite de messages atteinte pour aujourd''hui'; end if;
+  if n >= 400 then raise exception 'Daily message limit reached'; end if;
   insert into peer_messages(sender, receiver, body, att) values (me, p_to, b, a) returning peer_messages.id into id;
   return id;
 end $$;
