@@ -2728,10 +2728,14 @@ button.scanimg{border:0;padding:0;background:none;cursor:zoom-in;display:block}
 .v4voice.on .v4bars .v4b:nth-child(3n){animation-delay:.2s}.v4voice.on .v4bars .v4b:nth-child(3n+1){animation-delay:.45s}
 @keyframes v4eq{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
 .v4voice small{opacity:.75;font-family:var(--f-mono);font-size:.78rem}
-.v4rec{display:flex;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--line);background:var(--surface)}
+.v4rec{display:flex;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--line);background:var(--surface);min-width:0}
+.chat{grid-template-columns:minmax(0,1fr)!important}.chat>*{min-width:0}.chatbar.v4bar{min-width:0}
+.v4rec .btn{flex:none;padding-inline:16px}.v4rec .iconbtn{flex:none}
+@media (max-width:460px){.v4rec-l{display:none}.v4wave i:nth-child(n+9){display:none}}
+body:has(.glass.chat) #aiFab{display:none!important}
 .v4rec b{white-space:nowrap}.v4rec-dot{width:12px;height:12px;border-radius:50%;background:#E5484D;animation:v4blink 1s infinite}
 @keyframes v4blink{50%{opacity:.25}}
-.v4wave{display:flex;gap:3px;align-items:center;flex:1;height:24px;color:#E5484D;overflow:hidden}
+.v4wave{display:flex;gap:3px;align-items:center;flex:1 1 0;min-width:0;height:24px;color:#E5484D;overflow:hidden}
 .v4wave i{width:3px;height:100%;background:currentColor;border-radius:2px;animation:v4eq .7s ease-in-out infinite alternate}
 .v4wave i:nth-child(2n){animation-delay:.25s}.v4wave i:nth-child(3n){animation-delay:.5s}
 .msg .v4voice,.msg .v4file,.msg .v4img,.msg .v4stk{white-space:normal}
@@ -2865,7 +2869,7 @@ const v4Stickers=()=>{const own=(S.me&&S.me.owned)||{},all=[...V4STK];if(typeof 
 const v4LockedPacks=()=>{if(typeof SH_PACKS==="undefined"||S.mode!=="student")return[];const own=(S.me&&S.me.owned)||{};return SH_PACKS.filter(pk=>!own[pk.id])};
 const V4IN=k=>({peer:"peerInput",chat:"chatInput",staff:"staffInput"})[k]||"chatInput",V4F=k=>({peer:"peerchat",chat:"chat",staff:"staffchat"})[k]||"chat";
 function v4Bar(kind,target,ph){const inId=V4IN(kind),files=!!window.__chatFiles,rec=V4.rec&&V4.rec.kind===kind?V4.rec:null,pan=V4.panel&&V4.panel.kind===kind?V4.panel.t:null,busy=V4.sending||(kind==="peer"&&PR.sending);
-  if(rec)return`<div class="v4rec" role="status"><span class="v4rec-dot" aria-hidden="true"></span><b>Enregistrement <span id="v4recT">${fmtDur(rec.sec)}</span></b><span class="v4wave" aria-hidden="true">${"<i></i>".repeat(18)}</span><button type="button" class="iconbtn" data-v4="recCancel" aria-label="Annuler le vocal" title="Annuler">${ic("trash")}</button><button type="button" class="btn sm" data-v4="recSend" aria-label="Envoyer le vocal">${ic("send")}</button></div>`;
+  if(rec)return`<div class="v4rec" role="status"><span class="v4rec-dot" aria-hidden="true"></span><b><span class="v4rec-l">Enregistrement </span><span id="v4recT">${fmtDur(rec.sec)}</span></b><span class="v4wave" aria-hidden="true">${"<i></i>".repeat(18)}</span><button type="button" class="iconbtn" data-v4="recCancel" aria-label="Annuler le vocal" title="Annuler">${ic("trash")}</button><button type="button" class="btn sm" data-v4="recSend" aria-label="Envoyer le vocal">${ic("send")}Envoyer</button></div>`;
   return`${pan?v4PanelHTML(kind,pan):""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Envoi en cours…</div>`:""}<form class="chatbar v4bar" data-f="${V4F(kind)}" data-s="${esc(target)}">
   <button type="button" class="iconbtn${pan?" on":""}" data-v4="panel" data-k="${kind}" data-t="${pan||"emo"}" aria-label="Emojis et stickers" title="Emojis et stickers">${ic("smile")}</button>
   <input id="${inId}" placeholder="${esc(ph||"Écris un message…")}" maxlength="1000" autocomplete="off" aria-label="Message">
