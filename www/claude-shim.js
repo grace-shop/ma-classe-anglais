@@ -460,14 +460,26 @@
   /* site web : quand une nouvelle version est en ligne, on propose de recharger */
   if (!isNative() && "serviceWorker" in navigator && location.protocol.startsWith("http")) {
     let reloading = false;
-    const offer = () => { if (UPD.shown) return; UPD.shown = true; updBox("New version available", "English Classes has been improved. Tap the button to get the new version.", "Update now", () => { reloading = true; location.reload(); }); };
+    const offer = () => { if (UPD.shown) return; UPD.shown = true; updBox("New version available", "English Classes has been improved. Tap the button to get the new version.", "Update now", () => { reloading = true; location.replace(location.pathname + "?v=" + Date.now() + location.hash); }); };
     const watch = (reg) => {
       if (!reg) return;
       reg.addEventListener("updatefound", () => { const w = reg.installing; if (w) w.addEventListener("statechange", () => { if (w.state === "activated" && navigator.serviceWorker.controller && !reloading) offer(); }); });
     };
     navigator.serviceWorker.getRegistration().then(watch).catch(() => {});
-    window.__swCheck = async (manual) => { try { const reg = await navigator.serviceWorker.getRegistration(); if (reg) { await reg.update(); watch(reg); } const v = await (await fetch("version.json?t=" + Date.now(), { cache: "no-store" })).json(); const cur = window.__appBuild || v.build; window.__appBuild = cur; if (v.build > cur) offer(); else if (manual) updBox("You are up to date", "You already have the latest version of English Classes.", "OK", (d) => d.remove(), false); } catch (e) {} };
-    fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then((r) => r.json()).then((v) => { window.__appBuild = v.build; }).catch(() => {});
+    const fresh = (b) => { reloading = true; location.replace(location.pathname + "?v=" + b + location.hash); };
+    const offer2 = (b) => { if (UPD.shown) return; UPD.shown = true; updBox("New version available", "English Classes has been improved. Tap the button to get the new version.", "Update now", () => fresh(b)); };
+    const t0 = Date.now();
+    window.__swCheck = async (manual) => { try {
+      const reg = await navigator.serviceWorker.getRegistration(); if (reg) { reg.update().catch(() => {}); watch(reg); }
+      const v = await (await fetch("version.json?t=" + Date.now(), { cache: "no-store" })).json();
+      const pb = window.__pageBuild || 0, cur = pb || (window.__appBuild != null ? window.__appBuild : v.build); window.__appBuild = cur;
+      if (v.build > cur) {
+        let tried = ""; try { tried = sessionStorage.getItem("ec_upd") || ""; } catch (e) {}
+        if (pb && Date.now() - t0 < 20000 && tried !== String(v.build)) { try { sessionStorage.setItem("ec_upd", String(v.build)); } catch (e) {} fresh(v.build); }   // old copy opened: load the new one at once
+        else offer2(v.build);
+      } else if (manual) updBox("You are up to date", "You already have the latest version of English Classes.", "OK", (d) => d.remove(), false);
+    } catch (e) {} };
+    window.__swCheck(false);
     setInterval(() => window.__swCheck(false), 30 * 60000);
     document.addEventListener("visibilitychange", () => { if (!document.hidden) window.__swCheck(false); });
   }

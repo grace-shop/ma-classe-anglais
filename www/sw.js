@@ -1,25 +1,31 @@
-/* Ma Classe d'Anglais — cache hors-ligne des fichiers de l'application */
-const V = "mca-v4";
+/* English Classes — offline cache of the app files */
+const V = "mca-v5";
 const CORE = ["./", "index.html", "config.js", "claude-shim.js", "manifest.webmanifest", "vendor/three.min.js", "vendor/supabase.js", "icons/icon-192.png"];
-self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => Promise.all(CORE.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting())); });
+self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => Promise.all(CORE.map((u) => c.add(new Request(u, { cache: "reload" })).catch(() => {})))).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== V && !k.startsWith("mca-files")).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
+const keyOf = (u) => { const x = new URL(u); x.search = ""; x.hash = ""; return x.href; };   // "?v=123" and plain URL share one cached copy
 self.addEventListener("fetch", (e) => {
   const u = new URL(e.request.url);
-  if (e.request.method === "GET" && /(^|\.)cdn\.jsdelivr\.net$/.test(u.hostname) && /supabase/.test(u.pathname)) {   // librairie de connexion : cache d'abord, pour démarrer sans réseau
+  if (e.request.method === "GET" && /(^|\.)cdn\.jsdelivr\.net$/.test(u.hostname) && /supabase/.test(u.pathname)) {   // login library: cache first, to start without network
     e.respondWith(caches.match(e.request).then((r) => r || fetch(e.request).then((res) => { const c = res.clone(); caches.open(V).then((ca) => ca.put(e.request, c)); return res; })));
     return;
   }
-  if (e.request.method === "GET" && /\.supabase\.co$/.test(u.hostname) && /\/storage\/v1\/object\/(public|sign)\//.test(u.pathname)) {   // sujets d'épreuves, images, PDF : gardés après la 1re ouverture
+  if (e.request.method === "GET" && /\.supabase\.co$/.test(u.hostname) && /\/storage\/v1\/object\/(public|sign)\//.test(u.pathname)) {   // exam papers, pictures, PDF: kept after the first opening
     e.respondWith(caches.open(V).then((ca) => ca.match(e.request).then((r) => r || fetch(e.request).then((res) => { if (res.ok) ca.put(e.request, res.clone()); return res; }))));
     return;
   }
-  if (e.request.method !== "GET" || u.origin !== location.origin) return;          // Supabase, Gemini, polices : toujours en ligne
+  if (e.request.method !== "GET" || u.origin !== location.origin) return;          // Supabase, Gemini, fonts: always online
+  if (/version\.json$/.test(u.pathname)) return;                                     // version check: always the server
   const isStatic = /\/(img|vendor|icons)\//.test(u.pathname);
-  if (isStatic) {                                                                    // images 3D : cache d'abord
+  if (isStatic) {                                                                    // 3D pictures: cache first
     e.respondWith(caches.match(e.request).then((r) => r || fetch(e.request).then((res) => { const c = res.clone(); caches.open(V).then((ca) => ca.put(e.request, c)); return res; })));
-  } else {                                                                           // page et scripts : réseau d'abord
-    const net = fetch(e.request).then((res) => { const c = res.clone(); caches.open(V).then((ca) => ca.put(e.request, c)); return res; });
-    const slow = new Promise((resolve) => setTimeout(() => caches.match(e.request).then((r) => resolve(r || null)), 3500));   // réseau trop lent : on ouvre la copie gardée
-    e.respondWith(Promise.race([net.catch(() => null), slow]).then((r) => r || net.catch(() => caches.match(e.request))));
+    return;
   }
+  // page and scripts: network first, never the browser's HTTP cache
+  const key = keyOf(e.request.url), forced = u.searchParams.has("v");
+  const net = fetch(e.request.url, { cache: "no-store", credentials: "same-origin" }).then((res) => { if (res.ok) { const c = res.clone(); caches.open(V).then((ca) => ca.put(key, c)); } return res; });
+  const old = () => caches.match(key).then((r) => r || caches.match(e.request));
+  if (forced) { e.respondWith(net.catch(old)); return; }                             // "?v=…": the user asked for the new version, wait for it
+  const slow = new Promise((resolve) => setTimeout(() => old().then((r) => resolve(r || null)), 6000));   // network too slow: open the saved copy
+  e.respondWith(Promise.race([net.catch(() => null), slow]).then((r) => r || net.catch(old)));
 });

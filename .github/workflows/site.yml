@@ -23,6 +23,8 @@ jobs:
         run: |
           echo "{\"build\": $(git rev-list --count HEAD), \"sha\": \"${GITHUB_SHA::7}\"}" > www/version.json
           cat www/version.json
+          sed -i "s/window.__pageBuild=0;/window.__pageBuild=$(git rev-list --count HEAD);/" www/index.html
+          grep -o "window.__pageBuild=[0-9]*" www/index.html
       - name: Publier sur la branche gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
