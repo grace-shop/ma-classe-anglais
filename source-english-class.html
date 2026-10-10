@@ -3717,7 +3717,7 @@ document.addEventListener("change",e=>{const el=e.target;if(!el||!el.id)return;
       else if(/^image\//.test(f.type))F.files.push({file:f,url:URL.createObjectURL(f),kind:"img"})}render()})()}
   if(el.id==="fsc_file"){const f=el.files&&el.files[0];el.value="";e.stopPropagation();if(!f||!F.sc)return;(async()=>{let d=0;if(/^video\//.test(f.type)){const chk=await fVideoCheck(f,60);if(!chk)return;d=chk.d}else if(!/^image\//.test(f.type))return;
       if(F.sc.url)URL.revokeObjectURL(F.sc.url);F.sc.text=(document.getElementById("fsc_text")||{}).value||"";F.sc.file=f;F.sc.url=URL.createObjectURL(f);F.sc.video=/^video\//.test(f.type);F.sc.d=d;feedSync()})()}},true);
-document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||!f.dataset.ff)return;e.preventDefault();e.stopImmediatePropagation();
+document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||!["post","com","srep"].includes(f.dataset.ff))return;e.preventDefault();e.stopImmediatePropagation();
   if(f.dataset.ff==="post")fPost();
   else if(f.dataset.ff==="com")fComment(f.dataset.id,f.querySelector("input"));
   else if(f.dataset.ff==="srep"){const c=fCur(),inp=document.getElementById("fsv_rep"),t=(inp&&inp.value||"").trim();if(!c||!t)return;inp.value="";
@@ -3898,7 +3898,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"vplay":vPlay(el.dataset.p,el.dataset.t);return;
   case"nOpen":S.view={type:"notifs"};S.animate=true;scrollTo(0,0);render();return;
   case"nGo":nGo(id);return;
-  case"nPerm":if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()){Promise.resolve(notifEnable()).then(render)}else if("Notification"in window)Notification.requestPermission().then(p=>{if(p==="granted")toast("Notifications are on","check");render()});return;
+  case"nPerm":nAskPerm();return;
   }},true);
 document.addEventListener("input",e=>{if(e.target&&e.target.id==="fsh_q"&&F.share){F.share.q=e.target.value;const h=document.getElementById("fsvhost");if(h)h._h="";feedSync()}});
 {const st=document.createElement("style");st.textContent=`
@@ -3928,6 +3928,147 @@ document.addEventListener("input",e=>{if(e.target&&e.target.id==="fsh_q"&&F.shar
 .fsv-bot{row-gap:10px}
 .nbig{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--surface2)}
 .it.nun{background:color-mix(in srgb,var(--ink-soft) 55%,transparent)}.ndot{width:10px;height:10px;border-radius:50%;background:#34B7F1;flex:none;margin-left:auto;align-self:center}
+`;document.head.appendChild(st)}
+
+/* =====================================================================
+   21. Sounds for notifications, Settings & security, block, report
+   ===================================================================== */
+const NP_DEF={sound:"1",vib:"1",push:"1"};
+const nPref=k=>{try{const v=localStorage.getItem("ec_np_"+k);return(v==null?NP_DEF[k]:v)==="1"}catch(e){return NP_DEF[k]==="1"}};
+const nPrefSet=(k,on)=>{try{localStorage.setItem("ec_np_"+k,on?"1":"0")}catch(e){}};
+function nAudio(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;V4.ac=V4.ac||new C();if(V4.ac.state==="suspended")V4.ac.resume();return V4.ac}catch(e){return null}}
+document.addEventListener("pointerdown",()=>{nAudio()},{once:true,capture:true});
+function nTone(ctx,f,t0,len,vol){const o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.setValueAtTime(f,t0);g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t0+len);o.connect(g).connect(ctx.destination);o.start(t0);o.stop(t0+len+0.05)}
+function nSound(kind,soft){if(nPref("vib")&&!soft&&navigator.vibrate){try{navigator.vibrate(/msg|story_reply|staff/.test(kind)?[70,50,70]:90)}catch(e){}}
+  if(!nPref("sound"))return;const ctx=nAudio();if(!ctx)return;const t=ctx.currentTime+0.02;
+  if(soft){nTone(ctx,1046,t,0.12,0.08);return}
+  if(/msg|story_reply|staff/.test(kind)){nTone(ctx,880,t,0.16,0.22);nTone(ctx,1318,t+0.13,0.22,0.2)}       // message: two quick notes
+  else if(kind==="report"){nTone(ctx,660,t,0.2,0.22);nTone(ctx,660,t+0.25,0.2,0.22)}
+  else{nTone(ctx,1174,t,0.28,0.16);nTone(ctx,1568,t+0.06,0.32,0.08)}}                                  // reactions, comments: soft chime
+{const _na=nArrive;nArrive=function(n){try{nSound(n.kind,nViewing(n))}catch(e){}return _na(n)}}
+{const _t=nTitle,_b=nBody;nTitle=n=>n.kind==="report"?(nName(n)+" reported something"):_t(n);nBody=n=>n.kind==="report"?(`Reason: ${n.body||"—"} · tap to check`):_b(n)}
+{const _g=nGo;nGo=function(id){const n=N.list.find(x=>String(x.id)===String(id));if(n&&String(n.ref||"").startsWith("report:")&&S.mode==="teacher"){if(!n.read_at){n.read_at=new Date().toISOString();window.__notif.read([n.id]).catch(()=>{})}S.view=null;S.tab="msgs";S.msgsTab="community";SF.rep=null;scrollTo(0,0);render();return}return _g(id)}}
+/* phone notifications with sound (Android app: its own "Messages" channel) */
+const isNat=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+async function nNativeInit(ask){const P=typeof LN==="function"?LN():null;if(!P)return"unsupported";try{let r=await P.checkPermissions();if(r.display!=="granted"&&ask)r=await P.requestPermissions();N.nperm=r.display;
+  if(r.display==="granted"&&!N.chan){N.chan=1;try{await P.createChannel({id:"messages",name:"Messages and activity",description:"Messages, comments and reactions",importance:5,visibility:1,vibration:true,lights:true})}catch(e){}}return r.display}catch(e){return"unsupported"}}
+if(isNat())setTimeout(()=>nNativeInit(false),3000);
+nSys=async function(title,body,tag){try{if(!nPref("push"))return;
+  if(isNat()){const P=LN();if(!P)return;if(N.nperm!=="granted")await nNativeInit(false);if(N.nperm!=="granted")return;await P.schedule({notifications:[{id:nid(tag+title+body+Date.now()),title,body,channelId:"messages",schedule:{at:new Date(Date.now()+300)}}]});return}
+  if(!("Notification" in window)||Notification.permission!=="granted")return;
+  const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();const o={body,tag:"ec-"+tag,renotify:true,icon:"icons/icon-192.png",badge:"icons/icon-192.png",vibrate:nPref("vib")?[80,50,80]:undefined,silent:!nPref("sound")};
+  if(r&&r.showNotification)r.showNotification(title,o);else new Notification(title,o)}catch(e){}};
+nPermState=function(){if(isNat())return N.nperm==="granted"?"granted":N.nperm==="denied"?"denied":"default";return"Notification"in window?Notification.permission:"unsupported"};
+async function nAskPerm(){if(isNat()){const r=await nNativeInit(true);if(r==="granted"){nPrefSet("push",true);toast("Phone notifications are on","check")}else toast("Allow notifications for English Classes in your phone settings.","x")}
+  else if("Notification"in window){const p=await Notification.requestPermission();if(p==="granted"){nPrefSet("push",true);toast("Notifications are on","check")}}render()}
+/* ---------------- blocked people ---------------- */
+const BL={set:new Set(),loaded:false,uid:null};
+async function blLoad(){if(!window.__safety||!S.uid)return;BL.uid=S.uid;try{const r=await window.__safety.blocks();BL.set=new Set(r.map(x=>x.blocked));BL.loaded=true;fApplyBlocks();render()}catch(e){}}
+setInterval(()=>{if(S.uid&&(!BL.loaded||BL.uid!==S.uid)&&window.__safety)blLoad()},5000);
+function fApplyBlocks(){if(!BL.set.size)return;F.posts=F.posts.filter(p=>!BL.set.has(p.author));F.stories=F.stories.filter(s=>!BL.set.has(s.author));for(const k in F.comments)F.comments[k]=F.comments[k].filter(c=>!BL.set.has(c.author))}
+{const _fl=feedLoad;feedLoad=async function(more){await _fl(more);if(BL.set.size){fApplyBlocks();render()}}}
+async function blSet(uid,on,name){try{await window.__safety.block(uid,on);if(on)BL.set.add(uid);else BL.set.delete(uid);try{const k="ec_bln_"+S.uid,m=JSON.parse(localStorage.getItem(k)||"{}");if(on)m[uid]=name||m[uid]||"";localStorage.setItem(k,JSON.stringify(m))}catch(e){}
+  toast(on?`${name||"This person"} is blocked`:`${name||"This person"} is unblocked`,on?"lock":"check");if(on){fApplyBlocks();if(S.view?.type==="peer"&&S.view.id===uid){S.view={type:"peers"};PR.with=null}peerRefresh&&peerOn()&&peerRefresh()}render()}
+  catch(e){toast(e.message||"Could not change it","x")}}
+const blName=uid=>{try{return JSON.parse(localStorage.getItem("ec_bln_"+S.uid)||"{}")[uid]||""}catch(e){return""}};
+/* ---------------- reports ---------------- */
+const SF={rep:null,reports:null,repLoading:false,safety:null,pw:false};
+const REASONS=["Bullying or insults","Inappropriate photo or video","Spam or fake","Something else"];
+function repHTML(){const r=SF.safety;if(!r)return"";
+  if(r.step==="menu")return`<div class="v4sheet-bg fz" data-v4="sfX"></div><div class="v4sheet fz"><b>${esc(r.name||"Options")}</b>
+    <button type="button" data-v4="sfReport">${ic("shield")}Report to the teachers</button>
+    ${r.target&&r.target!==S.uid&&S.mode==="student"?`<button type="button" class="danger" data-v4="sfBlock">${ic("lock")}Block ${esc(String(r.name||"this person").split(" ")[0])}</button>`:""}
+    <button type="button" class="v4cancel" data-v4="sfX">Cancel</button></div>`;
+  return`<div class="v4sheet-bg fz" data-v4="sfX"></div><form class="v4sheet fz" data-ff="rep"><b>Why are you reporting this?</b><p class="small muted" style="margin:0">Only the teachers will see your report. ${esc(r.name||"The person")} will not know it was you.</p>
+    ${REASONS.map((x,i)=>`<label class="sfr"><input type="radio" name="sf_reason" value="${esc(x)}" ${i===0?"checked":""}> ${esc(x)}</label>`).join("")}
+    <textarea id="sf_more" rows="2" maxlength="300" placeholder="Tell us more (optional)"></textarea>
+    <button class="btn" type="submit" ${r.busy?"disabled":""}>${r.busy?"Sending…":"Send the report"}</button><button type="button" class="v4cancel" data-v4="sfX">Cancel</button></form>`}
+{const _fs=feedSync;feedSync=function(){_fs();let h=document.getElementById("sfhost");if(!h){h=document.createElement("div");h.id="sfhost";document.body.appendChild(h)}const x=repHTML();if(h._h!==x){h._h=x;h.innerHTML=x}}}
+{const _l2=v4ChatLayout;v4ChatLayout=function(){_l2();if(SF.safety||document.getElementById("sfhost")?._h)feedSync()}}
+function sfOpen(o){SF.safety={step:"menu",...o};clearTimeout(F.svT);feedSync()}
+/* post menu (⋯) for other people's posts, and story / message options */
+{const _ph=fPostHTML;fPostHTML=function(p){let h=_ph(p);if(p.author!==S.uid&&!p.deleted_at){const b=`<button type="button" class="iconbtn sm" data-v4="sfPost" data-id="${esc(p.id)}" aria-label="More options" title="More">⋯</button>`;h=h.replace(/(<\/div>)(<\/header>|\s*<\/header>)/,`$1${b}$2`)}return h}}
+{const _sh=fStoryHTML;fStoryHTML=function(){let h=_sh();const c=fCur();if(c&&c.g.uid!==S.uid)h=h.replace('<button type="button" class="iconbtn" data-v4="fSvClose"',`<button type="button" class="iconbtn" data-v4="sfStory" aria-label="More options">⋯</button><button type="button" class="iconbtn" data-v4="fSvClose"`);return h}}
+{const _as=v4ActSheet;v4ActSheet=function(kind,list,c){let h=_as(kind,list,c);const raw=list.find(x=>x.id===(V4.act&&V4.act.id));if(kind==="peer"&&raw&&raw.sender!==S.uid)h=h.replace('<button type="button" class="v4cancel"',`<button type="button" data-v4="sfMsg">${ic("shield")}Report or block</button><button type="button" class="v4cancel"`);return h}}
+/* teachers: reports list at the top of the Community tab */
+async function repLoad(){if(SF.repLoading||!window.__safety)return;SF.repLoading=true;SF.reports=await window.__safety.reports().catch(()=>[]);SF.repLoading=false;render()}
+function repListHTML(){if(!fStaff())return"";if(SF.reports===null&&!SF.repLoading)repLoad();const L=(SF.reports||[]).filter(r=>!r.done_at);if(!L.length)return"";
+  return`<div class="section fwrap"><div class="glass card frep"><div class="row between"><b>${ic("shield")} Reports to check · ${L.length}</b></div>${L.slice(0,30).map(r=>`<div class="frep-it"><div><b>${esc(r.who?.name||"A student")}</b> reported ${r.target_who?.name?`<b>${esc(r.target_who.name)}</b>`:"something"} <span class="chip warn">${esc(r.kind)}</span><small class="muted"> · ${ago(+new Date(r.created_at))}</small></div><div class="small">${esc(r.reason||"")}</div>${r.excerpt?`<div class="small muted">“${esc(r.excerpt)}”</div>`:""}<div class="row">${r.kind==="post"?`<button type="button" class="btn ghost sm" data-v4="fJump" data-id="${esc(r.ref_id)}">See the post</button>`:""}<button type="button" class="btn ghost sm" data-v4="repDone" data-id="${r.id}">${ic("check")}Done</button></div></div>`).join("")}</div></div>`}
+{const _fv=feedView;feedView=function(emb){const h=_fv(emb);const r=repListHTML();if(!r)return h;const i=h.indexOf('<div class="section frail-wrap">');return i>0?h.slice(0,i)+r+h.slice(i):r+h}}
+/* ---------------- Settings & security page ---------------- */
+function devName(){const u=navigator.userAgent||"";const os=/android/i.test(u)?"Android":/iphone|ipad/i.test(u)?"iPhone":/windows/i.test(u)?"Windows":/mac os/i.test(u)?"Mac":/linux/i.test(u)?"Linux":"Device";return isNat()?`English Classes app · ${os}`:`${/edg/i.test(u)?"Edge":/chrome|crios/i.test(u)?"Chrome":/firefox/i.test(u)?"Firefox":/safari/i.test(u)?"Safari":"Browser"} · ${os}`}
+function pwScore(p){let s=0;if(p.length>=8)s++;if(p.length>=12)s++;if(/[a-z]/i.test(p)&&/\d/.test(p))s++;if(/[^a-z0-9]/i.test(p)||(/[a-z]/.test(p)&&/[A-Z]/.test(p)))s++;return Math.min(s,4)}
+const swHTML=(k,on,label,sub)=>`<div class="secrow"><div><b>${label}</b>${sub?`<small>${sub}</small>`:""}</div><button type="button" class="v4sw${on?" on":""}" role="switch" aria-checked="${on}" aria-label="${esc(label)}" data-v4="secTog" data-k="${k}"><i></i></button></div>`;
+function secView(){const A=window.__account?window.__account.info():{},me=S.mode==="student"?S.me:null,student=S.mode==="student"&&me&&!isParent(me),perm=nPermState(),bl=[...BL.set];
+  return`<div class="section" style="max-width:640px;margin-inline:auto">${backBtn()}<div class="row"><span class="nbig">${ic("shield")}</span><div><span class="eyebrow">Your account</span><h2>Settings & security</h2></div></div></div>
+  <div class="section secwrap">
+  <div class="glass card sec"><h3>${ic("user")} Account</h3>
+    <div class="secrow"><div><b>Name</b><small>${esc((me&&me.name)||(S.staff||[]).find(x=>x.id===S.uid)?.name||S.who?.name||"—")}</small></div></div>
+    <div class="secrow"><div><b>${A.phone?"Phone number":"E-mail"}</b><small>${esc(A.phone?("+228 "+A.phone.replace(/^228/,"").replace(/(\d{2})(?=\d)/g,"$1 ")):A.email||"—")}</small></div></div>
+    <div class="secrow"><div><b>Member since</b><small>${A.created?new Date(A.created).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}):"—"}</small></div><div><b>Last login</b><small>${A.last?ago(+new Date(A.last)):"—"}</small></div></div></div>
+  <form class="glass card sec" data-ff="pwd"><h3>${ic("lock")} Change my password</h3>
+    <label>Current password<input id="pw_cur" type="${SF.pw?"text":"password"}" autocomplete="current-password" required></label>
+    <label>New password<input id="pw_new" type="${SF.pw?"text":"password"}" autocomplete="new-password" minlength="8" required></label>
+    <div class="pwbar" id="pw_bar"><i></i><i></i><i></i><i></i><span>Use 8 characters or more, with letters and numbers.</span></div>
+    <label>Repeat the new password<input id="pw_new2" type="${SF.pw?"text":"password"}" autocomplete="new-password" minlength="8" required></label>
+    <label class="seccheck"><input type="checkbox" id="pw_others" checked> Log me out of my other phones and computers</label>
+    <div class="row between"><button type="button" class="btn ghost sm" data-v4="pwShow">${ic("eye")}${SF.pw?"Hide":"Show"}</button><button class="btn" type="submit" ${SF.pwBusy?"disabled":""}>${SF.pwBusy?"Saving…":"Change password"}</button></div>
+    <p class="small muted" style="margin:0">Forgot your current password? ${S.mode==="student"?"Ask your teacher: she can give you a new one from your profile.":"Log out and use “Forgot password?” on the login page."}</p></form>
+  <div class="glass card sec"><h3>${ic("users")} Where you are logged in</h3>
+    <div class="secrow"><div><b>This device</b><small>${esc(devName())} · active now</small></div><span class="chip ok">Now</span></div>
+    <div class="secrow"><div><b>Other phones and computers</b><small>Someone else knows your password? Log them out now, then change your password.</small></div></div>
+    <button type="button" class="btn ghost sm" data-v4="secOthers">${ic("x")}Log out of all other devices</button></div>
+  <div class="glass card sec"><h3>${BELL} Notifications</h3>
+    ${swHTML("sound",nPref("sound"),"Sound","Play a sound for new messages and activity")}
+    ${swHTML("vib",nPref("vib"),"Vibration","The phone vibrates for new messages")}
+    ${perm==="unsupported"?"":perm==="granted"?swHTML("push",nPref("push"),"Phone notifications","Show notifications when the app is in the background"):`<div class="secrow"><div><b>Phone notifications</b><small>${perm==="denied"?"Blocked: allow them in your phone or browser settings.":"Get notified even when you use another app."}</small></div>${perm==="denied"?"":`<button type="button" class="btn sm" data-v4="nPerm">Turn on</button>`}</div>`}
+    <button type="button" class="btn ghost sm" data-v4="secTest">${ic("speaker")}Test the sound</button></div>
+  ${student?`<div class="glass card sec"><h3>${ic("shield")} Privacy</h3>
+    ${swHTML("peer",me.peerOff!==true,"Classmates can send me messages","If you turn this off, classmates cannot write to you")}
+    <div class="secrow"><div><b>Who sees my posts and stories</b><small>Students and teachers of your school. Parents cannot see them.</small></div></div>
+    <div><b class="small">Blocked people</b>${bl.length?bl.map(u=>`<div class="secrow"><div class="row">${avatar(u,blName(u)||"?",32)}<span>${esc(blName(u)||"Blocked person")}</span></div><button type="button" class="btn ghost sm" data-v4="secUnblock" data-id="${u}">Unblock</button></div>`).join(""):`<p class="small muted" style="margin:4px 0 0">Nobody. To block someone, open their message or post and choose “Report or block”.</p>`}</div></div>`:""}
+  <div class="glass card sec sectips"><h3>${ic("star")} Stay safe</h3><ul class="small"><li>Never give your password to anyone, not even a friend.</li><li>Do not share your phone number or address in posts.</li><li>Someone is mean to you? Block them and report it: your teachers will help.</li></ul></div>
+  </div>`}
+{const _sv3=studentView;studentView=function(){if(S.view?.type==="security")return secView();return _sv3()}}
+{const _tv3=teacherView;teacherView=function(){if(S.view?.type==="security")return secView();return _tv3()}}
+{const _th=themeHTML;themeHTML=function(){return`<div class="section"><button type="button" class="glass card secentry" data-v4="secOpen"><span class="nbig">${ic("shield")}</span><span><b>Settings & security</b><small>Password, devices, notifications${S.mode==="student"&&S.me&&!isParent(S.me)?", privacy and blocked people":""}</small></span>${ic("right")}</button></div>`+_th()}}
+async function pwSubmit(f){const cur=f.querySelector("#pw_cur").value,n1=f.querySelector("#pw_new").value,n2=f.querySelector("#pw_new2").value,oth=f.querySelector("#pw_others").checked;
+  if(n1.length<8){toast("The new password needs at least 8 characters.","x");return}if(pwScore(n1)<2){toast("Too easy to guess: mix letters and numbers.","x");return}if(n1!==n2){toast("The two new passwords are not the same.","x");return}if(n1===cur){toast("Choose a new password, different from the old one.","x");return}
+  SF.pwBusy=true;render();try{await window.__account.changePassword(cur,n1,oth);toast("Password changed! Remember it well.","lock");for(const id of["pw_cur","pw_new","pw_new2"])delete S.drafts[id];SF.pw=false}catch(e){toast(e.message||"Cannot change the password.","x")}SF.pwBusy=false;render()}
+document.addEventListener("input",e=>{if(e.target&&e.target.id==="pw_new"){const s=pwScore(e.target.value),b=document.getElementById("pw_bar");if(b){b.dataset.s=s;b.querySelector("span").textContent=!e.target.value?"Use 8 characters or more, with letters and numbers.":["Too weak","Weak","OK","Good","Strong"][s]}}});
+document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset)return;
+  if(f.dataset.ff==="pwd"){e.preventDefault();e.stopImmediatePropagation();pwSubmit(f)}
+  else if(f.dataset.ff==="rep"){e.preventDefault();e.stopImmediatePropagation();const r=SF.safety;if(!r||r.busy)return;const reason=(f.querySelector('input[name="sf_reason"]:checked')||{}).value||"",more=(f.querySelector("#sf_more")||{}).value||"";r.busy=true;feedSync();
+    window.__safety.report(r.kind,r.ref,r.target,reason+(more?": "+more.trim():""),r.excerpt||"").then(()=>{SF.safety=null;feedSync();toast("Thank you. Your teachers will check it.","shield");if(F.sv)fShow()}).catch(er=>{r.busy=false;feedSync();toast(er.message||"Could not send","x")})}},true);
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el)return;const a=el.dataset.v4,id=el.dataset.id;
+  switch(a){
+  case"secOpen":S.view={type:"security"};S.animate=true;scrollTo(0,0);render();return;
+  case"pwShow":SF.pw=!SF.pw;render();return;
+  case"secOthers":if(confirm("Log out of all your other phones and computers?"))window.__account.signOutOthers().then(()=>toast("Done: only this device is logged in","check")).catch(er=>toast(er.message,"x"));return;
+  case"secTog":{const k=el.dataset.k;if(k==="peer"){const on=!(S.me&&S.me.peerOff!==true);S.me.peerOff=!on;render();write(()=>S.db.doc("students/"+S.uid).update({peerOff:!on})).then(()=>toast(on?"Classmates can write to you":"Classmates cannot write to you any more","check")).catch(()=>{});return}
+    const on=!nPref(k);nPrefSet(k,on);if(k==="sound"&&on)nSound("msg");if(k==="vib"&&on&&navigator.vibrate)navigator.vibrate(80);render();return}
+  case"secTest":nAudio();nSound("msg");setTimeout(()=>nSound("like"),700);return;
+  case"secUnblock":blSet(id,false,blName(id));return;
+  case"sfX":SF.safety=null;feedSync();if(F.sv)fShow();return;
+  case"sfPost":{const p=F.posts.find(x=>x.id===id);if(p)sfOpen({kind:"post",ref:p.id,target:p.author,name:p.who?.name,excerpt:v4Plain(p.body||"").slice(0,200)});return}
+  case"sfStory":{const c=fCur();if(c)sfOpen({kind:"story",ref:c.s.id,target:c.g.uid,name:c.g.who?.name,excerpt:v4Plain(c.s.body||"").slice(0,200)});return}
+  case"sfMsg":{const x=v4ActMsg();V4.act=null;if(x)sfOpen({kind:"message",ref:x.raw.id,target:x.raw.sender,name:peerName(x.raw.sender),excerpt:v4Plain(x.raw.body||"").slice(0,200)||attLabel(x.raw.att)});render();return}
+  case"sfReport":SF.safety.step="report";feedSync();return;
+  case"sfBlock":{const r=SF.safety;if(r&&confirm(`Block ${r.name||"this person"}? You will not see their posts and stories, and you cannot write to each other.`)){SF.safety=null;feedSync();if(F.sv)fCloseStory();blSet(r.target,true,r.name)}return}
+  case"repDone":window.__safety.closeReport(+id).then(()=>{const r=(SF.reports||[]).find(x=>String(x.id)===String(id));if(r)r.done_at=new Date().toISOString();render()}).catch(er=>toast(er.message,"x"));return;
+  }},true);
+{const st=document.createElement("style");st.textContent=`
+.secwrap{max-width:640px;margin-inline:auto;display:grid;gap:14px}
+.sec{display:grid;gap:12px}.sec h3{display:flex;align-items:center;gap:8px;margin:0}.sec h3 svg{width:20px;height:20px}
+.secrow{display:flex;align-items:center;justify-content:space-between;gap:12px}.secrow>div{display:grid;gap:2px;min-width:0}.secrow small{color:var(--muted);font-size:.8rem}
+.sec label{display:grid;gap:6px;font-weight:600}.seccheck{display:flex!important;align-items:center;gap:8px;font-weight:500}.seccheck input{width:20px!important;height:20px;flex:none;margin:0}.sfr input{width:18px!important;flex:none;margin:0}
+.v4sw{flex:none;width:50px;height:30px;border-radius:999px;border:0;background:var(--line);position:relative;cursor:pointer;transition:background .2s}.v4sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}.v4sw.on{background:#25D366}.v4sw.on i{transform:translateX(20px)}
+.pwbar{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;align-items:center}.pwbar i{height:5px;border-radius:3px;background:var(--line)}.pwbar span{grid-column:1/-1;font-size:.78rem;color:var(--muted)}
+.pwbar[data-s="1"] i:nth-child(-n+1){background:#E5484D}.pwbar[data-s="2"] i:nth-child(-n+2){background:#F5A524}.pwbar[data-s="3"] i:nth-child(-n+3){background:#7CC24E}.pwbar[data-s="4"] i{background:#25A55F}
+.secentry{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;color:inherit;font:inherit}.secentry>span:nth-child(2){display:grid;flex:1}.secentry small{color:var(--muted)}.secentry>svg{width:20px;height:20px;opacity:.6}
+.sectips ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.sfr{display:flex!important;align-items:center;gap:10px;padding:8px 4px;font-weight:500;cursor:pointer}
+.frep{display:grid;gap:10px;border-color:#F5A524!important}.frep-it{display:grid;gap:4px;padding-top:10px;border-top:1px solid var(--line)}
 `;document.head.appendChild(st)}
 
 /* ==== v4 END ==== */

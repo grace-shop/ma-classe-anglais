@@ -413,3 +413,51 @@ drop trigger if exists notif_docs on public.docs;
 create trigger notif_docs after insert on public.docs for each row
   when (new.path like 'students/%/msgs/%' or new.path like 'gradebook/chat%/msgs/%')
   execute function public.trg_notif_docs();
+
+-- =====================================================================
+--  SIGNALEMENTS : un élève signale une publication, une story, un message…
+--  Les professeurs les voient dans la modération et reçoivent une notification.
+-- =====================================================================
+create table if not exists public.reports (
+  id         bigserial primary key,
+  uid        uuid not null references auth.users(id) on delete cascade,
+  who        jsonb not null default '{}'::jsonb,
+  kind       text not null,
+  ref_id     text not null default '',
+  target     uuid,
+  target_who jsonb not null default '{}'::jsonb,
+  reason     text not null default '',
+  excerpt    text not null default '',
+  created_at timestamptz not null default now(),
+  done_at    timestamptz
+);
+alter table public.reports enable row level security;
+drop policy if exists reports_read on public.reports;
+create policy reports_read on public.reports for select to authenticated using (uid = auth.uid() or public.my_level() >= 3);
+revoke all on public.reports from anon, authenticated;
+grant select on public.reports to authenticated;
+
+create or replace function public.report_content(p_kind text, p_ref text, p_target uuid, p_reason text, p_excerpt text) returns bigint
+language plpgsql security definer set search_path = public as $$
+declare me uuid := auth.uid(); n int; rid bigint; m record;
+begin
+  if me is null or public.my_level() < 2 then raise exception 'Access denied'; end if;
+  select count(*) into n from reports where uid = me and created_at > now() - interval '1 day';
+  if n >= 30 then raise exception 'Too many reports today'; end if;
+  insert into reports(uid, who, kind, ref_id, target, target_who, reason, excerpt)
+    values (me, public.feed_who(me), left(coalesce(p_kind, ''), 20), left(coalesce(p_ref, ''), 80), p_target,
+            case when p_target is null then '{}'::jsonb else public.feed_who(p_target) end, left(coalesce(p_reason, ''), 300), left(coalesce(p_excerpt, ''), 300))
+    returning reports.id into rid;
+  for m in select uid from members where level in ('admin', 'owner') loop
+    perform public.notify(m.uid, 'report', me, 'report:' || rid::text, coalesce(nullif(p_reason, ''), p_kind));
+  end loop;
+  return rid;
+end $$;
+create or replace function public.close_report(p_id bigint) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if public.my_level() < 3 then raise exception 'Access denied'; end if;
+  update reports set done_at = now() where id = p_id;
+end $$;
+revoke all on function public.report_content(text, text, uuid, text, text), public.close_report(bigint) from public, anon;
+grant execute on function public.report_content(text, text, uuid, text, text), public.close_report(bigint) to authenticated;

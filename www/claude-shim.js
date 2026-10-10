@@ -287,6 +287,26 @@
     storyReactions: async () => { const { data, error } = await sb.from("story_reactions").select("*").limit(3000); if (error) return []; return data || []; },
     delStory: async (id) => { const { error } = await sb.rpc("delete_story", { p_id: id }); if (error) throw feedErr(error, "Could not delete"); },
   };
+  /* ---------------- compte et sécurité ---------------- */
+  window.__account = {
+    info: () => { const u = (session && session.user) || {}; const em = String(u.email || ""); const tel = /@tel\.english-classes\.app$/i.test(em) ? em.split("@")[0] : ""; return { email: tel ? "" : em, phone: tel, created: u.created_at || null, last: u.last_sign_in_at || null }; },
+    changePassword: async (current, next, others) => {
+      const em = session && session.user && session.user.email; if (!em) throw new Error("You are not logged in.");
+      const chk = await sb.auth.signInWithPassword({ email: em, password: current });
+      if (chk.error) throw new Error(/invalid login|credentials/i.test(chk.error.message || "") ? "Your current password is not correct." : (chk.error.message || "Cannot check your password."));
+      const { error } = await sb.auth.updateUser({ password: next });
+      if (error) throw new Error(/same|different/i.test(error.message || "") ? "The new password must be different from the old one." : /weak|short|least/i.test(error.message || "") ? "This password is too weak: use at least 8 characters with letters and numbers." : (error.message || "Cannot change the password."));
+      if (others) { try { await sb.auth.signOut({ scope: "others" }); } catch (e) {} }
+    },
+    signOutOthers: async () => { const { error } = await sb.auth.signOut({ scope: "others" }); if (error) throw new Error(error.message || "Cannot log out the other devices."); },
+  };
+  window.__safety = {
+    block: async (uid, on) => { const { error } = await sb.rpc("block_user", { p_uid: uid, p_on: !!on }); if (error) throw new Error(/block_user|schema cache/i.test(error.message || "") ? "The teacher must first run the new file supabase/messagerie.sql in Supabase." : error.message); },
+    blocks: async () => { const { data, error } = await sb.from("blocks").select("*").eq("uid", session.user.id); if (error) return []; return data || []; },
+    report: async (kind, ref, target, reason, excerpt) => { const { error } = await sb.rpc("report_content", { p_kind: kind, p_ref: String(ref || ""), p_target: target || null, p_reason: reason || "", p_excerpt: excerpt || "" }); if (error) throw new Error(/report_content|schema cache/i.test(error.message || "") ? "The teacher must first run the new file supabase/communaute.sql in Supabase." : error.message); },
+    reports: async () => { const { data, error } = await sb.from("reports").select("*").order("created_at", { ascending: false }).limit(200); if (error) return []; return data || []; },
+    closeReport: async (id) => { const { error } = await sb.rpc("close_report", { p_id: id }); if (error) throw new Error(error.message); },
+  };
   /* ---------------- notifications (table notifications, voir supabase/communaute.sql) ---------------- */
   window.__notif = {
     list: async () => { const { data, error } = await sb.from("notifications").select("*").order("created_at", { ascending: false }).limit(80); if (error) throw new Error(error.message || "x"); return data || []; },

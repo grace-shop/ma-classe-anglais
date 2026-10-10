@@ -77,6 +77,28 @@ begin
   return true;
 end $$;
 
+-- Personnes bloquées (comme sur Facebook) : on ne peut plus s'écrire
+create table if not exists public.blocks (
+  uid        uuid not null references auth.users(id) on delete cascade,
+  blocked    uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (uid, blocked)
+);
+alter table public.blocks enable row level security;
+drop policy if exists blocks_read on public.blocks;
+create policy blocks_read on public.blocks for select to authenticated using (uid = auth.uid() or public.my_level() >= 3);
+revoke all on public.blocks from anon, authenticated;
+grant select on public.blocks to authenticated;
+create or replace function public.block_user(p_uid uuid, p_on boolean) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is null or p_uid = auth.uid() then raise exception 'Access denied'; end if;
+  if p_on then insert into blocks(uid, blocked) values (auth.uid(), p_uid) on conflict do nothing;
+  else delete from blocks where uid = auth.uid() and blocked = p_uid; end if;
+end $$;
+revoke all on function public.block_user(uuid, boolean) from public, anon;
+grant execute on function public.block_user(uuid, boolean) to authenticated;
+
 -- Tous les apprenants actifs de l'école (les camarades de la même professeure d'abord)
 drop function if exists public.peer_directory();
 create or replace function public.peer_directory() returns table(uid uuid, name text, classe text, same boolean)
@@ -90,6 +112,8 @@ begin
     from docs d
     where d.col = 'students' and d.id <> me::text
       and d.id ~ '^[0-9a-fA-F-]{36}$' and public.peer_ok(d.id::uuid)
+      and coalesce(d.data->>'peerOff', '') <> 'true'
+      and not exists (select 1 from blocks bl where (bl.uid = me and bl.blocked = d.id::uuid) or (bl.uid = d.id::uuid and bl.blocked = me))
     order by 4 desc, 2 limit 5000;
 end $$;
 
@@ -104,6 +128,8 @@ begin
   if p_to = me then raise exception 'You cannot write to yourself'; end if;
   if not public.peer_ok(me) then raise exception 'Chat is turned off for your account'; end if;
   if not public.peer_ok(p_to) then raise exception 'This student cannot receive messages'; end if;
+  if exists (select 1 from docs where path = 'students/' || p_to::text and data->>'peerOff' = 'true') then raise exception 'This student has turned off messages from classmates'; end if;
+  if exists (select 1 from blocks where (uid = p_to and blocked = me) or (uid = me and blocked = p_to)) then raise exception 'You cannot write to this person'; end if;
   if p_att is not null and jsonb_typeof(p_att) = 'object' then
     k := p_att->>'k';
     if k = 'sticker' then
