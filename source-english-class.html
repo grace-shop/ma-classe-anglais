@@ -4150,6 +4150,38 @@ setInterval(()=>{try{if(S.mode!=="student"||!S.me||isParent(S.me)||V4.wdFix===S.
   write(()=>meRef().update({dailyWords:{day:"",items:items.filter(w=>!bad.includes(w))}})).then(()=>{V4.wdAt=0;V4.words=false;try{wdGen()}catch(e){}}).catch(()=>{})}catch(e){}},6000);
 {const st=document.createElement("style");st.textContent=`.trcard{border-color:#9A7CFF!important;gap:12px}`;document.head.appendChild(st)}
 
+/* =====================================================================
+   23. Students always see the English syllabus (even before the owner's
+       app has updated the database) + tables and italics in lessons
+   ===================================================================== */
+function progOverlay(){if(!S.lessons||!S.lessons.length)return;const fr=[["lessons","lessons"],["quizzes","quizzes"],["decks","decks"],["epreuves","eps"]].some(([c,k])=>(S[k]||[]).some(x=>String(x.id).startsWith("prog-")&&frLike(docText(c,x))));
+  if(!fr)return;if(PROGC===null){progLoad();return}if(!PROGC)return;let ch=0;
+  for(const[c,k]of[["lessons","lessons"],["quizzes","quizzes"],["decks","decks"],["epreuves","eps"]]){const src=PROGC[c]||{};
+    for(const x of(S[k]||[])){const en=src[x.id];if(!en||!frLike(docText(c,x)))continue;for(const f of["title","theme","grammar","body","questions","cards","sujet","year"])if(en[f]!==undefined)x[f]=en[f];ch++}}
+  for(const[id,cc]of Object.entries(S.corriges||{})){const en=(PROGC.corriges||{})[id];if(en&&frLike(cc.text)){cc.text=en.text;ch++}}
+  if(ch)render()}
+setInterval(()=>{try{progOverlay()}catch(e){}},2500);
+/* the owner's update also runs when the owner looks at the student view, and for teachers */
+progEnglish=async function(){if(progEnglish.busy||!(S.isOwner||S.isStaff)||!S.db)return;if((S.settings||{}).contentVer===CONTENT_VER)return;if(!S.isOwner&&progEnglish.ranFor===S.uid)return;
+  if(PROGC===null){progLoad();return}if(!PROGC||!(S.lessons||[]).length)return;progEnglish.busy=true;progEnglish.ranFor=S.uid;
+  const have={lessons:S.lessons,quizzes:S.quizzes,decks:S.decks||[],epreuves:S.eps};let n=0;
+  try{for(const[col,docs]of Object.entries(PROGC)){for(const[id,en]of Object.entries(docs)){
+      if(col==="corriges"){const cur=(S.corriges||{})[id];if(!cur||cur.text===en.text)continue;await write(()=>S.db.doc("corriges/"+id).set({...cur,text:en.text}));n++;continue}
+      const L=have[col];if(!L)continue;const cur=L.find(x=>x.id===id);if(!cur)continue;
+      const same=["title","theme","grammar","body","sujet"].every(f=>(cur[f]||"")===(en[f]||""))&&JSON.stringify(cur.questions||null)===JSON.stringify(en.questions||null)&&JSON.stringify(cur.cards||null)===JSON.stringify(en.cards||null);if(same)continue;
+      const keep={};for(const k of["createdAt","fileId","fileName","fileType","corrigeVisible","hidden","teacherId","audience","minutes","exam"])if(cur[k]!==undefined&&cur[k]!=="")keep[k]=cur[k];
+      await write(()=>S.db.doc(col+"/"+id).set({...en,...keep}));n++}}
+    if(S.isOwner)await write(()=>S.db.doc("settings/main").set({...S.settings,contentVer:CONTENT_VER}));
+    if(n)toast(`${n} lessons, quizzes and papers updated to English`,"check")}catch(e){console.warn("progEnglish",e)}progEnglish.busy=false};
+/* lessons: | tables |, *italics* */
+{const _lh=lessonHTML;lessonHTML=function(body){const parts=String(body||"").split(/\n{2,}/);
+  return parts.map(p=>{const lines=p.split("\n").map(x=>x.trim()).filter(Boolean);
+    if(lines.length>=2&&lines.every(x=>x.startsWith("|"))){const rows=lines.filter(x=>!/^\|[\s:|-]+\|?$/.test(x)).map(x=>x.replace(/^\||\|$/g,"").split("|").map(c=>c.trim()));
+      const cell=c=>esc(c).replace(/\*\*(.+?)\*\*/g,(m,w)=>`<strong data-say="${w}">${w}</strong>`).replace(/\*(.+?)\*/g,"<em>$1</em>");
+      return`<div class="ltable"><table><thead><tr>${rows[0].map(c=>`<th>${cell(c)}</th>`).join("")}</tr></thead><tbody>${rows.slice(1).map(r=>`<tr>${r.map(c=>`<td>${cell(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}
+    return _lh(p).replace(/(^|[\s(>])\*([^*\n<>]+?)\*(?=[\s).,;:!?<]|$)/g,"$1<em>$2</em>")}).join("")}}
+{const st=document.createElement("style");st.textContent=`.ltable{overflow-x:auto;margin:10px 0}.ltable table{border-collapse:collapse;width:100%;font-size:.95rem}.ltable th,.ltable td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.ltable th{background:var(--surface2);font-weight:800}`;document.head.appendChild(st)}
+
 /* ==== v4 END ==== */
 render();
 loadThree();
