@@ -5,7 +5,10 @@
 --  (Remplace l'ancien fichier peer.sql.)
 --  Règles appliquées par le SERVEUR :
 --   • messages entre élèves actifs de l'école (pas les parents, pas le primaire)
---   • 1000 caractères maximum, 15 messages par minute, 400 par jour
+--   • 4000 caractères maximum, 40 messages par minute, 3000 par jour
+--   • comme WhatsApp : supprimer pour tout le monde, photos à vue unique, réponses, réactions
+--     (les messages supprimés et les photos à vue unique restent visibles par les professeurs
+--      dans la modération, pour la sécurité des élèves)
 --   • pièces jointes : dossier privé « chat », 10 Mo maximum, chacun écrit
 --     uniquement dans son propre dossier
 --   • la professeure peut masquer un message ou couper le chat d'un élève ;
@@ -22,9 +25,13 @@ create table if not exists public.peer_messages (
   hidden     boolean not null default false
 );
 alter table public.peer_messages add column if not exists att jsonb;
+alter table public.peer_messages add column if not exists meta jsonb;
+alter table public.peer_messages add column if not exists react jsonb;
+alter table public.peer_messages add column if not exists deleted_at timestamptz;
+alter table public.peer_messages add column if not exists opened_at timestamptz;
 alter table public.peer_messages alter column body set default '';
 alter table public.peer_messages drop constraint if exists peer_messages_body_check;
-alter table public.peer_messages add constraint peer_messages_body_check check (char_length(body) <= 1000);
+alter table public.peer_messages add constraint peer_messages_body_check check (char_length(body) <= 4000);
 create index if not exists peer_messages_recv_idx on public.peer_messages (receiver, created_at desc);
 create index if not exists peer_messages_send_idx on public.peer_messages (sender, created_at desc);
 alter table public.peer_messages enable row level security;
@@ -87,9 +94,10 @@ begin
 end $$;
 
 drop function if exists public.send_peer_message(uuid, text, jsonb);
-create or replace function public.send_peer_message(p_to uuid, p_body text, p_att jsonb) returns uuid
+drop function if exists public.send_peer_message(uuid, text, jsonb, jsonb);
+create or replace function public.send_peer_message(p_to uuid, p_body text, p_att jsonb, p_meta jsonb) returns uuid
 language plpgsql security definer set search_path = public as $$
-declare me uuid := auth.uid(); b text := btrim(coalesce(p_body, '')); n int; id uuid; k text; a jsonb := null;
+declare me uuid := auth.uid(); b text := btrim(coalesce(p_body, '')); n int; id uuid; k text; a jsonb := null; mt jsonb := null;
 begin
   if me is null or public.my_level() <> 2 then raise exception 'Access denied'; end if;
   if not public.peer_enabled() then raise exception 'Your teacher has turned off chat between students'; end if;
@@ -105,21 +113,81 @@ begin
       if coalesce(p_att->>'p', '') not like me::text || '/%' then raise exception 'Invalid file'; end if;
       a := jsonb_build_object('k', k, 'p', p_att->>'p', 't', left(coalesce(p_att->>'t', ''), 120), 'n', left(coalesce(p_att->>'n', ''), 80),
                               's', coalesce((p_att->>'s')::bigint, 0), 'd', coalesce((p_att->>'d')::int, 0));
+      if k = 'img' and coalesce(p_att->>'o', '') in ('true', '1') then a := a || jsonb_build_object('o', true); end if;
     else raise exception 'Invalid attachment'; end if;
   end if;
   if char_length(b) < 1 and a is null then raise exception 'Empty message'; end if;
-  if char_length(b) > 1000 then raise exception 'Message too long (1000 characters maximum)'; end if;
+  if char_length(b) > 4000 then raise exception 'Message too long (4000 characters maximum)'; end if;
+  if p_meta is not null and jsonb_typeof(p_meta) = 'object' and jsonb_typeof(p_meta->'re') = 'object' then
+    mt := jsonb_build_object('re', jsonb_build_object('id', left(coalesce(p_meta->'re'->>'id', ''), 40), 't', left(coalesce(p_meta->'re'->>'t', ''), 140), 'w', left(coalesce(p_meta->'re'->>'w', ''), 40)));
+  end if;
   select count(*) into n from peer_messages where sender = me and created_at > now() - interval '1 minute';
-  if n >= 15 then raise exception 'You are writing too fast: wait one minute'; end if;
+  if n >= 40 then raise exception 'You are writing too fast: wait one minute'; end if;
   select count(*) into n from peer_messages where sender = me and created_at > now() - interval '1 day';
-  if n >= 400 then raise exception 'Daily message limit reached'; end if;
-  insert into peer_messages(sender, receiver, body, att) values (me, p_to, b, a) returning peer_messages.id into id;
+  if n >= 3000 then raise exception 'Daily message limit reached'; end if;
+  insert into peer_messages(sender, receiver, body, att, meta) values (me, p_to, b, a, mt) returning peer_messages.id into id;
   return id;
 end $$;
 
--- ancienne version (texte seul), gardée pour les anciennes applications
+-- anciennes versions, gardées pour les anciennes applications
+create or replace function public.send_peer_message(p_to uuid, p_body text, p_att jsonb) returns uuid
+language sql security definer set search_path = public as $$ select public.send_peer_message(p_to, p_body, p_att, null::jsonb) $$;
 create or replace function public.send_peer_message(p_to uuid, p_body text) returns uuid
-language sql security definer set search_path = public as $$ select public.send_peer_message(p_to, p_body, null::jsonb) $$;
+language sql security definer set search_path = public as $$ select public.send_peer_message(p_to, p_body, null::jsonb, null::jsonb) $$;
+
+-- Copie de sécurité (visible seulement par les professeurs) des messages supprimés et des photos à vue unique
+create table if not exists public.peer_archive (
+  id         uuid primary key default gen_random_uuid(),
+  msg_id     uuid,
+  sender     uuid,
+  receiver   uuid,
+  body       text,
+  att        jsonb,
+  kind       text,
+  sent_at    timestamptz,
+  created_at timestamptz not null default now()
+);
+alter table public.peer_archive enable row level security;
+drop policy if exists peer_archive_staff on public.peer_archive;
+create policy peer_archive_staff on public.peer_archive for select to authenticated using (public.peer_staff_sees(sender));
+revoke all on public.peer_archive from anon, authenticated;
+grant select on public.peer_archive to authenticated;
+
+-- Supprimer pour tout le monde (seulement ses propres messages)
+create or replace function public.delete_peer_message(p_id uuid) returns void
+language plpgsql security definer set search_path = public as $$
+declare m peer_messages;
+begin
+  select * into m from peer_messages where id = p_id;
+  if m.id is null or m.sender <> auth.uid() or public.my_level() <> 2 then raise exception 'Access denied'; end if;
+  if m.deleted_at is not null then return; end if;
+  insert into peer_archive(msg_id, sender, receiver, body, att, kind, sent_at) values (m.id, m.sender, m.receiver, m.body, m.att, 'deleted', m.created_at);
+  update peer_messages set body = '', att = null, meta = null, react = null, deleted_at = now() where id = p_id;
+end $$;
+
+-- Réaction (emoji) sur un message ; '' enlève la réaction
+create or replace function public.react_peer_message(p_id uuid, p_e text) returns void
+language plpgsql security definer set search_path = public as $$
+declare m peer_messages; me uuid := auth.uid(); e text := left(coalesce(p_e, ''), 16);
+begin
+  select * into m from peer_messages where id = p_id;
+  if m.id is null or me not in (m.sender, m.receiver) or public.my_level() <> 2 or m.deleted_at is not null then raise exception 'Access denied'; end if;
+  if e = '' then update peer_messages set react = coalesce(react, '{}'::jsonb) - me::text where id = p_id;
+  else update peer_messages set react = coalesce(react, '{}'::jsonb) || jsonb_build_object(me::text, e) where id = p_id; end if;
+end $$;
+
+-- Ouvrir une photo à vue unique : le destinataire la reçoit une seule fois
+create or replace function public.open_peer_once(p_id uuid) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare m peer_messages;
+begin
+  select * into m from peer_messages where id = p_id;
+  if m.id is null or m.receiver <> auth.uid() or public.my_level() <> 2 then raise exception 'Access denied'; end if;
+  if m.att is null or coalesce(m.att->>'o', '') <> 'true' or m.opened_at is not null or m.att->>'p' is null then return null; end if;
+  insert into peer_archive(msg_id, sender, receiver, body, att, kind, sent_at) values (m.id, m.sender, m.receiver, m.body, m.att, 'once', m.created_at);
+  update peer_messages set opened_at = now(), att = jsonb_build_object('k', 'img', 'o', true, 'opened', true) where id = p_id;
+  return m.att;
+end $$;
 
 create or replace function public.mark_peer_read(p_from uuid) returns void
 language sql security definer set search_path = public as $$
@@ -127,8 +195,8 @@ language sql security definer set search_path = public as $$
 $$;
 
 revoke all on function public.peer_ok(uuid), public.peer_staff_sees(uuid), public.peer_enabled() from public, anon;
-revoke all on function public.peer_directory(), public.send_peer_message(uuid, text), public.send_peer_message(uuid, text, jsonb), public.mark_peer_read(uuid) from public, anon;
-grant execute on function public.peer_directory(), public.send_peer_message(uuid, text), public.send_peer_message(uuid, text, jsonb), public.mark_peer_read(uuid) to authenticated;
+revoke all on function public.peer_directory(), public.send_peer_message(uuid, text), public.send_peer_message(uuid, text, jsonb), public.send_peer_message(uuid, text, jsonb, jsonb), public.mark_peer_read(uuid), public.delete_peer_message(uuid), public.react_peer_message(uuid, text), public.open_peer_once(uuid) from public, anon;
+grant execute on function public.peer_directory(), public.send_peer_message(uuid, text), public.send_peer_message(uuid, text, jsonb), public.send_peer_message(uuid, text, jsonb, jsonb), public.mark_peer_read(uuid), public.delete_peer_message(uuid), public.react_peer_message(uuid, text), public.open_peer_once(uuid) to authenticated;
 grant execute on function public.peer_staff_sees(uuid) to authenticated;
 
 do $$ begin

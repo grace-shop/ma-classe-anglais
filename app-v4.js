@@ -220,28 +220,29 @@ const v4LockedPacks=()=>{if(typeof SH_PACKS==="undefined"||S.mode!=="student")re
 const V4IN=k=>({peer:"peerInput",chat:"chatInput",staff:"staffInput"})[k]||"chatInput",V4F=k=>({peer:"peerchat",chat:"chat",staff:"staffchat"})[k]||"chat";
 function v4Bar(kind,target,ph){const inId=V4IN(kind),files=!!window.__chatFiles,rec=V4.rec&&V4.rec.kind===kind?V4.rec:null,pan=V4.panel&&V4.panel.kind===kind?V4.panel.t:null,busy=V4.sending||(kind==="peer"&&PR.sending);
   if(rec)return`<div class="v4rec" role="status"><span class="v4rec-dot" aria-hidden="true"></span><b><span class="v4rec-l">Recording </span><span id="v4recT">${fmtDur(rec.sec)}</span></b><span class="v4wave" aria-hidden="true">${"<i></i>".repeat(18)}</span><button type="button" class="iconbtn" data-v4="recCancel" aria-label="Cancel the voice message" title="Cancel">${ic("trash")}</button><button type="button" class="btn sm" data-v4="recSend" aria-label="Send the voice message">${ic("send")}Send</button></div>`;
-  return`${pan?v4PanelHTML(kind,pan):""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Sending…</div>`:""}${V4.fixing===kind?`<div class="v4upl"><span class="v4spin"></span>Nova is checking your English…</div>`:""}<form class="chatbar v4bar" data-f="${V4F(kind)}" data-s="${esc(target)}">
+  return`${pan?v4PanelHTML(kind,pan):""}${V4.reply&&V4.reply.kind===kind?`<div class="v4replybar"><div class="v4quote"><div class="v4q-w">Replying to ${esc(V4.reply.who)}</div><div class="v4q-t">${esc(V4.reply.t)}</div></div><button type="button" class="iconbtn sm" data-v4="replyX" aria-label="Cancel reply">${ic("x")}</button></div>`:""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Sending…</div>`:""}${V4.fixing===kind?`<div class="v4upl"><span class="v4spin"></span>Nova is checking your English…</div>`:""}<form class="chatbar v4bar" data-f="${V4F(kind)}" data-s="${esc(target)}">
   <button type="button" class="iconbtn${pan?" on":""}" data-v4="panel" data-k="${kind}" data-t="${pan||"emo"}" aria-label="Emojis and stickers" title="Emojis and stickers">${ic("smile")}</button>
   <input id="${inId}" placeholder="${esc(ph||"Write a message…")}" maxlength="1000" autocomplete="off" aria-label="Message">
   ${files?`<span class="v4att"><label class="iconbtn" title="Send a photo or a file" aria-label="Send a photo or a file">${ic("clip")}<input type="file" id="v4f_${kind}" hidden accept="image/*,application/pdf,audio/*,.doc,.docx,.ppt,.pptx,.txt"></label>${V4.canRec?`<button type="button" class="iconbtn" data-v4="rec" data-k="${kind}" aria-label="Record a voice message" title="Voice message">${ic("mic")}</button>`:""}</span>`:""}
   <button class="btn" type="submit" aria-label="Send" ${busy?"disabled":""}>${ic("send")}</button></form>`}
-async function v4Deliver(kind,target,text,att){
-  if(kind==="staff")return staffSend(target,text,att);
-  if(kind==="peer"){const id=await window.__peer.send(target,text||"",att||null);PR.inbox.unshift({id:id||("tmp"+Date.now()),sender:S.uid,receiver:target,body:text||"",att:att||null,created_at:new Date().toISOString(),read_at:null});render();return}
+async function v4Deliver(kind,target,text,att,meta){
+  if(kind==="staff")return staffSend(target,text,att,meta);
+  if(kind==="peer"){const id=await window.__peer.send(target,text||"",att||null,meta||null);PR.inbox.unshift({id:id||("tmp"+Date.now()),sender:S.uid,receiver:target,body:text||"",att:att||null,meta:meta||null,created_at:new Date().toISOString(),read_at:null});render();return}
   const at=Date.now(),from=S.mode==="teacher"?"teacher":"student",pv=(v4Plain(text)||attLabel(att)).slice(0,80);
-  await write(()=>S.db.collection("students/"+target+"/msgs").add({from,text:text||"",at,...(att?{att}:{})}));
+  await write(()=>S.db.collection("students/"+target+"/msgs").add({from,text:text||"",at,...(att?{att}:{}),...(meta&&meta.re?{re:meta.re}:{})}));
   await write(()=>S.db.doc("students/"+target).update(from==="teacher"?{lastMsgAt:at,lastMsgFrom:"teacher",lastMsgText:pv,teacherReadAt:at}:{lastMsgAt:at,lastMsgFrom:"student",lastMsgText:pv,studentReadAt:at,lastActive:at,activity:"Wrote to the teacher"}));
   if(from==="student")presence("Writing a message")}
 function v4Target(kind){const f=document.querySelector(`form.v4bar[data-f="${V4F(kind)}"]`);return f?f.dataset.s:(V4.rec&&V4.rec.target)||(V4.panel&&V4.panel.target)||""}
-async function v4SendFile(kind,target,file,name,k,dur){if(!window.__chatFiles){toast("Sending files is not available here.","x");return}
+async function v4SendFile(kind,target,file,name,k,dur,opt){opt=opt||{};if(!window.__chatFiles){toast("Sending files is not available here.","x");return}
   if(!navigator.onLine){toast("No network: try again when you are connected.","x");return}
   if(!target)return;if(file.size>10*1024*1024){toast("File too big (10 MB maximum).","x");return}
   let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type))f=await shrinkImg(f,1280,.72);
   const kk=k||(/^image\//.test(f.type)?"img":"file");V4.sending=true;V4.upl=kind;render();
-  try{const up=await window.__chatFiles.upload(f,name||f.name||"file");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{})};
-    if(kk!=="file")V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f);
-    let text="";if(kk!=="voice"){const inp=document.getElementById(V4IN(kind));text=(inp&&inp.value||"").trim();if(inp){inp.value="";delete S.drafts[inp.id]}}
-    await v4Deliver(kind,target,text,att)}
+  try{const up=await window.__chatFiles.upload(f,name||f.name||"file");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{}),...(opt.once&&kk==="img"?{o:true}:{})};
+    if(kk!=="file"&&!opt.once){V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f)}
+    let text="";if(opt.caption!=null)text=opt.once?"":String(opt.caption).trim();else if(kk!=="voice"){const inp=document.getElementById(V4IN(kind));text=(inp&&inp.value||"").trim();if(inp){inp.value="";delete S.drafts[inp.id]}}
+    if(text&&v4NeedFix(text)){const r=await v4Check(text);if(r)text=v4Pack(text,r.en,r.k)}
+    await v4Deliver(kind,target,text,att,v4TakeReply(kind))}
   catch(e){toast((e&&e.message)||"Cannot send right now.","x")}
   V4.sending=false;V4.upl=null;render()}
 async function recStart(kind,target){if(V4.rec||!target)return;let stream;
@@ -258,12 +259,12 @@ function recStop(cancel){const r=V4.rec;if(!r)return;r.cancel=!!cancel;try{r.mr.
 
 /* conversation privée prof ↔ élève / parent */
 chatHTML=function(sid,me){const ready=S.chatFor===sid&&S.msgsReady;
-  return`<div class="glass chat"><div class="msgs" id="chatScroll">${!ready?`<div class="muted" style="margin:auto">Loading…</div>`:S.msgs.length?S.msgs.map(m=>msgHTML(m.from===me,m.text,m.att,m.at)).join(""):`<div class="muted" style="margin:auto;text-align:center">No messages yet.<br>${me==="student"?"Ask your teacher a question in English. You can also send a voice message or a photo.":"Write the first message, or send a voice message, a photo or a file."}</div>`}</div>
+  return`<div class="glass chat"><div class="msgs" id="chatScroll">${!ready?`<div class="muted" style="margin:auto">Loading…</div>`:S.msgs.length?v4MsgList("chat",S.msgs,v4Ctx("chat",sid,me)):`<div class="muted" style="margin:auto;text-align:center">No messages yet.<br>${me==="student"?"Ask your teacher a question in English. You can also send a voice message or a photo.":"Write the first message, or send a voice message, a photo or a file."}</div>`}</div>
   ${v4Bar("chat",sid,me==="student"?"Write to your teacher…":"Write a message…")}</div>`};
 /* camarades */
 peerChatView=function(){const id=S.view.id,me=S.uid,nm=peerName(id),msgs=PR.inbox.filter(m=>(m.sender===me&&m.receiver===id)||(m.sender===id&&m.receiver===me)).slice().reverse();
   return`<div class="section" style="max-width:720px;margin-inline:auto"><div><button class="back" data-a="peerBack">${ic("left")}Classmates</button></div><div class="row">${avatar(id,nm,48)}<div><span class="eyebrow">Classmate</span><h2>${esc(nm)}${S.peers[id]?` <span class="chip ok">Online</span>`:""}</h2></div></div>
-  <div class="glass chat"><div class="msgs" id="chatScroll">${msgs.length?msgs.map(m=>msgHTML(m.sender===me,m.body,m.att,+new Date(m.created_at))).join(""):`<div class="muted" style="margin:auto;text-align:center">No messages yet.<br>Say hello to ${esc(nm.split(" ")[0])}! You can write, or send a voice message, a photo, a file or a sticker.</div>`}</div>
+  <div class="glass chat"><div class="msgs" id="chatScroll">${msgs.length?v4MsgList("peer",msgs,v4Ctx("peer",id)):`<div class="muted" style="margin:auto;text-align:center">No messages yet.<br>Say hello to ${esc(nm.split(" ")[0])}! You can write, or send a voice message, a photo, a file or a sticker.</div>`}</div>
   ${v4Bar("peer",id,"Write a message…")}</div>
   <p class="hint">Be polite and kind to your classmates. Write in English to practise!</p></div>`};
 
@@ -546,15 +547,15 @@ const staffUnreadCount=()=>staffPeers().filter(d=>staffUnread(d.id)).length;
 function staffOpen(id){SC.unsub?.();SC.with=id;SC.msgs=[];SC.ready=false;S.view={type:"staffchat",id};
   SC.unsub=S.db.collection(staffBase(id)+"/msgs").orderBy("at","desc").limit(200).onSnapshot(q=>{SC.msgs=q.docs.map(d=>({id:d.id,...d.data()})).reverse();SC.ready=true;render()},()=>{SC.ready=true;render()});
   write(()=>S.db.doc(staffBase(id)).set({...(SC.meta[id]||{}),read:{...((SC.meta[id]||{}).read||{}),[S.uid]:Date.now()}})).catch(()=>{});S.animate=true;scrollTo(0,0);render()}
-async function staffSend(to,text,att){const at=Date.now();
-  await write(()=>S.db.collection(staffBase(to)+"/msgs").add({from:S.uid,text:text||"",at,...(att?{att}:{})}));
-  const m=SC.meta[to]||{};await write(()=>S.db.doc(staffBase(to)).set({...m,members:[S.uid,to],last:{from:S.uid,text:(text||attLabel(att)).slice(0,80),at},read:{...(m.read||{}),[S.uid]:at}}))}
+async function staffSend(to,text,att,meta){const at=Date.now();
+  await write(()=>S.db.collection(staffBase(to)+"/msgs").add({from:S.uid,text:text||"",at,...(att?{att}:{}),...(meta&&meta.re?{re:meta.re}:{})}));
+  const m=SC.meta[to]||{};await write(()=>S.db.doc(staffBase(to)).set({...m,members:[S.uid,to],last:{from:S.uid,text:(v4Plain(text)||attLabel(att)).slice(0,80),at},read:{...(m.read||{}),[S.uid]:at}}))}
 function staffListHTML(){const L=staffPeers();
   return`<div class="section"><div><span class="eyebrow">Between colleagues</span><h2>Teachers</h2><p class="sub">Chat with the other teachers at your school: messages, voice notes, photos and files. Students and parents cannot see it.</p></div>
   ${L.length?`<div class="glass list">${L.sort((a,b)=>((SC.meta[b.id]||{}).last?.at||0)-((SC.meta[a.id]||{}).last?.at||0)).map(d=>{const m=SC.meta[d.id]||{},l=m.last;return`<div class="thread" data-v4="staffOpen" data-id="${d.id}" tabindex="0">${avatar(d.id,d.name||"Teacher")}<div class="txt"><b>${esc(d.name||"Teacher")} <small class="muted" style="font-weight:600">· ${d.role==="principal"?"Head teacher":"Teacher"}</small></b><span>${l?esc((l.from===S.uid?"You: ":"")+l.text):"No messages"}</span></div><div class="row small muted">${l?fmtTime(l.at):""}${staffUnread(d.id)?`<span class="chip bad">New</span>`:""}</div></div>`}).join("")}</div>`:`<div class="empty">No other teachers yet. When the head teacher accepts a teacher (Class tab), they appear here.</div>`}</div>`}
 function staffChatView(){const id=S.view.id,d=(S.staff||[]).find(x=>x.id===id)||{},nm=d.name||"Teacher";
   return`<div class="section" style="max-width:760px;margin-inline:auto"><div><button class="back" data-v4="staffBack">${ic("left")}Teachers</button></div><div class="row">${avatar(id,nm,48)}<div><span class="eyebrow">Between teachers · private</span><h2>${esc(nm)}</h2></div></div>
-  <div class="glass chat"><div class="msgs" id="chatScroll">${!SC.ready?`<div class="muted" style="margin:auto">Loading…</div>`:SC.msgs.length?SC.msgs.map(m=>msgHTML(m.from===S.uid,m.text,m.att,m.at)).join(""):`<div class="muted" style="margin:auto;text-align:center">No messages yet.<br>Write the first message to ${esc(nm.split(" ")[0])}.</div>`}</div>
+  <div class="glass chat"><div class="msgs" id="chatScroll">${!SC.ready?`<div class="muted" style="margin:auto">Loading…</div>`:SC.msgs.length?v4MsgList("staff",SC.msgs,v4Ctx("staff",id,nm)):`<div class="muted" style="margin:auto;text-align:center">No messages yet.<br>Write the first message to ${esc(nm.split(" ")[0])}.</div>`}</div>
   ${v4Bar("staff",id,"Write to your colleague…")}</div></div>`}
 {const _tabs=msgsTabsHTML;msgsTabsHTML=()=>{const h=_tabs();if(!staffOn())return h;const n=staffUnreadCount();return h.replace('</div></div>',`<button data-a="msgsTab" data-k="staff" aria-pressed="${S.msgsTab==="staff"}">Teachers${n?` <span class="chip bad">${n}</span>`:""}</button></div></div>`)}}
 {const _mv=msgsView;msgsView=function(){if(S.msgsTab==="staff"&&staffOn())return msgsTabsHTML()+staffListHTML();return _mv()}}
@@ -706,13 +707,13 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches("[data-v4][tabindex]")){e.preventDefault();e.target.click()}});
 document.addEventListener("change",e=>{const el=e.target;if(!el||!el.id)return;
-  if(el.id.startsWith("v4f_")){const kind=el.id.slice(4),file=el.files&&el.files[0],t=el.closest("form")?.dataset.s;el.value="";if(file&&t)v4SendFile(kind,t,file,file.name);e.stopPropagation();return}
+  if(el.id.startsWith("v4f_")){const kind=el.id.slice(4),file=el.files&&el.files[0],t=el.closest("form")?.dataset.s;el.value="";if(file&&t){if(/^image\//.test(file.type)&&!/gif/.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false};render()}else v4SendFile(kind,t,file,file.name)}e.stopPropagation();return}
   if(el.id==="v4hwf"){const fl=[...(el.files||[])];el.value="";for(const f of fl){if(V4.hwFiles.length>=5){toast("5 files maximum.","x");break}if(f.size>20*1024*1024){toast(f.name+": too big (20 MB maximum).","x");continue}V4.hwFiles.push(f)}render();e.stopPropagation()}},true);
 document.addEventListener("input",e=>{const el=e.target;if(el&&el.id==="fq_msgs"){S.drafts.fq_msgs=el.value;S.v4msgLim=40;render()}});
 document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset)return;
   if(f.dataset.f==="hw"){e.preventDefault();e.stopImmediatePropagation();hwSubmit(f)}
   if((f.dataset.f==="chat"||f.dataset.f==="peerchat")&&f.classList.contains("v4bar")){e.preventDefault();e.stopImmediatePropagation();v4TextSend(f.dataset.f==="peerchat"?"peer":"chat",f)}
-  if(f.dataset.f==="staffchat"){e.preventDefault();e.stopImmediatePropagation();const inp=document.getElementById("staffInput"),text=(inp&&inp.value||"").trim();if(!text)return;if(inp)inp.value="";delete S.drafts.staffInput;staffSend(f.dataset.s,text,null).catch(()=>{})}},true);
+  if(f.dataset.f==="staffchat"){e.preventDefault();e.stopImmediatePropagation();const inp=document.getElementById("staffInput"),text=(inp&&inp.value||"").trim();if(!text)return;if(inp)inp.value="";delete S.drafts.staffInput;staffSend(f.dataset.s,text,null,v4TakeReply("staff")).catch(()=>{});render()}},true);
 
 /* =====================================================================
    17. French → English: a learner's French message is struck through in red,
@@ -731,6 +732,7 @@ Decide:
 - "mistakes": it is in English but has real mistakes (grammar, spelling, wrong word, word order, missing words) → give the corrected English.
 - "ok": it is correct English. Ignore small things: capital letters, final punctuation, informal chat style (hi, ok, lol, pls), emojis, names.
 Keep the same meaning, the emojis and the names; simple, natural English, as a friendly student would write.
+The topic can be anything (personal, private, sensitive or taboo): only correct the language. Never refuse, never judge, never add advice, never change or soften the meaning.
 Answer only in JSON: {"status":"ok" or "french" or "mistakes","english":"the correct English version (empty if ok)"}`,{cache:false}),new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),15000))]);
   const st=r&&r.status,en=String(r&&r.english||"").trim();
   if(!en||(st!=="french"&&st!=="mistakes"))return null;
@@ -744,7 +746,7 @@ async function v4TextSend(kind,f){const id=V4IN(kind),inp=document.getElementByI
   let text=orig;
   if(v4NeedFix(orig)){V4.fixing=kind;render();const r=await v4Check(orig);V4.fixing=null;if(r)text=v4Pack(orig,r.en,r.k)}
   if(kind==="peer")PR.sending=true;render();
-  try{await v4Deliver(kind,tgt,text,null)}catch(e){toast((e&&e.message)||"Could not send","x");S.drafts[id]=orig}
+  try{await v4Deliver(kind,tgt,text,null,v4TakeReply(kind))}catch(e){toast((e&&e.message)||"Could not send","x");S.drafts[id]=orig}
   if(kind==="peer")PR.sending=false;render();
   const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight;
   if(hadFocus){const n=document.getElementById(id);if(n)n.focus({preventScroll:true})}}
@@ -786,3 +788,137 @@ body::after{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area-
  body.v4chat .v4grid{max-height:min(210px,30vh)}
  body.v4chat main,body.v4chat .wrap{padding-bottom:0!important}
 }`;document.head.appendChild(st)}
+
+/* =====================================================================
+   18. Like WhatsApp: delete (for me / for everyone), view once photos,
+       reply, reactions, read ticks, day separators — in every messenger.
+   ===================================================================== */
+const V4RE=["👍","❤️","😂","😮","😢","🙏"];
+V4.ctx={};
+const v4HidKey=()=>"ec_hid_"+(S.uid||"x");
+function v4Hidden(){if(!V4.hid||V4.hidFor!==S.uid){V4.hidFor=S.uid;try{V4.hid=new Set(JSON.parse(localStorage.getItem(v4HidKey())||"[]"))}catch(e){V4.hid=new Set()}}return V4.hid}
+function v4HideForMe(id){const h=v4Hidden();h.add(id);try{localStorage.setItem(v4HidKey(),JSON.stringify([...h].slice(-3000)))}catch(e){}}
+function v4Ctx(kind,id,x){let c;
+  if(kind==="peer")c={target:id,other:peerName(id),list:()=>PR.inbox};
+  else if(kind==="staff")c={target:id,other:x||"Teacher",readAt:((SC.meta[id]||{}).read||{})[id]||0,base:staffBase(id)+"/msgs",list:()=>SC.msgs};
+  else{const st=x==="student";c={target:id,me:x,other:st?"Teacher":((person(id)||{}).name||"Student"),readAt:st?((S.me||{}).teacherReadAt||0):((person(id)||{}).studentReadAt||0),base:"students/"+id+"/msgs",list:()=>S.msgs}}
+  V4.ctx[kind]=c;return c}
+function v4Norm(kind,m,c){
+  if(kind==="peer")return{id:m.id,mine:m.sender===S.uid,from:m.sender,text:m.body||"",att:m.att,at:+new Date(m.created_at),re:m.meta&&m.meta.re,react:m.react||{},del:!!m.deleted_at,read:!!m.read_at,opened:!!(m.opened_at||(m.att&&m.att.opened))};
+  const mine=kind==="chat"?m.from===c.me:m.from===S.uid;
+  return{id:m.id,mine,from:m.from,text:m.text||"",att:m.att,at:m.at,re:m.re,react:m.react||{},del:!!m.del,read:mine&&(c.readAt||0)>=m.at,opened:!!(m.att&&m.att.opened)}}
+function v4Who(kind,w,c){if(!w)return"";if(w===S.uid||(kind==="chat"&&w===c.me))return"You";return c.other}
+function v4DayLabel(d){const t=new Date();t.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);const n=Math.round((t-x)/864e5);
+  return n===0?"Today":n===1?"Yesterday":n<7?x.toLocaleDateString("en-GB",{weekday:"long"}):x.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:x.getFullYear()===t.getFullYear()?undefined:"numeric"})}
+function v4MsgList(kind,list,c){const H=v4Hidden();let out="",lastDay="";
+  for(const raw of list){const m=v4Norm(kind,raw,c);if(H.has(m.id))continue;const day=new Date(m.at).toDateString();
+    if(day!==lastDay){lastDay=day;out+=`<div class="v4day"><span>${v4DayLabel(m.at)}</span></div>`}
+    out+=v4MsgHTML(kind,m,c)}
+  return out}
+function v4MsgHTML(kind,m,c){const a=m.att,once=!!(a&&a.o)&&!m.del,stk=a&&a.k==="sticker"&&!m.text&&!m.del;let body;
+  if(m.del)body=`<div class="v4del">⊘ ${m.mine?"You deleted this message":"This message was deleted"}</div>`;
+  else if(once){const ob=`<i class="v4one">1</i>`;
+    body=m.mine?`<div class="v4once">${ob}<b>Photo</b><small>${m.opened?"Opened":"View once"}</small></div>`
+      :m.opened?`<div class="v4once off">${ob}<b>Opened</b></div>`
+      :`<button type="button" class="v4once" data-v4="once" data-k="${kind}" data-id="${esc(m.id)}">${ob}<b>Photo</b><small>Tap to view once</small></button>`}
+  else body=msgBodyHTML(m.text,a);
+  const re=m.re&&!m.del?`<div class="v4quote" data-v4="jump" data-id="${esc(m.re.id||"")}"><div class="v4q-w">${esc(v4Who(kind,m.re.w,c))}</div><div class="v4q-t">${esc(m.re.t||"")}</div></div>`:"";
+  const rx=Object.values(m.react||{}).filter(Boolean),rxh=rx.length&&!m.del?`<div class="v4rx">${[...new Set(rx)].map(e=>E(e)).join("")}${rx.length>1?`<b>${rx.length}</b>`:""}</div>`:"";
+  const tick=m.mine&&!m.del&&kind!=="x"?`<i class="v4tick${m.read?" rd":""}" aria-label="${m.read?"Read":"Sent"}">${m.read?"✓✓":"✓"}</i>`:"";
+  return`<div class="msg ${m.mine?"mine":""}${stk?" stk":""}${m.del?" del":""}${rxh?" hasrx":""}" data-mid="${esc(m.id)}" data-k="${kind}" id="m-${esc(m.id)}">${re}${body}<span>${fmtTime(m.at)}${tick}</span>${rxh}</div>`}
+function v4ActSheet(kind,list,c){const raw=list.find(x=>x.id===V4.act.id);if(!raw)return"";const m=v4Norm(kind,raw,c),txt=v4Plain(m.text);
+  return`<div class="v4sheet-bg" data-v4="actClose"></div><div class="v4sheet" role="dialog" aria-label="Message options">
+  ${!m.del?`<div class="v4rxrow">${V4RE.map(e=>`<button type="button" data-v4="react" data-e="${e}" aria-pressed="${(m.react||{})[S.uid]===e}" aria-label="React ${e}">${E(e)}</button>`).join("")}</div>`:""}
+  ${!m.del?`<button type="button" data-v4="reply">${ic("left")}Reply</button>`:""}
+  ${!m.del&&txt?`<button type="button" data-v4="copy">${ic("copy")}Copy</button>`:""}
+  <button type="button" data-v4="delMe">${ic("trash")}Delete for me</button>
+  ${m.mine&&!m.del?`<button type="button" class="danger" data-v4="delAll">${ic("trash")}Delete for everyone</button>`:""}
+  <button type="button" class="v4cancel" data-v4="actClose">Cancel</button></div>`}
+function v4PreSheet(){const P=V4.pre;return`<div class="v4sheet-bg" data-v4="preX"></div><div class="v4sheet v4pre" role="dialog" aria-label="Send a photo">
+  <img src="${P.url}" alt="Photo to send">
+  <div class="v4pre-row"><input id="v4cap" placeholder="${P.once?"No caption for view once photos":"Add a caption…"}" maxlength="1000" ${P.once?"disabled":""} value="${esc(P.cap||"")}" autocomplete="off">
+  <button type="button" class="v4onebtn${P.once?" on":""}" data-v4="preOnce" aria-pressed="${P.once}" title="View once" aria-label="View once"><i class="v4one">1</i></button>
+  <button type="button" class="btn" data-v4="preSend" aria-label="Send">${ic("send")}</button></div>
+  ${P.once?`<p class="small" style="margin:0">View once: your contact can open this photo only one time.</p>`:""}
+  <button type="button" class="v4cancel" data-v4="preX">Cancel</button></div>`}
+function v4TakeReply(kind){const r=V4.reply;if(!r||r.kind!==kind)return null;V4.reply=null;return{re:{id:r.id,t:r.t.slice(0,140),w:r.w}}}
+function v4ActMsg(){const a=V4.act;if(!a)return null;const c=V4.ctx[a.kind];if(!c)return null;const raw=c.list().find(x=>x.id===a.id);return raw?{kind:a.kind,c,raw,m:v4Norm(a.kind,raw,c)}:null}
+function v4DocPath(kind,c,id){return c.base+"/"+id}
+async function v4React(e){const x=v4ActMsg();V4.act=null;if(!x){render();return}const cur=(x.m.react||{})[S.uid],ne=cur===e?"":e;
+  if(x.kind==="peer"){x.raw.react={...(x.raw.react||{}),[S.uid]:ne};if(!ne)delete x.raw.react[S.uid];render();try{await window.__peer.react(x.raw.id,ne)}catch(er){toast(er.message||"Could not react","x")}return}
+  x.raw.react={...(x.raw.react||{}),[S.uid]:ne};render();await write(()=>S.db.doc(v4DocPath(x.kind,x.c,x.raw.id)).update({react:{[S.uid]:ne}})).catch(()=>{})}
+async function v4DelAll(){const x=v4ActMsg();V4.act=null;if(!x||!x.m.mine){render();return}
+  if(x.kind==="peer"){try{await window.__peer.del(x.raw.id);x.raw.deleted_at=new Date().toISOString();x.raw.body="";x.raw.att=null;x.raw.meta=null}catch(er){toast(er.message||"Could not delete","x")}render();return}
+  if(S.mode==="teacher")write(()=>S.db.collection("gradebook/archive/msgs").add({path:x.c.base,id:x.raw.id,from:x.raw.from||"",text:x.raw.text||"",att:x.raw.att||null,at:x.raw.at||0,delAt:Date.now(),by:S.uid})).catch(()=>{});
+  Object.assign(x.raw,{del:true,text:"",att:null,re:null});render();
+  await write(()=>S.db.doc(v4DocPath(x.kind,x.c,x.raw.id)).update({del:true,text:"",att:null,re:null,react:null})).catch(()=>{});
+  if(x.kind==="chat")write(()=>S.db.doc("students/"+x.c.target).update({lastMsgText:"⊘ Message deleted"})).catch(()=>{})}
+async function v4OpenOnce(kind,id){const c=V4.ctx[kind];if(!c)return;const raw=c.list().find(x=>x.id===id);if(!raw)return;
+  let att=null;
+  try{if(kind==="peer"){att=await window.__peer.openOnce(id);raw.opened_at=new Date().toISOString();raw.att={k:"img",o:true,opened:true}}
+    else{att=raw.att&&raw.att.p?{...raw.att}:null;const op={k:"img",o:true,opened:Date.now(),p:null,t:null,n:null,s:null};raw.att=op;write(()=>S.db.doc(v4DocPath(kind,c,id)).update({att:op})).catch(()=>{})}}
+  catch(er){toast(er.message||"Cannot open this photo.","x");return}
+  render();if(!att||!att.p){toast("This photo was already opened.","eye");return}
+  const ov=document.createElement("div");ov.className="v4onceview";ov.innerHTML=`<div class="v4spin"></div><button type="button" class="iconbtn" aria-label="Close">${ic("x")}</button><p>View once · it disappears when you close it</p>`;document.body.appendChild(ov);
+  let url=null;const close=()=>{ov.remove();if(url)URL.revokeObjectURL(url)};ov.querySelector("button").onclick=close;
+  try{const r=await fetch(await srcURL({k:"m",id:att.p,t:att.t}));const b=await r.blob();url=URL.createObjectURL(b);const im=new Image();im.src=url;im.alt="View once photo";im.draggable=false;im.oncontextmenu=e=>e.preventDefault();ov.querySelector(".v4spin").replaceWith(im)}
+  catch(er){ov.querySelector(".v4spin").replaceWith(Object.assign(document.createElement("p"),{textContent:"Cannot load the photo (network)."}))}}
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el)return;const a=el.dataset.v4;
+  switch(a){
+  case"actClose":V4.act=null;render();return;
+  case"react":v4React(el.dataset.e);return;
+  case"reply":{const x=v4ActMsg();V4.act=null;if(x){const t=v4Plain(x.m.text)||attLabel(x.m.att)||"Message";V4.reply={kind:x.kind,id:x.raw.id,t:t.slice(0,140),w:x.kind==="chat"?x.raw.from:(x.kind==="peer"?x.raw.sender:x.raw.from),who:x.m.mine?"yourself":x.c.other}}render();const n=document.getElementById(V4IN(x?x.kind:"chat"));if(n)n.focus();return}
+  case"replyX":V4.reply=null;render();return;
+  case"copy":{const x=v4ActMsg();V4.act=null;render();if(x){const t=v4Plain(x.m.text);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Message copied","copy")).catch(()=>toast("Cannot copy here.","x"))}return}
+  case"delMe":{const x=v4ActMsg();V4.act=null;if(x){v4HideForMe(x.raw.id);toast("Message deleted for you","trash")}render();return}
+  case"delAll":v4DelAll();return;
+  case"once":v4OpenOnce(el.dataset.k,el.dataset.id);return;
+  case"jump":{const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
+  case"preX":if(V4.pre)URL.revokeObjectURL(V4.pre.url);V4.pre=null;render();return;
+  case"preOnce":if(V4.pre){V4.pre.cap=(document.getElementById("v4cap")||{}).value||V4.pre.cap||"";V4.pre.once=!V4.pre.once;render()}return;
+  case"preSend":{const P=V4.pre;if(!P)return;const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,"img",null,{once:P.once,caption:cap});return}
+  }},true);
+/* option sheets live outside the chat box (so nothing clips them) */
+function v4SyncSheets(){let host=document.getElementById("v4sheets");if(!host){host=document.createElement("div");host.id="v4sheets";document.body.appendChild(host)}
+  const inChat=!!document.getElementById("chatScroll");let h="";
+  if(inChat){const a=V4.act,c=a&&V4.ctx[a.kind];if(a&&c)h=v4ActSheet(a.kind,c.list(),c);else if(V4.pre)h=v4PreSheet()}
+  else{V4.act=null;if(V4.pre){URL.revokeObjectURL(V4.pre.url);V4.pre=null}}
+  if(host._h!==h){host._h=h;host.innerHTML=h}}
+{const _l=v4ChatLayout;v4ChatLayout=function(){_l();v4SyncSheets()}}
+/* tap (or long-press / right-click) on a message → options */
+function v4MsgTap(e){const b=e.target.closest&&e.target.closest(".msg[data-mid]");if(!b||e.target.closest("button,a,input,label,.v4quote"))return;if(String(b.dataset.mid).startsWith("tmp"))return;
+  e.preventDefault();V4.act={kind:b.dataset.k,id:b.dataset.mid};render()}
+document.addEventListener("click",v4MsgTap);
+document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest(".msg[data-mid]"))v4MsgTap(e)});
+/* classmates: live updates (deleted, reactions, read ticks, opened) */
+{const _ps=peerStart;peerStart=function(){const was=!!PR.un;_ps();if(!was&&PR.un&&window.__peer&&window.__peer.listenUpd&&!PR.unU)PR.unU=window.__peer.listenUpd(m=>{const i=PR.inbox.findIndex(x=>x.id===m.id);if(i>=0){PR.inbox[i]={...PR.inbox[i],...m};render()}})}}
+/* moderation: deleted messages and view once photos stay visible for teachers */
+{const _pm=peerModView;peerModView=function(){const h=_pm();if(V4.arch===undefined&&window.__peer&&window.__peer.archive){V4.arch=null;window.__peer.archive().then(r=>{V4.arch=r;render()}).catch(()=>{V4.arch=[]})}
+  const L=V4.arch||[];if(!L.length)return h;const nm=id=>(person(id)||{}).name||"Student";
+  return h+`<div class="section"><div><span class="eyebrow">Safety copy</span><h2>Deleted messages and view once photos</h2><p class="sub">Students can delete their messages and send view once photos. A copy stays here for you, so you can act if there is a problem.</p></div><div class="glass list">${L.slice(0,100).map(x=>`<div class="it"><div class="txt"><b>${esc(nm(x.sender))} → ${esc(nm(x.receiver))} <span class="chip ${x.kind==="once"?"warn":"bad"}">${x.kind==="once"?"View once":"Deleted"}</span></b><span>${msgBodyHTML(x.body||"",x.att&&x.att.p?{...x.att,o:undefined}:null)}</span><small class="muted">${fmtTime(+new Date(x.sent_at||x.created_at))}</small></div></div>`).join("")}</div></div>`}}
+{const st=document.createElement("style");st.textContent=`
+.v4day{display:flex;justify-content:center;margin:6px 0}.v4day span{font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted);opacity:1;margin:0;display:inline-block}
+.msg[data-mid]{cursor:pointer;-webkit-user-select:text;user-select:text;position:relative}
+.msg.hasrx{margin-bottom:12px}
+.msg .v4tick{font-style:normal;margin-left:6px;letter-spacing:-2px;font-weight:700}.msg .v4tick.rd{color:#34B7F1;opacity:1}
+.v4del{font-style:italic;opacity:.75}
+.msg.del{opacity:.85}
+.v4quote{display:grid;gap:1px;border-left:4px solid #8B7CFF;background:rgba(127,127,160,.16);border-radius:10px;padding:5px 9px;margin-bottom:6px;cursor:pointer;max-width:100%;min-width:0}
+.v4q-w{font-size:.75rem;font-weight:800;color:#8B7CFF}.v4q-t{font-size:.84rem;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v4replybar{display:flex;align-items:center;gap:8px;padding:8px 10px 0;background:var(--surface)}.v4replybar .v4quote{flex:1;margin:0}
+.v4rx{position:absolute;bottom:-14px;right:10px;display:flex;align-items:center;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:1px 7px;font-size:.95rem;box-shadow:var(--shadow)}.msg:not(.mine) .v4rx{right:auto;left:10px}.v4rx b{font-size:.7rem;margin-left:2px;color:var(--muted)}.v4rx .e3d{width:18px;height:18px}
+.v4once{display:flex;align-items:center;gap:8px;border:0;background:none;color:inherit;font:inherit;padding:2px 0;cursor:pointer;text-align:left}.v4once small{opacity:.7;margin-left:4px}.v4once.off{opacity:.6;cursor:default}
+.v4one{font-style:normal;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;border:2px dashed currentColor;font-size:.72rem;font-weight:800;line-height:1}
+.v4sheet-bg{position:fixed;inset:0;background:rgba(5,8,20,.45);z-index:80}
+.v4sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(440px,100%);z-index:81;background:var(--surface);color:var(--fg);border-radius:22px 22px 0 0;padding:12px 12px calc(14px + env(safe-area-inset-bottom,0px));display:grid;gap:4px;box-shadow:0 -10px 40px rgba(0,0,0,.35);animation:v4up .18s ease-out}
+@keyframes v4up{from{transform:translate(-50%,30px);opacity:0}}
+.v4sheet>button{display:flex;align-items:center;gap:12px;border:0;background:none;color:inherit;font:inherit;font-weight:600;padding:13px 12px;border-radius:12px;cursor:pointer;text-align:left}.v4sheet>button:hover{background:var(--surface2)}.v4sheet>button svg{width:20px;height:20px}
+.v4sheet>button.danger{color:#E5484D}.v4sheet .v4cancel{justify-content:center;color:var(--muted)}
+.v4rxrow{display:flex;justify-content:space-around;padding:4px 0 8px;border-bottom:1px solid var(--line);margin-bottom:4px}.v4rxrow button{border:0;background:none;font-size:1.7rem;cursor:pointer;border-radius:50%;width:48px;height:48px;display:grid;place-items:center}.v4rxrow button[aria-pressed=true]{background:var(--ink-soft)}.v4rxrow .e3d{width:32px;height:32px}
+.v4pre img{max-width:100%;max-height:52vh;object-fit:contain;border-radius:14px;margin:0 auto;display:block;background:#000}
+.v4pre-row{display:flex;gap:8px;align-items:center;margin-top:8px}.v4pre-row input{flex:1;min-width:0}
+.v4onebtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface2);color:var(--fg);display:grid;place-items:center;cursor:pointer;flex:none}.v4onebtn.on{background:#25D366;color:#fff;border-color:transparent}
+.v4onceview{position:fixed;inset:0;z-index:90;background:#000;display:grid;place-items:center;color:#fff}.v4onceview img{max-width:100vw;max-height:88vh;object-fit:contain;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.v4onceview .iconbtn{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:12px;background:rgba(255,255,255,.15);color:#fff}.v4onceview p{position:absolute;bottom:calc(16px + env(safe-area-inset-bottom,0px));margin:0;font-size:.85rem;opacity:.8}
+.msg.v4flash{animation:v4fl 1.2s}@keyframes v4fl{30%{box-shadow:0 0 0 4px #8B7CFF}}
+`;document.head.appendChild(st)}

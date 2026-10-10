@@ -246,10 +246,20 @@
   /* ---------------- copies d'élèves (photos / PDF des devoirs et épreuves) ---------------- */
   window.__peer = {
     dir: async () => { const { data, error } = await sb.rpc("peer_directory"); if (error) throw new Error(mapErr(error).message); return data || []; },
-    send: async (to, body, att) => { const args = { p_to: to, p_body: body || "" }; if (att) args.p_att = att; const { data, error } = await sb.rpc("send_peer_message", args); if (error) throw new Error(/function .*send_peer_message|p_att|schema cache/i.test(error.message || "") ? "The teacher must first run the file supabase/messagerie.sql in Supabase." : (error.message || "Could not send")); return data; },
+    send: async (to, body, att, meta) => { const args = { p_to: to, p_body: body || "" }; if (att || meta) args.p_att = att || null; if (meta) args.p_meta = meta; const { data, error } = await sb.rpc("send_peer_message", args); if (error) throw new Error(/function .*send_peer_message|p_att|schema cache/i.test(error.message || "") ? "The teacher must first run the file supabase/messagerie.sql in Supabase." : (error.message || "Could not send")); return data; },
     read: async (from) => { const { error } = await sb.rpc("mark_peer_read", { p_from: from }); if (error) throw new Error(error.message); },
     inbox: async () => { const { data, error } = await sb.from("peer_messages").select("*").order("created_at", { ascending: false }).limit(400); if (error) throw new Error(mapErr(error).message); return data || []; },
     all: async () => { const { data, error } = await sb.from("peer_messages").select("*").order("created_at", { ascending: false }).limit(300); if (error) throw new Error(mapErr(error).message); return data || []; },
+    del: async (id) => { const { error } = await sb.rpc("delete_peer_message", { p_id: id }); if (error) throw new Error(/delete_peer_message|schema cache/i.test(error.message || "") ? "The teacher must first run the new file supabase/messagerie.sql in Supabase." : (error.message || "Could not delete")); },
+    react: async (id, e) => { const { error } = await sb.rpc("react_peer_message", { p_id: id, p_e: e || "" }); if (error) throw new Error(/react_peer_message|schema cache/i.test(error.message || "") ? "The teacher must first run the new file supabase/messagerie.sql in Supabase." : (error.message || "Could not react")); },
+    openOnce: async (id) => { const { data, error } = await sb.rpc("open_peer_once", { p_id: id }); if (error) throw new Error(error.message || "Could not open"); return data || null; },
+    archive: async () => { const { data, error } = await sb.from("peer_archive").select("*").order("created_at", { ascending: false }).limit(300); if (error) return []; return data || []; },
+    listenUpd: (fn) => {
+      try {
+        const ch = sb.channel("peeru-" + rid(8)).on("postgres_changes", { event: "UPDATE", schema: "public", table: "peer_messages" }, (p) => { try { fn(p.new); } catch (e) {} }).subscribe();
+        return () => { try { sb.removeChannel(ch); } catch (e) {} };
+      } catch (e) { return () => {}; }
+    },
     hide: async (id, on) => { const { error } = await sb.from("peer_messages").update({ hidden: !!on }).eq("id", id); if (error) throw new Error(mapErr(error).message); },
     listen: (fn) => {
       try {
