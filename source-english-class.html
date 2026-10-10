@@ -2869,7 +2869,8 @@ function v4PanelHTML(kind,t){return`<div class="v4panel glass"><div class="v4tab
   ${t==="emo"?`<div class="v4grid emo">${V4EMO.map(x=>`<button type="button" data-v4="emo" data-k="${kind}" data-e="${x}" aria-label="${x}">${E(x)}</button>`).join("")}</div>`:`<div class="v4grid stk">${v4Stickers().map(c=>`<button type="button" data-v4="stk" data-k="${kind}" data-e="${c}" aria-label="Send this sticker"><img src="img/${c}.webp" alt="" loading="lazy"></button>`).join("")}${v4LockedPacks().map(pk=>`<button type="button" class="lockpk" data-v4="packInfo" data-id="${pk.id}" aria-label="${esc(pk.t)} pack to unlock" title="Unlock it in the shop"><img src="img/${pk.e[0]}.webp" alt="" loading="lazy"></button>`).join("")}</div>${v4LockedPacks().length&&S.mode==="student"?`<span class="small muted">${v4LockedPacks().length} sticker pack${v4LockedPacks().length>1?"s":""} to unlock in the shop (greyed out).</span>`:""}`}</div>`}
 const v4Stickers=()=>{const own=(S.me&&S.me.owned)||{},all=[...V4STK];if(typeof SH_PACKS!=="undefined")for(const pk of SH_PACKS)if(own[pk.id]||S.mode==="teacher")for(const c of pk.e)if(!all.includes(c))all.push(c);return all};
 const v4LockedPacks=()=>{if(typeof SH_PACKS==="undefined"||S.mode!=="student")return[];const own=(S.me&&S.me.owned)||{};return SH_PACKS.filter(pk=>!own[pk.id])};
-const V4IN=k=>({peer:"peerInput",chat:"chatInput",staff:"staffInput"})[k]||"chatInput",V4F=k=>({peer:"peerchat",chat:"chat",staff:"staffchat"})[k]||"chat";
+const V4KINDS={peer:{input:"peerInput",form:"peerchat"},chat:{input:"chatInput",form:"chat"},staff:{input:"staffInput",form:"staffchat"}};   // feature files can register more kinds (e.g. V4KINDS.group={input:"groupInput",form:"groupchat"})
+const V4IN=k=>(V4KINDS[k]||V4KINDS.chat).input,V4F=k=>(V4KINDS[k]||V4KINDS.chat).form;
 function v4Bar(kind,target,ph){const inId=V4IN(kind),files=!!window.__chatFiles,rec=V4.rec&&V4.rec.kind===kind?V4.rec:null,pan=V4.panel&&V4.panel.kind===kind?V4.panel.t:null,busy=V4.sending||(kind==="peer"&&PR.sending);
   if(rec)return`<div class="v4rec" role="status"><span class="v4rec-dot" aria-hidden="true"></span><b><span class="v4rec-l">Recording </span><span id="v4recT">${fmtDur(rec.sec)}</span></b><span class="v4wave" aria-hidden="true">${"<i></i>".repeat(18)}</span><button type="button" class="iconbtn" data-v4="recCancel" aria-label="Cancel the voice message" title="Cancel">${ic("trash")}</button><button type="button" class="btn sm" data-v4="recSend" aria-label="Send the voice message">${ic("send")}Send</button></div>`;
   return`${pan?v4PanelHTML(kind,pan):""}${V4.reply&&V4.reply.kind===kind?`<div class="v4replybar"><div class="v4quote"><div class="v4q-w">Replying to ${esc(V4.reply.who)}</div><div class="v4q-t">${esc(V4.reply.t)}</div></div><button type="button" class="iconbtn sm" data-v4="replyX" aria-label="Cancel reply">${ic("x")}</button></div>`:""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Sending…</div>`:""}${V4.fixing===kind?`<div class="v4upl"><span class="v4spin"></span>Nova is checking your English…</div>`:""}<form class="chatbar v4bar" data-f="${V4F(kind)}" data-s="${esc(target)}">
@@ -4181,6 +4182,28 @@ progEnglish=async function(){if(progEnglish.busy||!(S.isOwner||S.isStaff)||!S.db
       return`<div class="ltable"><table><thead><tr>${rows[0].map(c=>`<th>${cell(c)}</th>`).join("")}</tr></thead><tbody>${rows.slice(1).map(r=>`<tr>${r.map(c=>`<td>${cell(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}
     return _lh(p).replace(/(^|[\s(>])\*([^*\n<>]+?)\*(?=[\s).,;:!?<]|$)/g,"$1<em>$2</em>")}).join("")}}
 {const st=document.createElement("style");st.textContent=`.ltable{overflow-x:auto;margin:10px 0}.ltable table{border-collapse:collapse;width:100%;font-size:.95rem}.ltable th,.ltable td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.ltable th{background:var(--surface2);font-weight:800}`;document.head.appendChild(st)}
+
+/* ---- app-v5-0-core.js ---- */
+/* =====================================================================
+   v5 core: nicknames and conversation flags (pin / archive / mute)
+   Shared by the feature files (app-v5-*.js).
+   - nickOf(uid) → nickname I gave to this person ("" if none)
+   - nickSet(uid, name)
+   - dispName(uid, fallback) → nickname or fallback name
+   - convHas(id, flag) / convToggle(id, flag)   id = "peer:<uid>" | "group:<id>" | "staff:<uid>"; flag = "pin" | "arch" | "mute"
+   Saved in my own student document (synced between my devices) and in localStorage (offline).
+   ===================================================================== */
+const V5={};
+function v5PrefsLocal(){try{return JSON.parse(localStorage.getItem("ec_v5p_"+(S.uid||"x"))||"{}")||{}}catch(e){return{}}}
+function v5Prefs(){const loc=v5PrefsLocal(),me=S.mode==="student"&&S.me?S.me:null;
+  return{nicks:{...(loc.nicks||{}),...((me&&me.nicks)||{})},conv:{...(loc.conv||{}),...((me&&me.conv)||{})}}}
+function v5PrefsSave(p){try{localStorage.setItem("ec_v5p_"+(S.uid||"x"),JSON.stringify(p))}catch(e){}
+  if(S.mode==="student"&&S.me&&S.db&&!isParent(S.me)){S.me.nicks=p.nicks;S.me.conv=p.conv;write(()=>S.db.doc("students/"+S.uid).update({nicks:p.nicks,conv:p.conv})).catch(()=>{})}}
+function nickOf(uid){return(v5Prefs().nicks||{})[uid]||""}
+function dispName(uid,fallback){return nickOf(uid)||fallback||""}
+function nickSet(uid,name){const p=v5Prefs();name=String(name||"").trim().slice(0,30);if(name)p.nicks[uid]=name;else delete p.nicks[uid];v5PrefsSave(p);render()}
+function convHas(id,flag){return!!((v5Prefs().conv||{})[id]||{})[flag]}
+function convToggle(id,flag){const p=v5Prefs(),c={...(p.conv[id]||{})};if(c[flag])delete c[flag];else c[flag]=Date.now();if(Object.keys(c).length)p.conv[id]=c;else delete p.conv[id];v5PrefsSave(p);render()}
 
 /* ==== v4 END ==== */
 render();
