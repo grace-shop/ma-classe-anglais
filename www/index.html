@@ -4089,6 +4089,74 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
 }
 `;document.head.appendChild(st)}
 
+/* =====================================================================
+   22. No French left in the content
+       a) the syllabus content installed before the English version is
+          replaced automatically by the English content.json (owner's app)
+       b) the teachers' own French content can be translated by Nova
+       c) old daily words with French meanings are replaced
+   ===================================================================== */
+const CONTENT_VER="en-2026-10b";
+const FRW=new Set("le la les un une des du au aux et est sont je tu il elle nous vous ils elles mon ma mes ton ta tes son sa ses notre votre leur pour avec dans sur pas que qui quoi comment pourquoi quand très bien aussi mais donc car ou où ce cette ces cet être avoir fait faire dit dire écris écrire traduis traduire choisis choisir complète compléter réponds répondre phrase phrases mot mots verbe exemple exercice leçon question bonne réponse vrai faux suivant suivante voici ici".split(" "));
+function frLike(t){t=String(t||"").toLowerCase();if(t.length<3)return false;const ws=t.match(/[a-zàâçéèêëîïôûùüÿœ']+/g)||[];if(!ws.length)return false;
+  const n=ws.filter(w=>FRW.has(w.replace(/^[ldjmtsnc]'/,""))).length,acc=(t.match(/[àâçéèêëîïôûùœ]/g)||[]).length;
+  return(n>=3&&n/ws.length>0.12)||(acc>=3&&n>=1)||(ws.length<=6&&n>=2)}
+const TXT={lessons:["title","theme","grammar","body"],quizzes:["title"],decks:["title"],homework:["title","instructions"],epreuves:["title","sujet"],pictures:["prompt","answer","fr","set"],rewards:["title","desc"],anns:["title","body","text"]};
+const COLS={lessons:"lessons",quizzes:"quizzes",decks:"decks",homework:"homework",epreuves:"eps",pictures:"pictures",rewards:"rewards",announcements:"anns"};
+function docText(col,d){const k=col==="announcements"?"anns":col;let t=(TXT[k]||[]).map(f=>d[f]||"").join(" \n");
+  if(col==="quizzes")t+=" "+(d.questions||[]).map(q=>[q.q,...(q.choices||[]),q.hint||"",q.explain||""].join(" ")).join(" ");
+  if(col==="decks")t+=" "+(d.cards||[]).map(c=>[c.fr,c.ex].join(" ")).join(" ");
+  if(col==="pictures")t+=" "+(d.alt||[]).join(" ");return t}
+/* a) syllabus content → English */
+async function progEnglish(){if(progEnglish.busy||S.mode!=="teacher"||!S.isOwner||!S.db)return;if((S.settings||{}).contentVer===CONTENT_VER)return;
+  if(PROGC===null){progLoad();return}if(!PROGC||!(S.lessons||[]).length)return;progEnglish.busy=true;
+  const have={lessons:S.lessons,quizzes:S.quizzes,decks:S.decks||[],epreuves:S.eps};let n=0;
+  try{for(const[col,docs]of Object.entries(PROGC)){
+      for(const[id,en]of Object.entries(docs)){let cur;
+        if(col==="corriges"){cur=(S.corriges||{})[id];if(!cur)continue;if(cur.text===en.text)continue;await write(()=>S.db.doc("corriges/"+id).set({...cur,text:en.text}));n++;continue}
+        const L=have[col];if(!L)continue;cur=L.find(x=>x.id===id);if(!cur)continue;
+        const keep={};for(const k of["createdAt","fileId","fileName","fileType","corrigeVisible","hidden","teacherId","audience","minutes","exam"])if(cur[k]!==undefined&&cur[k]!=="")keep[k]=cur[k];
+        const next={...en,...keep};const {id:_i,...curData}=cur;if(JSON.stringify(Object.fromEntries(Object.entries(curData).sort()))===JSON.stringify(Object.fromEntries(Object.entries(next).sort())))continue;
+        await write(()=>S.db.doc(col+"/"+id).set(next));n++}}
+    await write(()=>S.db.doc("settings/main").set({...S.settings,contentVer:CONTENT_VER}));
+    if(n)toast(`${n} lessons, quizzes and papers updated to English`,"check")}
+  catch(e){console.warn("progEnglish",e)}progEnglish.busy=false}
+setInterval(()=>{try{progEnglish()}catch(e){}},5000);
+/* b) teachers' own content still in French */
+const TR={busy:false,done:0,total:0,err:0};
+function frItems(){const progIds=new Set();if(PROGC)for(const docs of Object.values(PROGC))for(const id of Object.keys(docs))progIds.add(id);
+  const out=[];for(const[col,key]of Object.entries(COLS))for(const d of(S[key]||[])){if(!d||progIds.has(d.id))continue;if(S.mode==="teacher"&&!S.isOwner&&d.teacherId&&d.teacherId!==S.uid)continue;if(frLike(docText(col,d)))out.push([col,d])}
+  for(const[id,c]of Object.entries(S.corriges||{}))if(!progIds.has(id)&&frLike(c.text))out.push(["corriges",{id,...c}]);return out}
+function trPayload(col,d){const k=col==="announcements"?"anns":col,p={};for(const f of(TXT[k]||[]))if(d[f])p[f]=d[f];
+  if(col==="quizzes")p.questions=(d.questions||[]).map(q=>({q:q.q||"",...(q.choices?{choices:q.choices}:{}),...(q.hint?{hint:q.hint}:{}),...(q.explain?{explain:q.explain}:{})}));
+  if(col==="decks")p.cards=(d.cards||[]).map(c=>({en:c.en||"",fr:c.fr||"",ex:c.ex||""}));
+  if(col==="pictures"&&d.alt)p.alt=d.alt;if(col==="corriges")p.text=d.text||"";return p}
+function trMerge(col,d,r){const out={...d};delete out.id;const k=col==="announcements"?"anns":col;
+  for(const f of[...(TXT[k]||[]),"text"])if(typeof r[f]==="string"&&r[f].trim()&&d[f]!==undefined)out[f]=r[f];
+  if(col==="quizzes"&&Array.isArray(r.questions)&&r.questions.length===(d.questions||[]).length)out.questions=d.questions.map((q,i)=>{const t=r.questions[i]||{};const o={...q};if(typeof t.q==="string"&&t.q.trim())o.q=t.q;if(Array.isArray(t.choices)&&q.choices&&t.choices.length===q.choices.length)o.choices=t.choices.map((c,j)=>String(c||q.choices[j]));if(typeof t.hint==="string"&&q.hint)o.hint=t.hint;if(typeof t.explain==="string"&&q.explain)o.explain=t.explain;return o});
+  if(col==="decks"&&Array.isArray(r.cards)&&r.cards.length===(d.cards||[]).length)out.cards=d.cards.map((c,i)=>{const t=r.cards[i]||{};return{...c,...(typeof t.fr==="string"&&t.fr.trim()?{fr:t.fr}:{}),...(typeof t.ex==="string"&&t.ex.trim()?{ex:t.ex}:{})}});
+  if(col==="pictures"&&Array.isArray(r.alt))out.alt=r.alt.map(String);return out}
+async function trAll(){if(TR.busy||!AI.sample)return;const L=frItems();if(!L.length){toast("Everything is already in English.","check");return}TR.busy=true;TR.done=0;TR.err=0;TR.total=L.length;render();
+  for(const[col,d]of L){try{const p=trPayload(col,d);
+      const r=await AI.sample.json(`This is content from an English-learning app for students in Togo. Some text is in French. Translate EVERY French text into natural, simple English (A1–B1 level). Keep text that is already in English exactly as it is. Keep exactly the same JSON keys, the same arrays, the same number and order of items, and markdown such as **bold**.
+For a field named "fr": write a short, very simple English definition of the English word (never French).
+For a quiz question that asks to translate from French (for example « Août » in English is…), rewrite it as an English-only question that has the same correct answer (for example: The 8th month of the year is…), and keep the choices in the same order.
+Return ONLY the JSON object.
+${JSON.stringify(p)}`,{modelTier:"complex",cache:false});
+      if(!r||typeof r!=="object")throw new Error("bad");const next=trMerge(col,d,r);const path=(col==="announcements"?"announcements":col)+"/"+d.id;
+      await write(()=>S.db.doc(path).set(next))}catch(e){TR.err++}TR.done++;render()}
+  TR.busy=false;toast(TR.err?`Done, ${TR.err} item(s) could not be translated: try again.`:"All your content is now in English!",TR.err?"x":"check");render()}
+function trCardHTML(){if(S.mode!=="teacher"||!(S.isOwner||S.isStaff)||!AI.sample||AI.disabled)return"";if(PROGC===null)progLoad();const n=TR.busy?TR.total-TR.done:frItems().length;if(!n&&!TR.busy)return"";
+  return`<div class="section"><div class="glass card row between trcard"><div><b>${ic("spark")} ${TR.busy?`Nova is translating… ${TR.done} / ${TR.total}`:`${n} of your lessons, quizzes or homework still contain French`}</b><p class="sub small" style="margin:0">The app is English only. Nova can translate them into simple English for you (French quiz questions become English questions).</p></div>${TR.busy?`<span class="v4spin"></span>`:`<button type="button" class="btn sm" data-v4="trAll">${ic("spark")}Translate with Nova</button>`}</div></div>`}
+{const _cv=contentView;contentView=function(){return trCardHTML()+_cv()}}
+{const _dv=dashView;dashView=function(){const h=_dv();return(S.isOwner&&(S.settings||{}).contentVer!==CONTENT_VER&&PROGC?`<div class="section"><div class="glass card small">${ic("refresh")} Updating the syllabus lessons and quizzes to English…</div></div>`:"")+h}}
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-v4="trAll"]');if(el){e.preventDefault();trAll()}},true);
+/* c) daily words with French meanings (made before the English version) are replaced */
+setInterval(()=>{try{if(S.mode!=="student"||!S.me||isParent(S.me)||V4.wdFix===S.uid)return;V4.wdFix=S.uid;const d=wdOf(),items=d.items||[];
+  const bad=items.filter(w=>frLike(w.fr)||frLike(w.exfr)||/[àâçéèêëîïôûùœ]/.test((w.fr||"")+(w.exfr||"")));if(!bad.length)return;
+  write(()=>meRef().update({dailyWords:{day:"",items:items.filter(w=>!bad.includes(w))}})).then(()=>{V4.wdAt=0;V4.words=false;try{wdGen()}catch(e){}}).catch(()=>{})}catch(e){}},6000);
+{const st=document.createElement("style");st.textContent=`.trcard{border-color:#9A7CFF!important;gap:12px}`;document.head.appendChild(st)}
+
 /* ==== v4 END ==== */
 render();
 loadThree();
