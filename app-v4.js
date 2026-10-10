@@ -203,13 +203,13 @@ function msgBodyHTML(text,a){let h="";
     else if(a.k==="voice")h+=voiceHTML(a);
     else if(a.k==="img"){const u=V4.obj[a.p];h+=`<button type="button" class="v4img" data-v4="doc" data-k="m" data-id="${esc(a.p)}" data-t="${esc(a.t||"image/jpeg")}" data-n="${esc(a.n||"photo.jpg")}" aria-label="See the photo"><img ${u?`src="${u}"`:`data-chatp="${esc(a.p)}" data-t="${esc(a.t||"")}"`} alt="Photo"></button>`}
     else if(a.p)h+=`<button type="button" class="v4file" data-v4="doc" data-k="m" data-id="${esc(a.p)}" data-t="${esc(a.t||"")}" data-n="${esc(a.n||"file")}">${ic(/word/.test(a.t||"")?"word":"file")}<span><b>${esc(a.n||"File")}</b><small>${fmtSize(a.s)}${V4.cached.has("m:"+a.p)?" · offline":""}</small></span></button>`}
-  if(text)h+=`<div class="${onlyEmoji(text)?"msg-emo":""}" style="white-space:pre-wrap">${E(text)}</div>`;
+  if(text){const fx=v4Split(text);h+=fx?v4FixHTML(fx[0],fx[1]):`<div class="${onlyEmoji(text)?"msg-emo":""}" style="white-space:pre-wrap">${E(text)}</div>`}
   return h}
 const msgHTML=(mine,text,a,at)=>`<div class="msg ${mine?"mine":""}${a&&a.k==="sticker"&&!text?" stk":""}">${msgBodyHTML(text,a)}<span>${fmtTime(at)}</span></div>`;
 async function hydrateChat(){for(const img of document.querySelectorAll("img[data-chatp]:not([data-ok])")){img.dataset.ok="1";const p=img.dataset.chatp;
   try{let u=V4.obj[p];if(!u){const b=await srcBlob({k:"m",id:p,t:img.dataset.t});u=V4.obj[p]=URL.createObjectURL(b)}img.src=u}catch(e){img.alt="Photo not available offline"}}}
 document.addEventListener("load",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.closest&&t.closest("#chatScroll")){const cs=document.getElementById("chatScroll");if(cs&&cs.scrollHeight-cs.scrollTop-cs.clientHeight<400)cs.scrollTop=cs.scrollHeight}},true);
-new MutationObserver(()=>{clearTimeout(hydrateChat._t);hydrateChat._t=setTimeout(hydrateChat,60)}).observe(document.body,{childList:true,subtree:true});
+new MutationObserver(()=>{clearTimeout(hydrateChat._t);hydrateChat._t=setTimeout(hydrateChat,60);if(typeof v4ChatLayout==="function"&&!v4ChatLayout._q){v4ChatLayout._q=1;requestAnimationFrame(()=>{v4ChatLayout._q=0;v4ChatLayout()})}}).observe(document.body,{childList:true,subtree:true});
 async function v4Play(p,t){const A=V4.audio||(V4.audio=new Audio());if(V4.playing===p){A.pause();V4.playing=null;render();return}
   try{let u=V4.obj[p];if(!u){V4.playing=p;render();const b=await srcBlob({k:"m",id:p,t});u=V4.obj[p]=URL.createObjectURL(b)}A.src=u;A.onended=()=>{V4.playing=null;render()};V4.playing=p;await A.play();render()}
   catch(e){V4.playing=null;render();toast(navigator.onLine?"Cannot play audio on this device.":"This voice message is not saved on this device yet.","x")}}
@@ -220,15 +220,15 @@ const v4LockedPacks=()=>{if(typeof SH_PACKS==="undefined"||S.mode!=="student")re
 const V4IN=k=>({peer:"peerInput",chat:"chatInput",staff:"staffInput"})[k]||"chatInput",V4F=k=>({peer:"peerchat",chat:"chat",staff:"staffchat"})[k]||"chat";
 function v4Bar(kind,target,ph){const inId=V4IN(kind),files=!!window.__chatFiles,rec=V4.rec&&V4.rec.kind===kind?V4.rec:null,pan=V4.panel&&V4.panel.kind===kind?V4.panel.t:null,busy=V4.sending||(kind==="peer"&&PR.sending);
   if(rec)return`<div class="v4rec" role="status"><span class="v4rec-dot" aria-hidden="true"></span><b><span class="v4rec-l">Recording </span><span id="v4recT">${fmtDur(rec.sec)}</span></b><span class="v4wave" aria-hidden="true">${"<i></i>".repeat(18)}</span><button type="button" class="iconbtn" data-v4="recCancel" aria-label="Cancel the voice message" title="Cancel">${ic("trash")}</button><button type="button" class="btn sm" data-v4="recSend" aria-label="Send the voice message">${ic("send")}Send</button></div>`;
-  return`${pan?v4PanelHTML(kind,pan):""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Sending…</div>`:""}<form class="chatbar v4bar" data-f="${V4F(kind)}" data-s="${esc(target)}">
+  return`${pan?v4PanelHTML(kind,pan):""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Sending…</div>`:""}${V4.fixing===kind?`<div class="v4upl"><span class="v4spin"></span>Nova is writing it in English…</div>`:""}<form class="chatbar v4bar" data-f="${V4F(kind)}" data-s="${esc(target)}">
   <button type="button" class="iconbtn${pan?" on":""}" data-v4="panel" data-k="${kind}" data-t="${pan||"emo"}" aria-label="Emojis and stickers" title="Emojis and stickers">${ic("smile")}</button>
   <input id="${inId}" placeholder="${esc(ph||"Write a message…")}" maxlength="1000" autocomplete="off" aria-label="Message">
-  ${files?`<label class="iconbtn" title="Send a photo or a file" aria-label="Send a photo or a file">${ic("clip")}<input type="file" id="v4f_${kind}" hidden accept="image/*,application/pdf,audio/*,.doc,.docx,.ppt,.pptx,.txt"></label>${V4.canRec?`<button type="button" class="iconbtn" data-v4="rec" data-k="${kind}" aria-label="Record a voice message" title="Voice message">${ic("mic")}</button>`:""}`:""}
+  ${files?`<span class="v4att"><label class="iconbtn" title="Send a photo or a file" aria-label="Send a photo or a file">${ic("clip")}<input type="file" id="v4f_${kind}" hidden accept="image/*,application/pdf,audio/*,.doc,.docx,.ppt,.pptx,.txt"></label>${V4.canRec?`<button type="button" class="iconbtn" data-v4="rec" data-k="${kind}" aria-label="Record a voice message" title="Voice message">${ic("mic")}</button>`:""}</span>`:""}
   <button class="btn" type="submit" aria-label="Send" ${busy?"disabled":""}>${ic("send")}</button></form>`}
 async function v4Deliver(kind,target,text,att){
   if(kind==="staff")return staffSend(target,text,att);
   if(kind==="peer"){const id=await window.__peer.send(target,text||"",att||null);PR.inbox.unshift({id:id||("tmp"+Date.now()),sender:S.uid,receiver:target,body:text||"",att:att||null,created_at:new Date().toISOString(),read_at:null});render();return}
-  const at=Date.now(),from=S.mode==="teacher"?"teacher":"student",pv=(text||attLabel(att)).slice(0,80);
+  const at=Date.now(),from=S.mode==="teacher"?"teacher":"student",pv=(v4Plain(text)||attLabel(att)).slice(0,80);
   await write(()=>S.db.collection("students/"+target+"/msgs").add({from,text:text||"",at,...(att?{att}:{})}));
   await write(()=>S.db.doc("students/"+target).update(from==="teacher"?{lastMsgAt:at,lastMsgFrom:"teacher",lastMsgText:pv,teacherReadAt:at}:{lastMsgAt:at,lastMsgFrom:"student",lastMsgText:pv,studentReadAt:at,lastActive:at,activity:"Wrote to the teacher"}));
   if(from==="student")presence("Writing a message")}
@@ -711,4 +711,79 @@ document.addEventListener("change",e=>{const el=e.target;if(!el||!el.id)return;
 document.addEventListener("input",e=>{const el=e.target;if(el&&el.id==="fq_msgs"){S.drafts.fq_msgs=el.value;S.v4msgLim=40;render()}});
 document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset)return;
   if(f.dataset.f==="hw"){e.preventDefault();e.stopImmediatePropagation();hwSubmit(f)}
+  if((f.dataset.f==="chat"||f.dataset.f==="peerchat")&&f.classList.contains("v4bar")){e.preventDefault();e.stopImmediatePropagation();v4TextSend(f.dataset.f==="peerchat"?"peer":"chat",f)}
   if(f.dataset.f==="staffchat"){e.preventDefault();e.stopImmediatePropagation();const inp=document.getElementById("staffInput"),text=(inp&&inp.value||"").trim();if(!text)return;if(inp)inp.value="";delete S.drafts.staffInput;staffSend(f.dataset.s,text,null).catch(()=>{})}},true);
+
+/* =====================================================================
+   17. French → English: a learner's French message is struck through in red,
+       with the English version in green under it. + mobile chat layout.
+   ===================================================================== */
+const V4MK="\n⟦EN⟧ ";
+function v4Split(t){t=String(t||"");const i=t.indexOf(V4MK);return i<0?null:[t.slice(0,i),t.slice(i+V4MK.length)]}
+function v4Plain(t){const x=v4Split(t);return x?x[1]:String(t||"")}
+function v4FixHTML(fr,en){return`<s class="v4fr">${E(fr)}</s><div class="v4en"><span class="v4en-l">In English</span><span>${E(en)}</span></div>`}
+const V4FR_STRONG=new Set("salut bonjour bonsoir merci oui non madame monsieur mademoiselle svp stp slt cc mdr bjr dac daccord".split(" "));
+const V4FR_W=new Set("je j tu il elle nous vous ils elles suis es est sommes êtes sont avons avez ont le la les un une des du au aux ce cet cette ces mon mes ton ta tes sa ses notre nos votre vos leur leurs et ou mais donc pas ne n oui non merci bonjour bonsoir salut madame monsieur comment pourquoi quoi qui quand où avec pour dans chez très bien ça ca c cest moi toi lui que qu fait faire fais vais va vas aller veux peux dois aujourd hui demain hier rien tout tous toutes beaucoup aussi encore déjà maintenant comme sans parce quel quelle combien voilà voici bon bonne aime suis été avoir être devoir exercice leçon prof cours classe livre français anglais".split(" "));
+function v4LooksFrench(t){t=String(t||"").toLowerCase();if(t.length<2)return false;
+  const ws=t.match(/[a-zàâçéèêëîïôûùüÿœ]+/g)||[];if(!ws.length)return false;
+  const fr=ws.filter(w=>V4FR_W.has(w)||V4FR_STRONG.has(w)).length,acc=/[àâçéèêëîïôûùœ]/.test(t);
+  if(ws.some(w=>V4FR_STRONG.has(w)))return true;
+  if(acc&&ws.length<=12)return true;
+  return fr>=2&&fr/ws.length>=0.25}
+function v4NeedFix(t){return S.mode==="student"&&S.me&&!isParent(S.me)&&!!AI.sample&&!AI.disabled&&navigator.onLine&&!onlyEmoji(t)&&v4LooksFrench(t)}
+async function v4ToEnglish(t){try{
+  const r=await Promise.race([AI.sample.json(`A learner of English in Togo wrote this chat message, maybe in French or mixing French and English:
+"""${String(t).slice(0,600)}"""
+If the message is (fully or partly) in French, give the natural English version a friendly student would write (keep emojis, names and the same meaning; simple English). If it is already in English, say so.
+Answer only in JSON: {"french":true or false,"english":"the English version"}`,{cache:false}),new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),15000))]);
+  const en=String(r&&r.english||"").trim();return r&&r.french&&en&&en.toLowerCase()!==String(t).trim().toLowerCase()?en.slice(0,480):null}catch(e){return null}}
+function v4Pack(fr,en){const room=1000-V4MK.length-en.length;return(fr.length>room?fr.slice(0,Math.max(0,room-1))+"…":fr)+V4MK+en}
+async function v4TextSend(kind,f){const id=V4IN(kind),inp=document.getElementById(id),orig=(inp&&inp.value||"").trim();if(!orig)return;
+  if(kind==="peer"&&(PR.sending||V4.fixing))return;
+  if(kind==="peer"&&!navigator.onLine){toast("No network: try again when you are online.","x");return}
+  const tgt=f.dataset.s,hadFocus=document.activeElement===inp;if(inp)inp.value="";delete S.drafts[id];
+  let text=orig;
+  if(v4NeedFix(orig)){V4.fixing=kind;render();const en=await v4ToEnglish(orig);V4.fixing=null;if(en)text=v4Pack(orig,en)}
+  if(kind==="peer")PR.sending=true;render();
+  try{await v4Deliver(kind,tgt,text,null)}catch(e){toast((e&&e.message)||"Could not send","x");S.drafts[id]=orig}
+  if(kind==="peer")PR.sending=false;render();
+  const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight;
+  if(hadFocus){const n=document.getElementById(id);if(n)n.focus({preventScroll:true})}}
+/* Nova panel: same correction on the learner's bubble */
+{const _aiSend=aiSend;aiSend=async function(text){const t0=String(text||"").trim();if(!AI.busy&&t0&&v4NeedFix(t0)){const p=_aiSend(text);const u=[...AI.turns].reverse().find(x=>x.role==="user"&&x.content===t0);if(u)v4ToEnglish(t0).then(en=>{if(en){u.en=en;try{renderAI()}catch(e){}}});return p}return _aiSend(text)}}
+
+/* mobile: the chat fills the screen, the send bar stays above the keyboard */
+function v4ChatLayout(){const c=document.querySelector(".glass.chat"),B=document.body;
+  let on=!!c&&innerWidth<=900&&!document.getElementById("docv");
+  if(on){const was=B.classList.contains("v4chat");if(scrollY>0&&(!was||!B.classList.contains("v4kb")))scrollTo(0,0);
+    const hd=document.querySelector("header.top"),hb=hd?hd.getBoundingClientRect().bottom:0,vh=window.visualViewport?visualViewport.height:innerHeight;
+    let b=hb;for(const el of c.parentElement.children){if(el===c)break;const r=el.getBoundingClientRect();if(r.height)b=Math.max(b,r.bottom)}
+    if(!was&&b-hb>vh*0.5)on=false;
+    else{V4.maxVH=Math.max(V4.maxVH||0,vh);const kb=B.classList.contains("v4kb")&&vh<V4.maxVH*0.8;const top=kb?hb+4:Math.min(b+8,vh*0.42);document.documentElement.style.setProperty("--v4ct",Math.round(top)+"px");
+      const cs=document.getElementById("chatScroll");if(cs&&!was)cs.scrollTop=cs.scrollHeight}}
+  B.classList.toggle("v4chat",on)}
+if(window.visualViewport)visualViewport.addEventListener("resize",()=>{v4ChatLayout();const cs=document.getElementById("chatScroll");if(cs&&B4near(cs))cs.scrollTop=cs.scrollHeight});
+addEventListener("resize",()=>v4ChatLayout());
+function B4near(cs){return cs.scrollHeight-cs.scrollTop-cs.clientHeight<260}
+document.addEventListener("focusin",e=>{const t=e.target;if(!t||!t.matches||!t.matches(".v4bar input:not([type=file])"))return;
+  document.body.classList.add("v4kb");if(V4.panel){V4.panel=null;const id=t.id;render();const n=document.getElementById(id);if(n&&document.activeElement!==n)n.focus({preventScroll:true})}
+  v4ChatLayout();setTimeout(()=>{v4ChatLayout();const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight},350)});
+document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(!(a&&a.matches&&a.matches(".v4bar input:not([type=file])"))){document.body.classList.remove("v4kb");v4ChatLayout()}},120));
+{const st=document.createElement("style");st.textContent=`
+.v4fr{display:block;width:fit-content;max-width:100%;color:#B91C1C;background:#FFE4E6;border-radius:10px;padding:3px 8px;text-decoration:line-through;text-decoration-thickness:2px;white-space:pre-wrap}
+.v4en{display:grid;gap:2px;margin-top:6px;color:#166534;background:#DCFCE7;border-radius:10px;padding:5px 9px;font-weight:600;white-space:pre-wrap}
+.v4en-l{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;opacity:.75;font-weight:800}
+.v4bar:has(>input:not(:placeholder-shown)) .v4att{display:none}
+.v4att{display:contents}
+.v4bar .btn[type=submit]{padding-inline:16px;flex:none}
+body::after{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60;pointer-events:none}
+@media (max-width:900px){
+ body.v4chat nav.tabs{display:none!important}
+ body.v4chat .glass.chat{position:fixed!important;left:0;right:0;top:var(--v4ct,140px);bottom:0;height:auto!important;max-height:none!important;z-index:25;border-radius:22px 22px 0 0;margin:0!important;display:flex!important;flex-direction:column}
+ body.v4chat .glass.chat>.msgs{flex:1 1 auto;min-height:0}
+ body.v4chat .glass.chat>.v4panel{flex:none;margin:6px 8px}
+ body.v4chat .glass.chat>.chatbar,body.v4chat .glass.chat>.v4rec{flex:none;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+ body.v4chat.v4kb .glass.chat>.chatbar{padding-bottom:10px}
+ body.v4chat .v4grid{max-height:min(210px,30vh)}
+ body.v4chat main,body.v4chat .wrap{padding-bottom:0!important}
+}`;document.head.appendChild(st)}
