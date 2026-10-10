@@ -2007,7 +2007,7 @@ function renderAI(visOnly){const fab=$("#aiFab"),panel=$("#aiPanel");if(!fab||!p
   const at=$("#aiAttach");at.hidden=!AI.img;at.innerHTML=AI.img?`<img src="${AI.img.url}" alt=""><span>Photo attached</span><button class="btn ghost sm" type="button" data-a="aiImgClear">Remove</button>`:"";
   $("#aiSend").innerHTML=AI.busy?ic("stop"):ic("send");$("#aiSend").setAttribute("aria-label",AI.busy?"Stop":"Send");$("#aiSend").type=AI.busy?"button":"submit";$("#aiSend").dataset.a=AI.busy?"aiStop":"";
   const box=$("#aiMsgs");
-  box.innerHTML=AI.turns.length?AI.turns.map((t,i)=>t.role==="user"?`<div class="ai-b u">${t.img?`<img src="${t.img}" alt="">`:""}${t.en?v4FixHTML(t.content,t.en):esc(t.content)}</div>`:`<div class="ai-b a" data-i="${i}">${t.pending?`<span class="ai-think"><i></i><i></i><i></i> Nova is thinking…</span>`:mdLite(t.content)}${!t.pending&&t.content?`<div class="ai-tools">${canSpeak?`<button type="button" data-a="aiSay" data-i="${i}">${ic("speaker")} Listen</button>`:""}<button type="button" data-a="aiCopy" data-i="${i}">Copy</button></div>`:""}${t.note?`<div class="hint">${esc(t.note)}</div>`:""}${t.error?`<div class="ai-err">${esc(t.error)}</div>`:""}</div>`).join("")
+  box.innerHTML=AI.turns.length?AI.turns.map((t,i)=>t.role==="user"?`<div class="ai-b u">${t.img?`<img src="${t.img}" alt="">`:""}${t.en?v4FixHTML(t.content,t.en,t.enk):esc(t.content)}</div>`:`<div class="ai-b a" data-i="${i}">${t.pending?`<span class="ai-think"><i></i><i></i><i></i> Nova is thinking…</span>`:mdLite(t.content)}${!t.pending&&t.content?`<div class="ai-tools">${canSpeak?`<button type="button" data-a="aiSay" data-i="${i}">${ic("speaker")} Listen</button>`:""}<button type="button" data-a="aiCopy" data-i="${i}">Copy</button></div>`:""}${t.note?`<div class="hint">${esc(t.note)}</div>`:""}${t.error?`<div class="ai-err">${esc(t.error)}</div>`:""}</div>`).join("")
    :`<div class="ai-b a"><p>Hello${S.mode==="teacher"?"":S.me?.name?" "+esc(S.me.name.split(" ")[0]):""}! I am <b>Nova</b>, your AI assistant. Ask me any question: English, homework, general knowledge… I can also read my answers aloud.</p></div><div class="ai-sugg">${aiSuggestions().map(q=>`<button type="button" data-a="aiAsk" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>`;
   box.scrollTop=box.scrollHeight}
 function updateBubble(i){const el=document.querySelector(`.ai-b.a[data-i="${i}"]`);if(el){el.innerHTML=mdLite(AI.turns[i].content);const box=$("#aiMsgs");box.scrollTop=box.scrollHeight}}
@@ -2862,7 +2862,7 @@ function msgBodyHTML(text,a){let h="";
     else if(a.k==="voice")h+=voiceHTML(a);
     else if(a.k==="img"){const u=V4.obj[a.p];h+=`<button type="button" class="v4img" data-v4="doc" data-k="m" data-id="${esc(a.p)}" data-t="${esc(a.t||"image/jpeg")}" data-n="${esc(a.n||"photo.jpg")}" aria-label="See the photo"><img ${u?`src="${u}"`:`data-chatp="${esc(a.p)}" data-t="${esc(a.t||"")}"`} alt="Photo"></button>`}
     else if(a.p)h+=`<button type="button" class="v4file" data-v4="doc" data-k="m" data-id="${esc(a.p)}" data-t="${esc(a.t||"")}" data-n="${esc(a.n||"file")}">${ic(/word/.test(a.t||"")?"word":"file")}<span><b>${esc(a.n||"File")}</b><small>${fmtSize(a.s)}${V4.cached.has("m:"+a.p)?" · offline":""}</small></span></button>`}
-  if(text){const fx=v4Split(text);h+=fx?v4FixHTML(fx[0],fx[1]):`<div class="${onlyEmoji(text)?"msg-emo":""}" style="white-space:pre-wrap">${E(text)}</div>`}
+  if(text){const fx=v4Split(text);h+=fx?v4FixHTML(fx[0],fx[1],fx[2]):`<div class="${onlyEmoji(text)?"msg-emo":""}" style="white-space:pre-wrap">${E(text)}</div>`}
   return h}
 const msgHTML=(mine,text,a,at)=>`<div class="msg ${mine?"mine":""}${a&&a.k==="sticker"&&!text?" stk":""}">${msgBodyHTML(text,a)}<span>${fmtTime(at)}</span></div>`;
 async function hydrateChat(){for(const img of document.querySelectorAll("img[data-chatp]:not([data-ok])")){img.dataset.ok="1";const p=img.dataset.chatp;
@@ -2879,7 +2879,7 @@ const v4LockedPacks=()=>{if(typeof SH_PACKS==="undefined"||S.mode!=="student")re
 const V4IN=k=>({peer:"peerInput",chat:"chatInput",staff:"staffInput"})[k]||"chatInput",V4F=k=>({peer:"peerchat",chat:"chat",staff:"staffchat"})[k]||"chat";
 function v4Bar(kind,target,ph){const inId=V4IN(kind),files=!!window.__chatFiles,rec=V4.rec&&V4.rec.kind===kind?V4.rec:null,pan=V4.panel&&V4.panel.kind===kind?V4.panel.t:null,busy=V4.sending||(kind==="peer"&&PR.sending);
   if(rec)return`<div class="v4rec" role="status"><span class="v4rec-dot" aria-hidden="true"></span><b><span class="v4rec-l">Recording </span><span id="v4recT">${fmtDur(rec.sec)}</span></b><span class="v4wave" aria-hidden="true">${"<i></i>".repeat(18)}</span><button type="button" class="iconbtn" data-v4="recCancel" aria-label="Cancel the voice message" title="Cancel">${ic("trash")}</button><button type="button" class="btn sm" data-v4="recSend" aria-label="Send the voice message">${ic("send")}Send</button></div>`;
-  return`${pan?v4PanelHTML(kind,pan):""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Sending…</div>`:""}${V4.fixing===kind?`<div class="v4upl"><span class="v4spin"></span>Nova is writing it in English…</div>`:""}<form class="chatbar v4bar" data-f="${V4F(kind)}" data-s="${esc(target)}">
+  return`${pan?v4PanelHTML(kind,pan):""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Sending…</div>`:""}${V4.fixing===kind?`<div class="v4upl"><span class="v4spin"></span>Nova is checking your English…</div>`:""}<form class="chatbar v4bar" data-f="${V4F(kind)}" data-s="${esc(target)}">
   <button type="button" class="iconbtn${pan?" on":""}" data-v4="panel" data-k="${kind}" data-t="${pan||"emo"}" aria-label="Emojis and stickers" title="Emojis and stickers">${ic("smile")}</button>
   <input id="${inId}" placeholder="${esc(ph||"Write a message…")}" maxlength="1000" autocomplete="off" aria-label="Message">
   ${files?`<span class="v4att"><label class="iconbtn" title="Send a photo or a file" aria-label="Send a photo or a file">${ic("clip")}<input type="file" id="v4f_${kind}" hidden accept="image/*,application/pdf,audio/*,.doc,.docx,.ppt,.pptx,.txt"></label>${V4.canRec?`<button type="button" class="iconbtn" data-v4="rec" data-k="${kind}" aria-label="Record a voice message" title="Voice message">${ic("mic")}</button>`:""}</span>`:""}
@@ -3377,39 +3377,38 @@ document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset)return
    17. French → English: a learner's French message is struck through in red,
        with the English version in green under it. + mobile chat layout.
    ===================================================================== */
-const V4MK="\n⟦EN⟧ ";
-function v4Split(t){t=String(t||"");const i=t.indexOf(V4MK);return i<0?null:[t.slice(0,i),t.slice(i+V4MK.length)]}
+const V4MK="\n⟦EN⟧ ",V4MK2="\n⟦OK⟧ ";
+function v4Split(t){t=String(t||"");for(const[m,k]of[[V4MK,"fr"],[V4MK2,"fix"]]){const i=t.indexOf(m);if(i>=0)return[t.slice(0,i),t.slice(i+m.length),k]}return null}
 function v4Plain(t){const x=v4Split(t);return x?x[1]:String(t||"")}
-function v4FixHTML(fr,en){return`<s class="v4fr">${E(fr)}</s><div class="v4en"><span class="v4en-l">In English</span><span>${E(en)}</span></div>`}
-const V4FR_STRONG=new Set("salut bonjour bonsoir merci oui non madame monsieur mademoiselle svp stp slt cc mdr bjr dac daccord".split(" "));
-const V4FR_W=new Set("je j tu il elle nous vous ils elles suis es est sommes êtes sont avons avez ont le la les un une des du au aux ce cet cette ces mon mes ton ta tes sa ses notre nos votre vos leur leurs et ou mais donc pas ne n oui non merci bonjour bonsoir salut madame monsieur comment pourquoi quoi qui quand où avec pour dans chez très bien ça ca c cest moi toi lui que qu fait faire fais vais va vas aller veux peux dois aujourd hui demain hier rien tout tous toutes beaucoup aussi encore déjà maintenant comme sans parce quel quelle combien voilà voici bon bonne aime suis été avoir être devoir exercice leçon prof cours classe livre français anglais".split(" "));
-function v4LooksFrench(t){t=String(t||"").toLowerCase();if(t.length<2)return false;
-  const ws=t.match(/[a-zàâçéèêëîïôûùüÿœ]+/g)||[];if(!ws.length)return false;
-  const fr=ws.filter(w=>V4FR_W.has(w)||V4FR_STRONG.has(w)).length,acc=/[àâçéèêëîïôûùœ]/.test(t);
-  if(ws.some(w=>V4FR_STRONG.has(w)))return true;
-  if(acc&&ws.length<=12)return true;
-  return fr>=2&&fr/ws.length>=0.25}
-function v4NeedFix(t){return S.mode==="student"&&S.me&&!isParent(S.me)&&!!AI.sample&&!AI.disabled&&navigator.onLine&&!onlyEmoji(t)&&v4LooksFrench(t)}
-async function v4ToEnglish(t){try{
-  const r=await Promise.race([AI.sample.json(`A learner of English in Togo wrote this chat message, maybe in French or mixing French and English:
+function v4FixHTML(fr,en,k){return`<s class="v4fr">${E(fr)}</s><div class="v4en"><span class="v4en-l">${k==="fix"?"Correct English":"In English"}</span><span>${E(en)}</span></div>`}
+function v4NeedFix(t){t=String(t||"").trim();return S.mode==="student"&&S.me&&!isParent(S.me)&&!!AI.sample&&!AI.disabled&&navigator.onLine&&t.length>=2&&!onlyEmoji(t)&&/\p{L}{2}/u.test(t)}
+async function v4Check(t){try{
+  const r=await Promise.race([AI.sample.json(`You check chat messages written by a learner of English in Togo. Message:
 """${String(t).slice(0,600)}"""
-If the message is (fully or partly) in French, give the natural English version a friendly student would write (keep emojis, names and the same meaning; simple English). If it is already in English, say so.
-Answer only in JSON: {"french":true or false,"english":"the English version"}`,{cache:false}),new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),15000))]);
-  const en=String(r&&r.english||"").trim();return r&&r.french&&en&&en.toLowerCase()!==String(t).trim().toLowerCase()?en.slice(0,480):null}catch(e){return null}}
-function v4Pack(fr,en){const room=1000-V4MK.length-en.length;return(fr.length>room?fr.slice(0,Math.max(0,room-1))+"…":fr)+V4MK+en}
+Decide:
+- "french": the message is fully or partly in French (or another language than English) → give the natural English version.
+- "mistakes": it is in English but has real mistakes (grammar, spelling, wrong word, word order, missing words) → give the corrected English.
+- "ok": it is correct English. Ignore small things: capital letters, final punctuation, informal chat style (hi, ok, lol, pls), emojis, names.
+Keep the same meaning, the emojis and the names; simple, natural English, as a friendly student would write.
+Answer only in JSON: {"status":"ok" or "french" or "mistakes","english":"the correct English version (empty if ok)"}`,{cache:false}),new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),15000))]);
+  const st=r&&r.status,en=String(r&&r.english||"").trim();
+  if(!en||(st!=="french"&&st!=="mistakes"))return null;
+  const n=x=>x.toLowerCase().replace(/[^\p{L}\p{N}]+/gu,"");if(n(en)===n(String(t)))return null;
+  return{k:st==="french"?"fr":"fix",en:en.slice(0,480)}}catch(e){return null}}
+function v4Pack(fr,en,k){const mk=k==="fix"?V4MK2:V4MK,room=1000-mk.length-en.length;return(fr.length>room?fr.slice(0,Math.max(0,room-1))+"…":fr)+mk+en}
 async function v4TextSend(kind,f){const id=V4IN(kind),inp=document.getElementById(id),orig=(inp&&inp.value||"").trim();if(!orig)return;
   if(kind==="peer"&&(PR.sending||V4.fixing))return;
   if(kind==="peer"&&!navigator.onLine){toast("No network: try again when you are online.","x");return}
   const tgt=f.dataset.s,hadFocus=document.activeElement===inp;if(inp)inp.value="";delete S.drafts[id];
   let text=orig;
-  if(v4NeedFix(orig)){V4.fixing=kind;render();const en=await v4ToEnglish(orig);V4.fixing=null;if(en)text=v4Pack(orig,en)}
+  if(v4NeedFix(orig)){V4.fixing=kind;render();const r=await v4Check(orig);V4.fixing=null;if(r)text=v4Pack(orig,r.en,r.k)}
   if(kind==="peer")PR.sending=true;render();
   try{await v4Deliver(kind,tgt,text,null)}catch(e){toast((e&&e.message)||"Could not send","x");S.drafts[id]=orig}
   if(kind==="peer")PR.sending=false;render();
   const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight;
   if(hadFocus){const n=document.getElementById(id);if(n)n.focus({preventScroll:true})}}
 /* Nova panel: same correction on the learner's bubble */
-{const _aiSend=aiSend;aiSend=async function(text){const t0=String(text||"").trim();if(!AI.busy&&t0&&v4NeedFix(t0)){const p=_aiSend(text);const u=[...AI.turns].reverse().find(x=>x.role==="user"&&x.content===t0);if(u)v4ToEnglish(t0).then(en=>{if(en){u.en=en;try{renderAI()}catch(e){}}});return p}return _aiSend(text)}}
+{const _aiSend=aiSend;aiSend=async function(text){const t0=String(text||"").trim();if(!AI.busy&&t0&&v4NeedFix(t0)){const p=_aiSend(text);const u=[...AI.turns].reverse().find(x=>x.role==="user"&&x.content===t0);if(u)v4Check(t0).then(r=>{if(r){u.en=r.en;u.enk=r.k;try{renderAI()}catch(e){}}});return p}return _aiSend(text)}}
 
 /* mobile: the chat fills the screen, the send bar stays above the keyboard */
 function v4ChatLayout(){const c=document.querySelector(".glass.chat"),B=document.body;
