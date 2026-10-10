@@ -268,6 +268,23 @@
       } catch (e) { return () => {}; }
     },
   };
+  /* ---------------- Community : publications et stories (tables posts, stories… voir supabase/communaute.sql) ---------------- */
+  const feedErr = (error, def) => new Error(/create_post|create_story|toggle_like|add_comment|feed_ok|relation .*(posts|stories)|schema cache/i.test((error && error.message) || "") ? "The teacher must first run the file supabase/communaute.sql in Supabase." : ((error && error.message) || def));
+  window.__feed = {
+    posts: async (before) => { let q = sb.from("posts").select("*").order("created_at", { ascending: false }).limit(30); if (before) q = q.lt("created_at", before); const { data, error } = await q; if (error) throw feedErr(error, "Cannot load posts"); return data || []; },
+    likes: async (ids) => { if (!ids.length) return []; const { data, error } = await sb.from("post_likes").select("*").in("post_id", ids); if (error) return []; return data || []; },
+    comments: async (ids) => { if (!ids.length) return []; const { data, error } = await sb.from("post_comments").select("*").in("post_id", ids).order("created_at", { ascending: true }).limit(1000); if (error) return []; return data || []; },
+    create: async (body, media) => { const { data, error } = await sb.rpc("create_post", { p_body: body || "", p_media: media && media.length ? media : null }); if (error) throw feedErr(error, "Could not publish"); return data; },
+    del: async (id) => { const { error } = await sb.rpc("delete_post", { p_id: id }); if (error) throw feedErr(error, "Could not delete"); },
+    like: async (id, e) => { const { data, error } = await sb.rpc("toggle_like", { p_post: id, p_e: e || "❤️" }); if (error) throw feedErr(error, "Could not like"); return data; },
+    comment: async (id, body) => { const { data, error } = await sb.rpc("add_comment", { p_post: id, p_body: body }); if (error) throw feedErr(error, "Could not comment"); return data; },
+    delComment: async (id) => { const { error } = await sb.rpc("delete_comment", { p_id: id }); if (error) throw feedErr(error, "Could not delete"); },
+    stories: async () => { const { data, error } = await sb.from("stories").select("*").order("created_at", { ascending: true }).limit(500); if (error) throw feedErr(error, "Cannot load stories"); return data || []; },
+    storyViews: async () => { const { data, error } = await sb.from("story_views").select("*").limit(3000); if (error) return []; return data || []; },
+    story: async (media, body, bg) => { const { data, error } = await sb.rpc("create_story", { p_media: media || null, p_body: body || "", p_bg: bg || "" }); if (error) throw feedErr(error, "Could not publish the story"); return data; },
+    viewStory: async (id) => { await sb.rpc("view_story", { p_id: id }); },
+    delStory: async (id) => { const { error } = await sb.rpc("delete_story", { p_id: id }); if (error) throw feedErr(error, "Could not delete"); },
+  };
   /* ---------------- pièces jointes des messageries (vocaux, photos, fichiers) : dossier privé « chat » ---------------- */
   const CHATURL = {};
   window.__chatFiles = {

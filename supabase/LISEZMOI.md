@@ -13,7 +13,8 @@ Ordre pour une nouvelle installation :
 | 5 | `single-device.sql` | Limite d'appareils par compte |
 | 6 | `hardening.sql` | Durcissement des fonctions internes |
 | 7 | `securite.sql` | Notes, XP dépensés et récompenses protégés |
-| 8 | `messagerie.sql` | Messages entre apprenants, vocaux, photos, fichiers, stickers, photos de profil |
+| 8 | `messagerie.sql` | Messages entre apprenants, vocaux, photos, fichiers, stickers, photos de profil, suppression, vue unique, réactions |
+| 9 | `communaute.sql` | Community : publications, j’aime, commentaires et stories de 24 h |
 
 ## Fonctions serveur (Edge Functions)
 
