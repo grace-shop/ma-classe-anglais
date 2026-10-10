@@ -274,7 +274,7 @@
     posts: async (before) => { let q = sb.from("posts").select("*").order("created_at", { ascending: false }).limit(30); if (before) q = q.lt("created_at", before); const { data, error } = await q; if (error) throw feedErr(error, "Cannot load posts"); return data || []; },
     likes: async (ids) => { if (!ids.length) return []; const { data, error } = await sb.from("post_likes").select("*").in("post_id", ids); if (error) return []; return data || []; },
     comments: async (ids) => { if (!ids.length) return []; const { data, error } = await sb.from("post_comments").select("*").in("post_id", ids).order("created_at", { ascending: true }).limit(1000); if (error) return []; return data || []; },
-    create: async (body, media) => { const { data, error } = await sb.rpc("create_post", { p_body: body || "", p_media: media && media.length ? media : null }); if (error) throw feedErr(error, "Could not publish"); return data; },
+    create: async (body, media, shared) => { const args = { p_body: body || "", p_media: media && media.length ? media : null }; if (shared) args.p_shared = shared; const { data, error } = await sb.rpc("create_post", args); if (error) throw feedErr(error, "Could not publish"); return data; },
     del: async (id) => { const { error } = await sb.rpc("delete_post", { p_id: id }); if (error) throw feedErr(error, "Could not delete"); },
     like: async (id, e) => { const { data, error } = await sb.rpc("toggle_like", { p_post: id, p_e: e || "❤️" }); if (error) throw feedErr(error, "Could not like"); return data; },
     comment: async (id, body) => { const { data, error } = await sb.rpc("add_comment", { p_post: id, p_body: body }); if (error) throw feedErr(error, "Could not comment"); return data; },
@@ -283,18 +283,32 @@
     storyViews: async () => { const { data, error } = await sb.from("story_views").select("*").limit(3000); if (error) return []; return data || []; },
     story: async (media, body, bg) => { const { data, error } = await sb.rpc("create_story", { p_media: media || null, p_body: body || "", p_bg: bg || "" }); if (error) throw feedErr(error, "Could not publish the story"); return data; },
     viewStory: async (id) => { await sb.rpc("view_story", { p_id: id }); },
+    reactStory: async (id, e) => { const { data, error } = await sb.rpc("react_story", { p_id: id, p_e: e || "" }); if (error) throw feedErr(error, "Could not react"); return data; },
+    storyReactions: async () => { const { data, error } = await sb.from("story_reactions").select("*").limit(3000); if (error) return []; return data || []; },
     delStory: async (id) => { const { error } = await sb.rpc("delete_story", { p_id: id }); if (error) throw feedErr(error, "Could not delete"); },
+  };
+  /* ---------------- notifications (table notifications, voir supabase/communaute.sql) ---------------- */
+  window.__notif = {
+    list: async () => { const { data, error } = await sb.from("notifications").select("*").order("created_at", { ascending: false }).limit(80); if (error) throw new Error(error.message || "x"); return data || []; },
+    read: async (ids) => { await sb.rpc("mark_notifs_read", { p_ids: ids && ids.length ? ids : null }); },
+    listen: (fn) => {
+      try {
+        const uid = session && session.user && session.user.id; if (!uid) return () => {};
+        const ch = sb.channel("notif-" + rid(8)).on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: "uid=eq." + uid }, (p) => { try { fn(p.new); } catch (e) {} }).subscribe();
+        return () => { try { sb.removeChannel(ch); } catch (e) {} };
+      } catch (e) { return () => {}; }
+    },
   };
   /* ---------------- pièces jointes des messageries (vocaux, photos, fichiers) : dossier privé « chat » ---------------- */
   const CHATURL = {};
   window.__chatFiles = {
     upload: async (blob, name) => {
       const type = String(blob.type || "application/octet-stream").split(";")[0];
-      const ext = ({ "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "application/pdf": "pdf", "audio/webm": "webm", "audio/ogg": "ogg", "audio/mp4": "m4a", "audio/mpeg": "mp3", "audio/aac": "aac", "video/mp4": "mp4", "text/plain": "txt",
+      const ext = ({ "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "application/pdf": "pdf", "audio/webm": "webm", "audio/ogg": "ogg", "audio/mp4": "m4a", "audio/mpeg": "mp3", "audio/aac": "aac", "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov", "video/3gpp": "3gp", "text/plain": "txt",
         "application/msword": "doc", "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx", "application/vnd.ms-powerpoint": "ppt", "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx" })[type] || (String(name || "").split(".").pop() || "bin").slice(0, 5);
       const path = `${session.user.id}/${Date.now().toString(36)}-${rid(8)}.${ext}`;
       const { error } = await sb.storage.from("chat").upload(path, blob, { contentType: type, upsert: false });
-      if (error) throw { code: "upload_failed", message: /bucket not found/i.test(error.message || "") ? "The teacher must first run the file supabase/messagerie.sql in Supabase." : /mime|type/i.test(error.message || "") ? "This type of file is not allowed." : /size|large/i.test(error.message || "") ? "File too big (10 MB maximum)." : error.message };
+      if (error) throw { code: "upload_failed", message: /bucket not found/i.test(error.message || "") ? "The teacher must first run the file supabase/messagerie.sql in Supabase." : /mime|type/i.test(error.message || "") ? "This type of file is not allowed." : /size|large/i.test(error.message || "") ? "File too big (50 MB maximum)." : error.message };
       return { p: path, t: type, n: String(name || "file").slice(0, 80), s: blob.size };
     },
     url: async (path) => {
@@ -303,6 +317,7 @@
       if (error) throw error;
       CHATURL[path] = { url: data.signedUrl, until: Date.now() + 5 * 3600e3 }; return data.signedUrl;
     },
+    remove: async (paths) => { const mine = (paths || []).filter((x) => String(x).startsWith(session.user.id + "/")); if (mine.length) await sb.storage.from("chat").remove(mine); },
   };
   window.__avatarUpload = async (blob) => {
     const path = `${session.user.id}/photo-${Date.now().toString(36)}.jpg`;

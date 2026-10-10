@@ -1,5 +1,5 @@
 /* English Classes — offline cache of the app files */
-const V = "mca-v5";
+const V = "mca-v6";
 const CORE = ["./", "index.html", "config.js", "claude-shim.js", "manifest.webmanifest", "vendor/three.min.js", "vendor/supabase.js", "icons/icon-192.png"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => Promise.all(CORE.map((u) => c.add(new Request(u, { cache: "reload" })).catch(() => {})))).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== V && !k.startsWith("mca-files")).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
@@ -28,4 +28,10 @@ self.addEventListener("fetch", (e) => {
   if (forced) { e.respondWith(net.catch(old)); return; }                             // "?v=…": the user asked for the new version, wait for it
   const slow = new Promise((resolve) => setTimeout(() => old().then((r) => resolve(r || null)), 6000));   // network too slow: open the saved copy
   e.respondWith(Promise.race([net.catch(() => null), slow]).then((r) => r || net.catch(old)));
+});
+
+// tap on a notification: open the app
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((cs) => { for (const c of cs) { if ("focus" in c) return c.focus(); } return self.clients.openWindow("./"); }));
 });

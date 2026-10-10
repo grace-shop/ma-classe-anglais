@@ -9,7 +9,7 @@
 --   • comme WhatsApp : supprimer pour tout le monde, photos à vue unique, réponses, réactions
 --     (les messages supprimés et les photos à vue unique restent visibles par les professeurs
 --      dans la modération, pour la sécurité des élèves)
---   • pièces jointes : dossier privé « chat », 10 Mo maximum, chacun écrit
+--   • pièces jointes : dossier privé « chat », 50 Mo maximum (vidéos), chacun écrit
 --     uniquement dans son propre dossier
 --   • la professeure peut masquer un message ou couper le chat d'un élève ;
 --     réglage général : settings/main → peerChat = false coupe tout le chat
@@ -210,9 +210,9 @@ end $$;
 do $$ begin
   if exists (select 1 from information_schema.schemata where schema_name = 'storage') then
     insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-    values ('chat', 'chat', false, 10485760, array[
+    values ('chat', 'chat', false, 52428800, array[
       'image/jpeg','image/png','image/webp','image/gif','application/pdf',
-      'audio/webm','audio/ogg','audio/mp4','audio/mpeg','audio/aac','audio/x-m4a','audio/wav','video/mp4','text/plain',
+      'audio/webm','audio/ogg','audio/mp4','audio/mpeg','audio/aac','audio/x-m4a','audio/wav','video/mp4','video/webm','video/quicktime','video/3gpp','text/plain',
       'application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/vnd.ms-powerpoint','application/vnd.openxmlformats-officedocument.presentationml.presentation'])
     on conflict (id) do update set public = false, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;

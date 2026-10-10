@@ -223,7 +223,7 @@ function v4Bar(kind,target,ph){const inId=V4IN(kind),files=!!window.__chatFiles,
   return`${pan?v4PanelHTML(kind,pan):""}${V4.reply&&V4.reply.kind===kind?`<div class="v4replybar"><div class="v4quote"><div class="v4q-w">Replying to ${esc(V4.reply.who)}</div><div class="v4q-t">${esc(V4.reply.t)}</div></div><button type="button" class="iconbtn sm" data-v4="replyX" aria-label="Cancel reply">${ic("x")}</button></div>`:""}${V4.upl===kind?`<div class="v4upl"><span class="v4spin"></span>Sending…</div>`:""}${V4.fixing===kind?`<div class="v4upl"><span class="v4spin"></span>Nova is checking your English…</div>`:""}<form class="chatbar v4bar" data-f="${V4F(kind)}" data-s="${esc(target)}">
   <button type="button" class="iconbtn${pan?" on":""}" data-v4="panel" data-k="${kind}" data-t="${pan||"emo"}" aria-label="Emojis and stickers" title="Emojis and stickers">${ic("smile")}</button>
   <input id="${inId}" placeholder="${esc(ph||"Write a message…")}" maxlength="1000" autocomplete="off" aria-label="Message">
-  ${files?`<span class="v4att"><label class="iconbtn" title="Send a photo or a file" aria-label="Send a photo or a file">${ic("clip")}<input type="file" id="v4f_${kind}" hidden accept="image/*,application/pdf,audio/*,.doc,.docx,.ppt,.pptx,.txt"></label>${V4.canRec?`<button type="button" class="iconbtn" data-v4="rec" data-k="${kind}" aria-label="Record a voice message" title="Voice message">${ic("mic")}</button>`:""}</span>`:""}
+  ${files?`<span class="v4att"><label class="iconbtn" title="Send a photo or a file" aria-label="Send a photo or a file">${ic("clip")}<input type="file" id="v4f_${kind}" hidden accept="image/*,video/*,application/pdf,audio/*,.doc,.docx,.ppt,.pptx,.txt"></label>${V4.canRec?`<button type="button" class="iconbtn" data-v4="rec" data-k="${kind}" aria-label="Record a voice message" title="Voice message">${ic("mic")}</button>`:""}</span>`:""}
   <button class="btn" type="submit" aria-label="Send" ${busy?"disabled":""}>${ic("send")}</button></form>`}
 async function v4Deliver(kind,target,text,att,meta){
   if(kind==="staff")return staffSend(target,text,att,meta);
@@ -235,7 +235,7 @@ async function v4Deliver(kind,target,text,att,meta){
 function v4Target(kind){const f=document.querySelector(`form.v4bar[data-f="${V4F(kind)}"]`);return f?f.dataset.s:(V4.rec&&V4.rec.target)||(V4.panel&&V4.panel.target)||""}
 async function v4SendFile(kind,target,file,name,k,dur,opt){opt=opt||{};if(!window.__chatFiles){toast("Sending files is not available here.","x");return}
   if(!navigator.onLine){toast("No network: try again when you are connected.","x");return}
-  if(!target)return;if(file.size>10*1024*1024){toast("File too big (10 MB maximum).","x");return}
+  if(!target)return;if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");return}
   let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type))f=await shrinkImg(f,1280,.72);
   const kk=k||(/^image\//.test(f.type)?"img":"file");V4.sending=true;V4.upl=kind;render();
   try{const up=await window.__chatFiles.upload(f,name||f.name||"file");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{}),...(opt.once&&kk==="img"?{o:true}:{})};
@@ -926,7 +926,7 @@ document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closes
 /* =====================================================================
    19. Community: posts (like Facebook) and 24-hour stories (like WhatsApp)
    ===================================================================== */
-const F={posts:[],likes:{},comments:{},stories:[],views:[],seen:new Set(),loaded:false,loading:false,err:"",busy:false,files:[],open:{},more:true,sv:null,sc:null,at:0};
+const F={posts:[],likes:{},comments:{},stories:[],views:[],reacts:[],seen:new Set(),pick:null,share:null,loaded:false,loading:false,err:"",busy:false,files:[],open:{},more:true,sv:null,sc:null,at:0};
 const SBG=["linear-gradient(135deg,#6C80FF,#9A7CFF)","linear-gradient(135deg,#FF7A59,#FFB443)","linear-gradient(135deg,#11998E,#38EF7D)","linear-gradient(135deg,#E94057,#8A2387)","linear-gradient(135deg,#1E3C72,#2A5298)","linear-gradient(135deg,#232526,#414345)"];
 const sbg=k=>SBG[+String(k||"g0").slice(1)||0]||SBG[0];
 const feedOn=()=>!!window.__feed&&(S.mode==="teacher"?!!(S.isOwner||S.isStaff):(S.mode==="student"&&!!S.me&&!isParent(S.me)&&stOf(S.me)==="active"&&S.me.profile!=="primaire"&&S.settings.feed!==false&&!devBlocked()));
@@ -941,11 +941,11 @@ function fPackN(fr,en,k,max){const mk=k==="fix"?V4MK2:V4MK;return fr.length+mk.l
 async function fFix(t,max){t=String(t||"").trim();if(!t||!v4NeedFix(t))return t;const r=await v4Check(t);return r?fPackN(t,r.en,r.k,max):t}
 async function feedLoad(more){if(!feedOn()||F.loading)return;F.loading=true;
   try{const before=more&&F.posts.length?F.posts[F.posts.length-1].created_at:null;
-    const[p,st,vw]=await Promise.all([window.__feed.posts(before),more?Promise.resolve(F.stories):window.__feed.stories(),more?Promise.resolve(F.views):window.__feed.storyViews()]);
+    const[p,st,vw,rx]=await Promise.all([window.__feed.posts(before),more?Promise.resolve(F.stories):window.__feed.stories(),more?Promise.resolve(F.views):window.__feed.storyViews(),more||!window.__feed.storyReactions?Promise.resolve(F.reacts):window.__feed.storyReactions()]);F.reacts=rx||[];
     const ids=p.map(x=>x.id);const[lk,cm]=await Promise.all([window.__feed.likes(ids),window.__feed.comments(ids)]);
     for(const id of ids){F.likes[id]=[];F.comments[id]=[]}for(const l of lk)(F.likes[l.post_id]=F.likes[l.post_id]||[]).push(l);for(const c of cm)(F.comments[c.post_id]=F.comments[c.post_id]||[]).push(c);
     F.posts=more?[...F.posts,...p.filter(x=>!F.posts.some(y=>y.id===x.id))]:p;F.more=p.length>=30;F.stories=st;F.views=vw;for(const v of vw)if(v.uid===S.uid)F.seen.add(v.story_id);
-    F.loaded=true;F.err="";F.at=Date.now()}
+    F.loaded=true;F.err="";F.at=Date.now();fCleanMyMedia()}
   catch(e){F.loaded=true;F.err=(e&&e.message)||"Cannot load the Community right now."}
   F.loading=false;render()}
 setInterval(()=>{if(feedOn()&&document.visibilityState==="visible"&&(S.view?.type==="feed"||S.msgsTab==="community"||(S.mode==="student"&&S.tab==="home"&&!S.view))&&Date.now()-F.at>60000)feedLoad()},15000);
@@ -967,9 +967,10 @@ function fPostHTML(p){const lk=F.likes[p.id]||[],cm=(F.comments[p.id]||[]).filte
   ${canDel?`<button type="button" class="iconbtn sm" data-v4="fDel" data-id="${esc(p.id)}" aria-label="Delete this post" title="Delete">${ic("trash")}</button>`:""}</header>
   ${p.deleted_at?`<span class="chip bad">Deleted · only teachers see it</span>`:""}
   ${p.body?fText(p.body):""}
-  ${media.length?`<div class="fmedia n${Math.min(media.length,4)}">${media.slice(0,4).map((m,i)=>`<button type="button" class="v4img" data-v4="doc" data-k="m" data-id="${esc(m.p)}" data-t="${esc(m.t||"image/jpeg")}" data-n="photo-${i+1}.jpg" aria-label="See the photo"><img data-chatp="${esc(m.p)}" data-t="${esc(m.t||"")}" alt="Photo"></button>`).join("")}</div>`:""}
-  <div class="fcount">${lk.length?`<span>${E("❤️")} ${lk.length}</span>`:"<span></span>"}${cm.length?`<button type="button" class="linkbtn" data-v4="fCom" data-id="${esc(p.id)}">${cm.length} comment${cm.length>1?"s":""}</button>`:""}</div>
-  ${p.deleted_at?"":`<div class="factions"><button type="button" class="${liked?"on":""}" data-v4="fLike" data-id="${esc(p.id)}" aria-pressed="${liked}">${E(liked?"❤️":"🤍")} Like</button><button type="button" data-v4="fCom" data-id="${esc(p.id)}">${ic("chat")} Comment</button></div>`}
+  ${fMediaHTML(media)}
+  ${p.shared?fSharedHTML(p.shared):""}
+  <div class="fcount">${lk.length?`<span>${[...new Set(lk.map(l=>l.e||"❤️"))].slice(0,3).map(e=>E(e)).join("")} ${lk.length}</span>`:"<span></span>"}${cm.length?`<button type="button" class="linkbtn" data-v4="fCom" data-id="${esc(p.id)}">${cm.length} comment${cm.length>1?"s":""}</button>`:""}</div>
+  ${p.deleted_at?"":`${F.pick===p.id?`<div class="fpick">${FRE.map(e=>`<button type="button" data-v4="fLikeE" data-id="${esc(p.id)}" data-e="${e}" aria-label="React ${e}">${E(e)}</button>`).join("")}</div>`:""}<div class="factions"><button type="button" class="${liked?"on":""}" data-v4="fLike" data-id="${esc(p.id)}" aria-pressed="${liked}">${E(liked?(lk.find(l=>l.uid===S.uid).e||"❤️"):"🤍")} ${liked?"Liked":"Like"}</button><button type="button" class="fmore" data-v4="fPick" data-id="${esc(p.id)}" aria-label="More reactions" title="More reactions">${E("😊")}</button><button type="button" data-v4="fCom" data-id="${esc(p.id)}">${ic("chat")} Comment</button><button type="button" data-v4="fShare" data-k="post" data-id="${esc(p.id)}">${ic("send")} Share</button></div>`}
   ${shown.length||open?`<div class="fcoms">${cm.length>shown.length?`<button type="button" class="linkbtn" data-v4="fCom" data-id="${esc(p.id)}">See all ${cm.length} comments</button>`:""}${shown.map(c=>`<div class="fc">${whoAva(c.who,c.author,30)}<div class="fcb"><b>${esc(c.who?.name||"Student")}</b>${fText(c.body)}<small>${ago(+new Date(c.created_at))}${c.deleted_at?" · deleted":""}${!c.deleted_at&&(c.author===S.uid||mine||fStaff())?` · <button type="button" class="linkbtn" data-v4="fComDel" data-id="${esc(c.id)}">Delete</button>`:""}</small></div></div>`).join("")}
   ${open&&!p.deleted_at?`<form class="fcform" data-ff="com" data-id="${esc(p.id)}"><input id="fc_${esc(p.id)}" placeholder="Write a comment in English…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}</div>`:""}
   </article>`}
@@ -981,8 +982,8 @@ function feedView(embedded){if(!F.loaded&&!F.loading)feedLoad();try{localStorage
   </div>
   ${feedRailHTML(false)}
   <div class="section fwrap"><form class="glass card fcomp" data-ff="post"><div class="row" style="align-items:flex-start">${whoAva(myWho(),S.uid,42)}<textarea id="f_text" rows="2" maxlength="4000" placeholder="What's new? Write in English…">${esc(S.drafts.f_text||"")}</textarea></div>
-  ${F.files.length?`<div class="fthumbs">${F.files.map((f,i)=>`<span><img src="${f.url}" alt=""><button type="button" data-v4="fFileX" data-i="${i}" aria-label="Remove">×</button></span>`).join("")}</div>`:""}
-  <div class="row between"><div class="row"><label class="btn ghost sm">${ic("camera")}Photo<input type="file" id="f_files" accept="image/*" multiple hidden></label><button type="button" class="btn ghost sm" data-v4="fNewStory">${ic("plus")}Story</button></div><button class="btn sm" type="submit" ${F.busy?"disabled":""}>${F.busy?"Posting…":"Post"}</button></div></form>
+  ${F.files.length?`<div class="fthumbs">${F.files.map((f,i)=>`<span>${f.kind==="video"?`<video src="${f.url}" muted playsinline preload="metadata"></video><i class="fvbadge">▶ ${fmtDur(f.d||0)}</i>`:`<img src="${f.url}" alt="">`}<button type="button" data-v4="fFileX" data-i="${i}" aria-label="Remove">×</button></span>`).join("")}</div>`:""}
+  <div class="row between"><div class="row"><label class="btn ghost sm">${ic("camera")}Photo / video<input type="file" id="f_files" accept="image/*,video/*" multiple hidden></label><button type="button" class="btn ghost sm" data-v4="fNewStory">${ic("plus")}Story</button></div><button class="btn sm" type="submit" ${F.busy?"disabled":""}>${F.busy?"Posting…":"Post"}</button></div></form>
   ${F.err?`<div class="glass card small">${esc(F.err)}</div>`:""}
   ${!F.loaded?`<div class="empty">Loading…</div>`:vis.length?vis.map(fPostHTML).join(""):`<div class="empty">No posts yet. Be the first to share something!</div>`}
   ${F.loaded&&F.more&&vis.length?`<div style="text-align:center"><button type="button" class="btn ghost sm" data-v4="fMore">See older posts</button></div>`:""}
@@ -992,48 +993,50 @@ function fOpenStory(uid){const G=fGroups(),gi=G.findIndex(x=>x.uid===uid);if(gi<
 function fCur(){const v=F.sv;if(!v)return null;const g=v.G[v.gi];return g?{g,s:g.list[v.si]}:null}
 function fShow(){const c=fCur();if(!c){F.sv=null;feedSync();return}const s=c.s;F.sv.t0=Date.now();
   if(c.g.uid!==S.uid&&!F.seen.has(s.id)){F.seen.add(s.id);window.__feed.viewStory(s.id).catch(()=>{})}
-  clearTimeout(F.svT);if(!F.sv.views&&!F.sv.typing)F.svT=setTimeout(()=>fStep(1),s.media?6000:5000);feedSync();
-  if(s.media&&s.media.p&&!V4.obj[s.media.p])srcBlob({k:"m",id:s.media.p,t:s.media.t}).then(b=>{V4.obj[s.media.p]=URL.createObjectURL(b);if(fCur()&&fCur().s.id===s.id)fShow()}).catch(()=>{})}
+  clearTimeout(F.svT);if(!F.sv.views&&!F.sv.typing&&!F.share)F.svT=setTimeout(()=>fStep(1),fSdur(s)*1000+(fIsVid(s)?2500:0));feedSync();fVidStart();
+  if(s.media&&s.media.p&&!fIsVid(s)&&!V4.obj[s.media.p])srcBlob({k:"m",id:s.media.p,t:s.media.t}).then(b=>{V4.obj[s.media.p]=URL.createObjectURL(b);if(fCur()&&fCur().s.id===s.id)fShow()}).catch(()=>{})}
 function fStep(d){const v=F.sv;if(!v)return;const g=v.G[v.gi];v.si+=d;if(v.si>=g.list.length){v.gi++;v.si=0}else if(v.si<0){v.gi--;if(v.gi<0){v.gi=0;v.si=0}else v.si=v.G[v.gi].list.length-1}
   if(v.gi>=v.G.length){fCloseStory();return}fShow()}
 function fCloseStory(){clearTimeout(F.svT);F.sv=null;feedSync();render()}
-function fStoryHTML(){const c=fCur();if(!c)return"";const{g,s}=c,mine=g.uid===S.uid,v=F.sv,dur=s.media?6:5;
-  const views=F.views.filter(x=>x.story_id===s.id);const img=s.media&&s.media.p?V4.obj[s.media.p]:null;
+function fStoryHTML(){const c=fCur();if(!c)return"";const{g,s}=c,mine=g.uid===S.uid,v=F.sv,dur=fSdur(s);
+  const views=F.views.filter(x=>x.story_id===s.id),rxs=F.reacts.filter(x=>x.story_id===s.id&&x.uid!==S.uid);const img=s.media&&s.media.p?V4.obj[s.media.p]:null;
   return`<div class="fsv" style="${s.media?"":`background:${sbg(s.bg)}`}">
   <div class="fsv-bars">${g.list.map((x,i)=>`<i class="${i<v.si?"done":i===v.si?(v.views||v.typing?"run paused":"run"):""}" style="--d:${dur}s"></i>`).join("")}</div>
   <div class="fsv-top">${whoAva(g.who,g.uid,36)}<div><b>${esc(mine?"My story":g.who?.name||"Student")}</b><small>${ago(+new Date(s.created_at))}</small></div><button type="button" class="iconbtn" data-v4="fSvClose" aria-label="Close">${ic("x")}</button></div>
-  ${s.media?`<div class="fsv-media">${img?`<img src="${img}" alt="Story photo">`:`<div class="v4spin"></div>`}</div>`:""}
+  ${s.media?`<div class="fsv-media">${fIsVid(s)?(F.svUrl&&F.svUrl.id===s.id?`<video id="fsvVid" src="${F.svUrl.url}" autoplay playsinline ${F.svMute?"muted":""}></video>${F.svMute?`<button type="button" class="fsv-snd" data-v4="fSvSnd">🔇 Tap for sound</button>`:""}`:`<div class="v4spin"></div>`):img?`<img src="${img}" alt="Story photo">`:`<div class="v4spin"></div>`}</div>`:""}
   ${s.body?`<div class="fsv-text${s.media?" cap":""}">${fText(s.body)}</div>`:""}
   <button type="button" class="fsv-nav l" data-v4="fSvPrev" aria-label="Previous"></button><button type="button" class="fsv-nav r" data-v4="fSvNext" aria-label="Next"></button>
-  <div class="fsv-bot">${mine||fStaff()?`<button type="button" class="btn ghost sm" data-v4="fSvViews">${ic("eye")}${views.length} view${views.length===1?"":"s"}</button><button type="button" class="btn ghost sm" data-v4="fSvDel">${ic("trash")}Delete</button>`
-    :S.mode==="student"&&peerOn()&&g.who?.role==="student"?`<form class="fsv-reply" data-ff="srep"><input id="fsv_rep" placeholder="Reply to ${esc(String(g.who?.name||"").split(" ")[0])}…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}</div>
-  ${v.views?`<div class="v4sheet fsv-views"><b>Seen by ${views.length}</b>${views.length?views.map(x=>`<div class="row">${whoAva(x.who,x.uid,30)}<span>${esc(x.who?.name||"Student")}</span><small class="muted" style="margin-left:auto">${ago(+new Date(x.at))}</small></div>`).join(""):`<p class="small muted">Nobody yet.</p>`}<button type="button" class="v4cancel" data-v4="fSvViewsX">Close</button></div>`:""}
+  <div class="fsv-bot">${mine||fStaff()?`<button type="button" class="btn ghost sm" data-v4="fSvViews">${ic("eye")}${views.length}${rxs.length?` · ${[...new Set(rxs.map(x=>x.e))].slice(0,3).map(e=>E(e)).join("")} ${rxs.length}`:""}</button>${mine?"":fSvReactBtns(s)}<button type="button" class="btn ghost sm" data-v4="fShare" data-k="story" data-id="${esc(s.id)}">${ic("send")}Share</button><button type="button" class="btn ghost sm" data-v4="fSvDel">${ic("trash")}Delete</button>`
+    :`${fSvReactBtns(s)}${S.mode==="student"&&peerOn()&&g.who?.role==="student"?`<form class="fsv-reply" data-ff="srep"><input id="fsv_rep" placeholder="Reply to ${esc(String(g.who?.name||"").split(" ")[0])}…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}<button type="button" class="btn ghost sm fsv-sh" data-v4="fShare" data-k="story" data-id="${esc(s.id)}" aria-label="Share">${ic("send")}</button>`}</div>
+  ${v.views?`<div class="v4sheet fsv-views"><b>Seen by ${views.length}</b>${views.length?views.map(x=>{const r=rxs.find(y=>y.uid===x.uid);return`<div class="row">${whoAva(x.who,x.uid,30)}<span>${esc(x.who?.name||"Student")}</span>${r?`<span class="fsv-vr">${E(r.e)}</span>`:""}<small class="muted" style="margin-left:auto">${ago(+new Date(x.at))}</small></div>`}).join(""):`<p class="small muted">Nobody yet.</p>`}<button type="button" class="v4cancel" data-v4="fSvViewsX">Close</button></div>`:""}
   </div>`}
 /* story composer */
 function fComposerHTML(){const c=F.sc;return`<div class="fsv fsc" style="${c.url?"":`background:${sbg(c.bg)}`}">
   <div class="fsv-top"><b style="flex:1">New story</b><button type="button" class="iconbtn" data-v4="fScX" aria-label="Close">${ic("x")}</button></div>
-  ${c.url?`<div class="fsv-media"><img src="${c.url}" alt=""></div>`:""}
+  ${c.url?`<div class="fsv-media">${c.video?`<video src="${c.url}" autoplay muted loop playsinline></video>`:`<img src="${c.url}" alt="">`}</div>`:""}
   <textarea id="fsc_text" class="${c.url?"cap":""}" maxlength="300" placeholder="${c.url?"Add a caption…":"Type your story in English…"}">${esc(c.text||"")}</textarea>
   <div class="fsv-bot">${c.url?"":`<div class="fbgs">${SBG.map((b,i)=>`<button type="button" style="background:${b}" data-v4="fScBg" data-i="${i}" aria-pressed="${c.bg==="g"+i}" aria-label="Colour ${i+1}"></button>`).join("")}</div>`}
-  <label class="btn ghost sm">${ic("camera")}${c.url?"Change":"Photo"}<input type="file" id="fsc_file" accept="image/*" hidden></label>
+  <label class="btn ghost sm">${ic("camera")}${c.url?"Change":"Photo / video"}<input type="file" id="fsc_file" accept="image/*,video/*" hidden></label>
   <button type="button" class="btn sm" data-v4="fScPost" ${c.busy?"disabled":""}>${c.busy?"Posting…":"Share story"}</button></div></div>`}
 function feedSync(){let host=document.getElementById("fsvhost");if(!host){host=document.createElement("div");host.id="fsvhost";document.body.appendChild(host)}
-  const h=F.sc?fComposerHTML():F.sv?fStoryHTML():"";if(host._h!==h){const ta=document.activeElement&&document.activeElement.id,val=ta&&document.getElementById(ta)?document.getElementById(ta).value:null;host._h=h;host.innerHTML=h;
+  const h=(F.sc?fComposerHTML():F.sv?fStoryHTML():"")+(F.share?fShareHTML():"");if(host._h!==h){const ta=document.activeElement&&document.activeElement.id,val=ta&&document.getElementById(ta)?document.getElementById(ta).value:null;host._h=h;host.innerHTML=h;
     if(ta&&val!=null){const n=document.getElementById(ta);if(n){n.value=val;n.focus()}}}
   document.body.classList.toggle("fsv-on",!!h)}
-async function fUpload(file){const f=/gif/.test(file.type)?file:await shrinkImg(file,1440,.78);const up=await window.__chatFiles.upload(f,file.name||"photo.jpg");V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f);return{p:up.p,t:up.t}}
+async function fUpload(file,d){if(/^video\//.test(file.type)){const poster=await fPoster(file).catch(()=>null);let pp=null;if(poster){const u2=await window.__chatFiles.upload(poster,"poster.jpg");V4.obj[u2.p]=URL.createObjectURL(poster);pp={p:u2.p,t:u2.t}}
+    const up=await window.__chatFiles.upload(file,file.name||"video.mp4");return{p:up.p,t:up.t,d:Math.round(d||0),...(pp?{poster:pp}:{})}}
+  const f=/gif/.test(file.type)?file:await shrinkImg(file,1440,.78);const up=await window.__chatFiles.upload(f,file.name||"photo.jpg");V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f);return{p:up.p,t:up.t}}
 async function fPost(){if(F.busy)return;const ta=document.getElementById("f_text"),text=((ta&&ta.value)||"").trim();if(!text&&!F.files.length){toast("Write something or add a photo.","x");return}
   if(!navigator.onLine){toast("No network: try again when you are online.","x");return}
   F.busy=true;render();
-  try{const media=[];for(const f of F.files)media.push(await fUpload(f.file));const body=await fFix(text,4000);
+  try{const media=[];if(F.files.some(f=>f.kind==="video"))toast("Uploading the video… keep the app open.","clock");for(const f of F.files)media.push(await fUpload(f.file,f.d));const body=await fFix(text,4000);
     await window.__feed.create(body,media);for(const f of F.files)URL.revokeObjectURL(f.url);F.files=[];delete S.drafts.f_text;if(ta)ta.value="";toast("Posted!","rocket");await feedLoad()}
   catch(e){toast((e&&e.message)||"Could not publish","x")}F.busy=false;render()}
 async function fComment(id,inp){const t=(inp.value||"").trim();if(!t)return;inp.value="";delete S.drafts[inp.id];
   try{const body=await fFix(t,1000);const cid=await window.__feed.comment(id,body);(F.comments[id]=F.comments[id]||[]).push({id:cid||("tmp"+Date.now()),post_id:id,author:S.uid,who:myWho(),body,created_at:new Date().toISOString()});F.open[id]=true;render();const n=document.getElementById("fc_"+id);if(n)n.focus()}
   catch(e){toast((e&&e.message)||"Could not comment","x");inp.value=t}}
-async function fLike(id){const L=F.likes[id]=F.likes[id]||[],i=L.findIndex(l=>l.uid===S.uid);if(i>=0)L.splice(i,1);else L.push({post_id:id,uid:S.uid,e:"❤️"});render();try{await window.__feed.like(id,"❤️")}catch(e){toast(e.message||"Could not like","x");feedLoad()}}
+async function fLike(id,e){const L=F.likes[id]=F.likes[id]||[],i=L.findIndex(l=>l.uid===S.uid);e=e||(i>=0?L[i].e:"❤️")||"❤️";F.pick=null;if(i>=0&&L[i].e===e)L.splice(i,1);else if(i>=0)L[i].e=e;else L.push({post_id:id,uid:S.uid,e});render();try{await window.__feed.like(id,e)}catch(er){toast(er.message||"Could not react","x");feedLoad()}}
 async function fStoryPost(){const c=F.sc;if(!c||c.busy)return;const t=((document.getElementById("fsc_text")||{}).value||"").trim();if(!t&&!c.file){toast("Write something or add a photo.","x");return}
-  c.busy=true;c.text=t;feedSync();try{const media=c.file?await fUpload(c.file):null;const body=await fFix(t,300);await window.__feed.story(media,body,c.url?"":c.bg);if(c.url)URL.revokeObjectURL(c.url);F.sc=null;feedSync();toast("Story shared! It stays 24 hours.","rocket");await feedLoad()}
+  c.busy=true;c.text=t;feedSync();try{if(c.video)toast("Uploading the video… keep the app open.","clock");const media=c.file?await fUpload(c.file,c.d):null;const body=await fFix(t,300);await window.__feed.story(media,body,c.url?"":c.bg);if(media)fRememberMedia(media);if(c.url)URL.revokeObjectURL(c.url);F.sc=null;feedSync();toast("Story shared! It stays 24 hours.","rocket");await feedLoad()}
   catch(e){c.busy=false;feedSync();toast((e&&e.message)||"Could not share","x")}}
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el)return;const a=el.dataset.v4,id=el.dataset.id;
   switch(a){
@@ -1057,8 +1060,11 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"fScPost":fStoryPost();return;
   }},true);
 document.addEventListener("change",e=>{const el=e.target;if(!el||!el.id)return;
-  if(el.id==="f_files"){for(const f of [...(el.files||[])]){if(F.files.length>=4){toast("4 photos maximum.","x");break}if(!/^image\//.test(f.type))continue;F.files.push({file:f,url:URL.createObjectURL(f)})}el.value="";render();e.stopPropagation()}
-  if(el.id==="fsc_file"){const f=el.files&&el.files[0];el.value="";if(f&&F.sc){if(F.sc.url)URL.revokeObjectURL(F.sc.url);F.sc.text=(document.getElementById("fsc_text")||{}).value||"";F.sc.file=f;F.sc.url=URL.createObjectURL(f);feedSync()}e.stopPropagation()}},true);
+  if(el.id==="f_files"){const fl=[...(el.files||[])];el.value="";e.stopPropagation();(async()=>{for(const f of fl){if(F.files.length>=4){toast("4 photos or videos maximum.","x");break}
+      if(/^video\//.test(f.type)){if(F.files.some(x=>x.kind==="video")){toast("One video per post.","x");continue}const chk=await fVideoCheck(f,180);if(!chk)continue;F.files.push({file:f,url:URL.createObjectURL(f),kind:"video",d:chk.d})}
+      else if(/^image\//.test(f.type))F.files.push({file:f,url:URL.createObjectURL(f),kind:"img"})}render()})()}
+  if(el.id==="fsc_file"){const f=el.files&&el.files[0];el.value="";e.stopPropagation();if(!f||!F.sc)return;(async()=>{let d=0;if(/^video\//.test(f.type)){const chk=await fVideoCheck(f,60);if(!chk)return;d=chk.d}else if(!/^image\//.test(f.type))return;
+      if(F.sc.url)URL.revokeObjectURL(F.sc.url);F.sc.text=(document.getElementById("fsc_text")||{}).value||"";F.sc.file=f;F.sc.url=URL.createObjectURL(f);F.sc.video=/^video\//.test(f.type);F.sc.d=d;feedSync()})()}},true);
 document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||!f.dataset.ff)return;e.preventDefault();e.stopImmediatePropagation();
   if(f.dataset.ff==="post")fPost();
   else if(f.dataset.ff==="com")fComment(f.dataset.id,f.querySelector("input"));
@@ -1067,7 +1073,7 @@ document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||!f.da
     (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story",t:"Story: "+what,w:c.g.uid}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}F.sv&&(F.sv.typing=false);fShow()})()}},true);
 document.addEventListener("focusin",e=>{if(e.target&&e.target.id==="fsv_rep"&&F.sv){F.sv.typing=true;clearTimeout(F.svT);feedSync()}});
 document.addEventListener("keydown",e=>{if(!F.sv&&!F.sc)return;if(e.key==="Escape"){if(F.sc){F.sc=null;feedSync()}else fCloseStory()}else if(F.sv&&!F.sv.typing&&e.key==="ArrowRight")fStep(1);else if(F.sv&&!F.sv.typing&&e.key==="ArrowLeft")fStep(-1)});
-{const _l=v4ChatLayout;v4ChatLayout=function(){_l();if(F.sv||F.sc||document.getElementById("fsvhost")?._h)feedSync()}}
+{const _l=v4ChatLayout;v4ChatLayout=function(){_l();if(F.sv||F.sc||F.share||document.getElementById("fsvhost")?._h)feedSync();nBell()}}
 /* where it appears */
 {const _sv=studentView;studentView=function(){if(S.view?.type==="feed"&&feedOn())return feedView(false);return _sv()}}
 {const _hm3=homeView;homeView=function(){const h=_hm3();return S.mode==="student"&&feedOn()?feedRailHTML(true)+h:h}}
@@ -1112,4 +1118,162 @@ body.fsv-on{overflow:hidden}
 .fsc textarea{background:transparent;border:0;color:#fff;font-size:clamp(1.4rem,6vw,2rem);font-weight:800;text-align:center;width:min(640px,92vw);min-height:30vh;resize:none;outline:none}.fsc textarea::placeholder{color:rgba(255,255,255,.7)}
 .fsc textarea.cap{position:absolute;bottom:calc(84px + env(safe-area-inset-bottom,0px));min-height:0;height:56px;font-size:1rem;font-weight:600;background:rgba(0,0,0,.45);border-radius:14px;padding:12px}
 .fbgs{display:flex;gap:6px}.fbgs button{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.6);cursor:pointer}.fbgs button[aria-pressed=true]{border-color:#fff;box-shadow:0 0 0 2px #fff}
+`;document.head.appendChild(st)}
+
+/* =====================================================================
+   20. Reactions on posts and stories, sharing, videos, notifications
+   ===================================================================== */
+const FRE=["👍","❤️","😂","😮","😢","😡"],SRE=["❤️","😂","😮","😢","👏","🔥"];
+const BELL=`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>`;
+const SITE_URL=()=>location.protocol.startsWith("http")&&!/localhost|127\.0\.0\.1/.test(location.host)?location.origin+location.pathname.replace(/index\.html$/,""):"https://grace-shop.github.io/ma-classe-anglais/";
+const fIsVid=s=>!!(s&&s.media&&/^video\//.test(s.media.t||""));
+const fSdur=s=>fIsVid(s)?Math.min(60,Math.max(3,s.media.d||15)):s&&s.media?6:5;
+function fVidTile(m){return`<button type="button" class="fvid" data-v4="vplay" data-p="${esc(m.p)}" data-t="${esc(m.t||"video/mp4")}" aria-label="Play the video">${m.poster?`<img data-chatp="${esc(m.poster.p)}" data-t="${esc(m.poster.t||"image/jpeg")}" alt="">`:""}<span class="fplay">▶</span>${m.d?`<small>${fmtDur(m.d)}</small>`:""}</button>`}
+function fMediaHTML(media){media=Array.isArray(media)?media:[];if(!media.length)return"";
+  return`<div class="fmedia n${Math.min(media.length,4)}">${media.slice(0,4).map((m,i)=>/^video\//.test(m.t||"")?fVidTile(m):`<button type="button" class="v4img" data-v4="doc" data-k="m" data-id="${esc(m.p)}" data-t="${esc(m.t||"image/jpeg")}" data-n="photo-${i+1}.jpg" aria-label="See the photo"><img data-chatp="${esc(m.p)}" data-t="${esc(m.t||"")}" alt="Photo"></button>`).join("")}</div>`}
+function fSharedHTML(sh){return`<div class="fshared" data-v4="fJump" data-id="${esc(sh.id||"")}"><header>${whoAva(sh.who,sh.author,28)}<b>${esc(sh.who?.name||"Student")}</b><small>${sh.at?ago(+new Date(sh.at)):""}</small></header>${sh.body?fText(sh.body):""}${fMediaHTML(sh.media)}</div>`}
+/* video helpers */
+function fVideoCheck(f,maxSec){return new Promise(res=>{if(f.size>50*1024*1024){toast("Video too big: 50 MB maximum. Record a shorter video or a lower quality.","x");res(null);return}
+  const v=document.createElement("video"),u=URL.createObjectURL(f);v.preload="metadata";v.muted=true;
+  const done=r=>{URL.revokeObjectURL(u);res(r)};v.onloadedmetadata=()=>{const d=v.duration||0;if(d>maxSec+0.5){toast(`Video too long: ${maxSec>=120?Math.round(maxSec/60)+" minutes":maxSec+" seconds"} maximum.`,"x");done(null)}else done({d})};
+  v.onerror=()=>done({d:0});setTimeout(()=>done({d:0}),8000);v.src=u})}
+function fPoster(f){return new Promise((res,rej)=>{const v=document.createElement("video"),u=URL.createObjectURL(f);v.muted=true;v.playsInline=true;v.preload="auto";
+  const fin=b=>{URL.revokeObjectURL(u);b?res(b):rej(new Error("poster"))};
+  v.onloadeddata=()=>{try{v.currentTime=Math.min(0.6,(v.duration||1)/3)}catch(e){fin(null)}};
+  v.onseeked=()=>{try{const w=Math.min(720,v.videoWidth||640),h=Math.round(w*(v.videoHeight||360)/(v.videoWidth||640));const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(v,0,0,w,h);c.toBlob(b=>fin(b),"image/jpeg",.72)}catch(e){fin(null)}};
+  v.onerror=()=>fin(null);setTimeout(()=>fin(null),10000);v.src=u})}
+async function vPlay(p,t){let ov=document.getElementById("vplayer");if(ov)ov.remove();ov=document.createElement("div");ov.id="vplayer";ov.className="v4onceview";
+  ov.innerHTML=`<div class="v4spin"></div><button type="button" class="iconbtn" aria-label="Close">${ic("x")}</button>`;document.body.appendChild(ov);
+  const close=()=>{const v=ov.querySelector("video");if(v){v.pause();v.removeAttribute("src");v.load()}ov.remove()};ov.querySelector("button").onclick=close;
+  try{const u=await srcURL({k:"m",id:p,t});const v=document.createElement("video");v.controls=true;v.autoplay=true;v.playsInline=true;v.src=u;v.className="vplayer-v";ov.querySelector(".v4spin").replaceWith(v);v.play().catch(()=>{})}
+  catch(e){ov.querySelector(".v4spin").replaceWith(Object.assign(document.createElement("p"),{textContent:navigator.onLine?"Cannot play this video.":"No network: the video needs internet."}))}}
+/* story video */
+async function fVidStart(){const c=fCur();if(!c||!fIsVid(c.s))return;const s=c.s;
+  if(!F.svUrl||F.svUrl.id!==s.id){F.svMute=false;try{const u=await srcURL({k:"m",id:s.media.p,t:s.media.t});if(fCur()?.s.id!==s.id)return;F.svUrl={id:s.id,url:u};feedSync()}catch(e){return}}
+  const v=document.getElementById("fsvVid");if(!v||v._ok)return;v._ok=1;v.onended=()=>{if(fCur()?.s.id===s.id&&!F.sv.views&&!F.share)fStep(1)};
+  v.play().catch(()=>{if(!F.svMute){F.svMute=true;feedSync();const v2=document.getElementById("fsvVid");if(v2){v2._ok=1;v2.muted=true;v2.onended=v.onended;v2.play().catch(()=>{})}}})}
+function fSvReactBtns(s){const my=(F.reacts.find(x=>x.story_id===s.id&&x.uid===S.uid)||{}).e;
+  return`<div class="fsv-rx">${SRE.map(e=>`<button type="button" class="${my===e?"on":""}" data-v4="fSvLike" data-e="${e}" aria-pressed="${my===e}" aria-label="React ${e}">${E(e)}</button>`).join("")}</div>`}
+async function fSvLike(e){const c=fCur();if(!c)return;const s=c.s,i=F.reacts.findIndex(x=>x.story_id===s.id&&x.uid===S.uid);
+  if(i>=0&&F.reacts[i].e===e)F.reacts.splice(i,1);else if(i>=0)F.reacts[i].e=e;else F.reacts.push({story_id:s.id,uid:S.uid,e,who:myWho()});
+  const pop=document.createElement("div");pop.className="fsv-pop";pop.innerHTML=E(e);document.body.appendChild(pop);setTimeout(()=>pop.remove(),1000);
+  F.svH=null;const host=document.getElementById("fsvhost");if(host)host._h="";feedSync();try{await window.__feed.reactStory(s.id,e)}catch(er){toast(er.message||"Could not react","x")}}
+/* story media cleanup (saves storage space): my story files are removed after 3 days */
+function fRememberMedia(m){try{const k="ec_smedia_"+S.uid,L=JSON.parse(localStorage.getItem(k)||"[]");L.push({ps:[m.p,m.poster&&m.poster.p].filter(Boolean),at:Date.now()});localStorage.setItem(k,JSON.stringify(L.slice(-200)))}catch(e){}}
+function fCleanMyMedia(){if(fCleanMyMedia.done||!window.__chatFiles||!window.__chatFiles.remove)return;fCleanMyMedia.done=1;
+  try{const k="ec_smedia_"+S.uid,L=JSON.parse(localStorage.getItem(k)||"[]"),old=L.filter(x=>Date.now()-x.at>72*3600e3);if(!old.length)return;
+    window.__chatFiles.remove(old.flatMap(x=>x.ps)).then(()=>localStorage.setItem(k,JSON.stringify(L.filter(x=>Date.now()-x.at<=72*3600e3)))).catch(()=>{})}catch(e){}}
+/* sharing */
+function fShareItem(){const sh=F.share;if(!sh)return null;if(sh.k==="post"){const p=F.posts.find(x=>x.id===sh.id);if(!p)return null;const o=p.shared||{id:p.id,author:p.author,who:p.who,body:p.body,media:p.media};return{k:"post",id:o.id||p.id,author:o.author,who:o.who,body:v4Plain(o.body||""),media:o.media||[]}}
+  const s=F.stories.find(x=>x.id===sh.id);if(!s)return null;return{k:"story",id:s.id,author:s.author,who:s.who,body:v4Plain(s.body||""),media:s.media?[s.media]:[]}}
+function fShareHTML(){const sh=F.share,it=fShareItem();if(!it)return"";const nm=esc(it.who?.name||"Student");
+  if(sh.step==="feed")return`<div class="v4sheet-bg fz" data-v4="fShareX"></div><div class="v4sheet fz"><b>Share ${nm}'s post to your feed</b><textarea id="fsh_text" rows="2" maxlength="1000" placeholder="Say something about it (in English)…"></textarea><div class="fshared mini"><header>${whoAva(it.who,it.author,24)}<b>${nm}</b></header>${it.body?`<div class="ftext">${esc(it.body.slice(0,160))}</div>`:""}</div><button type="button" class="btn" data-v4="fShareFeed" ${sh.busy?"disabled":""}>${sh.busy?"Sharing…":"Share now"}</button><button type="button" class="v4cancel" data-v4="fShareX">Cancel</button></div>`;
+  if(sh.step==="friends"){const q=(sh.q||"").toLowerCase(),L=PR.dir.filter(x=>!q||x.name.toLowerCase().includes(q)).slice(0,60);
+    return`<div class="v4sheet-bg fz" data-v4="fShareX"></div><div class="v4sheet fz fsh-list"><b>Send to a classmate</b><input id="fsh_q" type="search" placeholder="Search…" value="${esc(sh.q||"")}" autocomplete="off">${L.length?L.map(x=>`<button type="button" data-v4="fShareTo" data-id="${x.uid}" ${sh.busy?"disabled":""}>${avatar(x.uid,x.name,34)}<span>${esc(x.name)}</span>${sh.sent&&sh.sent[x.uid]?`<span class="chip ok" style="margin-left:auto">Sent</span>`:""}</button>`).join(""):`<p class="small muted">${PR.loaded?"No classmate found.":"Loading…"}</p>`}<button type="button" class="v4cancel" data-v4="fShareX">Done</button></div>`}
+  return`<div class="v4sheet-bg fz" data-v4="fShareX"></div><div class="v4sheet fz"><b>Share</b>
+  ${it.k==="post"?`<button type="button" data-v4="fShareStep" data-k="feed">${ic("users")}Share to my feed</button>`:""}
+  ${S.mode==="student"&&peerOn()?`<button type="button" data-v4="fShareStep" data-k="friends">${ic("chat")}Send to a classmate</button>`:""}
+  <button type="button" data-v4="fShareOut">${ic("send")}Share outside the app</button>
+  <button type="button" class="v4cancel" data-v4="fShareX">Cancel</button></div>`}
+function fShareClose(){F.share=null;feedSync();if(F.sv)fShow();render()}
+async function fShareTo(uid){const sh=F.share,it=fShareItem();if(!sh||!it||sh.busy)return;sh.busy=true;feedSync();
+  try{const ex=(it.body||"").slice(0,300),hasVid=it.media.some(m=>/^video\//.test(m.t||""));let att=null;
+    const img=it.media.find(m=>/^image\//.test(m.t||""));if(img&&window.__chatFiles){try{const b=await srcBlob({k:"m",id:img.p,t:img.t});const up=await window.__chatFiles.upload(b,"photo.jpg");att={k:"img",p:up.p,t:up.t,n:up.n,s:up.s}}catch(e){}}
+    const text=`📢 ${it.k==="post"?"Post":"Story"} by ${it.who?.name||"a student"}${ex?`:\n${ex}`:""}${hasVid?"\n🎬 (video in the Community)":""}`;
+    await window.__peer.send(uid,text,att,{re:{id:it.k+":"+it.id,t:(it.k==="post"?"Post: ":"Story: ")+(ex.slice(0,100)||"📷"),w:it.author}});
+    sh.sent=sh.sent||{};sh.sent[uid]=1;toast("Sent!","send")}
+  catch(e){toast((e&&e.message)||"Could not send","x")}sh.busy=false;feedSync()}
+async function fShareOut(){const it=fShareItem();if(!it)return;const text=`${it.who?.name||"A student"} on English Classes${it.body?`: “${it.body.slice(0,280)}”`:""}`,url=SITE_URL();
+  try{const P=window.Capacitor?.Plugins?.Share;if(P&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()){await P.share({title:"English Classes",text,url,dialogTitle:"Share"});return}
+    if(navigator.share){await navigator.share({title:"English Classes",text,url});return}
+    await navigator.clipboard.writeText(text+"\n"+url);toast("Copied: paste it where you want","copy")}catch(e){if(e&&e.name!=="AbortError")toast("Sharing is not available here.","x")}}
+/* chat: videos too */
+{const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img")return fVidTile({p:a.p,t:a.t,d:a.d})+_mb(text,null);return _mb(text,a)}}
+/* ---------------- notifications ---------------- */
+const N={list:[],loaded:false,un:null,uid:null,at:0,markT:null};
+const nOn=()=>!!window.__notif&&!!S.uid&&(S.mode==="teacher"?!!(S.isOwner||S.isStaff):!!S.me);
+async function nLoad(){if(!nOn())return;N.at=Date.now();try{N.list=await window.__notif.list();N.loaded=true}catch(e){N.loaded=true}render()}
+function nStart(){if(!nOn())return;if(N.uid&&N.uid!==S.uid){try{N.un&&N.un()}catch(e){}N.un=null;N.list=[]}if(N.un)return;N.uid=S.uid;nLoad();
+  N.un=window.__notif.listen(n=>{if(N.list.some(x=>x.id===n.id))return;N.list.unshift(n);nArrive(n);render()})}
+setInterval(()=>{if(!nOn())return;if(!N.un||N.uid!==S.uid)nStart();else if(document.visibilityState==="visible"&&Date.now()-N.at>90000)nLoad()},4000);
+const nName=n=>(n.who&&n.who.name)||"Someone";
+function nTitle(n){const m=nName(n);return({msg:m,story_reply:m,comment:m,like:m,share:m,story_like:m,tmsg:n.who?.role==="teacher"?m:"Your teacher",smsg:m,staff:m})[n.kind]||"English Classes"}
+function nBody(n){const b=n.body||"";return({msg:`Message: “${b}”`,story_reply:`Replied to your story: “${b}”`,comment:`Commented on your post: “${b}”`,like:`Reacted ${b} to your post`,share:"Shared your post",story_like:`Reacted ${b} to your story`,tmsg:`Message: “${b}”`,smsg:`Message: “${b}”`,staff:`Message: “${b}”`})[n.kind]||b}
+function nViewing(n){const r=n.ref||"";if(r.startsWith("peer:"))return S.view?.type==="peer"&&S.view.id===r.slice(5)&&!document.hidden;if(r==="chat")return S.view?.type==="chat"&&!document.hidden;if(r.startsWith("chat:"))return S.view?.type==="chat"&&S.view.id===r.slice(5)&&!document.hidden;if(r.startsWith("staff:"))return S.view?.type==="staffchat"&&S.view.id===r.slice(6)&&!document.hidden;return false}
+function nArrive(n){if(nViewing(n))return;const peerHandled=(n.kind==="msg"||n.kind==="story_reply")&&!!PR.un;
+  if(!peerHandled&&!document.hidden)toast(`${nTitle(n)}: ${nBody(n)}`.slice(0,120),n.kind.includes("like")?"heart":"chat");
+  if(document.hidden||!document.hasFocus())nSys(nTitle(n),nBody(n),n.ref||n.kind,peerHandled)}
+async function nSys(title,body,tag,skipNative){try{
+  if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()){if(!skipNative&&typeof notifyNow==="function")notifyNow(title,body);return}
+  if(!("Notification" in window)||Notification.permission!=="granted")return;
+  const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();const o={body,tag:"ec-"+tag,renotify:true,icon:"icons/icon-192.png",badge:"icons/icon-192.png"};
+  if(r&&r.showNotification)r.showNotification(title,o);else new Notification(title,o)}catch(e){}}
+function nPermState(){if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())return typeof notifOn==="function"&&notifOn()?"granted":"default";return"Notification"in window?Notification.permission:"unsupported"}
+function nBell(){const h=document.getElementById("hdr");if(!h)return;let b=h.querySelector('[data-v4="nOpen"]');if(!nOn()){if(b)b.remove();return}
+  const n=N.list.filter(x=>!x.read_at).length;if(!b){h.insertAdjacentHTML("afterbegin",`<button class="iconbtn nbell" data-v4="nOpen" aria-label="Notifications" title="Notifications">${BELL}<span class="nbadge" hidden></span></button>`);b=h.querySelector('[data-v4="nOpen"]')}
+  const sp=b.querySelector(".nbadge"),t=n?(n>9?"9+":String(n)):"";if(sp.textContent!==t){sp.textContent=t;sp.hidden=!n}}
+function nView(){if(!N.loaded)nLoad();
+  if(N.list.some(x=>!x.read_at)&&!N.markT)N.markT=setTimeout(()=>{N.markT=null;if(S.view?.type!=="notifs")return;window.__notif.read(null).catch(()=>{});setTimeout(()=>{for(const x of N.list)if(!x.read_at)x.read_at=new Date().toISOString();render()},4000)},1500);
+  const perm=nPermState();
+  return`<div class="section" style="max-width:640px;margin-inline:auto">${backBtn()}<div class="row"><span class="nbig">${BELL}</span><div><span class="eyebrow">Activity</span><h2>Notifications</h2></div></div>
+  ${perm==="default"?`<div class="glass card row between" style="gap:12px"><span class="small">Get a notification on your phone when someone writes to you or reacts to your posts.</span><button class="btn sm" data-v4="nPerm">Turn on</button></div>`:perm==="denied"?`<p class="hint">Notifications are blocked for this site: allow them in your browser settings.</p>`:""}
+  ${!N.loaded?`<div class="empty">Loading…</div>`:N.list.length?`<div class="glass list">${N.list.map(n=>`<div class="it click${n.read_at?"":" nun"}" data-v4="nGo" data-id="${n.id}" tabindex="0">${n.actor?whoAva(n.who,n.actor,42):`<span class="av">🔔</span>`}<div class="txt"><b>${esc(nTitle(n))}</b><span>${E(nBody(n))}</span><small class="muted">${ago(+new Date(n.created_at))}</small></div>${n.read_at?"":`<i class="ndot" aria-label="New"></i>`}</div>`).join("")}</div>`:`<div class="empty">No notifications yet. When someone writes to you, comments or reacts, you will see it here.</div>`}
+  </div>`}
+function nGo(id){const n=N.list.find(x=>String(x.id)===String(id));if(!n)return;if(!n.read_at){n.read_at=new Date().toISOString();window.__notif.read([n.id]).catch(()=>{})}const r=n.ref||"";S.animate=true;
+  if(r.startsWith("peer:")&&S.mode==="student"&&peerOn()){const u=r.slice(5);S.view={type:"peer",id:u};PR.with=u;peerStart();peerMarkRead(u)}
+  else if(r==="chat"&&S.mode==="student"){S.view={type:"chat",id:S.uid};subChat(S.uid)}
+  else if(r.startsWith("chat:")&&S.mode==="teacher"){const sid=r.slice(5);S.view={type:"chat",id:sid};subChat(sid)}
+  else if(r.startsWith("staff:")&&S.mode==="teacher"){S.tab="msgs";S.msgsTab="staff";staffOpen(r.slice(6));return}
+  else if(r.startsWith("post:")){const pid=r.slice(5);if(S.mode==="teacher"){S.view=null;S.tab="msgs";S.msgsTab="community"}else S.view={type:"feed"};F.open[pid]=true;feedLoad();setTimeout(()=>{const el=document.getElementById("p-"+pid);if(el){el.scrollIntoView({block:"start",behavior:"smooth"});el.classList.add("v4flash")}},900)}
+  else if(r.startsWith("story:")){if(S.mode==="teacher"){S.view=null;S.tab="msgs";S.msgsTab="community"}else S.view={type:"feed"};feedLoad().then(()=>fOpenStory(S.uid))}
+  scrollTo(0,0);render()}
+{const _sv2=studentView;studentView=function(){if(S.view?.type==="notifs"&&nOn())return nView();return _sv2()}}
+{const _tv2=teacherView;teacherView=function(){if(S.view?.type==="notifs"&&nOn())return nView();return _tv2()}}
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el)return;const a=el.dataset.v4,id=el.dataset.id;
+  switch(a){
+  case"fPick":F.pick=F.pick===id?null:id;render();return;
+  case"fLikeE":fLike(id,el.dataset.e);return;
+  case"fShare":F.share={k:el.dataset.k,id,step:"menu"};clearTimeout(F.svT);feedSync();return;
+  case"fShareX":fShareClose();return;
+  case"fShareStep":F.share.step=el.dataset.k;if(el.dataset.k==="friends"&&!PR.loaded&&peerOn())peerRefresh().then(()=>{const h=document.getElementById("fsvhost");if(h)h._h="";feedSync()});feedSync();if(el.dataset.k==="feed")setTimeout(()=>document.getElementById("fsh_text")?.focus(),60);return;
+  case"fShareFeed":{const sh=F.share,it=fShareItem();if(!sh||!it||sh.busy)return;const t=((document.getElementById("fsh_text")||{}).value||"").trim();sh.busy=true;feedSync();
+    (async()=>{try{const body=await fFix(t,1000);await window.__feed.create(body,[],sh.id);toast("Shared to your feed!","rocket");F.share=null;feedSync();await feedLoad()}catch(er){sh.busy=false;feedSync();toast(er.message||"Could not share","x")}})();return}
+  case"fShareTo":fShareTo(id);return;
+  case"fShareOut":fShareOut();return;
+  case"fJump":{const t=document.getElementById("p-"+id);if(t){t.scrollIntoView({block:"start",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
+  case"fSvLike":fSvLike(el.dataset.e);return;
+  case"fSvSnd":{F.svMute=false;const v=document.getElementById("fsvVid");if(v){v.muted=false;v.play().catch(()=>{})}const h=document.getElementById("fsvhost");const b=h&&h.querySelector(".fsv-snd");if(b)b.remove();return}
+  case"vplay":vPlay(el.dataset.p,el.dataset.t);return;
+  case"nOpen":S.view={type:"notifs"};S.animate=true;scrollTo(0,0);render();return;
+  case"nGo":nGo(id);return;
+  case"nPerm":if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()){Promise.resolve(notifEnable()).then(render)}else if("Notification"in window)Notification.requestPermission().then(p=>{if(p==="granted")toast("Notifications are on","check");render()});return;
+  }},true);
+document.addEventListener("input",e=>{if(e.target&&e.target.id==="fsh_q"&&F.share){F.share.q=e.target.value;const h=document.getElementById("fsvhost");if(h)h._h="";feedSync()}});
+{const st=document.createElement("style");st.textContent=`
+.fpick{display:flex;gap:4px;justify-content:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 8px;width:fit-content;margin:0 auto;box-shadow:var(--shadow);animation:v4up .15s ease-out}
+.fpick button{border:0;background:none;font-size:1.6rem;width:44px;height:44px;border-radius:50%;cursor:pointer;display:grid;place-items:center;transition:transform .12s}.fpick button:hover{transform:scale(1.25)}.fpick .e3d{width:30px;height:30px}
+.factions{grid-template-columns:1fr auto 1fr 1fr!important}.factions .fmore{padding:8px 6px}
+.fvid{position:relative;border:0;padding:0;background:#000;cursor:pointer;display:block;width:100%;min-height:180px;border-radius:0;overflow:hidden}
+.fvid img{width:100%;height:100%;max-height:460px;object-fit:cover;display:block;opacity:.9}
+.fplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:1.5rem;display:grid;place-items:center;border:2px solid rgba(255,255,255,.85);padding-left:4px}
+.fvid small{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:8px;padding:2px 7px;font-size:.75rem;font-family:var(--f-mono)}
+.msg .fvid{width:min(260px,62vw);min-height:150px;border-radius:14px;margin-bottom:4px}.msg .fvid small{display:block}
+.fthumbs video{width:72px;height:72px;object-fit:cover;border-radius:12px;display:block;background:#000}.fvbadge{position:absolute;left:4px;bottom:4px;font-style:normal;font-size:.68rem;background:rgba(0,0,0,.65);color:#fff;border-radius:6px;padding:1px 5px}
+.vplayer-v{max-width:100vw;max-height:86vh;width:100%;background:#000}
+.fshared{border:1px solid var(--line);border-radius:16px;padding:10px;display:grid;gap:8px;cursor:pointer;background:var(--surface2)}.fshared header{display:flex;align-items:center;gap:8px}.fshared header small{color:var(--muted);font-size:.75rem;margin-left:auto}.fshared .fmedia{border-radius:10px}
+.fshared.mini{cursor:default}.fshared.mini .ftext{font-size:.88rem;opacity:.85}
+.v4sheet.fz{z-index:100}.v4sheet-bg.fz{z-index:99}.v4sheet textarea,.v4sheet input{width:100%}
+.fsh-list{max-height:80vh;overflow:auto}.fsh-list>button{gap:10px}
+.fsv-rx{display:flex;gap:4px;justify-content:center;width:100%}.fsv-rx button{border:0;background:rgba(255,255,255,.12);border-radius:50%;width:42px;height:42px;font-size:1.35rem;cursor:pointer;display:grid;place-items:center;transition:transform .12s}.fsv-rx button.on{background:rgba(255,255,255,.4);transform:scale(1.12)}.fsv-rx .e3d{width:26px;height:26px}
+.fsv-sh{padding-inline:12px}
+.fsv-vr{margin-left:6px}.fsv-vr .e3d{width:20px;height:20px}
+.fsv-pop{position:fixed;left:50%;top:45%;z-index:120;font-size:5rem;pointer-events:none;animation:fsvpop 1s ease-out forwards}.fsv-pop .e3d{width:110px;height:110px}
+@keyframes fsvpop{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}30%{transform:translate(-50%,-50%) scale(1.2);opacity:1}100%{transform:translate(-50%,-120%) scale(1);opacity:0}}
+.fsv-media video{max-width:100%;max-height:100%;width:100%;object-fit:contain}
+.fsv-snd{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;border:0;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font:inherit;font-weight:700;padding:10px 16px;cursor:pointer}
+#hdr .nbell{position:relative}.nbadge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#E5484D;color:#fff;font-size:.68rem;font-weight:800;display:grid;place-items:center;line-height:1}
+@media (max-width:430px){#hdr{gap:4px!important;flex-wrap:nowrap!important}#hdr .iconbtn{width:34px!important;height:34px!important;min-width:34px}#hdr .pill{padding-inline:7px!important}#hdr [data-a="toggleLite"],#hdr [data-a="skinNext"]{display:none!important}}
+.fsv-bot{row-gap:10px}
+.nbig{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--surface2)}
+.it.nun{background:color-mix(in srgb,var(--ink-soft) 55%,transparent)}.ndot{width:10px;height:10px;border-radius:50%;background:#34B7F1;flex:none;margin-left:auto;align-self:center}
 `;document.head.appendChild(st)}
