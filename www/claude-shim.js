@@ -244,6 +244,7 @@
   };
 
   /* ---------------- copies d'élèves (photos / PDF des devoirs et épreuves) ---------------- */
+  Object.defineProperty(window, "__sb", { get: () => sb, configurable: true });   // Supabase client for feature files (tables + RPC, same rights as the user)
   window.__peer = {
     dir: async () => { const { data, error } = await sb.rpc("peer_directory"); if (error) throw new Error(mapErr(error).message); return data || []; },
     send: async (to, body, att, meta) => { const args = { p_to: to, p_body: body || "" }; if (att || meta) args.p_att = att || null; if (meta) args.p_meta = meta; const { data, error } = await sb.rpc("send_peer_message", args); if (error) throw new Error(/function .*send_peer_message|p_att|schema cache/i.test(error.message || "") ? "The teacher must first run the file supabase/messagerie.sql in Supabase." : (error.message || "Could not send")); return data; },

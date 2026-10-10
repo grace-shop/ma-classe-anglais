@@ -4,6 +4,9 @@ root = pathlib.Path(__file__).resolve().parent.parent
 src = root / "source-english-class.html"
 s = src.read_text(encoding="utf-8")
 v4 = (root / "app-v4.js").read_text(encoding="utf-8")
+# extra feature files (app-v5-*.js), added in name order after app-v4.js
+for f in sorted(root.glob("app-v5-*.js")):
+    v4 += "\n/* ---- " + f.name + " ---- */\n" + f.read_text(encoding="utf-8")
 A, B = "/* ==== v4 START ==== */", "/* ==== v4 END ==== */"
 if A in s:
     i, j = s.index(A), s.index(B) + len(B)
