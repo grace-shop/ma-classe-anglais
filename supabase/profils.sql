@@ -93,3 +93,17 @@ end $$;
 
 revoke all on function public.profiles_min(uuid[]), public.get_profile(uuid) from public, anon;
 grant execute on function public.profiles_min(uuid[]), public.get_profile(uuid) to authenticated;
+
+-- Photo de couverture (en haut du profil) : visible comme la fiche du camarade
+create or replace function public.profile_cover(p_uid uuid) returns text
+language plpgsql stable security definer set search_path = public as $$
+declare me uuid := auth.uid(); c text;
+begin
+  if me is null or p_uid is null or not public.profile_visible(me, p_uid) then return null; end if;
+  if public.my_level() < 3 and p_uid <> me and not public.peer_ok(me) then return null; end if;
+  select coalesce(d->>'cover', '') into c from docs where path = 'students/' || p_uid::text;
+  if c is null or c = '' or c !~ '^https://[^/]+/storage/v1/object/public/avatars/' then return null; end if;
+  return c;
+end $$;
+revoke all on function public.profile_cover(uuid) from public, anon;
+grant execute on function public.profile_cover(uuid) to authenticated;

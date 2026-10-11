@@ -850,9 +850,9 @@ let threeState="idle";function loadThree(){if(LITE||threeState!=="idle")return;t
 function setLite(v){LITE=v;LITE_SRC="user";try{localStorage.setItem("mca_lite",v?"1":"0")}catch(e){}document.documentElement.setAttribute("data-lite",v?"1":"0");const c=document.getElementById("bg3d");if(v){if(c)c.style.display="none"}else{if(threeState==="idle")loadThree();else if(threeState==="ready"){if(window.__bgResume)window.__bgResume();else try{initBg3d()}catch(e){}if(!mascot.canvas)try{initMascot()}catch(e){}}}}
 function liteHTML(){return`<div class="section"><div><span class="eyebrow">Data and battery</span><h2>Data saver mode</h2></div><div class="glass card"><div class="row between" style="flex-wrap:nowrap"><div><h3>${LITE?"On":"Off"}</h3><p class="sub small" style="margin:0">Turns off the 3D background, the mascot and the animations. The app loads faster and uses much less mobile data and battery. Great for small data plans and old phones.${!LITE&&autoLite()?" Your phone or connection seems slow: turn on this mode if the app is slow.":""}</p></div><button class="toggle" role="switch" aria-checked="${LITE}" aria-label="Data saver mode" data-a="toggleLite"></button></div></div></div>`}
 const SKINS=[["nuit","Night","The default theme: dark, starry, elegant",["#0B0E1C","#C9D3FF","#E3C173"]],["porcelaine","Porcelain","Light and elegant",["#F2F3F7","#1E2558","#A8823A"]],["auto","Automatic","Follows the light or dark mode of your device",["#F2F3F7","#1E2558","#0E1120"]],["savane","Savanna","Warm colours, green and gold",["#F5EFE3","#1F5C3F","#A8731C"]],["ocean","Ocean","Lagoon blue, fresh",["#EDF4F6","#0B4F6C","#11809F"]]];
-let SKIN="nuit";try{SKIN=localStorage.getItem("mca_skin2")||"nuit"}catch(e){}
+let SKIN="nuit";try{SKIN=localStorage.getItem("mca_skin3")||"nuit"}catch(e){}
 function isDarkSkin(){return SKIN==="nuit"||(SKIN==="auto"&&(document.documentElement.getAttribute("data-theme")==="dark"||(document.documentElement.getAttribute("data-theme")!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches)))}
-function applySkin(k,save){if(!SKINS.some(x=>x[0]===k))k="nuit";SKIN=k;document.documentElement.setAttribute("data-skin",k);if(save)try{localStorage.setItem("mca_skin2",k)}catch(e){}window.__bgSkin&&window.__bgSkin(isDarkSkin())}
+function applySkin(k,save){if(!SKINS.some(x=>x[0]===k))k="nuit";SKIN=k;document.documentElement.setAttribute("data-skin",k);if(save)try{localStorage.setItem("mca_skin3",k)}catch(e){}window.__bgSkin&&window.__bgSkin(isDarkSkin())}
 applySkin(SKIN);
 function themeHTML(){return`<div class="section"><div><span class="eyebrow">Appearance</span><h2>App theme</h2><p class="sub">Choose the style you like. This only changes your screen.</p></div><div class="skins">${SKINS.map(([k,l,d,c])=>`<button class="skin" data-a="skin" data-k="${k}" aria-pressed="${SKIN===k}"><span class="sw"><i style="background:${c[0]}"></i><i style="background:${c[1]}"></i><i style="background:${c[2]}"></i></span><b>${l}</b><span>${d}</span></button>`).join("")}</div></div>`}
 const AI={sample:undefined,turns:[],busy:false,ctl:null,open:false,speak:false,img:null,canImg:false,disabled:false};
@@ -3925,7 +3925,7 @@ document.addEventListener("input",e=>{if(e.target&&e.target.id==="fsh_q"&&F.shar
 .fsv-media video{max-width:100%;max-height:100%;width:100%;object-fit:contain}
 .fsv-snd{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;border:0;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font:inherit;font-weight:700;padding:10px 16px;cursor:pointer}
 #hdr .nbell{position:relative}.nbadge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#E5484D;color:#fff;font-size:.68rem;font-weight:800;display:grid;place-items:center;line-height:1}
-@media (max-width:430px){#hdr{gap:4px!important;flex-wrap:nowrap!important}#hdr .iconbtn{width:34px!important;height:34px!important;min-width:34px}#hdr .pill{padding-inline:7px!important}#hdr [data-a="toggleLite"],#hdr [data-a="skinNext"]{display:none!important}}
+@media (max-width:430px){#hdr{gap:4px!important;flex-wrap:nowrap!important}#hdr .iconbtn{width:34px!important;height:34px!important;min-width:34px}#hdr .pill{padding-inline:7px!important}#hdr [data-a="toggleLite"]{display:none!important}}
 .fsv-bot{row-gap:10px}
 .nbig{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--surface2)}
 .it.nun{background:color-mix(in srgb,var(--ink-soft) 55%,transparent)}.ndot{width:10px;height:10px;border-radius:50%;background:#34B7F1;flex:none;margin-left:auto;align-self:center}
@@ -5201,6 +5201,68 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   if(k==="avPeerNick"){const id=el.dataset.id;if(typeof pvOpen==="function"){pvOpen(id);V5.pvNick=true;feedSync()}return}
   if(k==="avPeerBlock"){const id=el.dataset.id;if(typeof sfOpen==="function")sfOpen({kind:"profile",ref:id,target:id,name:(AV.cache[id]||{}).name||""});return}
 },true);
+
+/* ---- cover photo: every learner may add one at the top of their profile (optional) ---- */
+AV.covers={};
+function covLoad(uid){if(!uid||!window.__sb||AV.covers[uid]!==undefined)return;AV.covers[uid]=null;
+  window.__sb.rpc("profile_cover",{p_uid:uid}).then(r=>{AV.covers[uid]=(r&&r.data)||null;render()}).catch(()=>{})}
+function covBanner(url,editable){
+  const bg=url?`background-image:url('${String(url).replace(/'/g,"%27")}')`:"background:linear-gradient(120deg,#6C80FF,#9A7CFF 50%,#06D6A0)";
+  return`<div class="av3-cover" style="${bg}">${editable?`<label class="av3-cov-btn">${ic("camera")}${url?"Change cover":"Add a cover photo"}<input type="file" id="covFile" accept="image/*" hidden></label>${url?`<button type="button" class="av3-cov-btn" data-v4="covDel">${ic("trash")}Remove</button>`:""}`:""}</div>`}
+{const _pf=profileView;profileView=function(){const url=S.me&&S.me.cover;return`<div class="section av3-wrap" style="max-width:720px;margin-inline:auto;gap:0">${covBanner(url,true)}</div>`+_pf()}}
+{const _pv2=personView;personView=function(){const id=S.view&&S.view.id;covLoad(id);const h=_pv2();const url=id&&AV.covers[id];
+  return url?h.replace('<div class="section av3-wrap" style="max-width:720px;margin-inline:auto">',`<div class="section av3-wrap" style="max-width:720px;margin-inline:auto">${covBanner(url,false)}`):h}}
+async function covSet(url){if(!S.uid||S.mode!=="student")return;S.me={...(S.me||{}),cover:url||""};
+  await write(()=>S.db.doc("students/"+S.uid).update({cover:url||""}));render()}
+document.addEventListener("change",async e=>{const el=e.target;if(!el||el.id!=="covFile")return;const f=el.files&&el.files[0];el.value="";if(!f)return;
+  if(!navigator.onLine){toast("No network: try again when you are online.","x");return}
+  try{toast("Uploading your cover photo…","clock");const blob=await shrinkImg(f,1280,.8);const url=await window.__avatarUpload(blob);await covSet(url);toast("Cover photo saved","check")}
+  catch(err){toast((err&&err.message)||"Could not save the cover photo","x")}},true);
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el||el.dataset.v4!=="covDel")return;covSet("");toast("Cover photo removed","check")},true);
+{const st=document.createElement("style");st.textContent=`
+.av3-cover{position:relative;height:160px;border-radius:26px;background-size:cover;background-position:center;box-shadow:0 22px 50px -26px rgba(60,80,200,.6),inset 0 0 0 1px rgba(255,255,255,.12);margin-bottom:-44px;display:flex;align-items:flex-end;justify-content:flex-end;gap:8px;padding:12px;overflow:hidden}
+.av3-cover:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.35));pointer-events:none}
+.av3-cov-btn{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(10,14,30,.55);color:#fff;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+`;document.head.appendChild(st)}
+
+/* ---- app-v5-themes.js ---- */
+/* =====================================================================
+   v5 themes: seven new themes (light and dark), added to the theme list
+   - The default theme is the first one: Night (dark, starry)
+   - Everyone starts on the default theme once; then each person keeps their choice
+   - Dark themes keep the 3D starry background
+   ===================================================================== */
+const TH_NEW=[
+ {k:"aurora",l:"Aurora",d:"Northern lights: teal and violet on deep blue",dark:1,
+  bg:"#0B1020",surface:"#141A33",surface2:"#1A2242",line:"#263057",line2:"#34407A",fg:"#EEF4FF",muted:"#A9B8E0",ink:"#5EEAD4",inkSoft:"#13303A",onInk:"#06201C",inkHover:"#99F6E4",sky:"#38BDF8",skyS:"#0C2A3D",gold:"#FBBF24",goldS:"#3A2E0C",rose:"#F472B6",roseS:"#3D1A2E",grad:"linear-gradient(120deg,#5EEAD4 0%,#818CF8 100%)",gradtext:"linear-gradient(100deg,#5EEAD4 0%,#818CF8 55%,#F472B6 100%)"},
+ {k:"sakura",l:"Sakura",d:"Soft cherry blossom: pink and white",dark:0,
+  bg:"#FDF2F5",surface:"#FFFFFF",surface2:"#FCE9EF",line:"#F3D3DE",line2:"#E9B8C8",fg:"#3B1F2B",muted:"#8A5C6E",ink:"#B83A6B",inkSoft:"#FBE3EC",onInk:"#FFFFFF",inkHover:"#962E56",sky:"#7C6BD6",skyS:"#ECE9FB",gold:"#C98B2B",goldS:"#FBF0DC",rose:"#E0557F",roseS:"#FCE3EB",grad:"linear-gradient(120deg,#E0557F 0%,#B83A6B 100%)",gradtext:"linear-gradient(100deg,#E0557F 0%,#B83A6B 55%,#C98B2B 100%)"},
+ {k:"foret",l:"Forest",d:"Deep green forest with emerald and gold",dark:1,
+  bg:"#0C1A14",surface:"#132A20",surface2:"#183327",line:"#22473A",line2:"#2F5C4C",fg:"#EAF7F0",muted:"#A7CDBB",ink:"#6EE7B7",inkSoft:"#173B2D",onInk:"#05261A",inkHover:"#A7F3D0",sky:"#5EC9A0",skyS:"#123A2C",gold:"#E9C46A",goldS:"#3A3218",rose:"#F4A261",roseS:"#3D2A1B",grad:"linear-gradient(120deg,#34D399 0%,#10B981 100%)",gradtext:"linear-gradient(100deg,#6EE7B7 0%,#E9C46A 60%,#F4A261 100%)"},
+ {k:"soleil",l:"Soleil",d:"Warm sunset: orange, amber and coral",dark:0,
+  bg:"#FFF7EE",surface:"#FFFFFF",surface2:"#FFF0E0",line:"#F7DCC2",line2:"#EDC39C",fg:"#3A2412",muted:"#866247",ink:"#E2622B",inkSoft:"#FDE5D6",onInk:"#FFFFFF",inkHover:"#C24E1C",sky:"#2F80ED",skyS:"#E3EEFD",gold:"#E8A317",goldS:"#FDF1D3",rose:"#D6336C",roseS:"#FBE3EB",grad:"linear-gradient(120deg,#F59E0B 0%,#E2622B 100%)",gradtext:"linear-gradient(100deg,#E2622B 0%,#F59E0B 55%,#D6336C 100%)"},
+ {k:"lavande",l:"Lavender",d:"Calm lavender and violet, light and airy",dark:0,
+  bg:"#F5F3FF",surface:"#FFFFFF",surface2:"#F1EEFD",line:"#E2DCFA",line2:"#CBC2F2",fg:"#241D47",muted:"#6B63A0",ink:"#6D4AE0",inkSoft:"#ECE6FF",onInk:"#FFFFFF",inkHover:"#5734C2",sky:"#3B82F6",skyS:"#E4EEFF",gold:"#D69E2E",goldS:"#FBF3DD",rose:"#E95C9B",roseS:"#FCE6F1",grad:"linear-gradient(120deg,#8B5CF6 0%,#6366F1 100%)",gradtext:"linear-gradient(100deg,#6D4AE0 0%,#9B6BFF 55%,#E95C9B 100%)"},
+ {k:"ardoise",l:"Slate & Coral",d:"Dark slate with a coral glow",dark:1,
+  bg:"#111418",surface:"#1B2026",surface2:"#222831",line:"#2D3540",line2:"#3D4856",fg:"#F3F4F6",muted:"#A7B0BD",ink:"#FF8A65",inkSoft:"#3A241E",onInk:"#1A0E08",inkHover:"#FFAB91",sky:"#60A5FA",skyS:"#1B2A3D",gold:"#FCD34D",goldS:"#3A3212",rose:"#F87171",roseS:"#3D1F1F",grad:"linear-gradient(120deg,#FF8A65 0%,#F472B6 100%)",gradtext:"linear-gradient(100deg,#FFAB91 0%,#FCD34D 60%,#F87171 100%)"},
+ {k:"glacier",l:"Glacier",d:"Icy clear blue, fresh and clean",dark:0,
+  bg:"#EEF7FB",surface:"#FFFFFF",surface2:"#E8F3F9",line:"#D3E7F1",line2:"#B5D5E6",fg:"#0F2A3A",muted:"#5A7A8C",ink:"#0A7EA4",inkSoft:"#DDF1F8",onInk:"#FFFFFF",inkHover:"#076584",sky:"#0A7EA4",skyS:"#DDF1F8",gold:"#D39B2A",goldS:"#FBF0D6",rose:"#E06C75",roseS:"#FBE4E6",grad:"linear-gradient(120deg,#22B8CF 0%,#0A7EA4 100%)",gradtext:"linear-gradient(100deg,#0A7EA4 0%,#22B8CF 55%,#8BE9FD 100%)"}
+];
+const TH_RGBA=(hex,a)=>{const h=hex.replace("#","");const n=parseInt(h.length===3?h.split("").map(c=>c+c).join(""):h,16);return`rgba(${n>>16&255},${n>>8&255},${n&255},${a})`};
+function thCSS(t){const dk=!!t.dark;
+  return`:root[data-skin="${t.k}"]{--bg:${t.bg};--surface:${t.surface};--surface2:${t.surface2};--line:${t.line};--line2:${t.line2};--fg:${t.fg};--muted:${t.muted};--ink:${t.ink};--ink-soft:${t.inkSoft};--on-ink:${t.onInk};--ink-hover:${t.inkHover};--sky:${t.sky};--sky-soft:${t.skyS};--gold:${t.gold};--gold-soft:${t.goldS};--rose:${t.rose};--rose-soft:${t.roseS};--grad:${t.grad};--gradtext:${t.gradtext};--glass-bg:${TH_RGBA(t.surface,dk?.72:.88)};--header-bg:${TH_RGBA(t.bg,.8)};--nav-bg:${TH_RGBA(t.surface,.9)};--hero-bg:linear-gradient(135deg,${TH_RGBA(t.surface,.96)},${TH_RGBA(t.surface2,.9)});--empty-bg:${TH_RGBA(t.surface,.6)};--flash-front:linear-gradient(160deg,${t.surface},${t.surface2});--overlay:${dk?"rgba(0,0,0,.55)":TH_RGBA(t.fg,.35)}}
+:root[data-skin="${t.k}"] body{background:${t.bg};color:var(--fg)}
+:root[data-skin="${t.k}"] .glass{background:var(--glass-bg)}`}
+{const st=document.createElement("style");st.id="th5css";st.textContent=TH_NEW.map(thCSS).join("\n")+`
+.skins{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.skin .sw i{box-shadow:inset 0 -6px 12px rgba(0,0,0,.08)}
+`;document.head.appendChild(st)}
+/* add the new themes to the theme list (after the five existing ones) */
+for(const t of TH_NEW){if(!SKINS.some(x=>x[0]===t.k))SKINS.push([t.k,t.l,t.d,[t.bg,t.ink,t.gold]])}
+const TH_DARK=new Set(TH_NEW.filter(t=>t.dark).map(t=>t.k));
+{const _dk=isDarkSkin;isDarkSkin=function(){if(TH_DARK.has(SKIN))return true;return _dk()}}
+/* the 3D starry background follows the dark themes */
+if(typeof window.__bgSkin==="function")window.__bgSkin(isDarkSkin());
 
 /* ==== v4 END ==== */
 render();
