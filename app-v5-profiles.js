@@ -147,3 +147,26 @@ setInterval(()=>{const st=document.getElementById("avStage");if(!st)return;const
 .av3-mine span{display:grid;gap:2px}
 .av3-bio{margin:6px 0 10px;padding:8px 12px;border-radius:14px;background:var(--surface2,#f5f6fb)}
 `;document.head.appendChild(st)}
+
+/* ---- a classmate's profile: avatar, name, class, bio, and what I can do with them ---- */
+function personView(){
+  const id=S.view&&S.view.id;if(!id)return"";avtLoadOf(id);
+  const p=avtFor(id)||{};const nm=(p.name)||(typeof peerName==="function"?peerName(id):"Classmate");
+  const nk=typeof nickOf==="function"?nickOf(id):"";const blk=(typeof BL!=="undefined"&&BL&&BL.set&&BL.set.has&&BL.set.has(id));
+  return`<div class="section av3-wrap" style="max-width:720px;margin-inline:auto">
+  <button class="back" data-v4="avPeerBack">${ic("left")}Back</button>
+  <div class="av3-stage">${p.avt?avtHTML(p.avt,170,true):`<span class="av" style="width:150px;height:150px;font-size:4rem">${esc((nm||"?")[0])}</span>`}</div>
+  <div class="glass card av3-form">
+    <span class="eyebrow">${esc(p.classe||"Classmate")}</span>
+    <h2 style="margin:0">${esc(nk||nm)}${nk?` <small class="muted" style="font-size:.55em">${esc(nm)}</small>`:""}</h2>
+    <p class="${p.bio?"":"muted"}" style="margin:0">${esc(p.bio||"No bio yet.")}</p>
+    <div class="av3-chips"><button class="btn sm" data-a="openPeer" data-id="${id}">${ic("chat")}Send a message</button>
+      <button class="btn ghost sm" data-v4="avPeerNick" data-id="${id}">${ic("pen")}Nickname</button>
+      <button class="btn ghost sm" data-v4="avPeerBlock" data-id="${id}">${ic("lock")}${blk?"Unblock":"Block"}</button></div>
+  </div></div>`}
+{const _sv2=studentView;studentView=function(){if(S.view&&S.view.type==="person")return personView();return _sv2()}}
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el)return;const k=el.dataset.v4;
+  if(k==="avPeerBack"){S.view={type:"peers"};S.animate=true;render();return}
+  if(k==="avPeerNick"){const id=el.dataset.id;if(typeof pvOpen==="function"){pvOpen(id);V5.pvNick=true;feedSync()}return}
+  if(k==="avPeerBlock"){const id=el.dataset.id;if(typeof sfOpen==="function")sfOpen({kind:"profile",ref:id,target:id,name:(AV.cache[id]||{}).name||""});return}
+},true);

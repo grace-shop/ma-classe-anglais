@@ -142,7 +142,7 @@ const FC="mca-files-v1",fcKey=k=>"https://mca-cache.local/"+encodeURIComponent(k
 async function fcGet(k){try{if(!window.caches)return null;const c=await caches.open(FC),r=await c.match(fcKey(k));if(!r)return null;V4.cached.add(k);return await r.blob()}catch(e){return null}}
 async function fcPut(k,b){try{if(!window.caches||!b)return;const c=await caches.open(FC);await c.put(fcKey(k),new Response(b,{headers:{"Content-Type":b.type||"application/octet-stream"}}));V4.cached.add(k)}catch(e){}}
 (async()=>{try{if(!window.caches)return;const c=await caches.open(FC);for(const r of await c.keys())V4.cached.add(decodeURIComponent(r.url.split("/").pop()))}catch(e){}})();
-async function srcURL(src){if(src.k==="a")return blobURL(src.id);if(src.k==="c")return await window.__copies.url(src.id);if(src.k==="m")return await window.__chatFiles.url(src.id);throw new Error("source")}
+async function srcURL(src){if(src.k==="a")return window.__signedAsset?window.__signedAsset(src.id):blobURL(src.id);if(src.k==="c")return await window.__copies.url(src.id);if(src.k==="m")return await window.__chatFiles.url(src.id);throw new Error("source")}
 async function srcBlob(src){const key=src.k+":"+src.id;let b=await fcGet(key);if(b)return b;
   const r=await fetch(await srcURL(src));if(!r.ok)throw new Error("http "+r.status);b=await r.blob();
   if(src.t&&(!b.type||b.type==="application/octet-stream"||b.type==="binary/octet-stream"))b=new Blob([b],{type:src.t});

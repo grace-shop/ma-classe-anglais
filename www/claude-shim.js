@@ -229,6 +229,11 @@
 
   /* ---------------- fichiers ---------------- */
   const publicUrl = (id) => sb.storage.from("assets").getPublicUrl(id).data.publicUrl;
+  // exam papers, pictures and homework files: a link that expires after one hour (works with a public or a private bucket)
+  window.__signedAsset = async (id) => {
+    try { const { data, error } = await sb.storage.from("assets").createSignedUrl(id, 3600); if (!error && data && data.signedUrl) return data.signedUrl; } catch (e) {}
+    return publicUrl(id);
+  };
   window.__blobURL = (id) => (sb ? publicUrl(id) : "");
   const assetsApi = {
     upload: async (blob, opts = {}) => {
