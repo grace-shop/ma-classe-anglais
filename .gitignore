@@ -3,3 +3,4 @@ android/
 ios/
 www/vendor/supabase.js
 *.apk
+.claude/

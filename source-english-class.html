@@ -1,6 +1,6 @@
 <title>English Classes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
 <style>
 /* Layout: porcelain app — soft light ground with slow pearl 3D behind, white cards with hairline borders, ink primary + gold for rewards; sticky header, segmented nav (top on desktop, bottom bar on phone) */
 :root{
@@ -722,7 +722,7 @@ body[data-mode="teacher"] *,body[data-mode="teacher"] *::before,body[data-mode="
 /* ============ constants ============ */
 const LEVELS=["A1","A2","B1","B2","C1"];
 const LEVEL_NAMES={A1:"Beginner",A2:"Elementary",B1:"Intermediate",B2:"Upper intermediate",C1:"Advanced"};
-const DAILY_GOAL=50, XP_PER_RANK=200;
+const DAILY_GOAL=20, XP_PER_RANK=200;
 const PROFILES={primaire:"Primary pupil",college:"Middle school student",lycee:"High school student",etudiant:"University student",adulte:"Adult / professional"};
 const AUDIENCES={tous:"Everyone",primaire:"Primary",college:"Middle school",lycee:"High school",etudiant:"University",adulte:"Adults"};
 const CLASSES={primaire:["CP1","CP2","CE1","CE2","CM1","CM2"],college:["6e","5e","4e","3e"],lycee:["2nde","1re","Tle"],etudiant:["Licence 1","Licence 2","Licence 3","Master","BTS / autre"],adulte:["Professionnel","En recherche d'emploi","Autre"]};
@@ -925,7 +925,7 @@ function hideSplash(){const s=$("#splash");if(!s||s.classList.contains("out"))re
 setTimeout(hideSplash,4500);
 
 /* ============ 3D mascot "Nova" ============ */
-const TIPS_STUDENT=["Practice makes perfect!","One activity a day keeps your streak going.","Tap the coloured words to hear them.","Mistakes help you learn!","The word of the day is worth +5 XP.","You're doing great!"];
+const TIPS_STUDENT=["Practice makes perfect!","One activity a day keeps your streak going.","Tap the coloured words to hear them.","Mistakes help you learn!","The word of the day is worth +2 XP.","You're doing great!"];
 const TIPS_TEACHER=["Your class is live!","Difficult points help you plan the next lesson.","An announcement motivates the whole class.","Great teachers inspire!"];
 let mascot={jump(){},canvas:null};
 function initMascot(){mascot=(function(){const api={jump(){},canvas:null};if(!window.THREE)return api;const T=THREE;const cv=document.createElement("canvas");cv.setAttribute("aria-hidden","true");api.canvas=cv;
@@ -1210,12 +1210,12 @@ function homeView(){const m=S.me,xp=m.xp||0,rank=rankOf(xp),into=xp%XP_PER_RANK,
   const hour=new Date().getHours(),greet=hour<12?"Good morning":hour<18?"Good afternoon":"Good evening";
   const sq=S.decks.length?srsQueue():{due:[],fresh:[]},sn=Math.min(SRS_MAX,sq.due.length+sq.fresh.length);
   const sugg=[
-    sn&&{a:"startSrs",id:"",icon:"brain",tone:"t-gold",eb:"Today's review · +3 XP / word",t:sq.due.length?`${sq.due.length} word(s) to review before you forget them`:`${sq.fresh.length} new words to learn`,lvl:S.me.level},
-    AI.sample&&!AI.disabled&&{a:"openTalk",id:"",icon:"chat",tone:"t-cyan",eb:"Chat with Nova · +5 XP / message",t:"Speak English with the AI: it corrects you and asks you questions",lvl:S.me.level},
-    {a:"startPic",id:"mix",icon:"camera",tone:"t-coral",eb:"Picture game · +10 XP / answer",t:"Guess the pictures: objects, actions, jobs…",lvl:S.me.level},
-    nextLesson&&{a:"openLesson",id:nextLesson.id,icon:"book",tone:"t-cyan",eb:"Lesson · +20 XP",t:nextLesson.title,lvl:nextLesson.level},
+    sn&&{a:"startSrs",id:"",icon:"brain",tone:"t-gold",eb:"Today's review · +1 XP / word",t:sq.due.length?`${sq.due.length} word(s) to review before you forget them`:`${sq.fresh.length} new words to learn`,lvl:S.me.level},
+    AI.sample&&!AI.disabled&&{a:"openTalk",id:"",icon:"chat",tone:"t-cyan",eb:"Chat with Nova · +2 XP / message",t:"Speak English with the AI: it corrects you and asks you questions",lvl:S.me.level},
+    {a:"startPic",id:"mix",icon:"camera",tone:"t-coral",eb:"Picture game · +3 XP / answer",t:"Guess the pictures: objects, actions, jobs…",lvl:S.me.level},
+    nextLesson&&{a:"openLesson",id:nextLesson.id,icon:"book",tone:"t-cyan",eb:"Lesson · +6 XP",t:nextLesson.title,lvl:nextLesson.level},
     nextQuiz&&{a:"startQuiz",id:nextQuiz.id,icon:"bolt",tone:"t-coral",eb:"Quiz · up to +"+((nextQuiz.questions||[]).length*10+50)+" XP",t:nextQuiz.title,lvl:nextQuiz.level},
-    nextDeck&&{a:"startDeck",id:nextDeck.id,icon:"cards",tone:"t-gold",eb:"Vocabulary · +5 XP / word",t:nextDeck.title,lvl:nextDeck.level},
+    nextDeck&&{a:"startDeck",id:nextDeck.id,icon:"cards",tone:"t-gold",eb:"Vocabulary · +2 XP / word",t:nextDeck.title,lvl:nextDeck.level},
     nextHw&&{a:"openHw",id:nextHw.id,icon:"pen",tone:"t-ok",eb:"Homework · due "+fmtDate(nextHw.due),t:nextHw.title,lvl:nextHw.level}].filter(Boolean).slice(0,6);
   const earned=BADGES.filter(b=>(m.badges||{})[b.id]);
   const w=wordOfDay(),wDone=m.wotdDay===t;
@@ -1227,7 +1227,7 @@ function homeView(){const m=S.me,xp=m.xp||0,rank=rankOf(xp),into=xp%XP_PER_RANK,
   <div class="section"><div class="head"><div><span class="eyebrow">For you today</span><h2>Keep making progress</h2></div></div>
   ${sugg.length?`<div class="grid sugg-grid">${sugg.map(s=>`<div class="glass card click tilt" tabindex="0" data-a="${s.a}" data-id="${s.id}"><span class="glow ${s.tone}"></span><span class="ic ${s.tone}">${ic(s.icon)}</span><span class="eyebrow">${esc(s.eb)}</span><h3>${esc(s.t)}</h3><div class="row">${lvlChip(s.lvl)}</div></div>`).join("")}</div>`:`<div class="empty">You have finished everything! Your teacher will add new activities soon.</div>`}</div>
   ${examCountdown(m)}
-  ${w?`<div class="section"><div class="glass wotd"><span class="medal">${ic("star")}</span><div style="min-width:0"><span class="eyebrow">Word of the day · ${esc(w.level)}</span><div class="w gradtext">${esc(w.en)}</div><div class="muted">${esc(w.fr)}${w.ex?` · <i>${esc(w.ex)}</i>`:""}</div></div><div class="row">${sayBtn(w.en+(w.ex?". "+w.ex:""))}${wDone?`<span class="chip ok">${ic("check")}Learned</span>`:`<button class="btn sm" data-a="wotd">${ic("check")}I learned it · +5 XP</button>`}</div></div></div>`:""}
+  ${w?`<div class="section"><div class="glass wotd"><span class="medal">${ic("star")}</span><div style="min-width:0"><span class="eyebrow">Word of the day · ${esc(w.level)}</span><div class="w gradtext">${esc(w.en)}</div><div class="muted">${esc(w.fr)}${w.ex?` · <i>${esc(w.ex)}</i>`:""}</div></div><div class="row">${sayBtn(w.en+(w.ex?". "+w.ex:""))}${wDone?`<span class="chip ok">${ic("check")}Learned</span>`:`<button class="btn sm" data-a="wotd">${ic("check")}I learned it · +2 XP</button>`}</div></div></div>`:""}
   ${S.anns.length?`<div class="section">${S.anns.filter(teacherOk).slice(0,2).map(a=>`<div class="glass ann"><span class="ic">${ic("mega")}</span><div><span class="eyebrow">Message from your teacher · ${fmtDate(a.createdAt)}</span><div style="white-space:pre-wrap;margin-top:4px">${esc(a.text)}</div></div></div>`).join("")}</div>`:""}
   <div class="section"><div class="head"><div><span class="eyebrow">Rewards</span><h2>My badges <span class="muted small mono">${earned.length}/${BADGES.length}</span></h2></div><button class="btn ghost sm" data-a="tab" data-k="me">See all${ic("right")}</button></div>
   <div class="badges">${BADGES.slice(0,4).map(badgeHTML).join("")}</div></div>${shopTeaser()}${downloadHTML()}`}
@@ -1237,9 +1237,9 @@ function programmeHTML(read){const mine=myProgClass(S.me);if(!mine)return"";cons
   return`<div class="section"><div class="head"><div><span class="eyebrow">This year's syllabus · ${esc(pc)}${exam?" · prepares for "+exam:""}</span><h2>My <span class="gradtext">syllabus</span></h2><p class="sub">Your class units, in order for the year: theme, grammar point and vocabulary. ${units.length?`${done} of ${units.length} studied.`:""}</p></div>${group.length>1?`<div class="seg">${group.map(c=>`<button data-a="progClass" data-k="${c}" aria-pressed="${c===pc}">${c}${c===mine?" ★":""}</button>`).join("")}</div>`:""}</div>
   ${units.length?`<div class="bar"><i style="width:${pct(done,units.length)}%"></i></div><div class="glass list">${units.map(u=>`<div class="it unit" data-a="openLesson" data-id="${u.id}" tabindex="0" style="cursor:pointer"><span class="unum ${read[u.id]?"done":""}">${read[u.id]?ic("check"):esc(u.unit||"•")}</span><div class="txt"><b>${esc(u.title)}</b><div class="small muted">${esc(u.theme||"")}${u.grammar?" · "+esc(u.grammar):""}</div></div>${lvlChip(u.level)}</div>`).join("")}</div>`:`<div class="empty">The syllabus for this class is not online yet.</div>`}</div>`}
 function learnView(){const read=S.me.lessonsRead||{};
-  return`${audBar()}${srsHTML()}${programmeHTML(read)}<div class="section"><div><span class="eyebrow">Vocabulary</span><h2>3D <span class="gradtext">flashcards</span></h2><p class="sub">Two modes: 3D cards that flip over, and listening, where you write the word you hear. +5 XP for each new word mastered.</p></div>
+  return`${audBar()}${srsHTML()}${programmeHTML(read)}<div class="section"><div><span class="eyebrow">Vocabulary</span><h2>3D <span class="gradtext">flashcards</span></h2><p class="sub">Two modes: 3D cards that flip over, and listening, where you write the word you hear. +2 XP for each new word mastered.</p></div>
   ${S.decks.length?`<div class="grid">${byLevel(S.decks).map(d=>{const n=(d.cards||[]).length,k=knownOf(d).length;return`<div class="glass card tilt"><span class="glow t-gold"></span><div class="row between"><span class="ic t-gold">${ic("cards")}</span><span class="mono small muted">${k}/${n} words</span></div><h3>${esc(d.title)}</h3><div class="bar gold"><i style="width:${pct(k,n)}%"></i></div><div class="row">${lvlChip(d.level)}${audChip(d)}${exChip(d)}${k===n&&n?`<span class="chip ok">Mastered</span>`:""}</div><div class="modes"><button class="btn sm" data-a="startDeck" data-id="${d.id}" data-m="cards">${ic("cards")}3D cards</button>${canSpeak?`<button class="btn ghost sm" data-a="startDeck" data-id="${d.id}" data-m="listen">${ic("speaker")}Listening</button>`:""}</div></div>`}).join("")}</div>`:`<div class="empty">No vocabulary lists yet.</div>`}</div>
-  <div class="section"><div><span class="eyebrow">Lessons from your teacher</span><h2>More lessons</h2><p class="sub">Your level (${esc(S.me.level)}) comes first. +20 XP for each new lesson read.</p></div>
+  <div class="section"><div><span class="eyebrow">Lessons from your teacher</span><h2>More lessons</h2><p class="sub">Your level (${esc(S.me.level)}) comes first. +6 XP for each new lesson read.</p></div>
   ${byLevel(S.lessons.filter(l=>!l.classe)).length?`<div class="grid">${byLevel(S.lessons.filter(l=>!l.classe)).map(l=>`<div class="glass card click tilt" tabindex="0" data-a="openLesson" data-id="${l.id}"><span class="glow t-cyan"></span><span class="ic t-cyan">${ic("book")}</span><h3>${esc(l.title)}</h3><span class="muted small">${esc(String(l.body||"").replace(/\*\*/g,"").slice(0,90))}…</span><div class="row">${lvlChip(l.level)}${audChip(l)}${exChip(l)}${read[l.id]?`<span class="chip ok">${ic("check")}Read</span>`:""}</div></div>`).join("")}</div>`:`<div class="empty">No lessons yet.</div>`}</div>`}
 function quizCard(q){const b=bestFor(q.id);return`<div class="glass card tilt"><span class="glow t-coral"></span><div class="row between"><span class="ic t-coral">${ic("bolt")}</span>${b!=null?`<span class="chip ${b===100?"ok":b>=60?"warn":"bad"}">Best ${b} %</span>`:`<span class="chip">New</span>`}</div><h3>${esc(q.title)}</h3><div class="row">${lvlChip(q.level)}${audChip(q)}${exChip(q)}<span class="chip">${(q.questions||[]).length} questions</span></div><div class="row"><button class="btn sm" data-a="startQuiz" data-id="${q.id}">${ic(b!=null?"refresh":"bolt")}${b!=null?"Play again":"Start"}</button>${q.exam?"":`<button class="btn ghost sm" data-a="sheet" data-id="${q.id}" data-k="0" title="Download the printable worksheet">${ic("download")}Worksheet</button>`}</div></div>`}
 function mistakesPool(){const pool=[],seenQ=new Set();for(const a of [...(S.me?.attempts||[])].reverse()){if(a.quizId==="revision")continue;
@@ -1250,7 +1250,7 @@ function genTopics(){const pc=myProgClass(S.me),units=pc?progUnits(pc):[],ex=EXA
 function quizListView(){const pc=myProgClass(S.me),group=PROG_GROUP[S.me.profile]||(pc?[pc]:[]),qc=S.quizClass&&group.includes(S.quizClass)?S.quizClass:pc;
   const all=byLevel(S.quizzes.filter(q=>!q.exam)),mine=all.filter(q=>q.classe===qc),gen=all.filter(q=>!q.classe),ex=byLevel(S.quizzes.filter(q=>q.exam)),pool=mistakesPool();
   const nQ=all.reduce((n,q)=>n+(q.questions||[]).length,0),g=S.gen||{};
-  return`${audBar()}<div class="section"><div><span class="eyebrow">Practice · ${all.length} quiz · ${nQ} questions</span><h2>Quiz</h2><p class="sub">+10 XP for each right answer, +50 XP for a perfect score. And with Nova, the questions never stop.</p></div>
+  return`${audBar()}<div class="section"><div><span class="eyebrow">Practice · ${all.length} quiz · ${nQ} questions</span><h2>Quiz</h2><p class="sub">+3 XP for each right answer, +15 XP for a perfect score. And with Nova, the questions never stop.</p></div>
   <div class="grid">
    ${AI.sample&&!AI.disabled?`<form class="glass card form" data-f="aiGen" style="border-color:#D9DDF3"><div class="row between"><span class="ic t-grad">${ic("spark")}</span><span class="chip warn">Unlimited</span></div><h3>New questions with Nova</h3><p class="muted small" style="margin:0">Nova creates a new quiz every time, made for your class and level, with an explanation for each answer.</p>
      <label>Topic<select id="ag_topic">${genTopics().map(t=>`<option>${esc(t)}</option>`).join("")}</select></label><input id="ag_free" maxlength="120" placeholder="Or write your topic: football, jobs, since/for…" aria-label="Your own topic">
@@ -1266,7 +1266,7 @@ function examCard(q){const taken=examTaken(S.me,q.id),att=(S.me.attempts||[]).fi
    :S.confirm==="exam"+q.id?`<p class="small" style="margin:0">Only one try. The timer starts as soon as you begin and the exam is sent automatically when time is up. No corrections during the exam.</p><div class="row"><button class="btn sm" data-a="startQuiz" data-id="${q.id}">${ic("timer")}Let's go</button><button class="btn ghost sm" data-a="cancelDel">Cancel</button></div>`
    :`<div><button class="btn sm" data-a="askExam" data-id="${q.id}">${ic("timer")}Take the exam</button></div>`}</div>`}
 function hwListView(){const subs=S.me.submissions||{},fb=S.me.feedback||{},list=S.homework.filter(visible);
-  return`${audBar()}<div class="section"><div><span class="eyebrow">To hand in</span><h2>Homework</h2><p class="sub">+40 XP for each homework handed in.</p></div>
+  return`${audBar()}<div class="section"><div><span class="eyebrow">To hand in</span><h2>Homework</h2><p class="sub">+12 XP for each homework handed in.</p></div>
   ${list.length?`<div class="grid">${list.map(h=>{const late=h.due&&new Date(h.due+"T23:59")<new Date();const st=fb[h.id]?gradeChip(fb[h.id].grade):subs[h.id]?`<span class="chip">${ic("check")}Handed in</span>`:late?`<span class="chip bad">Late</span>`:`<span class="chip warn">To do</span>`;
     return`<div class="glass card click tilt" tabindex="0" data-a="openHw" data-id="${h.id}"><span class="glow t-ok"></span><div class="row between"><span class="ic t-ok">${ic("pen")}</span>${st}</div><h3>${esc(h.title)}</h3><span class="muted small row">${ic("clock")}Due ${h.due?new Date(h.due).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}):"—"}</span><div class="row">${lvlChip(h.level)}${audChip(h)}${exChip(h)}</div></div>`}).join("")}</div>`:`<div class="empty">No homework yet.</div>`}</div>`}
 function profileView(){const m=S.me,a=[...(m.attempts||[])].reverse(),avg=a.length?Math.round(a.reduce((s,x)=>s+pct(x.score,x.total),0)/a.length):null,fb=m.feedback||{};
@@ -1647,7 +1647,7 @@ const explainHTML=(t,h)=>`<div class="explain"><span class="ex-ic" aria-hidden="
 function picStage(x,done,ok){return`<div class="pstage ${done?(ok?"ok":"no"):""}" aria-hidden="${x.picId?"false":"true"}"><div class="pring"></div><div class="pfloat">${x.picId?`<img src="${esc(blobURL(x.picId))}" alt="Photo to describe">`:`<span class="pemo${segG(x.pic).length>1?" many":""}">${E(x.pic)}</span>`}</div><i class="pshadow"></i></div>`}
 const picReveal=x=>`<div class="preveal"><b>${esc(x.say||"")}</b>${x.fr?`<span class="muted small">${esc(x.fr)}</span>`:""}<div>${sayBtn(x.say||"")}</div></div>`;
 function picGamesHTML(){const modes=picModesFor(),hard=S.picHard??picHardDefault(),best=k=>{const a=(S.me?.attempts||[]).filter(x=>x.quizId==="pic-"+k);return a.length?Math.max(...a.map(x=>pct(x.score,x.total))):null};
-  return`<div class="section"><div class="head"><div><span class="eyebrow">Learn with pictures · ${modes.length} games</span><h2>Picture <span class="gradtext">games</span></h2><p class="sub">Look at the picture, guess the word or say what the person is doing. Every round is different, and you can hear the right answer. +10 XP for each right answer.</p></div><div class="seg" role="group" aria-label="Difficulty"><button data-a="picHard" data-k="0" aria-pressed="${!hard}">With choices</button><button data-a="picHard" data-k="1" aria-pressed="${hard}">I type the answer</button></div></div>
+  return`<div class="section"><div class="head"><div><span class="eyebrow">Learn with pictures · ${modes.length} games</span><h2>Picture <span class="gradtext">games</span></h2><p class="sub">Look at the picture, guess the word or say what the person is doing. Every round is different, and you can hear the right answer. +3 XP for each right answer.</p></div><div class="seg" role="group" aria-label="Difficulty"><button data-a="picHard" data-k="0" aria-pressed="${!hard}">With choices</button><button data-a="picHard" data-k="1" aria-pressed="${hard}">I type the answer</button></div></div>
   <div class="pgrid">${modes.map(m=>{const b=best(m.k);return`<button class="pcard tilt" data-a="startPic" data-k="${m.k}"><span class="pcard-emo" aria-hidden="true">${E(m.pic)}</span><span class="pcard-en">${esc(m.en)}</span><b>${esc(m.t)}</b><span class="small muted">${esc(m.d)}</span>${b!=null?`<span class="chip ${b>=80?"ok":"warn"}">Best ${b}%</span>`:`<span class="chip">New</span>`}</button>`}).join("")}</div></div>`}
 function picFormHTML(lvlSel,audSel){const d=S.picDraft;
   return`<form class="form" data-f="pic"><div class="scanbox"><div class="row"><label class="btn ghost sm filebtn">${ic("camera")}Take or choose a photo<input type="file" id="pic_file" accept="image/*" hidden></label>${d?`<button class="btn ghost sm" type="button" data-a="picClear">${ic("x")}Remove</button>`:""}</div>${d?.url?`<img src="${d.url}" alt="Photo preview" style="max-height:260px;max-width:100%;border-radius:14px;object-fit:contain;background:#fff;justify-self:start">`:`<span class="hint">A clear photo: an object, a person doing something, a place in the neighbourhood, the market… It is made smaller automatically for slow connections.</span>`}</div>
@@ -1757,7 +1757,7 @@ async function talkFinish(){const T=S.talk;if(!T||T.busy)return;const n=T.turns.
 function talkCardHTML(){if(!AI.sample||AI.disabled||isParent(S.me))return"";const last=(S.me?.talks||[]).slice(-1)[0];
   return`<div class="section"><div class="glass card talk-card" data-a="openTalk" tabindex="0" role="button"><div class="talk-orb" aria-hidden="true"><span>${E("💬")}</span></div><div style="display:grid;gap:4px;min-width:0"><span class="eyebrow">New · chat with AI</span><h3 style="margin:0">Speak English with Nova</h3><span class="small muted">Chat in English: Nova answers you, corrects your sentences and asks you questions. At the market, at school, in a job interview…${last?` Last time: ${esc(last.title)}, ${fmtDate(last.at)}.`:""}</span></div><span class="btn sm">${ic("chat")}Start</span></div></div>`}
 function talkPickerHTML(){const list=talkScFor(),hist=[...(S.me?.talks||[])].reverse().slice(0,5);
-  return`<div class="section"><div class="glass hero talk-hero"><div style="display:grid;gap:10px"><span class="eyebrow">Chat with AI</span><h2>Speak English <span class="gradtext">with Nova</span></h2><p class="sub">Choose a situation. Nova plays the role, answers you in English, corrects your sentences with a simple explanation and asks you questions to keep you talking. +5 XP per message, +20 XP if you keep going for 5 turns.</p>
+  return`<div class="section"><div class="glass hero talk-hero"><div style="display:grid;gap:10px"><span class="eyebrow">Chat with AI</span><h2>Speak English <span class="gradtext">with Nova</span></h2><p class="sub">Choose a situation. Nova plays the role, answers you in English, corrects your sentences with a simple explanation and asks you questions to keep you talking. +2 XP per message, +6 XP if you keep going for 5 turns.</p>
   <div class="row"><div class="seg" role="group" aria-label="Corrections"><button data-a="talkStrict" data-k="0" aria-pressed="${!S.talkStrict}">Big mistakes</button><button data-a="talkStrict" data-k="1" aria-pressed="${!!S.talkStrict}">All mistakes</button></div><button class="btn ghost sm" data-a="talkVoice" aria-pressed="${TALK_VOICE}">${ic(TALK_VOICE?"speaker":"mute")}Nova ${TALK_VOICE?"speaks out loud":"is muted"}</button></div></div>
   <div class="hero-side"><div class="talk-orb big" aria-hidden="true"><span>${E("🗣️")}</span></div></div></div></div>
   <div class="section"><div><span class="eyebrow">Situations · ${list.length}</span><h2>Where do you want to talk today?</h2></div><div class="pgrid">${list.map(x=>`<button class="pcard tilt" data-a="talkStart" data-k="${x.k}"><span class="pcard-emo" aria-hidden="true">${E(x.e)}</span><span class="pcard-en">${esc(x.en)}</span><b>${esc(x.t)}</b><span class="small muted">${esc(x.d)}</span></button>`).join("")}</div></div>
@@ -1898,7 +1898,7 @@ function epCard(e){const sub=(S.me?.epreuveSubs||{})[e.id],fb=(S.me?.epreuveFb||
   const st=fb?`<span class="chip ok">${esc(fb.grade)}/20</span>`:sub?`<span class="chip">${ic("check")}Done</span>`:`<span class="chip warn">To do</span>`;
   return`<div class="glass card click tilt" tabindex="0" data-a="openEp" data-id="${e.id}"><div class="row between"><span class="ic t-gold">${ic("file")}</span>${st}</div><span class="eyebrow">${esc(e.exam||"Past paper")}${e.year?" · "+esc(e.year):""}</span><h3>${esc(e.title)}</h3><div class="row">${lvlChip(e.level)}${audChip(e)}${e.minutes?`<span class="chip">${ic("clock")}${e.minutes} min</span>`:""}${e.fileId?`<span class="chip">${/^image/.test(e.fileType||"")?"HD photo":"PDF"}</span>`:""}${e.corrigeVisible?`<span class="chip ok">Answer key published</span>`:""}</div></div>`}
 function epListView(){const all=byLevel(S.eps),types=[...new Set(all.map(e=>e.exam).filter(Boolean))],list=S.epFilter?all.filter(e=>e.exam===S.epFilter):all;
-  return`${audBar()}<div class="section"><div><span class="eyebrow">Past paper bank</span><h2>Past papers to do</h2><p class="sub">Real exam papers (BEPC, BAC, tests, competitions…) to practise with. Write your answers and your teacher will correct them. +40 XP for each paper you do.</p></div>
+  return`${audBar()}<div class="section"><div><span class="eyebrow">Past paper bank</span><h2>Past papers to do</h2><p class="sub">Real exam papers (BEPC, BAC, tests, competitions…) to practise with. Write your answers and your teacher will correct them. +12 XP for each paper you do.</p></div>
   ${types.length>1?`<div class="seg">${["",...types].map(t=>`<button data-a="epFilter" data-k="${esc(t)}" aria-pressed="${S.epFilter===t}">${t?esc(CL(t)):"All"}</button>`).join("")}</div>`:""}
   ${list.length?`<div class="grid">${list.map(epCard).join("")}</div>`:`<div class="empty">No past papers for your profile yet. Your teacher will add some.</div>`}</div>`}
 function epView(){const e=S.eps.find(x=>x.id===S.view.id);if(!e)return backBtn()+`<div class="empty">This past paper has been removed.</div>`;const T=S.mode==="teacher";
@@ -2269,7 +2269,7 @@ function pronView(){const T=S.pron||(S.pron=pronNew()),r=T.res,ai=AI.sample&&!AI
   return`<div class="section" style="max-width:720px"><div><span class="eyebrow">Speaking</span><h2>Pronunciation</h2><p class="sub">Listen to the sentence, then read it aloud. Nova tells you which words she did not understand well.</p></div>
   <div class="glass card" style="gap:16px;padding:clamp(20px,4vw,32px)"><div style="font-size:clamp(1.3rem,4.5vw,1.8rem);line-height:1.45;font-weight:600">${sentence}</div>
   <div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn ghost sm" data-a="pronHear">${ic("speaker")}Listen</button><button class="btn sm" data-a="pronMic" ${T.busy?"disabled":""}>${ic("mic")}${T.busy?"Listening…":(r?"Try again":"Speak")}</button><button class="btn ghost sm" data-a="pronNext" ${T.busy?"disabled":""}>${ic("refresh")}Another sentence</button>${ai?`<button class="btn ghost sm" data-a="pronAI" ${T.busy?"disabled":""}>${ic("spark")}Nova’s sentence</button>`:""}</div>
-  ${r?`<div class="feedback"><b>${r.score>=80?"Very good!":r.score>=50?"Not bad, keep going!":"Try again slowly"} · <span class="mono">${r.score} %</span></b><div class="small" style="margin-top:6px">Nova heard: “${esc(r.said)}”</div>${bad.length?`<div class="small" style="margin-top:10px">Words to practise (tap to listen):</div><div class="row" style="gap:8px;flex-wrap:wrap;margin-top:6px">${bad.map(x=>`<button class="btn ghost sm" data-a="pronWord" data-w="${esc(x.w.replace(/[^A-Za-z']/g,""))}">${ic("speaker")}${esc(x.w)}</button>`).join("")}</div><div class="small muted" style="margin-top:8px">Listen to the word, repeat it slowly, then read the whole sentence again.</div>`:`<div class="small" style="margin-top:6px">All the words were recognised.${r.score>=80&&T.rewarded?" +10 XP":""}</div>`}</div>`:""}</div>
+  ${r?`<div class="feedback"><b>${r.score>=80?"Very good!":r.score>=50?"Not bad, keep going!":"Try again slowly"} · <span class="mono">${r.score} %</span></b><div class="small" style="margin-top:6px">Nova heard: “${esc(r.said)}”</div>${bad.length?`<div class="small" style="margin-top:10px">Words to practise (tap to listen):</div><div class="row" style="gap:8px;flex-wrap:wrap;margin-top:6px">${bad.map(x=>`<button class="btn ghost sm" data-a="pronWord" data-w="${esc(x.w.replace(/[^A-Za-z']/g,""))}">${ic("speaker")}${esc(x.w)}</button>`).join("")}</div><div class="small muted" style="margin-top:8px">Listen to the word, repeat it slowly, then read the whole sentence again.</div>`:`<div class="small" style="margin-top:6px">All the words were recognised.${r.score>=80&&T.rewarded?" +3 XP":""}</div>`}</div>`:""}</div>
   <p class="hint">Tip: speak in a quiet place. The phone's speech recognition is the judge: if it understands your word, that's a good sign, but it can sometimes make mistakes.</p></div>`}
 
 const autoChk=(i,txt)=>`<label class="row" style="gap:10px;flex-wrap:nowrap;cursor:pointer;align-items:flex-start"><input id="${i}" type="checkbox"${S.drafts[i]==="1"?" checked":""}><span><b>Automatic AI marking</b> <span class="hint">(optional) ${txt}</span></span></label>`;
@@ -4204,6 +4204,99 @@ function dispName(uid,fallback){return nickOf(uid)||fallback||""}
 function nickSet(uid,name){const p=v5Prefs();name=String(name||"").trim().slice(0,30);if(name)p.nicks[uid]=name;else delete p.nicks[uid];v5PrefsSave(p);render()}
 function convHas(id,flag){return!!((v5Prefs().conv||{})[id]||{})[flag]}
 function convToggle(id,flag){const p=v5Prefs(),c={...(p.conv[id]||{})};if(c[flag])delete c[flag];else c[flag]=Date.now();if(Object.keys(c).length)p.conv[id]=c;else delete p.conv[id];v5PrefsSave(p);render()}
+
+/* ---- app-v5-1-me.js ---- */
+/* =====================================================================
+   v5 · me: XP earned slowly, exam papers protected, chats pin/archive/mute/nicknames
+   ===================================================================== */
+/* ---- XP: students earn little by little (30 % of the old amounts) ---- */
+const XP_RATE=0.3;
+{const _g=gain;gain=function(xp,...a){if(typeof xp==="number"&&xp>0)xp=Math.max(1,Math.round(xp*XP_RATE));return _g(xp,...a)}}
+
+/* ---- Exam papers and lesson files: students can read them in the app, never download them ---- */
+const docProt=src=>S.mode==="student"&&src&&src.k==="a";
+{const _od=openDoc;openDoc=async function(src,label){const prot=docProt(src);const pr=_od(src,label);V4.docProt=prot;await pr;V4.docProt=prot;const o=document.getElementById("docv");if(!o||!prot)return;
+  o.classList.add("prot");document.body.classList.add("docprot");
+  if(!o.querySelector(".docv-wm")){const who=esc((S.me&&S.me.name)||"Student"),d=new Date().toLocaleDateString("en-GB"),line=`${who} · ${d} · English Classes · `;
+    o.insertAdjacentHTML("beforeend",`<div class="docv-wm" aria-hidden="true">${Array.from({length:40},()=>`<span>${line.repeat(3)}</span>`).join("")}</div>`)}
+  const body=document.getElementById("docvBody");const fix=()=>{if(!body)return;for(const b of body.querySelectorAll('[data-v4="docSave"]')){const m=b.closest(".docv-msg");if(m)m.innerHTML=`${ic("lock")}<p>This file can only be read in the app. Ask your teacher for a PDF version.</p>`;else b.remove()}};fix();setTimeout(fix,1500);setTimeout(fix,5000)}}
+{const _ds=docSave;docSave=function(){if(V4.docProt){toast("Exam papers and lesson files cannot be downloaded.","lock");return}return _ds()}}
+{const _cd=closeDoc;closeDoc=function(){document.body.classList.remove("docprot");V4.docProt=false;return _cd()}}
+document.addEventListener("contextmenu",e=>{if(V4.docProt&&e.target.closest&&e.target.closest("#docv"))e.preventDefault()},true);
+document.addEventListener("keydown",e=>{if(V4.docProt&&(e.ctrlKey||e.metaKey)&&/^[sp]$/i.test(e.key)){e.preventDefault();toast("Exam papers cannot be saved or printed.","lock")}},true);
+{const st=document.createElement("style");st.textContent=`
+.docv.prot [data-v4="docSave"]{display:none!important}
+.docv.prot .docv-body,.docv.prot img,.docv.prot canvas{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.docv.prot img,.docv.prot canvas{pointer-events:none}
+.docv-wm{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:5;display:flex;flex-direction:column;gap:60px;transform:rotate(-24deg) scale(1.6);opacity:.11;color:#9A7CFF;font-weight:800;font-size:15px;white-space:nowrap;padding-top:40px}
+.docv{position:fixed}
+@media print{body.docprot *{display:none!important}body.docprot::after{content:"Printing is not allowed.";display:block!important}}
+`;document.head.appendChild(st)}
+
+/* ---- Classmates list: pin, archive, mute, nicknames (like WhatsApp) ---- */
+V5.showArch=false;
+peersView=function(){const me=S.uid,last={},un={};
+  for(const m of PR.inbox){const o=m.sender===me?m.receiver:m.sender;if(!last[o])last[o]=m;if(m.receiver===me&&!m.read_at&&!m.deleted_at)un[m.sender]=(un[m.sender]||0)+1}
+  const q=(S.drafts.peer_q||"").trim().toLowerCase(),t=m=>m?+new Date(m.created_at):0,pin=u=>((v5Prefs().conv["peer:"+u]||{}).pin)||0;
+  const all=PR.dir.filter(x=>!BL.set.has(x.uid)).filter(x=>!q||x.name.toLowerCase().includes(q)||nickOf(x.uid).toLowerCase().includes(q)).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid],pin:pin(x.uid),arch:convHas("peer:"+x.uid,"arch"),mute:convHas("peer:"+x.uid,"mute")}));
+  const sort=(a,b)=>(!!b.pin-!!a.pin)||(b.pin-a.pin)||(b.un-a.un)||(t(b.last)-t(a.last))||(b.on-a.on)||a.name.localeCompare(b.name);
+  const rows=all.filter(x=>q||!x.arch).sort(sort),arch=all.filter(x=>x.arch).sort(sort);
+  const row=x=>{const nk=nickOf(x.uid),prev=x.last?((x.last.sender===me?"You: ":"")+String(x.last.deleted_at?"⊘ Message deleted":(v4Plain(x.last.body)||attLabel(x.last.att))).slice(0,60)):((x.classe?CL(x.classe)+(x.same?" · your class":""):"")||"Say hello!");
+    return`<div class="it click pv-row${x.un?" pv-un":""}" data-a="openPeer" data-id="${x.uid}" tabindex="0">${avatar(x.uid,x.name)}<div class="txt"><b>${esc(nk||x.name)}${nk?` <small class="muted">${esc(x.name)}</small>`:""}${x.on?` <span class="pv-on" title="Online"></span>`:""}</b><span>${esc(prev)}</span></div>
+    <div class="pv-meta"><small>${x.last?fmtTime(t(x.last)):""}</small><span class="row" style="gap:4px">${x.pin?`<i class="pv-ic" title="Pinned">📌</i>`:""}${x.mute?`<i class="pv-ic" title="Muted">🔕</i>`:""}${x.un?`<span class="pv-badge">${x.un}</span>`:""}</span></div>
+    <button type="button" class="iconbtn sm pv-more" data-v4="pvMore" data-id="${x.uid}" aria-label="Options for ${esc(nk||x.name)}">⋯</button></div>`};
+  return`<div class="section" style="max-width:720px;margin-inline:auto">${backBtn()}<div class="row">${ic("users")}<div><span class="eyebrow">Classmates</span><h2>Chats</h2></div></div>
+  <p class="sub">Write to other learners at school: messages, voice notes, photos, videos, files and stickers. Be kind and respectful.</p>
+  ${PR.err?`<div class="glass card small">${esc(PR.err)}</div>`:""}
+  <input id="peer_q" type="search" placeholder="Search for a classmate…" value="${esc(S.drafts.peer_q||"")}" aria-label="Search for a classmate">
+  ${!PR.loaded?`<div class="empty">Loading…</div>`:rows.length||arch.length?`${arch.length&&!q?`<button type="button" class="glass pv-arch" data-v4="pvArch">${ic("file")}<b>Archived</b><span class="chip">${arch.length}</span><span class="muted small" style="margin-left:auto">${V5.showArch?"Hide":"Show"}</span></button>${V5.showArch?`<div class="glass list pv-list">${arch.map(row).join("")}</div>`:""}`:""}
+    ${rows.length>60&&!q?`<p class="hint">${rows.length} learners: the 60 most recent are shown. Search for a name to find the others.</p>`:""}<div class="glass list pv-list">${rows.slice(0,q?200:60).map(row).join("")}</div>`
+   :`<div class="empty"><b>No other learners yet.</b><br>Learners will appear here as soon as the teacher approves their registration.</div>`}</div>`};
+function pvSheetHTML(){const u=V5.pv;if(!u)return"";const nm=peerName(u),id="peer:"+u,nk=nickOf(u);
+  if(V5.pvNick)return`<div class="v4sheet-bg fz" data-v4="pvX"></div><form class="v4sheet fz" data-ff="nick"><b>Nickname for ${esc(nm)}</b><p class="small muted" style="margin:0">Only you can see it.</p><input id="pv_nick" maxlength="30" value="${esc(nk)}" placeholder="e.g. My bestie 💛" autocomplete="off"><button class="btn" type="submit">Save</button>${nk?`<button type="button" data-v4="pvNickDel">${ic("trash")}Remove the nickname</button>`:""}<button type="button" class="v4cancel" data-v4="pvX">Cancel</button></form>`;
+  return`<div class="v4sheet-bg fz" data-v4="pvX"></div><div class="v4sheet fz"><b>${esc(nk||nm)}</b>
+  <button type="button" data-v4="pvT" data-k="pin">📌 ${convHas(id,"pin")?"Unpin":"Pin to the top"}</button>
+  <button type="button" data-v4="pvT" data-k="arch">🗂️ ${convHas(id,"arch")?"Unarchive":"Archive"}</button>
+  <button type="button" data-v4="pvT" data-k="mute">${convHas(id,"mute")?"🔔 Unmute":"🔕 Mute notifications"}</button>
+  <button type="button" data-v4="pvNick">✏️ ${nk?"Change the nickname":"Give a nickname"}</button>
+  ${typeof personView==="function"||true?`<button type="button" data-v4="pvProfile">${ic("user")}View profile</button>`:""}
+  <button type="button" class="danger" data-v4="pvBlock">${ic("shield")}Report or block</button>
+  <button type="button" class="v4cancel" data-v4="pvX">Cancel</button></div>`}
+{const _fs2=feedSync;feedSync=function(){_fs2();let h=document.getElementById("pvhost");if(!h){h=document.createElement("div");h.id="pvhost";document.body.appendChild(h)}const x=pvSheetHTML();if(h._h!==x){h._h=x;h.innerHTML=x;const n=document.getElementById("pv_nick");if(n)n.focus()}}}
+const pvOpen=u=>{V5.pv=u;V5.pvNick=false;feedSync()},pvClose=()=>{V5.pv=null;V5.pvNick=false;feedSync()};
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el)return;const a=el.dataset.v4,u=V5.pv;
+  switch(a){
+  case"pvMore":e.stopPropagation();pvOpen(el.dataset.id);return;
+  case"pvArch":V5.showArch=!V5.showArch;render();return;
+  case"pvX":pvClose();return;
+  case"pvT":if(u){convToggle("peer:"+u,el.dataset.k);toast({pin:convHas("peer:"+u,"pin")?"Pinned":"Unpinned",arch:convHas("peer:"+u,"arch")?"Chat archived":"Chat unarchived",mute:convHas("peer:"+u,"mute")?"Notifications muted":"Notifications on"}[el.dataset.k],"check");pvClose()}return;
+  case"pvNick":V5.pvNick=true;const h=document.getElementById("pvhost");if(h)h._h="";feedSync();return;
+  case"pvNickDel":if(u){nickSet(u,"");pvClose()}return;
+  case"pvProfile":if(u){pvClose();S.view={type:"person",id:u};S.animate=true;scrollTo(0,0);render()}return;
+  case"pvBlock":if(u){const nm=peerName(u);pvClose();sfOpen({kind:"profile",ref:u,target:u,name:nm})}return;
+  case"pvChatMore":pvOpen(el.dataset.id);return;
+  }},true);
+document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||f.dataset.ff!=="nick")return;e.preventDefault();e.stopImmediatePropagation();const u=V5.pv,v=(f.querySelector("#pv_nick")||{}).value||"";if(u){nickSet(u,v);toast(v.trim()?"Nickname saved":"Nickname removed","check")}pvClose()},true);
+/* chat header: nickname + options */
+{const _pc=peerChatView;peerChatView=function(){let h=_pc();const id=S.view&&S.view.id;if(!id)return h;const nk=nickOf(id),nm=peerName(id);
+  if(nk)h=h.replace(`<h2>${esc(nm)}`,`<h2>${esc(nk)} <small class="muted" style="font-size:.55em">${esc(nm)}</small>`);
+  return h.replace('<span class="eyebrow">Classmate</span>',`<span class="eyebrow">Classmate${convHas("peer:"+id,"mute")?" · 🔕 muted":""}</span>`).replace(/(<\/h2><\/div>)(<\/div>)/,`$1<button type="button" class="iconbtn" data-v4="pvChatMore" data-id="${id}" aria-label="Chat options" style="margin-left:auto">⋯</button>$2`)}}
+/* muted chats: no toast, sound or phone notification */
+const pvMutedName=n=>PR.dir.some(x=>(x.name===n||nickOf(x.uid)===n)&&convHas("peer:"+x.uid,"mute"));
+{const _t=toast;toast=function(msg,...a){const m=/^Message from (.+)$/.exec(String(msg||""));if(m&&pvMutedName(m[1]))return;return _t(msg,...a)}}
+{const _nn=notifyNow;notifyNow=function(title,body){const m=/^Message from (.+)$/.exec(String(title||""));if(m&&pvMutedName(m[1]))return;return _nn(title,body)}}
+{const _na2=nArrive;nArrive=function(n){const r=n.ref||"";if(r.startsWith("peer:")&&convHas(r,"mute"))return;if(r.startsWith("peer:")&&convHas(r,"arch")){convToggle(r,"arch")}return _na2(n)}}
+{const st=document.createElement("style");st.textContent=`
+.pv-row{position:relative;gap:10px}.pv-row{display:flex;align-items:center}.pv-row .txt{display:grid!important;gap:2px;min-width:0;flex:1}.pv-row .txt b{display:block}.pv-row .txt span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);font-size:.86rem}.pv-row .txt b small{font-weight:500}
+.pv-meta{display:grid;justify-items:end;gap:4px;margin-left:auto}.pv-meta small{color:var(--muted);font-size:.72rem}
+.pv-badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#25D366;color:#fff;font-size:.72rem;font-weight:800;display:grid;place-items:center}
+.pv-un .txt b{font-weight:800}.pv-un .txt span{color:var(--fg)}
+.pv-on{display:inline-block;width:9px;height:9px;border-radius:50%;background:#25D366;box-shadow:0 0 0 2px var(--surface),0 0 8px #25D366;vertical-align:middle}
+.pv-ic{font-style:normal;font-size:.8rem}
+.pv-more{opacity:.6;flex:none}.pv-more:hover{opacity:1}
+.pv-arch{display:flex;align-items:center;gap:10px;width:100%;padding:12px 16px;border-radius:16px;border:1px solid var(--line);color:inherit;font:inherit;cursor:pointer;margin-bottom:10px}
+.pv-list{margin-bottom:10px}
+`;document.head.appendChild(st)}
 
 /* ==== v4 END ==== */
 render();
