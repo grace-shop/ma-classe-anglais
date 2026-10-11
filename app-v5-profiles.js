@@ -107,7 +107,7 @@ function avtView(){
 }
 /* ---- wiring ---- */
 {const _sv=studentView;studentView=function(){if(S.view&&S.view.type==="avt")return avtView();return _sv()}}
-{const _pv=peersView;peersView=function(){const h=_pv();const me=S.me&&S.me.avt?avtHTML(S.me.avt,36,false):"";
+{const _pv=peersView;peersView=function(){const h=_pv();const me=avtHTML((S.me&&S.me.avt)||AV_DEF,36,false);
   return h.replace('<div class="section" style="max-width:720px;margin-inline:auto">',`<div class="section" style="max-width:720px;margin-inline:auto"><button class="av3-mine" type="button" data-v4="avOpen">${me||ic("user")}<span><b>My avatar and bio</b><small class="muted">Your avatar is shown in your chats</small></span></button>`)}}
 {const _pc=peerChatView;peerChatView=function(){const h=_pc();const id=S.view&&S.view.id;if(!id)return h;avtLoadOf(id);
   const p=avtFor(id);const bio=p&&p.bio?`<div class="av3-bio small"><b>${esc(p.name||"")}</b> · ${esc(p.bio)}</div>`:"";
@@ -130,7 +130,7 @@ setInterval(()=>{const st=document.getElementById("avStage");if(!st)return;const
   const g=AV.gestures[Math.floor(Date.now()/2500)%AV.gestures.length];const d=AV.draft||avtOf(S.me&&S.me.avt);
   sv.innerHTML=avtSVG(d,g,180)},2500);
 {const st=document.createElement("style");st.textContent=`
-.av3-wrap{display:grid;gap:14px}.av3-stage{display:grid;justify-items:center;gap:8px;padding:18px;border-radius:28px;background:radial-gradient(120% 90% at 50% 0%,#EEF2FF,#fff 60%);box-shadow:0 24px 60px -24px rgba(60,80,200,.45),inset 0 1px 0 #fff}
+.av3-wrap{display:grid;gap:14px}.av3-stage{display:grid;justify-items:center;gap:8px;padding:18px;border-radius:28px;background:radial-gradient(120% 90% at 50% 0%,var(--ink-soft),var(--surface) 70%);color:var(--fg);box-shadow:0 24px 60px -24px rgba(60,80,200,.45),inset 0 1px 0 rgba(255,255,255,.08)}
 .av3-stage .av3d-avt svg{filter:drop-shadow(0 14px 18px rgba(60,70,160,.28))}
 .av3-arm{animation:av3wave 1.1s ease-in-out infinite}
 @keyframes av3wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-24deg)}}
@@ -142,8 +142,8 @@ setInterval(()=>{const st=document.getElementById("avStage");if(!st)return;const
 .av3-chip{min-width:40px;height:40px;padding:0 10px;border-radius:14px;border:1px solid var(--line);background:var(--surface2,#fff);font:inherit;cursor:pointer;display:grid;place-items:center;transition:transform .15s,box-shadow .15s}
 .av3-chip:hover{transform:translateY(-2px)}.av3-chip.on{border-color:#6C80FF;box-shadow:0 0 0 3px rgba(108,128,255,.25),0 8px 18px -8px rgba(108,128,255,.7)}
 .av3-chip i{display:block;width:26px;height:26px;border-radius:9px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12),0 4px 8px rgba(0,0,0,.12)}
-#avBio{width:100%;border-radius:14px;padding:10px 12px;border:1px solid var(--line);font:inherit;resize:vertical}
-.av3-mine{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;margin-bottom:10px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(120deg,#fff,#F1F4FF);font:inherit;color:inherit;cursor:pointer;text-align:left}
+#avBio{width:100%;border-radius:14px;padding:10px 12px;border:1px solid var(--line);background:var(--surface2);color:var(--fg);font:inherit;resize:vertical}
+.av3-mine{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;margin-bottom:10px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(120deg,var(--surface),var(--surface2));color:var(--fg);font:inherit;cursor:pointer;text-align:left;box-shadow:0 12px 26px -18px rgba(60,80,200,.6)}.av3-mine small{color:var(--muted)!important}
 .av3-mine span{display:grid;gap:2px}
 .av3-bio{margin:6px 0 10px;padding:8px 12px;border-radius:14px;background:var(--surface2,#f5f6fb)}
 `;document.head.appendChild(st)}

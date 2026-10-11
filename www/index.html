@@ -856,10 +856,10 @@ document.documentElement.setAttribute("data-lite",LITE?"1":"0");
 let threeState="idle";function loadThree(){if(LITE||threeState!=="idle")return;threeState="loading";const sc=document.createElement("script");sc.src=(window.__THREE_URL||"https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js");sc.onload=()=>{threeState="ready";try{initBg3d()}catch(e){console.warn(e)}try{initMascot()}catch(e){console.warn(e)}if(typeof render==="function")render()};sc.onerror=()=>{if(window.__THREE_URL){window.__THREE_URL=null;threeState="idle";loadThree()}else threeState="failed"};document.head.appendChild(sc)}
 function setLite(v){LITE=v;LITE_SRC="user";try{localStorage.setItem("mca_lite",v?"1":"0")}catch(e){}document.documentElement.setAttribute("data-lite",v?"1":"0");const c=document.getElementById("bg3d");if(v){if(c)c.style.display="none"}else{if(threeState==="idle")loadThree();else if(threeState==="ready"){if(window.__bgResume)window.__bgResume();else try{initBg3d()}catch(e){}if(!mascot.canvas)try{initMascot()}catch(e){}}}}
 function liteHTML(){return`<div class="section"><div><span class="eyebrow">Data and battery</span><h2>Data saver mode</h2></div><div class="glass card"><div class="row between" style="flex-wrap:nowrap"><div><h3>${LITE?"On":"Off"}</h3><p class="sub small" style="margin:0">Turns off the 3D background, the mascot and the animations. The app loads faster and uses much less mobile data and battery. Great for small data plans and old phones.${!LITE&&autoLite()?" Your phone or connection seems slow: turn on this mode if the app is slow.":""}</p></div><button class="toggle" role="switch" aria-checked="${LITE}" aria-label="Data saver mode" data-a="toggleLite"></button></div></div></div>`}
-const SKINS=[["nuit","Night","The default theme: dark, starry, elegant",["#0B0E1C","#C9D3FF","#E3C173"]],["porcelaine","Porcelain","Light and elegant",["#F2F3F7","#1E2558","#A8823A"]],["auto","Automatic","Follows the light or dark mode of your device",["#F2F3F7","#1E2558","#0E1120"]],["savane","Savanna","Warm colours, green and gold",["#F5EFE3","#1F5C3F","#A8731C"]],["ocean","Ocean","Lagoon blue, fresh",["#EDF4F6","#0B4F6C","#11809F"]]];
-let SKIN="nuit";try{SKIN=localStorage.getItem("mca_skin3")||"nuit"}catch(e){}
+const SKINS=[["nuit","Night","Dark, starry, elegant",["#0B0E1C","#C9D3FF","#E3C173"]],["porcelaine","Porcelain","Light and elegant",["#F2F3F7","#1E2558","#A8823A"]],["auto","Automatic","Follows the light or dark mode of your device",["#F2F3F7","#1E2558","#0E1120"]],["savane","Savanna","Warm colours, green and gold",["#F5EFE3","#1F5C3F","#A8731C"]],["ocean","Ocean","Lagoon blue, fresh",["#EDF4F6","#0B4F6C","#11809F"]]];
+let SKIN="aurora";try{SKIN=localStorage.getItem("mca_skin4")||"aurora"}catch(e){}
 function isDarkSkin(){return SKIN==="nuit"||(SKIN==="auto"&&(document.documentElement.getAttribute("data-theme")==="dark"||(document.documentElement.getAttribute("data-theme")!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches)))}
-function applySkin(k,save){if(!SKINS.some(x=>x[0]===k))k="nuit";SKIN=k;document.documentElement.setAttribute("data-skin",k);if(save)try{localStorage.setItem("mca_skin3",k)}catch(e){}window.__bgSkin&&window.__bgSkin(isDarkSkin())}
+function applySkin(k,save){if(!SKINS.some(x=>x[0]===k))k="aurora";SKIN=k;document.documentElement.setAttribute("data-skin",k);if(save)try{localStorage.setItem("mca_skin4",k)}catch(e){}window.__bgSkin&&window.__bgSkin(isDarkSkin())}
 applySkin(SKIN);
 function themeHTML(){return`<div class="section"><div><span class="eyebrow">Appearance</span><h2>App theme</h2><p class="sub">Choose the style you like. This only changes your screen.</p></div><div class="skins">${SKINS.map(([k,l,d,c])=>`<button class="skin" data-a="skin" data-k="${k}" aria-pressed="${SKIN===k}"><span class="sw"><i style="background:${c[0]}"></i><i style="background:${c[1]}"></i><i style="background:${c[2]}"></i></span><b>${l}</b><span>${d}</span></button>`).join("")}</div></div>`}
 const AI={sample:undefined,turns:[],busy:false,ctl:null,open:false,speak:false,img:null,canImg:false,disabled:false};
@@ -5145,7 +5145,7 @@ function avtView(){
 }
 /* ---- wiring ---- */
 {const _sv=studentView;studentView=function(){if(S.view&&S.view.type==="avt")return avtView();return _sv()}}
-{const _pv=peersView;peersView=function(){const h=_pv();const me=S.me&&S.me.avt?avtHTML(S.me.avt,36,false):"";
+{const _pv=peersView;peersView=function(){const h=_pv();const me=avtHTML((S.me&&S.me.avt)||AV_DEF,36,false);
   return h.replace('<div class="section" style="max-width:720px;margin-inline:auto">',`<div class="section" style="max-width:720px;margin-inline:auto"><button class="av3-mine" type="button" data-v4="avOpen">${me||ic("user")}<span><b>My avatar and bio</b><small class="muted">Your avatar is shown in your chats</small></span></button>`)}}
 {const _pc=peerChatView;peerChatView=function(){const h=_pc();const id=S.view&&S.view.id;if(!id)return h;avtLoadOf(id);
   const p=avtFor(id);const bio=p&&p.bio?`<div class="av3-bio small"><b>${esc(p.name||"")}</b> · ${esc(p.bio)}</div>`:"";
@@ -5168,7 +5168,7 @@ setInterval(()=>{const st=document.getElementById("avStage");if(!st)return;const
   const g=AV.gestures[Math.floor(Date.now()/2500)%AV.gestures.length];const d=AV.draft||avtOf(S.me&&S.me.avt);
   sv.innerHTML=avtSVG(d,g,180)},2500);
 {const st=document.createElement("style");st.textContent=`
-.av3-wrap{display:grid;gap:14px}.av3-stage{display:grid;justify-items:center;gap:8px;padding:18px;border-radius:28px;background:radial-gradient(120% 90% at 50% 0%,#EEF2FF,#fff 60%);box-shadow:0 24px 60px -24px rgba(60,80,200,.45),inset 0 1px 0 #fff}
+.av3-wrap{display:grid;gap:14px}.av3-stage{display:grid;justify-items:center;gap:8px;padding:18px;border-radius:28px;background:radial-gradient(120% 90% at 50% 0%,var(--ink-soft),var(--surface) 70%);color:var(--fg);box-shadow:0 24px 60px -24px rgba(60,80,200,.45),inset 0 1px 0 rgba(255,255,255,.08)}
 .av3-stage .av3d-avt svg{filter:drop-shadow(0 14px 18px rgba(60,70,160,.28))}
 .av3-arm{animation:av3wave 1.1s ease-in-out infinite}
 @keyframes av3wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-24deg)}}
@@ -5180,8 +5180,8 @@ setInterval(()=>{const st=document.getElementById("avStage");if(!st)return;const
 .av3-chip{min-width:40px;height:40px;padding:0 10px;border-radius:14px;border:1px solid var(--line);background:var(--surface2,#fff);font:inherit;cursor:pointer;display:grid;place-items:center;transition:transform .15s,box-shadow .15s}
 .av3-chip:hover{transform:translateY(-2px)}.av3-chip.on{border-color:#6C80FF;box-shadow:0 0 0 3px rgba(108,128,255,.25),0 8px 18px -8px rgba(108,128,255,.7)}
 .av3-chip i{display:block;width:26px;height:26px;border-radius:9px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12),0 4px 8px rgba(0,0,0,.12)}
-#avBio{width:100%;border-radius:14px;padding:10px 12px;border:1px solid var(--line);font:inherit;resize:vertical}
-.av3-mine{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;margin-bottom:10px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(120deg,#fff,#F1F4FF);font:inherit;color:inherit;cursor:pointer;text-align:left}
+#avBio{width:100%;border-radius:14px;padding:10px 12px;border:1px solid var(--line);background:var(--surface2);color:var(--fg);font:inherit;resize:vertical}
+.av3-mine{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;margin-bottom:10px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(120deg,var(--surface),var(--surface2));color:var(--fg);font:inherit;cursor:pointer;text-align:left;box-shadow:0 12px 26px -18px rgba(60,80,200,.6)}.av3-mine small{color:var(--muted)!important}
 .av3-mine span{display:grid;gap:2px}
 .av3-bio{margin:6px 0 10px;padding:8px 12px;border-radius:14px;background:var(--surface2,#f5f6fb)}
 `;document.head.appendChild(st)}
@@ -5235,13 +5235,15 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
 /* ---- app-v5-themes.js ---- */
 /* =====================================================================
    v5 themes: seven new themes (light and dark), added to the theme list
-   - The default theme is the first one: Night (dark, starry)
+   - The default theme is Aurora (dark, northern lights). Saved under key mca_skin4
    - Everyone starts on the default theme once; then each person keeps their choice
    - Dark themes keep the 3D starry background
    ===================================================================== */
 const TH_NEW=[
  {k:"aurora",l:"Aurora",d:"Northern lights: teal and violet on deep blue",dark:1,
   bg:"#0B1020",surface:"#141A33",surface2:"#1A2242",line:"#263057",line2:"#34407A",fg:"#EEF4FF",muted:"#A9B8E0",ink:"#5EEAD4",inkSoft:"#13303A",onInk:"#06201C",inkHover:"#99F6E4",sky:"#38BDF8",skyS:"#0C2A3D",gold:"#FBBF24",goldS:"#3A2E0C",rose:"#F472B6",roseS:"#3D1A2E",grad:"linear-gradient(120deg,#5EEAD4 0%,#818CF8 100%)",gradtext:"linear-gradient(100deg,#5EEAD4 0%,#818CF8 55%,#F472B6 100%)"},
+ {k:"violet",l:"Violet Aurora",d:"Northern lights in violet and pink, deep purple night",dark:1,
+  bg:"#0E0A1F",surface:"#1A1236",surface2:"#221948",line:"#332766",line2:"#46378A",fg:"#F4EFFF",muted:"#B9A9E6",ink:"#C084FC",inkSoft:"#2E1650",onInk:"#1A0630",inkHover:"#E9D5FF",sky:"#A78BFA",skyS:"#241A4A",gold:"#FBBF24",goldS:"#3A2E0C",rose:"#F472B6",roseS:"#3D1A33",grad:"linear-gradient(120deg,#C084FC 0%,#7C3AED 100%)",gradtext:"linear-gradient(100deg,#E9D5FF 0%,#C084FC 50%,#F472B6 100%)"},
  {k:"sakura",l:"Sakura",d:"Soft cherry blossom: pink and white",dark:0,
   bg:"#FDF2F5",surface:"#FFFFFF",surface2:"#FCE9EF",line:"#F3D3DE",line2:"#E9B8C8",fg:"#3B1F2B",muted:"#8A5C6E",ink:"#B83A6B",inkSoft:"#FBE3EC",onInk:"#FFFFFF",inkHover:"#962E56",sky:"#7C6BD6",skyS:"#ECE9FB",gold:"#C98B2B",goldS:"#FBF0DC",rose:"#E0557F",roseS:"#FCE3EB",grad:"linear-gradient(120deg,#E0557F 0%,#B83A6B 100%)",gradtext:"linear-gradient(100deg,#E0557F 0%,#B83A6B 55%,#C98B2B 100%)"},
  {k:"foret",l:"Forest",d:"Deep green forest with emerald and gold",dark:1,
@@ -5269,6 +5271,8 @@ for(const t of TH_NEW){if(!SKINS.some(x=>x[0]===t.k))SKINS.push([t.k,t.l,t.d,[t.
 const TH_DARK=new Set(TH_NEW.filter(t=>t.dark).map(t=>t.k));
 {const _dk=isDarkSkin;isDarkSkin=function(){if(TH_DARK.has(SKIN))return true;return _dk()}}
 /* the 3D starry background follows the dark themes */
+/* the source ran applySkin before these themes existed: apply again now that they are listed */
+try{applySkin(SKIN)}catch(e){}
 if(typeof window.__bgSkin==="function")window.__bgSkin(isDarkSkin());
 
 /* ==== v4 END ==== */
