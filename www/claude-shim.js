@@ -823,7 +823,11 @@
           pitch: first.pitch || 1.0,
           volume: 1.0,
           category: "playback"
-        }).catch(function (e) { console.warn("TTS :", e); });
+        }).catch(function (e) {
+          console.warn("TTS :", e);
+          /* the phone's voice engine failed: say so instead of staying silent */
+          try { if (typeof window.toast === "function") window.toast("The voice could not play. Check the volume and the voice engine of your phone.", "mute"); } catch (err) {}
+        });
       });
     }, 0);
   };
