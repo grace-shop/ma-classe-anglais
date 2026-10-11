@@ -5225,6 +5225,14 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
 .av3-cov-btn{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(10,14,30,.55);color:#fff;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 `;document.head.appendChild(st)}
 
+/* ---- log out: a visible card at the TOP of the profile and teacher pages (the button used to be at the very bottom) ---- */
+function logoutTopHTML(){
+  if(!window.__appLogout)return"";
+  return`<div class="section" style="max-width:720px;margin-inline:auto"><div class="glass card row between logout-top"><div><h3 style="margin:0">Log out</h3><p class="sub small" style="margin:0">${esc((S.who&&S.who.email)||"You are logged in on this device")}</p></div><button class="btn danger sm" type="button" data-a="logout">${ic("logout")}Log out</button></div></div>`;
+}
+{const _pv0=profileView;profileView=function(){return logoutTopHTML()+_pv0()}}
+{const _cv0=classView;classView=function(){return logoutTopHTML()+_cv0()}}
+
 /* ---- app-v5-themes.js ---- */
 /* =====================================================================
    v5 themes: seven new themes (light and dark), added to the theme list
