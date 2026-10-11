@@ -1,12 +1,14 @@
 /* =====================================================================
    v5 themes: seven new themes (light and dark), added to the theme list
-   - The default theme is the first one: Night (dark, starry)
+   - The default theme is Aurora (dark, northern lights). Saved under key mca_skin4
    - Everyone starts on the default theme once; then each person keeps their choice
    - Dark themes keep the 3D starry background
    ===================================================================== */
 const TH_NEW=[
  {k:"aurora",l:"Aurora",d:"Northern lights: teal and violet on deep blue",dark:1,
   bg:"#0B1020",surface:"#141A33",surface2:"#1A2242",line:"#263057",line2:"#34407A",fg:"#EEF4FF",muted:"#A9B8E0",ink:"#5EEAD4",inkSoft:"#13303A",onInk:"#06201C",inkHover:"#99F6E4",sky:"#38BDF8",skyS:"#0C2A3D",gold:"#FBBF24",goldS:"#3A2E0C",rose:"#F472B6",roseS:"#3D1A2E",grad:"linear-gradient(120deg,#5EEAD4 0%,#818CF8 100%)",gradtext:"linear-gradient(100deg,#5EEAD4 0%,#818CF8 55%,#F472B6 100%)"},
+ {k:"violet",l:"Violet Aurora",d:"Northern lights in violet and pink, deep purple night",dark:1,
+  bg:"#0E0A1F",surface:"#1A1236",surface2:"#221948",line:"#332766",line2:"#46378A",fg:"#F4EFFF",muted:"#B9A9E6",ink:"#C084FC",inkSoft:"#2E1650",onInk:"#1A0630",inkHover:"#E9D5FF",sky:"#A78BFA",skyS:"#241A4A",gold:"#FBBF24",goldS:"#3A2E0C",rose:"#F472B6",roseS:"#3D1A33",grad:"linear-gradient(120deg,#C084FC 0%,#7C3AED 100%)",gradtext:"linear-gradient(100deg,#E9D5FF 0%,#C084FC 50%,#F472B6 100%)"},
  {k:"sakura",l:"Sakura",d:"Soft cherry blossom: pink and white",dark:0,
   bg:"#FDF2F5",surface:"#FFFFFF",surface2:"#FCE9EF",line:"#F3D3DE",line2:"#E9B8C8",fg:"#3B1F2B",muted:"#8A5C6E",ink:"#B83A6B",inkSoft:"#FBE3EC",onInk:"#FFFFFF",inkHover:"#962E56",sky:"#7C6BD6",skyS:"#ECE9FB",gold:"#C98B2B",goldS:"#FBF0DC",rose:"#E0557F",roseS:"#FCE3EB",grad:"linear-gradient(120deg,#E0557F 0%,#B83A6B 100%)",gradtext:"linear-gradient(100deg,#E0557F 0%,#B83A6B 55%,#C98B2B 100%)"},
  {k:"foret",l:"Forest",d:"Deep green forest with emerald and gold",dark:1,
@@ -34,4 +36,6 @@ for(const t of TH_NEW){if(!SKINS.some(x=>x[0]===t.k))SKINS.push([t.k,t.l,t.d,[t.
 const TH_DARK=new Set(TH_NEW.filter(t=>t.dark).map(t=>t.k));
 {const _dk=isDarkSkin;isDarkSkin=function(){if(TH_DARK.has(SKIN))return true;return _dk()}}
 /* the 3D starry background follows the dark themes */
+/* the source ran applySkin before these themes existed: apply again now that they are listed */
+try{applySkin(SKIN)}catch(e){}
 if(typeof window.__bgSkin==="function")window.__bgSkin(isDarkSkin());
