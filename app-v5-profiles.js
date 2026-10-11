@@ -170,3 +170,26 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   if(k==="avPeerNick"){const id=el.dataset.id;if(typeof pvOpen==="function"){pvOpen(id);V5.pvNick=true;feedSync()}return}
   if(k==="avPeerBlock"){const id=el.dataset.id;if(typeof sfOpen==="function")sfOpen({kind:"profile",ref:id,target:id,name:(AV.cache[id]||{}).name||""});return}
 },true);
+
+/* ---- cover photo: every learner may add one at the top of their profile (optional) ---- */
+AV.covers={};
+function covLoad(uid){if(!uid||!window.__sb||AV.covers[uid]!==undefined)return;AV.covers[uid]=null;
+  window.__sb.rpc("profile_cover",{p_uid:uid}).then(r=>{AV.covers[uid]=(r&&r.data)||null;render()}).catch(()=>{})}
+function covBanner(url,editable){
+  const bg=url?`background-image:url('${String(url).replace(/'/g,"%27")}')`:"background:linear-gradient(120deg,#6C80FF,#9A7CFF 50%,#06D6A0)";
+  return`<div class="av3-cover" style="${bg}">${editable?`<label class="av3-cov-btn">${ic("camera")}${url?"Change cover":"Add a cover photo"}<input type="file" id="covFile" accept="image/*" hidden></label>${url?`<button type="button" class="av3-cov-btn" data-v4="covDel">${ic("trash")}Remove</button>`:""}`:""}</div>`}
+{const _pf=profileView;profileView=function(){const url=S.me&&S.me.cover;return`<div class="section av3-wrap" style="max-width:720px;margin-inline:auto;gap:0">${covBanner(url,true)}</div>`+_pf()}}
+{const _pv2=personView;personView=function(){const id=S.view&&S.view.id;covLoad(id);const h=_pv2();const url=id&&AV.covers[id];
+  return url?h.replace('<div class="section av3-wrap" style="max-width:720px;margin-inline:auto">',`<div class="section av3-wrap" style="max-width:720px;margin-inline:auto">${covBanner(url,false)}`):h}}
+async function covSet(url){if(!S.uid||S.mode!=="student")return;S.me={...(S.me||{}),cover:url||""};
+  await write(()=>S.db.doc("students/"+S.uid).update({cover:url||""}));render()}
+document.addEventListener("change",async e=>{const el=e.target;if(!el||el.id!=="covFile")return;const f=el.files&&el.files[0];el.value="";if(!f)return;
+  if(!navigator.onLine){toast("No network: try again when you are online.","x");return}
+  try{toast("Uploading your cover photo…","clock");const blob=await shrinkImg(f,1280,.8);const url=await window.__avatarUpload(blob);await covSet(url);toast("Cover photo saved","check")}
+  catch(err){toast((err&&err.message)||"Could not save the cover photo","x")}},true);
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el||el.dataset.v4!=="covDel")return;covSet("");toast("Cover photo removed","check")},true);
+{const st=document.createElement("style");st.textContent=`
+.av3-cover{position:relative;height:160px;border-radius:26px;background-size:cover;background-position:center;box-shadow:0 22px 50px -26px rgba(60,80,200,.6),inset 0 0 0 1px rgba(255,255,255,.12);margin-bottom:-44px;display:flex;align-items:flex-end;justify-content:flex-end;gap:8px;padding:12px;overflow:hidden}
+.av3-cover:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.35));pointer-events:none}
+.av3-cov-btn{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(10,14,30,.55);color:#fff;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+`;document.head.appendChild(st)}
