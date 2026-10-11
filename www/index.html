@@ -901,8 +901,21 @@ function loadVoices(){if(!canSpeak)return;let vs=[];try{vs=speechSynthesis.getVo
   VOICE.en=en.find(v=>v.voiceURI===VOICE.pref)||en[0]||null;VOICE.fr=fr[0]||null}
 if(canSpeak){loadVoices();try{speechSynthesis.addEventListener("voiceschanged",()=>{loadVoices();if(!S.view&&(S.tab==="me"||S.tab==="class"))render()})}catch(e){}}
 function chunks(t){const parts=String(t).match(/[^.!?;:\n]+[.!?;:]*|\n+/g)||[t];const out=[];let cur="";for(const p of parts){if((cur+p).length>180&&cur){out.push(cur);cur=p}else cur+=p}if(cur.trim())out.push(cur);return out.map(x=>x.trim()).filter(Boolean)}
-function speak(text,lang="en"){if(!canSpeak)return;try{if(!VOICE.list.length)loadVoices();const v=lang==="fr"?VOICE.fr:VOICE.en;speechSynthesis.cancel();
-  setTimeout(()=>{for(const c of chunks(text)){const u=new SpeechSynthesisUtterance(c);if(v){u.voice=v;u.lang=v.lang}else u.lang=lang==="fr"?"fr-FR":"en-US";u.rate=lang==="fr"?1:VOICE.rate;u.pitch=1;speechSynthesis.speak(u)}},80)}catch(e){toast("Audio is not available on this device.","mute")}}
+const UTT_KEEP=[];
+function localVoice(lang){const p=lang==="fr"?/^fr/i:/^en/i;return VOICE.list.find(v=>p.test(v.lang)&&v.localService)||null}
+function speakNow(text,lang,v,retry){let fell=false;
+  for(const c of chunks(text)){const u=new SpeechSynthesisUtterance(c);UTT_KEEP.push(u);if(UTT_KEEP.length>60)UTT_KEEP.shift();
+    if(v){u.voice=v;u.lang=v.lang}else u.lang=lang==="fr"?"fr-FR":"en-US";
+    u.rate=lang==="fr"?1:VOICE.rate;u.pitch=1;u.volume=1;
+    u.onerror=ev=>{if(ev&&(ev.error==="interrupted"||ev.error==="canceled"))return;
+      /* a online voice can fail without internet: try the phone's own voice once */
+      if(!retry&&!fell&&v&&!v.localService){fell=true;try{speechSynthesis.cancel()}catch(e){}speakNow(text,lang,localVoice(lang),true);return}
+      if(!fell){fell=true;toast("The voice could not play. Check the volume, then try again.","mute")}};
+    speechSynthesis.speak(u)}}
+function speak(text,lang="en"){if(!canSpeak)return;try{if(!VOICE.list.length)loadVoices();let v=lang==="fr"?VOICE.fr:VOICE.en;
+  if(v&&!v.localService&&navigator.onLine===false)v=localVoice(lang)||v;
+  speechSynthesis.cancel();try{speechSynthesis.resume()}catch(e){}
+  setTimeout(()=>speakNow(text,lang,v,false),80)}catch(e){toast("Audio is not available on this device.","mute")}}
 function say(text){speak(String(text).replace(/_{2,}/g," … ").replace(/\s+/g," ").trim(),"en")}
 function voiceSettingsHTML(){if(!canSpeak)return"";const en=VOICE.list.filter(v=>/^en/i.test(v.lang)).sort((a,b)=>voiceScore(b,"en")-voiceScore(a,"en"));
   return`<div class="section"><div><span class="eyebrow">Audio</span><h2>English voice</h2><p class="sub">Choose the voice that sounds best. “Google”, “Natural”, “Online” or “Enhanced” voices sound the most natural.</p></div><div class="glass card form">
