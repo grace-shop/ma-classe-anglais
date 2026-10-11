@@ -18,7 +18,7 @@ self.addEventListener("fetch", (e) => {
   if (/version\.json$/.test(u.pathname)) return;                                     // version check: always the server
   const isStatic = /\/(img|vendor|icons)\//.test(u.pathname);
   if (isStatic) {                                                                    // 3D pictures: cache first
-    e.respondWith(caches.match(e.request).then((r) => r || fetch(e.request).then((res) => { const c = res.clone(); caches.open(V).then((ca) => ca.put(e.request, c)); return res; })));
+    e.respondWith(caches.match(e.request).then((r) => r || fetch(e.request).then((res) => { if (res.ok) { const c = res.clone(); caches.open(V).then((ca) => ca.put(e.request, c)); } return res; })));   // never keep an error page (404) as if it were the file
     return;
   }
   // page and scripts: network first, never the browser's HTTP cache

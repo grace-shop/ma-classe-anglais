@@ -680,9 +680,10 @@
 
   /* ---------------- contenu de départ (première connexion de la prof principale) ---------------- */
   async function offerStarterContent() {
-    if (member.level !== "owner") return;
-    const { count, error: cErr } = await sb.from("docs").select("path", { count: "exact", head: true }).eq("col", "lessons");
-    if (cErr || count) return;
+    if (member.level !== "owner" || !navigator.onLine) return;   // offline: never wait here, the app opens from its saved copy
+    // the check must never hang the start of the app: give up after 8 s
+    const probe = await Promise.race([sb.from("docs").select("path", { count: "exact", head: true }).eq("col", "lessons"), new Promise((res) => setTimeout(() => res({ error: { message: "timeout" } }), 8000))]).catch(() => ({ error: {} }));
+    if (probe.error || probe.count) return;
     let content; try { content = await (await fetch("content.json", { cache: "no-store" })).json(); } catch (e) { return; }
     const total = Object.values(content).reduce((n, c) => n + Object.keys(c).length, 0);
     const box = document.createElement("div"); box.id = "authGate";
@@ -730,8 +731,12 @@
       return;
     }
     if (!window.supabase) { try { await loadScript(CFG.supabaseJs || "vendor/supabase.js"); } catch (e) { await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"); } }
+    // a bad connection (Wi-Fi or data without internet) must never freeze the app: database and login calls give up after 12 s
+    const fetchT = (url, opts = {}) => { const u = String(url && url.url || url); if (!/\/(rest|auth)\/v1\//.test(u)) return fetch(url, opts);
+      const c = new AbortController(), t = setTimeout(() => c.abort(), 12000); if (opts.signal) { if (opts.signal.aborted) c.abort(); else opts.signal.addEventListener("abort", () => c.abort()); }
+      return fetch(url, { ...opts, signal: c.signal }).finally(() => clearTimeout(t)); };
     let devId = ""; try { devId = localStorage.getItem("mca_dev") || ""; if (!devId) { devId = "d" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem("mca_dev", devId); } } catch (e) {}
-    sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" }, global: { headers: devId ? { "x-device-id": devId } : {} } });
+    sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" }, global: { headers: devId ? { "x-device-id": devId } : {}, fetch: fetchT } });
     const App = plug("App");
     if (isNative() && App) App.addListener("appUrlOpen", async ({ url }) => {
       if (!CFG.nativeRedirect || !url.startsWith(CFG.nativeRedirect)) return;
@@ -744,7 +749,8 @@
       if (ev === "PASSWORD_RECOVERY") { mode = "newpass"; note = null; showGate(); return; }
       if (s && mode !== "newpass") afterLogin();
     });
-    const { data } = await sb.auth.getSession(); session = data.session;
+    let data = { session: null }; try { const r = await Promise.race([sb.auth.getSession(), new Promise((res) => setTimeout(() => res(null), 4000))]); if (r && r.data) data = r.data; } catch (e) {}   // no network: never wait for the token refresh
+    session = data.session;
     if (!session) {                                    // jeton expiré et réseau coupé : on garde la session enregistrée
       try {
         for (let i = 0; i < localStorage.length; i++) {
