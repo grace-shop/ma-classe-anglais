@@ -36,6 +36,22 @@ const mdLen=(pat,bars)=>bars*16*(60/pat.bpm/4);
 async function mdBuiltBuffer(id){if(MD.bufs[id])return MD.bufs[id];const pat=MD.built.find(x=>x.id===id)||MD.built[0];
   const dur=mdLen(pat,4),ctx=new OfflineAudioContext(2,Math.ceil(44100*dur),44100);mdSchedule(ctx,ctx.destination,pat,0,64,{kick:1,clap:1,hat:1,bass:1});
   MD.bufs[id]=await ctx.startRendering();return MD.bufs[id]}
+
+/* video to sound: reads the sound track of a video, mono, 22 kHz, at most 4 minutes */
+async function mdVideoToAudio(file){
+  if(file.size>250*1024*1024)throw new Error("This video is too big (over 250 MB). Use a shorter video.");
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)throw new Error("This phone cannot read the sound of a video.");
+  const ab=await file.arrayBuffer();
+  const ctx=new AC();let src;
+  try{src=await ctx.decodeAudioData(ab)}catch(e){throw new Error("The sound of this video cannot be read. Try an MP4 video.")}
+  finally{try{ctx.close()}catch(e){}}
+  const secs=Math.min(src.duration,240);
+  const off=new OfflineAudioContext(1,Math.max(1,Math.ceil(secs*22050)),22050);
+  const b=off.createBufferSource();b.buffer=src;b.connect(off.destination);b.start(0);
+  const out=await off.startRendering();
+  return{blob:mdWav(out),secs:Math.min(secs,out.duration)};
+}
 /* WAV encoder for songs made in the beat maker */
 function mdWav(buf){const ch=buf.numberOfChannels,sr=buf.sampleRate,len=buf.length,out=new DataView(new ArrayBuffer(44+len*ch*2));let p=0;const w=(s)=>{for(let i=0;i<s.length;i++)out.setUint8(p++,s.charCodeAt(i))};
   w("RIFF");out.setUint32(p,36+len*ch*2,true);p+=4;w("WAVE");w("fmt ");out.setUint32(p,16,true);p+=4;out.setUint16(p,1,true);p+=2;out.setUint16(p,ch,true);p+=2;out.setUint32(p,sr,true);p+=4;out.setUint32(p,sr*ch*2,true);p+=4;out.setUint16(p,ch*2,true);p+=2;out.setUint16(p,16,true);p+=2;w("data");out.setUint32(p,len*ch*2,true);p+=4;
@@ -91,7 +107,7 @@ function mdMusicHTML(){const built=MD.built.map((b,i)=>`<button type="button" cl
   <div class="md-sec"><span class="eyebrow">Beats</span>${built}</div>
   ${MD.songs.length?`<div class="md-sec"><span class="eyebrow">My songs</span>${mine}</div>`:""}
   <div class="md-actions"><button type="button" class="btn ghost sm" data-v4="mdBeat">${ic("spark")}Make my own song</button>
-  <label class="btn ghost sm" style="cursor:pointer">${ic("file")}Upload a song<input type="file" id="mdSongFile" accept="audio/*" hidden></label></div></div>`}
+  <label class="btn ghost sm" style="cursor:pointer">${ic("file")}Upload a song<input type="file" id="mdSongFile" accept="audio/*,video/*" hidden></label></div></div>`}
 function mdBeatHTML(){const b=MD.beat;const rows=[["kick","Kick"],["clap","Clap"],["hat","Hi-hat"],["bass","Bass"]];
   return`<div class="md-sheet glass md-beat"><div class="md-top"><b>Make my own song</b><button type="button" class="iconbtn" data-v4="mdBtX" aria-label="Close">${ic("x")}</button></div>
   <div class="md-tempo"><label class="small muted">Tempo <select id="mdBpm" data-v4="mdBpm">${[80,90,110,125].map(v=>`<option value="${v}" ${b.bpm===v?"selected":""}>${v} BPM</option>`).join("")}</select></label>
@@ -165,8 +181,21 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   }},true);
 document.addEventListener("change",e=>{const el=e.target;if(!el||el.id!=="mdSongFile")return;const f=el.files&&el.files[0];el.value="";if(!f)return;
   if(!navigator.onLine){toast("No network: try again when you are online.","x");return}
-  (async()=>{try{toast("Uploading the song…","clock");const up=await window.__chatFiles.upload(f,f.name||"song.mp3");const name=String(f.name||"My song").replace(/\.[^.]+$/,"").slice(0,60);
-    MD.songs.unshift({title:name,p:up.p,t:up.t||f.type||"audio/mpeg",d:30});mdSaveSongs();MD.open="music";mdSync();toast("Song uploaded: pick it in My songs","check")}catch(err){toast((err&&err.message)||"Could not upload","x")}})()},true);
+  (async()=>{try{const name=String(f.name||"My song").replace(/\.[^.]+$/,"").slice(0,60);
+    const isVid=/^video\//.test(f.type||"")||/\.(mp4|mov|webm|3gp|mkv|m4v)$/i.test(f.name||"");
+    if(isVid){
+      /* a video: keep only its sound, as a light mono WAV, to use as the music of a photo or video */
+      toast("Turning the video into sound…","clock");
+      const r=await mdVideoToAudio(f);
+      toast("Uploading the sound…","clock");
+      const up=await window.__chatFiles.upload(r.blob,"song.wav");
+      MD.songs.unshift({title:name,p:up.p,t:"audio/wav",d:Math.max(1,Math.round(r.secs))});
+    }else{
+      toast("Uploading the song…","clock");const up=await window.__chatFiles.upload(f,f.name||"song.mp3");
+      MD.songs.unshift({title:name,p:up.p,t:up.t||f.type||"audio/mpeg",d:30});
+    }
+    mdSaveSongs();MD.open="music";mdSync();toast("Song uploaded: pick it in My songs","check")}
+  catch(err){toast((err&&err.message)||"Could not upload","x")}})()},true);
 document.addEventListener("input",e=>{const el=e.target;if(el&&el.id==="mdEdTxt"&&MD.ed){MD.ed.text=el.value;mdEdDraw()}},true);
 document.addEventListener("change",e=>{const el=e.target;if(el&&el.id==="mdBpm"&&MD.beat){MD.beat.bpm=+el.value;mdSync()}if(el&&el.id==="mdNote"&&MD.beat){MD.beat.note=+el.value;mdSync()}},true);
 document.addEventListener("input",e=>{const el=e.target;if(el&&el.id==="mdSongName"&&MD.beat){MD.beat.name=el.value}},true);
