@@ -6,7 +6,11 @@
      (see supabase/appels.sql): each person only receives the messages sent to them
    - Ring: the other person gets a call screen; accept (voice or video) or decline
    ===================================================================== */
-const CALL_ICE=[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}];
+const CALL_ICE=(()=>{const ice=[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}];
+  /* TURN relay (config.js): used when the network blocks direct connections between phones */
+  const c=window.APP_CONFIG||{},urls=String(c.turnUrls||"").split(",").map(x=>x.trim()).filter(Boolean);
+  if(urls.length&&c.turnUser&&c.turnPass)ice.push({urls,username:c.turnUser,credential:c.turnPass});
+  return ice})();
 const CALL={id:null,host:null,kind:"duo",video:false,group:null,others:[],peers:{},local:null,joined:false,micOn:true,camOn:false,ring:null,ringT:null,timer:null,clock:null,t0:0,pick:new Set(),cands:null};
 const CALL_TEST=()=>!!window.__callBus;   /* automated tests replace the database with a local bus */
 let CALL_UID=null;
