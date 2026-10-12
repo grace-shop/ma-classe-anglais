@@ -10,6 +10,8 @@
 async function peerRefresh(){if(!peerOn())return;
   try{const[d,i]=await Promise.all([window.__peer.dir(),window.__peer.inbox()]);
     PR.dir=d;
+    // an empty answer while we already show messages is a glitch (session not ready yet): keep what is shown
+    if(!i.length&&PR.inbox.length){PR.loaded=true;PR.err="";render();return}
     const have=new Set(i.map(x=>x.id)),cut=Date.now()-10*60000;
     const keep=PR.inbox.filter(x=>!have.has(x.id)&&(String(x.id).startsWith("tmp")||+new Date(x.created_at)>cut));
     PR.inbox=[...keep,...i].sort((a,b)=>+new Date(b.created_at)-+new Date(a.created_at));

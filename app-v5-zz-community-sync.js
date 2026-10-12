@@ -31,6 +31,8 @@ async function feedLoad(more){
     for(const id of ids){F.likes[id]=[];F.comments[id]=[]}
     for(const l of lk)(F.likes[l.post_id]=F.likes[l.post_id]||[]).push(l);
     for(const c of cm)(F.comments[c.post_id]=F.comments[c.post_id]||[]).push(c);
+    // an empty answer while posts are shown is a glitch (session not ready yet): keep what is shown
+    if(!more&&!p.length&&F.posts.length){F.loaded=true;F.err="";F.at=Date.now();F.loading=false;render();if(FC_AGAIN){FC_AGAIN=false;feedLoad()}return}
     const cut=Date.now()-10*60000;
     const keep=more?[]:F.posts.filter(x=>!ids.includes(x.id)&&+new Date(x.created_at)>cut);
     const merged=more?[...F.posts,...p.filter(x=>!F.posts.some(y=>y.id===x.id))]:[...keep,...p].sort((a,b)=>+new Date(b.created_at)-+new Date(a.created_at));
