@@ -8019,7 +8019,7 @@ stOf=function(x){
 
 /* ---------- 3D camera icon ---------- */
 let CAM3D_N=0;
-function camIcon3D(cls){const g="cam3d"+(++CAM3D_N);
+function camIcon3D(cls){const g="cam3d";   // same ids every time: a changing id made every redraw rebuild the whole page
   return `<svg class="cam3d ${cls||""}" viewBox="0 0 48 48" aria-hidden="true"><defs>
     <linearGradient id="${g}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".42" stop-color="#C9D3FF"/><stop offset="1" stop-color="#5A67C4"/></linearGradient>
     <linearGradient id="${g}t" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EEF2FF"/><stop offset="1" stop-color="#7786DD"/></linearGradient>
