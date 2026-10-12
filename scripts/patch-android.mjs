@@ -43,3 +43,17 @@ if (!gr.includes("EC_KEYSTORE")) gr = gr.replace(/android\s*\{/, `android {
         }
     }`);
 writeFileSync(g, gr); console.log("✓ version Android", build, "· signature fixe");
+
+// Notifications (appels et messages) : fichier Firebase + plugin Google Services dans le projet
+import { existsSync, copyFileSync } from "node:fs";
+if (existsSync("android-extras/google-services.json")) {
+  copyFileSync("android-extras/google-services.json", "android/app/google-services.json");
+  const root = "android/build.gradle", app = "android/app/build.gradle";
+  let r = readFileSync(root, "utf8");
+  if (!r.includes("google-services")) r = r.replace(/dependencies \{/, "dependencies {\n        classpath 'com.google.gms:google-services:4.4.2'");
+  writeFileSync(root, r);
+  let a = readFileSync(app, "utf8");
+  if (!a.includes("com.google.gms.google-services")) a += "\napply plugin: 'com.google.gms.google-services'\n";
+  writeFileSync(app, a);
+  console.log("✓ Firebase (notifications) ajouté au projet Android");
+}
