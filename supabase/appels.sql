@@ -60,7 +60,8 @@ begin
   if p_group is not null then
     return exists (select 1 from group_members where group_id = p_group and uid = u) and public.group_user_ok(u);
   end if;
-  return public.peer_ok(u);
+  /* students allowed to chat, and teachers (so a student can call her teacher) */
+  return public.group_user_ok(u);
 end $$;
 
 -- Blocked in either direction?
