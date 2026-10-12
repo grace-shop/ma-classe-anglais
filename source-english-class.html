@@ -7043,6 +7043,36 @@ function mdMusicHTML(){
     </div>
     <div class="zs-done"><button type="button" class="zc-share" data-v4="mdMusX">Done</button></div></div>`}
 
+/* ---------- community composer: Selfie, Music and Text as glossy 3D orbs ---------- */
+function ztTools(to){return`<div class="zt-row" role="group" aria-label="Media tools">
+  <button type="button" class="zt-tool" data-v4="mdSelfie" data-to="${to}" aria-label="Take a selfie"><span class="zt-orb" style="--d:0s">${sxIc("selfie")}</span><span>Selfie</span></button>
+  <button type="button" class="zt-tool" data-v4="mdMusic" aria-label="Add music"><span class="zt-orb" style="--d:.4s">${sxIc("music")}</span><span>Music</span></button>
+  <button type="button" class="zt-tool" data-v4="mdText" data-to="${to}" aria-label="Add text to the photo"><span class="zt-orb" style="--d:.8s">${sxIc("text")}</span><span>Text</span></button>
+  ${MD.music?`<span class="zt-chip">${sxIc("note")}<b>${mdEsc(sxName(MD.music,0))}</b><button type="button" data-v4="mdMusRm" aria-label="Remove music">${sxIc("x")}</button></span>`:""}
+</div>`}
+{const _fv2=feedView;feedView=function(embedded){const h=_fv2(embedded);
+  return typeof h==="string"?h.replace(/<div class="md-tools"[\s\S]*?<\/div>/,()=>ztTools("post")):h}}
+{const st=document.createElement("style");st.id="ztcss";st.textContent=`
+.zt-row{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:12px 0 8px}
+.zt-tool{display:grid;justify-items:center;gap:7px;border:0;background:transparent;font:inherit;font-size:.78rem;font-weight:800;color:#E8EEFF;cursor:pointer;padding:0;touch-action:manipulation}
+.zt-orb{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;color:#06201C;overflow:hidden;
+  background:radial-gradient(circle at 32% 26%,#FFFFFF 0%,#BFF9EE 22%,#5EEAD4 50%,#6D8BFF 84%,#7C6CFF 100%);
+  box-shadow:inset 0 -7px 12px rgba(20,30,90,.35),inset 0 3px 7px rgba(255,255,255,.75),0 16px 26px -12px rgba(94,234,212,.95),0 0 0 1px rgba(255,255,255,.3);
+  animation:ztBob 3.6s ease-in-out var(--d,0s) infinite;transition:transform .2s}
+.zt-orb::after{content:"";position:absolute;left:12px;right:12px;top:6px;height:14px;border-radius:14px;background:linear-gradient(#fff,rgba(255,255,255,0));opacity:.6;pointer-events:none}
+.zt-orb .sx-svg{width:24px;height:24px;stroke:#06201C;position:relative;z-index:1;filter:drop-shadow(0 1px 0 rgba(255,255,255,.55))}
+.zt-tool:hover .zt-orb{transform:translateY(-2px) scale(1.04)}
+.zt-tool:active .zt-orb{transform:scale(.92)}
+.zt-tool:focus-visible{outline:2px solid #5EEAD4;outline-offset:4px;border-radius:14px}
+@keyframes ztBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.zt-chip{display:inline-flex;align-items:center;gap:8px;align-self:center;padding:6px 6px 6px 10px;border-radius:999px;max-width:100%;color:#E8EEFF;font-weight:800;font-size:.82rem;background:linear-gradient(120deg,rgba(94,234,212,.22),rgba(129,140,248,.28));border:1px solid rgba(94,234,212,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.zt-chip .sx-svg{width:16px;height:16px;stroke:#8EF6E4}
+.zt-chip b{min-width:0;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zt-chip button{border:0;background:rgba(255,255,255,.16);color:#fff;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex:none}
+.zt-chip button .sx-svg{width:14px;height:14px;stroke:#fff}
+@media (prefers-reduced-motion:reduce){.zt-orb{animation:none}}
+`;document.head.appendChild(st)}
+
 /* ==== v4 END ==== */
 render();
 loadThree();
