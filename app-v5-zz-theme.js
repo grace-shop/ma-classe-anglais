@@ -47,7 +47,7 @@ header.top{padding-top:calc(env(safe-area-inset-top,0px) + 6px)}
 
 /* motion: views settle in softly */
 @keyframes zzRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-:root[data-skin="nuit"] main>section,:root[data-skin="nuit"] .view{animation:zzRise .5s cubic-bezier(.2,.8,.2,1) both}
+:root[data-skin="nuit"] main>section,:root[data-skin="nuit"] .view{animation:zzRise .5s cubic-bezier(.2,.8,.2,1) backwards}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 `;document.head.appendChild(st)}
