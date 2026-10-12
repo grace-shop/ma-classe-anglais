@@ -38,9 +38,40 @@ function fComposerHTML(){const c=F.sc;const media=!!c.url;
     ${track}
     <textarea id="fsc_text" class="sx-text ${media?"cap":""}" maxlength="300" placeholder="${media?"Add a caption…":"Type your story in English…"}">${esc(c.text||"")}</textarea>
     ${media?"":`<div class="sx-bgs">${SBG.map((b,i)=>`<button type="button" style="background:${b}" data-v4="fScBg" data-i="${i}" aria-pressed="${c.bg==="g"+i}" aria-label="Background ${i+1}"></button>`).join("")}</div>`}
+    ${scOptsHTML(c,media)}
     ${tools}
     <button type="button" class="sx-share" data-v4="fScPost" ${c.busy?"disabled":""}>${c.busy?"Posting…":"Share story"}</button>
   </div>`}
+
+/* ---------- story options: how long it stays on screen, and who must not see it ---------- */
+const SC_DURS=[5,10,15,30];
+function scOptsHTML(c,media){
+  const dur=media&&c.video?"":`<div class="sx-opt">
+      <span class="sx-opt-l">${sxIc("spark")}Show for</span>
+      <div class="sx-seg" role="group" aria-label="How long">${SC_DURS.map(n=>`<button type="button" class="sx-seg-b ${(c.dur||5)===n?"on":""}" data-v4="scDur" data-n="${n}" aria-pressed="${(c.dur||5)===n}">${n} s</button>`).join("")}</div>
+    </div>`;
+  const aud=`<div class="sx-opt">
+      <span class="sx-opt-l">${sxIc("up")}Who sees it</span>
+      <div class="sx-seg" role="group" aria-label="Who sees it">
+        <button type="button" class="sx-seg-b ${c.aud!=="hide"?"on":""}" data-v4="scAud" data-a="all" aria-pressed="${c.aud!=="hide"}">Everyone</button>
+        <button type="button" class="sx-seg-b ${c.aud==="hide"?"on":""}" data-v4="scAud" data-a="hide" aria-pressed="${c.aud==="hide"}">All except one</button>
+      </div>
+    </div>
+    ${c.aud==="hide"?`<label class="sx-hide"><span>Hide from</span>
+      <select id="sc_hide"><option value="">${c.peers?"Choose a classmate…":"Loading classmates…"}</option>${(c.peers||[]).map(p=>`<option value="${esc(p.uid)}" ${c.hide===p.uid?"selected":""}>${esc(p.name||"Student")}</option>`).join("")}</select>
+      <small>This person will not see the story at all.</small></label>`:""}`;
+  return`<div class="sx-opts">${dur}${aud}</div>`;
+}
+/* the options buttons and the classmate choice (listened to on the page itself) */
+document.addEventListener("click",async e=>{
+  const el=e.target.closest&&e.target.closest("[data-v4]");if(!el||!F.sc)return;const a=el.dataset.v4;
+  if(a==="scDur"){F.sc.dur=+el.dataset.n;F.sc.text=(document.getElementById("fsc_text")||{}).value||F.sc.text;feedSync();return}
+  if(a==="scAud"){F.sc.aud=el.dataset.a;F.sc.text=(document.getElementById("fsc_text")||{}).value||F.sc.text;
+    if(F.sc.aud==="hide"&&!F.sc.peers){F.sc.peers=[];feedSync();
+      try{F.sc.peers=(await window.__peer.dir()).filter(p=>p.uid!==S.uid)}catch(er){F.sc.peers=[];toast(er.message||"Could not load classmates","x")}}
+    feedSync();return}
+},true);
+document.addEventListener("change",e=>{if(e.target&&e.target.id==="sc_hide"&&F.sc)F.sc.hide=e.target.value||null});
 
 /* ---------- song names: hide raw file codes ---------- */
 function sxName(s,i){const t=String((s&&s.title)||"").trim();
@@ -213,7 +244,9 @@ ${gestArm}
  <ellipse cx="60" cy="54" rx="26" ry="29" fill="url(#${sid})"/>
  <ellipse cx="60" cy="54" rx="26" ry="29" fill="url(#avhl)"/>
  <path d="M38 70 Q60 92 82 70" stroke="#000" stroke-opacity=".08" stroke-width="5" fill="none"/>
+ <ellipse cx="60" cy="54" rx="26" ry="29" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="1.2"/>
  ${fix(hs.f)}
+ <ellipse cx="48" cy="30" rx="11" ry="3.6" fill="#fff" opacity=".18" transform="rotate(-16 48 30)"/>
  ${SX_BROW[a.brow%2].replace(/HC/g,hc)}
  <g class="av6-eyes">${SX_EYES[a.eyes%4]}</g>
  <ellipse cx="41" cy="70" rx="5" ry="3" fill="#FF8A8A" opacity=".42"/><ellipse cx="79" cy="70" rx="5" ry="3" fill="#FF8A8A" opacity=".42"/>
@@ -340,4 +373,15 @@ function avtView(){
 @keyframes av6bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6px)}}
 @keyframes av6blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
 @media (prefers-reduced-motion:reduce){.av6-head,.av6-eyes,.sx-halo{animation:none!important}}
+.sx-opts{display:grid;gap:8px;margin:10px 0 0}
+.sx-opt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:space-between}
+.sx-opt-l{display:inline-flex;align-items:center;gap:6px;color:#fff;font-size:.82rem;font-weight:700;opacity:.9}
+.sx-opt-l .sx-svg{width:16px;height:16px}
+.sx-seg{display:inline-flex;padding:3px;border-radius:999px;background:rgba(10,12,30,.5);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.sx-seg-b{border:0;background:transparent;color:rgba(255,255,255,.8);font:inherit;font-size:.8rem;font-weight:700;padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.sx-seg-b.on{background:linear-gradient(120deg,#5EEAD4,#818CF8);color:#06201C;box-shadow:0 6px 16px -8px rgba(94,234,212,.8)}
+.sx-hide{display:grid;gap:4px;color:#fff;font-size:.82rem;font-weight:700}
+.sx-hide select{font:inherit;color:#fff;background:rgba(10,12,30,.55);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px 12px}
+.sx-hide select option{color:#111}
+.sx-hide small{font-weight:500;opacity:.7}
 `;document.head.appendChild(st)}

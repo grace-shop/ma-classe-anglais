@@ -287,7 +287,7 @@
     delComment: async (id) => { const { error } = await sb.rpc("delete_comment", { p_id: id }); if (error) throw feedErr(error, "Could not delete"); },
     stories: async () => { const { data, error } = await sb.from("stories").select("*").order("created_at", { ascending: true }).limit(500); if (error) throw feedErr(error, "Cannot load stories"); return data || []; },
     storyViews: async () => { const { data, error } = await sb.from("story_views").select("*").limit(3000); if (error) return []; return data || []; },
-    story: async (media, body, bg) => { const { data, error } = await sb.rpc("create_story", { p_media: media || null, p_body: body || "", p_bg: bg || "" }); if (error) throw feedErr(error, "Could not publish the story"); return data; },
+    story: async (media, body, bg, o) => { o = o || {}; const { data, error } = await sb.rpc("create_story", { p_media: media || null, p_body: body || "", p_bg: bg || "", p_dur: o.dur || 5, p_aud: o.aud || "all", p_hide: o.hide || null }); if (error) throw feedErr(error, "Could not publish the story"); return data; },
     viewStory: async (id) => { await sb.rpc("view_story", { p_id: id }); },
     reactStory: async (id, e) => { const { data, error } = await sb.rpc("react_story", { p_id: id, p_e: e || "" }); if (error) throw feedErr(error, "Could not react"); return data; },
     storyReactions: async () => { const { data, error } = await sb.from("story_reactions").select("*").limit(3000); if (error) return []; return data || []; },

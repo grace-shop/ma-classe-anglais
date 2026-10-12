@@ -3675,7 +3675,7 @@ function fStoryHTML(){const c=fCur();if(!c)return"";const{g,s}=c,mine=g.uid===S.
   const views=F.views.filter(x=>x.story_id===s.id),rxs=F.reacts.filter(x=>x.story_id===s.id&&x.uid!==S.uid);const img=s.media&&s.media.p?V4.obj[s.media.p]:null;
   return`<div class="fsv" style="${s.media?"":`background:${sbg(s.bg)}`}">
   <div class="fsv-bars">${g.list.map((x,i)=>`<i class="${i<v.si?"done":i===v.si?(v.views||v.typing?"run paused":"run"):""}" style="--d:${dur}s"></i>`).join("")}</div>
-  <div class="fsv-top">${whoAva(g.who,g.uid,36)}<div><b>${esc(mine?"My story":g.who?.name||"Student")}</b><small>${ago(+new Date(s.created_at))}</small></div><button type="button" class="iconbtn" data-v4="fSvClose" aria-label="Close">${ic("x")}</button></div>
+  <div class="fsv-top">${whoAva(g.who,g.uid,36)}<div><b>${esc(mine?"My story":g.who?.name||"Student")}</b><small>${ago(+new Date(s.created_at))}${mine&&s.hide?" · hidden from one person":""}</small></div><button type="button" class="iconbtn" data-v4="fSvClose" aria-label="Close">${ic("x")}</button></div>
   ${s.media?`<div class="fsv-media">${fIsVid(s)?(F.svUrl&&F.svUrl.id===s.id?`<video id="fsvVid" src="${F.svUrl.url}" autoplay playsinline ${F.svMute?"muted":""}></video>${F.svMute?`<button type="button" class="fsv-snd" data-v4="fSvSnd">🔇 Tap for sound</button>`:""}`:`<div class="v4spin"></div>`):img?`<img src="${img}" alt="Story photo">`:`<div class="v4spin"></div>`}</div>`:""}
   ${s.body?`<div class="fsv-text${s.media?" cap":""}">${fText(s.body)}</div>`:""}
   <button type="button" class="fsv-nav l" data-v4="fSvPrev" aria-label="Previous"></button><button type="button" class="fsv-nav r" data-v4="fSvNext" aria-label="Next"></button>
@@ -3709,7 +3709,8 @@ async function fComment(id,inp){const t=(inp.value||"").trim();if(!t)return;inp.
   catch(e){toast((e&&e.message)||"Could not comment","x");inp.value=t}}
 async function fLike(id,e){const L=F.likes[id]=F.likes[id]||[],i=L.findIndex(l=>l.uid===S.uid);e=e||(i>=0?L[i].e:"❤️")||"❤️";F.pick=null;if(i>=0&&L[i].e===e)L.splice(i,1);else if(i>=0)L[i].e=e;else L.push({post_id:id,uid:S.uid,e});render();try{await window.__feed.like(id,e)}catch(er){toast(er.message||"Could not react","x");feedLoad()}}
 async function fStoryPost(){const c=F.sc;if(!c||c.busy)return;const t=((document.getElementById("fsc_text")||{}).value||"").trim();if(!t&&!c.file){toast("Write something or add a photo.","x");return}
-  c.busy=true;c.text=t;feedSync();try{if(c.video)toast("Uploading the video… keep the app open.","clock");const media=c.file?await fUpload(c.file,c.d):null;const body=await fFix(t,300);await window.__feed.story(media,body,c.url?"":c.bg);if(media)fRememberMedia(media);if(c.url)URL.revokeObjectURL(c.url);F.sc=null;feedSync();toast("Story shared! It stays 24 hours.","rocket");await feedLoad()}
+  if(c.aud==="hide"&&!c.hide){toast("Choose the classmate who must not see this story.","x");return}
+  c.busy=true;c.text=t;feedSync();try{if(c.video)toast("Uploading the video… keep the app open.","clock");const media=c.file?await fUpload(c.file,c.d):null;const body=await fFix(t,300);await window.__feed.story(media,body,c.url?"":c.bg,{dur:c.dur||5,aud:c.aud==="hide"?"hide":"all",hide:c.aud==="hide"?c.hide:null});if(media)fRememberMedia(media);if(c.url)URL.revokeObjectURL(c.url);F.sc=null;feedSync();toast("Story shared! It stays 24 hours.","rocket");await feedLoad()}
   catch(e){c.busy=false;feedSync();toast((e&&e.message)||"Could not share","x")}}
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el)return;const a=el.dataset.v4,id=el.dataset.id;
   switch(a){
@@ -3800,7 +3801,7 @@ const FRE=["👍","❤️","😂","😮","😢","😡"],SRE=["❤️","😂","�
 const BELL=`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>`;
 const SITE_URL=()=>location.protocol.startsWith("http")&&!/localhost|127\.0\.0\.1/.test(location.host)?location.origin+location.pathname.replace(/index\.html$/,""):"https://grace-shop.github.io/ma-classe-anglais/";
 const fIsVid=s=>!!(s&&s.media&&/^video\//.test(s.media.t||""));
-const fSdur=s=>fIsVid(s)?Math.min(60,Math.max(3,s.media.d||15)):s&&s.media?6:5;
+const fSdur=s=>fIsVid(s)?Math.min(60,Math.max(3,s.media.d||15)):(s&&s.dur)||(s&&s.media?6:5);
 function fVidTile(m){return`<button type="button" class="fvid" data-v4="vplay" data-p="${esc(m.p)}" data-t="${esc(m.t||"video/mp4")}" aria-label="Play the video">${m.poster?`<img data-chatp="${esc(m.poster.p)}" data-t="${esc(m.poster.t||"image/jpeg")}" alt="">`:""}<span class="fplay">▶</span>${m.d?`<small>${fmtDur(m.d)}</small>`:""}</button>`}
 function fMediaHTML(media){media=Array.isArray(media)?media:[];if(!media.length)return"";
   return`<div class="fmedia n${Math.min(media.length,4)}">${media.slice(0,4).map((m,i)=>/^video\//.test(m.t||"")?fVidTile(m):`<button type="button" class="v4img" data-v4="doc" data-k="m" data-id="${esc(m.p)}" data-t="${esc(m.t||"image/jpeg")}" data-n="photo-${i+1}.jpg" aria-label="See the photo"><img data-chatp="${esc(m.p)}" data-t="${esc(m.t||"")}" alt="Photo"></button>`).join("")}</div>`}
@@ -4729,6 +4730,127 @@ function callBarHTML(kind,id){
 }
 {const _pcv=peerChatView;peerChatView=function(){const id=S.view&&S.view.id;return(id?callBarHTML("duo",id):"")+_pcv()}}
 {const _gcv=grChatView;grChatView=function(){const id=S.view&&S.view.id;return(id&&grMember(id)&&GR.mem[id]&&GR.mem[id].length>1?callBarHTML("group",id):"")+_gcv()}}
+
+/* ---- app-v5-editor-timeline.js ---- */
+/* =====================================================================
+   v5 · video cut, Snap style: a timeline with thumbnails, a window you
+   drag by its edges (or by the middle), and a moving playhead.
+   The window keeps at most 60 seconds. It uses the same ED5.s / ED5.e
+   values as before, so the posting part does not change.
+   (Loads after app-v5-editor.js, so it replaces the video screen only.)
+   ===================================================================== */
+{const st=document.createElement("style");st.id="tlcss";st.textContent=`
+.tl-card{display:grid;gap:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:12px}
+.tl-head{display:flex;align-items:center;gap:10px;color:#fff}
+.tl-head b{font-size:.92rem;font-variant-numeric:tabular-nums}
+.tl-head span{flex:1;font-size:.84rem;opacity:.85;font-variant-numeric:tabular-nums}
+.tl{position:relative;height:66px;border-radius:14px;overflow:hidden;background:#0B0D22;touch-action:none;user-select:none;-webkit-user-select:none}
+.tl-thumbs{position:absolute;inset:0;display:flex;gap:1px}
+.tl-th{flex:1 1 0;min-width:0;height:100%;object-fit:cover;opacity:.9}
+.tl-dim{position:absolute;top:0;bottom:0;background:rgba(3,4,14,.72);pointer-events:none}
+.tl-win{position:absolute;top:0;bottom:0;border-top:3px solid #5EEAD4;border-bottom:3px solid #5EEAD4;border-radius:6px;box-shadow:0 0 0 1px rgba(94,234,212,.2);cursor:grab;min-width:24px}
+.tl-win:active{cursor:grabbing}
+.tl-h{position:absolute;top:-3px;bottom:-3px;width:18px;background:linear-gradient(180deg,#5EEAD4,#818CF8);cursor:ew-resize;display:grid;place-items:center}
+.tl-h.l{left:-2px;border-radius:10px 0 0 10px}
+.tl-h.r{right:-2px;border-radius:0 10px 10px 0}
+.tl-h::after{content:"";width:3px;height:22px;border-radius:3px;background:rgba(6,32,28,.7)}
+.tl-play{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.9);pointer-events:none;left:0}
+.tl-hint{margin:0;font-size:.8rem;opacity:.72;text-align:center;color:#fff}
+`;document.head.appendChild(st)}
+
+const TL={max:60,bar:null,drag:null,pvT:0,thumbsFor:null};
+
+/* the video screen with the timeline (replaces the old start/end sliders) */
+function ed5TLRender(){
+  const h=ed5Host();h.hidden=false;
+  h.innerHTML=`<div class="edt5-top"><button type="button" class="edt5-btn" data-ed="x">Use as is</button><b>Cut video</b><button type="button" class="edt5-btn go" data-ed="ok">Done</button></div>
+    <div class="edt5-stage"><div class="edt5-box" style="width:${Math.min(window.innerWidth-24,380)}px;max-height:50vh;aspect-ratio:9/16"><video id="edt5vid" muted playsinline></video></div></div>
+    <div class="tl-card">
+      <div class="tl-head"><b id="tlFrom">0:00.0</b><span id="tlLab"></span><button type="button" class="edt5-btn" data-ed="play">${ic("speaker")}Play the part</button></div>
+      <div class="tl" id="tlBar"><div class="tl-thumbs" id="tlThumbs"></div>
+        <div class="tl-dim" id="tlDl" style="left:0"></div><div class="tl-dim" id="tlDr" style="right:0"></div>
+        <div class="tl-win" id="tlWin"><span class="tl-h l" data-tl="l"></span><span class="tl-h r" data-tl="r"></span></div>
+        <div class="tl-play" id="tlPlay" style="display:none"></div></div>
+      <p class="tl-hint" id="tlHint">Drag the edges to choose the part. Drag the middle to move it. 60 seconds at most.</p>
+    </div>`;
+  const v=document.getElementById("edt5vid");if(!v)return;
+  ED5.vid=v;v.src=ED5.url;
+  v.onloadedmetadata=()=>{
+    let d=v.duration;
+    if(!isFinite(d)||d<=0){v.currentTime=1e8;v.ontimeupdate=()=>{v.ontimeupdate=null;v.currentTime=0;d=v.duration;tlInit(isFinite(d)&&d>0?d:0)}}
+    else tlInit(d);
+  };
+  TL.bar=document.getElementById("tlBar");tlBind();
+}
+function tlInit(d){
+  ED5.dur=d;ED5.s=0;ED5.e=Math.min(d,TL.max);
+  if(!d){const l=document.getElementById("tlLab");if(l)l.textContent="This video cannot be cut here. It will be posted as it is.";const hn=document.getElementById("tlHint");if(hn)hn.style.display="none";return}
+  tlSync();tlThumbs(d,ED5.url);
+  clearInterval(TL.pvT);TL.pvT=setInterval(tlPlayhead,80);
+}
+/* the window, the labels and the preview position */
+function tlSync(){
+  const d=ED5.dur;if(!d)return;
+  const L=ED5.s/d*100,R=(d-ED5.e)/d*100;
+  const w=document.getElementById("tlWin"),dl=document.getElementById("tlDl"),dr=document.getElementById("tlDr");
+  if(w){w.style.left=L+"%";w.style.width=((ED5.e-ED5.s)/d*100)+"%"}
+  if(dl)dl.style.width=L+"%";if(dr)dr.style.width=R+"%";
+  const f=document.getElementById("tlFrom"),lab=document.getElementById("tlLab");
+  if(f)f.textContent=ed5Fmt(ED5.s);
+  if(lab)lab.textContent=`to ${ed5Fmt(ED5.e)} · keeps ${Math.max(0,ED5.e-ED5.s).toFixed(1)} s`;
+  const v=ED5.vid;if(v&&(v.paused||TL.drag))try{v.currentTime=ED5.s}catch(e){}
+}
+function tlPlayhead(){
+  const d=ED5.dur,p=document.getElementById("tlPlay"),v=ED5.vid;
+  if(!d||!p||!v){return}
+  const playing=!v.paused&&v.currentTime>=ED5.s-0.05&&v.currentTime<=ED5.e+0.05;
+  p.style.display=playing?"block":"none";
+  if(playing)p.style.left=(v.currentTime/d*100)+"%";
+}
+/* thumbnails of the video: a few frames across the whole length */
+async function tlThumbs(d,url){
+  const row=document.getElementById("tlThumbs");if(!row)return;
+  const N=Math.max(6,Math.min(14,Math.round(d/3)));
+  const tv=document.createElement("video");tv.muted=true;tv.playsInline=true;tv.preload="auto";tv.src=url;
+  await new Promise(r=>{tv.onloadeddata=()=>r();tv.onerror=()=>r();setTimeout(r,4000)});
+  const W=96,H=96;
+  for(let i=0;i<N;i++){
+    if(ED5.url!==url||!document.getElementById("tlThumbs"))break;
+    const c=document.createElement("canvas");c.width=W;c.height=H;c.className="tl-th";row.appendChild(c);
+    const t=Math.min(d-0.05,(i+0.5)*d/N);
+    await new Promise(res=>{let done=false;const fin=()=>{if(done)return;done=true;tv.removeEventListener("seeked",fin);res()};
+      tv.addEventListener("seeked",fin);try{tv.currentTime=t}catch(e){fin()}setTimeout(fin,1500)});
+    try{const vw=tv.videoWidth||9,vh=tv.videoHeight||16,k=Math.max(W/vw,H/vh);
+      c.getContext("2d").drawImage(tv,(W-vw*k)/2,(H-vh*k)/2,vw*k,vh*k)}catch(e){}
+  }
+  tv.removeAttribute("src");try{tv.load()}catch(e){}
+}
+/* drag: the handles change the start or the end, the middle moves the window */
+function tlBind(){
+  const bar=TL.bar;if(!bar||bar._b)return;bar._b=true;
+  const tAt=x=>{const r=bar.getBoundingClientRect();return Math.max(0,Math.min(ED5.dur,(x-r.left)/r.width*ED5.dur))};
+  bar.addEventListener("pointerdown",e=>{
+    if(!ED5.dur)return;
+    const hd=e.target.closest&&e.target.closest("[data-tl]");const win=e.target.closest&&e.target.closest("#tlWin");
+    const t=tAt(e.clientX);
+    if(hd)TL.drag={m:hd.dataset.tl};
+    else if(win)TL.drag={m:"m",off:t-ED5.s};
+    else{const len=ED5.e-ED5.s;ED5.s=Math.max(0,Math.min(ED5.dur-len,t-len/2));ED5.e=ED5.s+len;TL.drag={m:"m",off:len/2}}
+    bar.setPointerCapture(e.pointerId);e.preventDefault();tlSync();
+  });
+  bar.addEventListener("pointermove",e=>{
+    if(!TL.drag)return;const t=tAt(e.clientX),dd=ED5.dur,k=TL.drag.m;
+    if(k==="l"){ED5.s=Math.max(0,Math.min(t,ED5.e-0.5));ED5.s=Math.max(ED5.s,ED5.e-TL.max)}
+    else if(k==="r"){ED5.e=Math.min(dd,Math.max(t,ED5.s+0.5));ED5.e=Math.min(ED5.e,ED5.s+TL.max)}
+    else{const len=ED5.e-ED5.s;ED5.s=Math.max(0,Math.min(dd-len,t-TL.drag.off));ED5.e=ED5.s+len}
+    tlSync();
+  });
+  const up=()=>{TL.drag=null;const v=ED5.vid;if(v&&v.paused)try{v.currentTime=ED5.s}catch(e){}};
+  bar.addEventListener("pointerup",up);bar.addEventListener("pointercancel",up);
+}
+
+/* the editor keeps the timeline for videos; photos keep their own screen */
+{const _r=ed5Render;ed5Render=function(){if(ED5.kind==="image")return _r();return ed5TLRender()}}
 
 /* ---- app-v5-editor.js ---- */
 /* =====================================================================
@@ -5688,9 +5810,9 @@ async function mdMusicReady(){if(!MD.music||!MD.music.l)return;const blob=await 
   if(!MD.music)return _cr(body,media,shared);await mdMusicReady();
   const up={p_body:body||"",p_media:media&&media.length?media:null,p_music:MD.music};if(shared)up.p_shared=shared;
   const { data, error }=await window.__sb.rpc("create_post",up);if(error)throw new Error(/create_post|music|schema/i.test(error.message||"")?"The teacher must first run supabase/musique.sql in Supabase.":(error.message||"Could not post"));MD.music=null;return data}}
-{const _st=window.__feed.story;window.__feed.story=async function(media,body,bg){
-  if(!MD.music)return _st(media,body,bg);await mdMusicReady();
-  const { data, error }=await window.__sb.rpc("create_story",{p_media:media||null,p_body:body||"",p_bg:bg||"",p_music:MD.music});if(error)throw new Error(/create_story|music|schema/i.test(error.message||"")?"The teacher must first run supabase/musique.sql in Supabase.":(error.message||"Could not share the story"));MD.music=null;return data}}
+{const _st=window.__feed.story;window.__feed.story=async function(media,body,bg,o){
+  if(!MD.music)return _st(media,body,bg,o);await mdMusicReady();const o2=o||{};
+  const { data, error }=await window.__sb.rpc("create_story",{p_media:media||null,p_body:body||"",p_bg:bg||"",p_music:MD.music,p_dur:o2.dur||5,p_aud:o2.aud||"all",p_hide:o2.hide||null});if(error)throw new Error(/create_story|music|schema/i.test(error.message||"")?"The teacher must first run supabase/musique.sql in Supabase.":(error.message||"Could not share the story"));MD.music=null;return data}}
 
 /* ---------- images of the app: loaded through short-lived links ---------- */
 const mdSigCache={};
@@ -6364,9 +6486,40 @@ function fComposerHTML(){const c=F.sc;const media=!!c.url;
     ${track}
     <textarea id="fsc_text" class="sx-text ${media?"cap":""}" maxlength="300" placeholder="${media?"Add a caption…":"Type your story in English…"}">${esc(c.text||"")}</textarea>
     ${media?"":`<div class="sx-bgs">${SBG.map((b,i)=>`<button type="button" style="background:${b}" data-v4="fScBg" data-i="${i}" aria-pressed="${c.bg==="g"+i}" aria-label="Background ${i+1}"></button>`).join("")}</div>`}
+    ${scOptsHTML(c,media)}
     ${tools}
     <button type="button" class="sx-share" data-v4="fScPost" ${c.busy?"disabled":""}>${c.busy?"Posting…":"Share story"}</button>
   </div>`}
+
+/* ---------- story options: how long it stays on screen, and who must not see it ---------- */
+const SC_DURS=[5,10,15,30];
+function scOptsHTML(c,media){
+  const dur=media&&c.video?"":`<div class="sx-opt">
+      <span class="sx-opt-l">${sxIc("spark")}Show for</span>
+      <div class="sx-seg" role="group" aria-label="How long">${SC_DURS.map(n=>`<button type="button" class="sx-seg-b ${(c.dur||5)===n?"on":""}" data-v4="scDur" data-n="${n}" aria-pressed="${(c.dur||5)===n}">${n} s</button>`).join("")}</div>
+    </div>`;
+  const aud=`<div class="sx-opt">
+      <span class="sx-opt-l">${sxIc("up")}Who sees it</span>
+      <div class="sx-seg" role="group" aria-label="Who sees it">
+        <button type="button" class="sx-seg-b ${c.aud!=="hide"?"on":""}" data-v4="scAud" data-a="all" aria-pressed="${c.aud!=="hide"}">Everyone</button>
+        <button type="button" class="sx-seg-b ${c.aud==="hide"?"on":""}" data-v4="scAud" data-a="hide" aria-pressed="${c.aud==="hide"}">All except one</button>
+      </div>
+    </div>
+    ${c.aud==="hide"?`<label class="sx-hide"><span>Hide from</span>
+      <select id="sc_hide"><option value="">${c.peers?"Choose a classmate…":"Loading classmates…"}</option>${(c.peers||[]).map(p=>`<option value="${esc(p.uid)}" ${c.hide===p.uid?"selected":""}>${esc(p.name||"Student")}</option>`).join("")}</select>
+      <small>This person will not see the story at all.</small></label>`:""}`;
+  return`<div class="sx-opts">${dur}${aud}</div>`;
+}
+/* the options buttons and the classmate choice (listened to on the page itself) */
+document.addEventListener("click",async e=>{
+  const el=e.target.closest&&e.target.closest("[data-v4]");if(!el||!F.sc)return;const a=el.dataset.v4;
+  if(a==="scDur"){F.sc.dur=+el.dataset.n;F.sc.text=(document.getElementById("fsc_text")||{}).value||F.sc.text;feedSync();return}
+  if(a==="scAud"){F.sc.aud=el.dataset.a;F.sc.text=(document.getElementById("fsc_text")||{}).value||F.sc.text;
+    if(F.sc.aud==="hide"&&!F.sc.peers){F.sc.peers=[];feedSync();
+      try{F.sc.peers=(await window.__peer.dir()).filter(p=>p.uid!==S.uid)}catch(er){F.sc.peers=[];toast(er.message||"Could not load classmates","x")}}
+    feedSync();return}
+},true);
+document.addEventListener("change",e=>{if(e.target&&e.target.id==="sc_hide"&&F.sc)F.sc.hide=e.target.value||null});
 
 /* ---------- song names: hide raw file codes ---------- */
 function sxName(s,i){const t=String((s&&s.title)||"").trim();
@@ -6539,7 +6692,9 @@ ${gestArm}
  <ellipse cx="60" cy="54" rx="26" ry="29" fill="url(#${sid})"/>
  <ellipse cx="60" cy="54" rx="26" ry="29" fill="url(#avhl)"/>
  <path d="M38 70 Q60 92 82 70" stroke="#000" stroke-opacity=".08" stroke-width="5" fill="none"/>
+ <ellipse cx="60" cy="54" rx="26" ry="29" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="1.2"/>
  ${fix(hs.f)}
+ <ellipse cx="48" cy="30" rx="11" ry="3.6" fill="#fff" opacity=".18" transform="rotate(-16 48 30)"/>
  ${SX_BROW[a.brow%2].replace(/HC/g,hc)}
  <g class="av6-eyes">${SX_EYES[a.eyes%4]}</g>
  <ellipse cx="41" cy="70" rx="5" ry="3" fill="#FF8A8A" opacity=".42"/><ellipse cx="79" cy="70" rx="5" ry="3" fill="#FF8A8A" opacity=".42"/>
@@ -6666,6 +6821,17 @@ function avtView(){
 @keyframes av6bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6px)}}
 @keyframes av6blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
 @media (prefers-reduced-motion:reduce){.av6-head,.av6-eyes,.sx-halo{animation:none!important}}
+.sx-opts{display:grid;gap:8px;margin:10px 0 0}
+.sx-opt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:space-between}
+.sx-opt-l{display:inline-flex;align-items:center;gap:6px;color:#fff;font-size:.82rem;font-weight:700;opacity:.9}
+.sx-opt-l .sx-svg{width:16px;height:16px}
+.sx-seg{display:inline-flex;padding:3px;border-radius:999px;background:rgba(10,12,30,.5);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.sx-seg-b{border:0;background:transparent;color:rgba(255,255,255,.8);font:inherit;font-size:.8rem;font-weight:700;padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.sx-seg-b.on{background:linear-gradient(120deg,#5EEAD4,#818CF8);color:#06201C;box-shadow:0 6px 16px -8px rgba(94,234,212,.8)}
+.sx-hide{display:grid;gap:4px;color:#fff;font-size:.82rem;font-weight:700}
+.sx-hide select{font:inherit;color:#fff;background:rgba(10,12,30,.55);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px 12px}
+.sx-hide select option{color:#111}
+.sx-hide small{font-weight:500;opacity:.7}
 `;document.head.appendChild(st)}
 
 /* ---- app-v5-themes.js ---- */
