@@ -26,14 +26,14 @@
 .zc-glass .sx-svg{width:20px;height:20px}
 .zc-glass-sp{width:46px;flex:none}
 .zc-stage{flex:1;min-height:0;display:grid;place-items:center;padding:4px 18px 12px;perspective:1100px}
-.zc-card{position:relative;height:min(100%,60vh);max-width:100%;aspect-ratio:9/16;border-radius:30px;overflow:hidden;background:#0A0D20;isolation:isolate;
+.zc-card{position:relative;width:min(84vw,300px);height:min(calc(min(84vw,300px) * 16 / 9),42vh);max-width:none;aspect-ratio:auto;flex:none;border-radius:30px;overflow:hidden;background:#0A0D20;isolation:isolate;
   box-shadow:0 0 0 1px rgba(255,255,255,.16),0 40px 80px -30px rgba(0,0,0,.95),0 0 70px -12px rgba(94,234,212,.4);animation:zcFloat 8s ease-in-out infinite;transform-style:preserve-3d}
 .zc-under{position:absolute;inset:-12%;background-size:cover;background-position:center;filter:blur(26px) saturate(1.5);opacity:.75;z-index:0}
 .zc-main{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;display:block;background:transparent}
 .zc-gloss{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(125deg,rgba(255,255,255,.22),transparent 36%,transparent 64%,rgba(255,255,255,.12));background-size:250% 100%;animation:zcShine 6s linear infinite}
 .zc-over{position:absolute;left:12px;right:12px;bottom:14px;z-index:3;width:auto;min-height:48px;max-height:30%;resize:none;border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:12px 14px;font:inherit;font-size:.95rem;color:#fff;background:rgba(8,10,28,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-sizing:border-box;outline:none}
 .zc-over::placeholder,.zc-big::placeholder{color:rgba(255,255,255,.6)}
-.zc-textcard{aspect-ratio:9/16}
+.zc-textcard{animation:none}
 .zc-big{position:absolute;inset:0;z-index:3;width:100%;height:100%;padding:28% 26px;border:0;outline:none;resize:none;background:transparent;color:#fff;font:inherit;font-size:1.55rem;font-weight:800;line-height:1.3;text-align:center;box-sizing:border-box;text-shadow:0 6px 24px rgba(0,0,0,.35)}
 .zc-dock{margin-top:auto;display:grid;gap:12px;padding:16px 16px calc(env(safe-area-inset-bottom,0px) + 16px);border-radius:30px 30px 0 0;background:linear-gradient(180deg,rgba(26,30,68,.78),rgba(7,9,26,.96));backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.14);box-shadow:0 -24px 60px -24px rgba(0,0,0,.85);max-height:60vh;overflow:auto}
 .zc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
