@@ -25,9 +25,10 @@
 .bt-out-card{border-color:rgba(244,63,94,.55)!important;background:linear-gradient(180deg,rgba(244,63,94,.2),rgba(12,15,34,.8))!important}
 .bt-win{font-size:2.6rem;text-align:center;color:#FDE68A;text-shadow:0 0 26px rgba(251,191,36,.7)}
 .bt-join{display:flex;gap:10px;align-items:center}
+.bt-diff{margin:0 auto 16px;display:flex;justify-content:center}
 `;document.head.appendChild(st)}
 
-const BT={room:null,st:null,off:0,iv:null,clk:null,on:false,busy:false,syncing:false,res:{},ci:null,cur:null,err:"",key:"",joinCode:""};
+const BT={diff:"hard",room:null,st:null,off:0,iv:null,clk:null,on:false,busy:false,syncing:false,res:{},ci:null,cur:null,err:"",key:"",joinCode:""};
 const BT_KINDS={
  duel:{t:"Duel",d:"Two students, the same questions. Best score wins.",n:8,ic:"bolt"},
  battle:{t:"Group battle",d:"2 to 8 students. Live ranking on every question.",n:10,ic:"trophy"},
@@ -51,7 +52,7 @@ function btRng(str){let h=2166136261;for(const ch of String(str)){h^=ch.charCode
 function btPrep(it,rnd){const ix=it.o.map((_,i)=>i);
   for(let i=ix.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[ix[i],ix[j]]=[ix[j],ix[i]]}
   return {q:it.q,e:it.e,o:ix.map(i=>it.o[i]),a:ix.indexOf(it.a)}}
-function btQs(n,rnd){const L=arLv();let p=AR_Q.filter(x=>(x.lv||1)===L);if(p.length<n)p=AR_Q.filter(x=>(x.lv||1)<=L);
+function btQs(n,rnd,lvl){const L=lvl||arLv();let p=AR_Q.filter(x=>(x.lv||1)===L);if(p.length<n)p=AR_Q.filter(x=>(x.lv||1)<=L);
   p=p.slice();for(let i=p.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[p[i],p[j]]=[p[j],p[i]]}
   return p.slice(0,n).map(it=>btPrep(it,rnd))}
 function btDayCode(){const d=new Date();const ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
@@ -106,6 +107,7 @@ function btHub(){btStop();BT.on=false;BT.key="";
   arSet(arTop("Battles","")+`<div class="ar-hero"><p class="ar-kicker">Compete · Win · Climb</p><h1>Battles</h1>
       <p>Play live with your classmates. Start one, or join with the code.</p></div>
     ${live?`<button class="ar-go bt-entry" data-ar="bt-back">Back to my battle</button>`:""}
+    <div class="ar-seg bt-diff" role="group" aria-label="Difficulty">${["easy","medium","hard"].map(l=>`<button class="${BT.diff===l?"on":""}" data-ar="bt-diff" data-l="${l}" aria-pressed="${BT.diff===l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join("")}</div>
     <div class="ar-grid">${cards}</div>
     <div class="ar-card"><p class="ar-kicker">Join a battle</p>
       <div class="bt-join"><input id="btCode" class="bt-in" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="CODE" value="${arEsc(BT.joinCode)}">
@@ -120,7 +122,7 @@ async function btKind(k){if(BT.busy)return;const K=BT_KINDS[k];if(!K)return;
   try{
     if(k==="challenge"){const code=btDayCode();const r=await btRpc("arena_challenge",{p_code:code,p_qs:btQs(K.n,btRng(code))});
       BT.room={id:r.id,code:r.code,kind:"challenge"}}
-    else{const r=await btRpc("arena_create",{p_kind:k,p_mode:"quiz",p_qs:btQs(K.n,Math.random)});
+    else{const r=await btRpc("arena_create",{p_kind:k,p_mode:"quiz",p_qs:btQs(K.n,Math.random,AR_LV[BT.diff||"hard"])});
       BT.room={id:r.id,code:r.code,kind:k}}
     BT.st=null;BT.res={};BT.ci=null;BT.cur=null;BT.err="";
     btPoll()}
@@ -150,7 +152,7 @@ function btLobby(st){const K=BT_KINDS[st.kind]||BT_KINDS.battle,host=st.host===s
     <span class="bt-tag ${p.uid===st.host?"host":""}">${p.uid===st.host?"Host":p.uid===st.me?"You":"Ready"}</span></div>`).join("");
   btPaint(JSON.stringify(["L",st.code,st.players.map(p=>p.uid+p.name)]),
     arTop(K.t,"Lobby")+`<div class="ar-card bt-glow"><p class="ar-kicker">Battle code</p><div class="bt-code">${arEsc(st.code)}</div>
-      <p class="bt-wait">Share this code · ${btNeed(st.kind)}</p></div>
+      <p class="bt-wait">Share this code · ${btNeed(st.kind)} · ${arEsc((st.qs_level||BT.diff||"hard")[0].toUpperCase()+(st.qs_level||BT.diff||"hard").slice(1))}</p></div>
     <p class="ar-kicker">Players · ${n} / ${btCap(st.kind)}</p><div class="bt-sb">${rows}</div>
     ${btErr()}
     ${host?`<button class="ar-go" data-ar="bt-start" style="width:100%" ${n<2?"disabled":""}>Start the battle</button>
@@ -225,6 +227,7 @@ function btClick(b){const a=b.dataset.ar;
   if(a==="bt-hub")return btHub();
   if(a==="bt-kind")return btKind(b.dataset.m);
   if(a==="bt-join")return btJoin();
+  if(a==="bt-diff"){BT.diff=b.dataset.l;return btHub()}
   if(a==="bt-back"){BT.err="";return btPoll()}
   if(a==="bt-start")return btStart();
   if(a==="bt-leave")return btLeave();

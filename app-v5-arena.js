@@ -325,14 +325,14 @@ function arHome(){arStopT();AR.mode=null;
       <b>${arEsc(m.t)}</b><small>${arEsc(m.d)}</small>
       ${AR.best[m.id]!=null?`<span class="ar-best">Best ${AR.best[m.id]}</span>`:""}</button>`).join("");
   arSet(`<div class="ar-top"><button class="ar-glass" data-ar="close" aria-label="Close">${arIc("x")}</button><b>Arena</b><span></span></div>
-    <div class="ar-hero"><p class="ar-kicker">Practise · Play · Progress</p><h1>The English Arena</h1><p>Six ways to train your English. Beat the clock and climb the board.</p></div>
+    <div class="ar-hero"><p class="ar-kicker">Practise · Play · Progress</p><h1>The English Arena</h1><p>Eight ways to train your English. Beat the clock and climb the board.</p></div>
     <div class="ar-grid">${cards}</div>
     <button class="ar-go bt-entry" data-ar="bt-hub">Battles · duels, group battles, royale, daily challenge</button>
     <div class="ar-tools">
       <div class="ar-seg" role="group" aria-label="Level">${["easy","medium","hard"].map(l=>`<button class="${AR.level===l?"on":""}" data-ar="level" data-l="${l}" aria-pressed="${AR.level===l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join("")}</div>
       <button class="ar-go" data-ar="board">Class board</button>
     </div>`)}
-function arPlay(mode){AR.mode=mode;if(mode==="quiz"){AR.qs=arPool(AR_Q,10).slice(0,10);AR.i=0;AR.score=0;AR.streak=0;return arQuiz()}
+function arPlay(mode){AR.mode=mode;if(mode==="quiz"||mode==="odd"||mode==="traps"){AR.qs=arPool(mode==="odd"?AR_ODD:mode==="traps"?AR_TRAP:AR_Q,10).slice(0,10);AR.i=0;AR.score=0;AR.streak=0;return arQuiz()}
   if(mode==="guess"){const w=arPool(AR_G,1)[0];AR.word=w;AR.guessed=[];AR.lives=6;arTimer(90,()=>arGuessEnd(false));return arGuess()}
   if(mode==="fill"){AR.items=arPool(AR_F,8).slice(0,8);AR.i=0;AR.score=0;return arFill()}
   if(mode==="order"){AR.items=arPool(AR_O,6).slice(0,6);AR.i=0;AR.score=0;return arOrder()}
@@ -340,9 +340,9 @@ function arPlay(mode){AR.mode=mode;if(mode==="quiz"){AR.qs=arPool(AR_Q,10).slice
   if(mode==="clock"){AR.qs=arPool(AR_Q,20).concat(arPool(AR_Q,20));AR.i=0;AR.score=0;arTimer(60,()=>arEnd("clock",AR.score,30));return arClock()}}
 
 /* quiz */
-function arQuiz(){if(AR.i>=AR.qs.length)return arEnd("quiz",AR.score,AR.qs.length*40);
+function arQuiz(){if(AR.i>=AR.qs.length)return arEnd(AR.mode,AR.score,AR.qs.length*40);
   const q=AR.qs[AR.i];AR.locked=false;
-  arSet(arTop("Quiz Blitz",`${AR.i+1} / ${AR.qs.length} · ${AR.score} pts`)+arBar(AR.i/AR.qs.length)+
+  arSet(arTop(AR.mode==="odd"?"Odd One Out":AR.mode==="traps"?"Grammar Traps":"Quiz Blitz",`${AR.i+1} / ${AR.qs.length} · ${AR.score} pts`)+arBar(AR.i/AR.qs.length)+
     `<div class="ar-ring-wrap">${arRing()}</div>
      <div class="ar-card"><p class="ar-kicker">Question ${AR.i+1}</p><h2>${arEsc(q.q)}</h2></div>
      <div class="ar-opts">${q.o.map((o,k)=>`<button class="ar-opt" data-ar="qa" data-k="${k}">${arEsc(o)}</button>`).join("")}</div>
@@ -353,7 +353,7 @@ function arQAnswer(k){if(AR.locked)return;AR.locked=true;arStopT();const q=AR.qs
   document.querySelectorAll(".ar-opt").forEach((b,j)=>{b.disabled=true;if(j===q.a)b.classList.add("ok");else if(j===k)b.classList.add("bad")});
   const fb=document.getElementById("arFb");
   if(fb)fb.innerHTML=`<div class="ar-note ${ok?"good":"bad"}"><b>${ok?"Correct!":(k<0?"Time's up!":"Not quite.")}</b> ${arEsc(q.e)}</div><div style="height:12px"></div><button class="ar-go" data-ar="next" style="width:100%">Next →</button>`}
-function arNext(){if(AR.mode==="quiz"){AR.i++;arQuiz()}else if(AR.mode==="fill"){AR.i++;arFill()}else if(AR.mode==="order"){AR.i++;arOrder()}}
+function arNext(){if(AR.mode==="quiz"||AR.mode==="odd"||AR.mode==="traps"){AR.i++;arQuiz()}else if(AR.mode==="fill"){AR.i++;arFill()}else if(AR.mode==="order"){AR.i++;arOrder()}}
 
 /* guess the word */
 function arGuess(){const w=AR.word.w;const lost=AR.guessed.filter(c=>!w.includes(c)).length;AR.lives=Math.max(0,6-lost);
@@ -432,7 +432,7 @@ function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
   const prev=AR.best[mode];if(prev==null||score>prev){AR.best[mode]=score;try{localStorage.setItem("ar_best",JSON.stringify(AR.best))}catch(e){}}
   arSubmit(mode,score);AR.boardMode=mode;
   const f=max?score/max:1;const stars=f>=0.85?3:f>=0.5?2:1;
-  const names={quiz:"Quiz Blitz",guess:"Guess the Word",fill:"Fill the Gap",order:"Word Order",cards:"Flashcards",clock:"Beat the Clock"};
+  const names={quiz:"Quiz Blitz",guess:"Guess the Word",fill:"Fill the Gap",order:"Word Order",cards:"Flashcards",clock:"Beat the Clock",odd:"Odd One Out",traps:"Grammar Traps"};
   const label=mode==="cards"?"cards learned":mode==="clock"?"correct answers":"points";
   const conf=stars>=2?`<div class="ar-confetti">${Array.from({length:36},(_,k)=>`<i style="left:${(k*37)%100}%;animation-delay:${((k%7)*0.18).toFixed(2)}s;background:${["#5EEAD4","#818CF8","#F472B6","#FBBF24"][k%4]}"></i>`).join("")}</div>`:"";
   arSet(arTop(names[mode]||"Arena","")+
@@ -473,7 +473,7 @@ function arClick(e){const b=e.target.closest&&e.target.closest("[data-ar]");if(!
 async function arSubmit(mode,score){try{const sb=window.__sb;if(!sb)return;
   const {error}=await sb.rpc("arena_submit",{p_mode:mode,p_score:Math.max(0,Math.min(100000,Math.round(score)))});if(error)throw error}
   catch(e){console.warn("arena submit",e)}}
-async function arBoardView(mode){AR.boardMode=mode;const names={quiz:"Quiz Blitz",guess:"Guess the Word",fill:"Fill the Gap",order:"Word Order",cards:"Flashcards",clock:"Beat the Clock"};
+async function arBoardView(mode){AR.boardMode=mode;const names={quiz:"Quiz Blitz",guess:"Guess the Word",fill:"Fill the Gap",order:"Word Order",cards:"Flashcards",clock:"Beat the Clock",odd:"Odd One Out",traps:"Grammar Traps"};
   const tabs=AR_MODES.map(m=>`<button class="${m.id===mode?"on":""}" data-ar="boardmode" data-m="${m.id}">${arEsc(m.t)}</button>`).join("");
   arSet(arTop("Class board","")+`<div class="ar-seg ar-seg-wrap">${tabs}</div><div class="ar-card" id="arBoard"><p class="ar-hint">Loading…</p></div>`);
   let rows=null,err="";
