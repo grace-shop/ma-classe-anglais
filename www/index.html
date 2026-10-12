@@ -8087,6 +8087,12 @@ async function feedLoad(more){
   if(FC_AGAIN){FC_AGAIN=false;feedLoad()}
 }
 
+/* the post appears at once when published; the next reload confirms it (it is kept for 10 minutes if the server answer is late) */
+{const _cr=window.__feed.create;window.__feed.create=async function(body,media,shared){const id=await _cr(body,media,shared);
+  if(id&&!shared){const mine={id,author:S.uid,who:(typeof myWho==="function"?myWho():null)||{name:"Me"},body:body||"",created_at:new Date().toISOString(),media:Array.isArray(media)?media:[]};
+    F.posts=[mine,...F.posts.filter(x=>x.id!==id)];F.likes[id]=F.likes[id]||[];F.comments[id]=F.comments[id]||[];try{render()}catch(e){}}
+  return id}}
+
 /* ---- app-v5-zz-community-tab.js ---- */
 /* =====================================================================
    v5 · Posts: a tab of its own for students, like the feed of a social
