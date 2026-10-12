@@ -19,7 +19,8 @@
     "@capacitor-community/text-to-speech": "latest",
     "@capacitor/local-notifications": "latest",
     "@capacitor-community/file-opener": "latest",
-    "@supabase/supabase-js": "^2"
+    "@supabase/supabase-js": "^2",
+    "@capacitor/push-notifications": "latest"
   },
   "devDependencies": {
     "@capacitor/cli": "latest"

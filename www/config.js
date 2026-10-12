@@ -12,7 +12,7 @@ window.APP_CONFIG = {
   threeUrl: "vendor/three.min.js",                     // fond 3D (copie locale) ; laissez tel quel
   /* Serveur TURN (relais d'appels) : utile si le réseau de l'école bloque les appels directs.
      Laissez vide tant que vous n'avez pas de compte TURN (ex. Metered, Cloudflare Calls, coturn). */
-  turnUrls: "",                                        // ex. "turn:turn.exemple.com:3478,turns:turn.exemple.com:5349"
-  turnUser: "",                                        // identifiant TURN
-  turnPass: ""                                         // mot de passe TURN
+  turnUrls: "turn:global.relay.metered.ca:80,turn:global.relay.metered.ca:80?transport=tcp,turn:global.relay.metered.ca:443,turns:global.relay.metered.ca:443?transport=tcp",                                        // ex. "turn:turn.exemple.com:3478,turns:turn.exemple.com:5349"
+  turnUser: "0ffaeca0a1b65b5a15444357",                                        // identifiant TURN
+  turnPass: "tlPR8rwlkmSRRBZu"                                         // mot de passe TURN
 };
