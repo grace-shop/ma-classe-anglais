@@ -21,7 +21,7 @@ const SX_I={
   x:'<path d="M6 6l12 12M18 6L6 18"/>',
   trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'
 };
-const sxIc=(n,cls)=>`<svg class="sx-svg ${cls||""}" viewBox="0 0 24 24" aria-hidden="true">${SX_I[n]||""}</svg>`;
+const sxIc=(n,cls)=>n==="selfie"?camIcon3D(cls):`<svg class="sx-svg ${cls||""}" viewBox="0 0 24 24" aria-hidden="true">${SX_I[n]||""}</svg>`;
 
 /* ---------- story composer ---------- */
 function fComposerHTML(){const c=F.sc;const media=!!c.url;

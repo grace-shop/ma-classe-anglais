@@ -266,7 +266,7 @@ chatHTML=function(sid,me){const ready=S.chatFor===sid&&S.msgsReady;
 peerChatView=function(){const id=S.view.id,me=S.uid,nm=peerName(id),msgs=PR.inbox.filter(m=>(m.sender===me&&m.receiver===id)||(m.sender===id&&m.receiver===me)).slice().reverse();
   return`<div class="section" style="max-width:720px;margin-inline:auto"><div><button class="back" data-a="peerBack">${ic("left")}Classmates</button></div><div class="row">${avatar(id,nm,48)}<div><span class="eyebrow">Classmate</span><h2>${esc(nm)}${S.peers[id]?` <span class="chip ok">Online</span>`:""}</h2></div></div>
   <div class="glass chat"><div class="msgs" id="chatScroll">${msgs.length?v4MsgList("peer",msgs,v4Ctx("peer",id)):`<div class="muted" style="margin:auto;text-align:center">No messages yet.<br>Say hello to ${esc(nm.split(" ")[0])}! You can write, or send a voice message, a photo, a file or a sticker.</div>`}</div>
-  ${v4Bar("peer",id,"Write a message…")}</div>
+  ${v4Bar("peer",id,"Message…")}</div>
   <p class="hint">Be polite and kind to your classmates. Write in English to practise!</p></div>`};
 
 /* =====================================================================
