@@ -7990,6 +7990,11 @@ function ztTools(to){return`<div class="zt-row" role="group" aria-label="Media t
 {const st=document.createElement("style");st.id="zzfuturecss";st.textContent=`
 @property --zf-a{syntax:'<angle>';inherits:false;initial-value:0deg}
 
+/* ---------- the 3D backdrop stays behind everything: content always sits on top, and the backdrop is softer ---------- */
+#bg3d{opacity:.6!important}
+main,.wrap,#main{position:relative;z-index:1}
+header.top{z-index:5}
+
 /* ---------- ambient aurora behind every screen ---------- */
 body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;
   background:
