@@ -155,7 +155,7 @@ AR_G.push(
 );
 const AR_LV={easy:1,medium:2,hard:3};
 function arLv(){return AR_LV[AR.level||"easy"]||1}
-function arPool(arr,n){const L=arLv();let p=arr.filter(x=>x.lv===L);if(p.length<n)p=arr.filter(x=>x.lv<=L);return arShuf(p)}
+function arPool(arr,n){const L=arLv();let p=arr.filter(x=>(x.lv||1)===L);if(p.length<n)p=arr.filter(x=>(x.lv||1)<=L);return arShuf(p)}
 
 const AR_MODES=[
  {id:"quiz",t:"Quiz Blitz",d:"10 questions · 15 s each",ic:"bolt",max:400},
@@ -327,6 +327,7 @@ function arHome(){arStopT();AR.mode=null;
   arSet(`<div class="ar-top"><button class="ar-glass" data-ar="close" aria-label="Close">${arIc("x")}</button><b>Arena</b><span></span></div>
     <div class="ar-hero"><p class="ar-kicker">Practise · Play · Progress</p><h1>The English Arena</h1><p>Six ways to train your English. Beat the clock and climb the board.</p></div>
     <div class="ar-grid">${cards}</div>
+    <button class="ar-go bt-entry" data-ar="bt-hub">Battles · duels, group battles, royale, daily challenge</button>
     <div class="ar-tools">
       <div class="ar-seg" role="group" aria-label="Level">${["easy","medium","hard"].map(l=>`<button class="${AR.level===l?"on":""}" data-ar="level" data-l="${l}" aria-pressed="${AR.level===l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join("")}</div>
       <button class="ar-go" data-ar="board">Class board</button>
@@ -448,6 +449,7 @@ function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
 
 /* clicks */
 function arClick(e){const b=e.target.closest&&e.target.closest("[data-ar]");if(!b)return;const a=b.dataset.ar;
+  if(a.indexOf("bt-")===0)return btClick(b);
   if(a==="close")return arClose();
   if(a==="home")return arHome();
   if(a==="start")return arPlay(b.dataset.m);
