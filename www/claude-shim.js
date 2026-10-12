@@ -577,6 +577,7 @@
   window.__appLogout = async () => {
     try { await Promise.race([sb.auth.signOut({ scope: "local" }), new Promise((r) => setTimeout(r, 2500))]); } catch (e) {}
     try { for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (/^sb-.+-auth-token/.test(k)) localStorage.removeItem(k); } } catch (e) {}
+    try { localStorage.removeItem("mca_sess"); } catch (e) {}
     session = null; mode = "in"; note = null;
     location.replace(location.pathname + "#connexion"); setTimeout(() => location.reload(), 50);
   };
@@ -749,13 +750,30 @@
       if (code) { const { error } = await sb.auth.exchangeCodeForSession(code); if (error) say(frErr(error.message)); }
       try { plug("Browser") && plug("Browser").close(); } catch (e) {}
     });
+    // Our own copy of the login (key mca_sess). The database client's copy can be lost
+    // (WebView storage cleared, a failed token refresh, a restart during sign-up), and then
+    // the student was asked to register again. Cleared only on a real sign-out.
+    const BK = "mca_sess";
+    const saveBackup = (s) => { try { if (s && s.user && s.refresh_token) localStorage.setItem(BK, JSON.stringify({ access_token: s.access_token, refresh_token: s.refresh_token, user: s.user })); } catch (e) {} };
+    const readBackup = () => { try { return JSON.parse(localStorage.getItem(BK) || "null"); } catch (e) { return null; } };
+    const clearBackup = () => { try { localStorage.removeItem(BK); } catch (e) {} };
     sb.auth.onAuthStateChange((ev, s) => {
-      session = s;
+      if (s || ev === "SIGNED_OUT") session = s;
+      if (s) saveBackup(s); else if (ev === "SIGNED_OUT") clearBackup();
       if (ev === "PASSWORD_RECOVERY") { mode = "newpass"; note = null; showGate(); return; }
       if (s && mode !== "newpass") afterLogin();
     });
     let data = { session: null }; try { const r = await Promise.race([sb.auth.getSession(), new Promise((res) => setTimeout(() => res(null), 4000))]); if (r && r.data) data = r.data; } catch (e) {}   // no network: never wait for the token refresh
     session = data.session;
+    if (!session) {                                    // the client's copy is missing: restore from ours
+      const bk = readBackup();
+      if (bk && bk.refresh_token) {
+        const r = await Promise.race([sb.auth.setSession({ access_token: bk.access_token, refresh_token: bk.refresh_token }).catch(() => null), new Promise((res) => setTimeout(() => res(undefined), 6000))]);
+        if (r === undefined) { if (bk.user) session = { user: bk.user }; }          // no network: keep the saved login, the app opens from its saved copy
+        else if (r && r.data && r.data.session) session = r.data.session;
+        else clearBackup();                                                         // the server refused the saved login
+      }
+    }
     if (!session) {                                    // jeton expiré et réseau coupé : on garde la session enregistrée
       try {
         for (let i = 0; i < localStorage.length; i++) {
