@@ -9,5 +9,10 @@ window.APP_CONFIG = {
   aiEnabled: true,                                     // false pour couper Nova
   nativeRedirect: "tg.maclasse.anglais://login",       // retour de connexion dans l'application Android
   apkUrl: "https://github.com/grace-shop/ma-classe-anglais/releases/latest/download/ma-classe-anglais.apk", // bouton « Télécharger l'application »
-  threeUrl: "vendor/three.min.js"                      // fond 3D (copie locale) ; laissez tel quel
+  threeUrl: "vendor/three.min.js",                     // fond 3D (copie locale) ; laissez tel quel
+  /* Serveur TURN (relais d'appels) : utile si le réseau de l'école bloque les appels directs.
+     Laissez vide tant que vous n'avez pas de compte TURN (ex. Metered, Cloudflare Calls, coturn). */
+  turnUrls: "",                                        // ex. "turn:turn.exemple.com:3478,turns:turn.exemple.com:5349"
+  turnUser: "",                                        // identifiant TURN
+  turnPass: ""                                         // mot de passe TURN
 };
