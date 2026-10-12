@@ -231,9 +231,9 @@ async function mdMusicReady(){if(!MD.music||!MD.music.l)return;const blob=await 
   if(!MD.music)return _cr(body,media,shared);await mdMusicReady();
   const up={p_body:body||"",p_media:media&&media.length?media:null,p_music:MD.music};if(shared)up.p_shared=shared;
   const { data, error }=await window.__sb.rpc("create_post",up);if(error)throw new Error(/create_post|music|schema/i.test(error.message||"")?"The teacher must first run supabase/musique.sql in Supabase.":(error.message||"Could not post"));MD.music=null;return data}}
-{const _st=window.__feed.story;window.__feed.story=async function(media,body,bg){
-  if(!MD.music)return _st(media,body,bg);await mdMusicReady();
-  const { data, error }=await window.__sb.rpc("create_story",{p_media:media||null,p_body:body||"",p_bg:bg||"",p_music:MD.music});if(error)throw new Error(/create_story|music|schema/i.test(error.message||"")?"The teacher must first run supabase/musique.sql in Supabase.":(error.message||"Could not share the story"));MD.music=null;return data}}
+{const _st=window.__feed.story;window.__feed.story=async function(media,body,bg,o){
+  if(!MD.music)return _st(media,body,bg,o);await mdMusicReady();const o2=o||{};
+  const { data, error }=await window.__sb.rpc("create_story",{p_media:media||null,p_body:body||"",p_bg:bg||"",p_music:MD.music,p_dur:o2.dur||5,p_aud:o2.aud||"all",p_hide:o2.hide||null});if(error)throw new Error(/create_story|music|schema/i.test(error.message||"")?"The teacher must first run supabase/musique.sql in Supabase.":(error.message||"Could not share the story"));MD.music=null;return data}}
 
 /* ---------- images of the app: loaded through short-lived links ---------- */
 const mdSigCache={};

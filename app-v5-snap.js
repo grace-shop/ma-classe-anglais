@@ -89,7 +89,7 @@ function snHeadHTML(){const bell=snBellCount();
     <button type="button" class="sn-ic" data-snap="search" aria-label="Search for a classmate">${ic("search")}</button>
     <h1>Chat</h1>
     <button type="button" class="sn-ic" data-snap="bell" aria-label="Notifications">${ic("bell")}${bell?`<i class="sn-badge">${bell}</i>`:""}</button>
-    <button type="button" class="sn-add" data-snap="search" aria-label="Find a classmate to chat with">${ic("plus")}</button>
+    <button type="button" class="sn-add" data-snap="compose" aria-label="Find a classmate to chat with">${ic("plus")}</button>
     <button type="button" class="sn-ic" data-snap="more" aria-label="More">${ic("dots")}</button>
   </header>`}
 function snChipsHTML(){const unread=snUnreadFrom().size+snGroupsUnread(),groups=(GR.list||[]).length,chip=(k,label,n)=>`<button type="button" class="sn-chip" data-snap="chip" data-k="${k}" aria-pressed="${SN.filter===k}">${label}${n?` <b>${n}</b>`:""}</button>`;
@@ -120,7 +120,7 @@ function snNearHTML(){const on=!!(SN.loc&&SN.loc.sharing);
   h=h.replace(/<p class="sub">[\s\S]*?<\/p>/,"");
   if(S.settings&&S.settings.chatPaused)h=h.replace(pre,pre+`<div class="sn-pause" role="status">${ic("pin")}Your teacher has paused chats and calls for the class.</div>`);
   h=h.replace(/<button type="button" class="iconbtn sm pv-more"/g,`<span class="sn-bub" aria-hidden="true">${ic("chat")}</span>$&`);
-  return h+`<button type="button" class="sn-fab" data-snap="compose" aria-label="New chat">${ic("edit")}</button>`}}
+  return h}}
 
 /* ---- chat screen: show "typing…" under the name ---- */
 {const _pc=peerChatView;peerChatView=function(){snTypingInit();const id=S.view&&S.view.id,h=_pc();if(!id)return h;

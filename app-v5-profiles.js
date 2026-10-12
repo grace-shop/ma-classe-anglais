@@ -120,7 +120,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
     AV.draft[el.dataset.k]=+el.dataset.n;render();return}
   if(k==="avSave"){const bio=document.getElementById("avBio");const d=AV.draft||{};const avt=avtOf(d);const b=String((bio&&bio.value)||d.bio||"").slice(0,150);
     if(!S.uid||S.mode!=="student"){toast("Only students can save an avatar.","x");return}
-    const ps=(({skin,hair,hairCol,eyes,mouth,outfit,bg})=>({skin,hair,hairCol,eyes,mouth,outfit,bg}))(avt);
+    const ps=(({g,skin,hair,hairCol,eyes,mouth,brow,outfit,cut,acc,bg})=>({g,skin,hair,hairCol,eyes,mouth,brow,outfit,cut,acc,bg}))(avt);
     S.me={...(S.me||{}),avt:ps,bio:b};
     write(()=>S.db.doc("students/"+S.uid).update({avt:ps,bio:b})).then(()=>{toast("Avatar and bio saved","check")}).catch(()=>toast("Saved on this phone: it will be sent when you are online.","check"));
     AV.draft=null;S.view=null;S.animate=true;render();return}

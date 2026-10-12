@@ -1003,7 +1003,7 @@ function fStoryHTML(){const c=fCur();if(!c)return"";const{g,s}=c,mine=g.uid===S.
   const views=F.views.filter(x=>x.story_id===s.id),rxs=F.reacts.filter(x=>x.story_id===s.id&&x.uid!==S.uid);const img=s.media&&s.media.p?V4.obj[s.media.p]:null;
   return`<div class="fsv" style="${s.media?"":`background:${sbg(s.bg)}`}">
   <div class="fsv-bars">${g.list.map((x,i)=>`<i class="${i<v.si?"done":i===v.si?(v.views||v.typing?"run paused":"run"):""}" style="--d:${dur}s"></i>`).join("")}</div>
-  <div class="fsv-top">${whoAva(g.who,g.uid,36)}<div><b>${esc(mine?"My story":g.who?.name||"Student")}</b><small>${ago(+new Date(s.created_at))}</small></div><button type="button" class="iconbtn" data-v4="fSvClose" aria-label="Close">${ic("x")}</button></div>
+  <div class="fsv-top">${whoAva(g.who,g.uid,36)}<div><b>${esc(mine?"My story":g.who?.name||"Student")}</b><small>${ago(+new Date(s.created_at))}${mine&&s.hide?" · hidden from one person":""}</small></div><button type="button" class="iconbtn" data-v4="fSvClose" aria-label="Close">${ic("x")}</button></div>
   ${s.media?`<div class="fsv-media">${fIsVid(s)?(F.svUrl&&F.svUrl.id===s.id?`<video id="fsvVid" src="${F.svUrl.url}" autoplay playsinline ${F.svMute?"muted":""}></video>${F.svMute?`<button type="button" class="fsv-snd" data-v4="fSvSnd">🔇 Tap for sound</button>`:""}`:`<div class="v4spin"></div>`):img?`<img src="${img}" alt="Story photo">`:`<div class="v4spin"></div>`}</div>`:""}
   ${s.body?`<div class="fsv-text${s.media?" cap":""}">${fText(s.body)}</div>`:""}
   <button type="button" class="fsv-nav l" data-v4="fSvPrev" aria-label="Previous"></button><button type="button" class="fsv-nav r" data-v4="fSvNext" aria-label="Next"></button>
@@ -1037,7 +1037,8 @@ async function fComment(id,inp){const t=(inp.value||"").trim();if(!t)return;inp.
   catch(e){toast((e&&e.message)||"Could not comment","x");inp.value=t}}
 async function fLike(id,e){const L=F.likes[id]=F.likes[id]||[],i=L.findIndex(l=>l.uid===S.uid);e=e||(i>=0?L[i].e:"❤️")||"❤️";F.pick=null;if(i>=0&&L[i].e===e)L.splice(i,1);else if(i>=0)L[i].e=e;else L.push({post_id:id,uid:S.uid,e});render();try{await window.__feed.like(id,e)}catch(er){toast(er.message||"Could not react","x");feedLoad()}}
 async function fStoryPost(){const c=F.sc;if(!c||c.busy)return;const t=((document.getElementById("fsc_text")||{}).value||"").trim();if(!t&&!c.file){toast("Write something or add a photo.","x");return}
-  c.busy=true;c.text=t;feedSync();try{if(c.video)toast("Uploading the video… keep the app open.","clock");const media=c.file?await fUpload(c.file,c.d):null;const body=await fFix(t,300);await window.__feed.story(media,body,c.url?"":c.bg);if(media)fRememberMedia(media);if(c.url)URL.revokeObjectURL(c.url);F.sc=null;feedSync();toast("Story shared! It stays 24 hours.","rocket");await feedLoad()}
+  if(c.aud==="hide"&&!c.hide){toast("Choose the classmate who must not see this story.","x");return}
+  c.busy=true;c.text=t;feedSync();try{if(c.video)toast("Uploading the video… keep the app open.","clock");const media=c.file?await fUpload(c.file,c.d):null;const body=await fFix(t,300);await window.__feed.story(media,body,c.url?"":c.bg,{dur:c.dur||5,aud:c.aud==="hide"?"hide":"all",hide:c.aud==="hide"?c.hide:null});if(media)fRememberMedia(media);if(c.url)URL.revokeObjectURL(c.url);F.sc=null;feedSync();toast("Story shared! It stays 24 hours.","rocket");await feedLoad()}
   catch(e){c.busy=false;feedSync();toast((e&&e.message)||"Could not share","x")}}
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el)return;const a=el.dataset.v4,id=el.dataset.id;
   switch(a){
@@ -1128,7 +1129,7 @@ const FRE=["👍","❤️","😂","😮","😢","😡"],SRE=["❤️","😂","�
 const BELL=`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>`;
 const SITE_URL=()=>location.protocol.startsWith("http")&&!/localhost|127\.0\.0\.1/.test(location.host)?location.origin+location.pathname.replace(/index\.html$/,""):"https://grace-shop.github.io/ma-classe-anglais/";
 const fIsVid=s=>!!(s&&s.media&&/^video\//.test(s.media.t||""));
-const fSdur=s=>fIsVid(s)?Math.min(60,Math.max(3,s.media.d||15)):s&&s.media?6:5;
+const fSdur=s=>fIsVid(s)?Math.min(60,Math.max(3,s.media.d||15)):(s&&s.dur)||(s&&s.media?6:5);
 function fVidTile(m){return`<button type="button" class="fvid" data-v4="vplay" data-p="${esc(m.p)}" data-t="${esc(m.t||"video/mp4")}" aria-label="Play the video">${m.poster?`<img data-chatp="${esc(m.poster.p)}" data-t="${esc(m.poster.t||"image/jpeg")}" alt="">`:""}<span class="fplay">▶</span>${m.d?`<small>${fmtDur(m.d)}</small>`:""}</button>`}
 function fMediaHTML(media){media=Array.isArray(media)?media:[];if(!media.length)return"";
   return`<div class="fmedia n${Math.min(media.length,4)}">${media.slice(0,4).map((m,i)=>/^video\//.test(m.t||"")?fVidTile(m):`<button type="button" class="v4img" data-v4="doc" data-k="m" data-id="${esc(m.p)}" data-t="${esc(m.t||"image/jpeg")}" data-n="photo-${i+1}.jpg" aria-label="See the photo"><img data-chatp="${esc(m.p)}" data-t="${esc(m.t||"")}" alt="Photo"></button>`).join("")}</div>`}
