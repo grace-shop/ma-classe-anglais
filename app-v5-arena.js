@@ -96,6 +96,67 @@ const AR_G=[
  {w:"bicycle",h:"Two wheels and pedals."}
 ];
 
+/* ---- levels: easy / medium / hard. Existing items are tagged by order, new items carry their level ---- */
+AR_Q.forEach((q,i)=>{if(!q.lv)q.lv=i<12?1:i<22?2:3});
+AR_F.forEach((x,i)=>{if(!x.lv)x.lv=i<5?1:i<10?2:3});
+AR_O.forEach((x,i)=>{if(!x.lv)x.lv=i<3?1:i<5?2:3});
+AR_G.forEach((x,i)=>{if(!x.lv)x.lv=i<5?1:i<10?2:3});
+AR_Q.push(
+ {lv:2,q:"By the time we arrived, the film ___.",o:["already started","has already started","had already started","already starts"],a:2,e:"Past perfect: an action finished before another past action."},
+ {lv:2,q:"She suggested ___ to the cinema.",o:["to go","going","go","went"],a:1,e:"Suggest + -ing."},
+ {lv:2,q:"I'd rather you ___ tell him now.",o:["didn't","don't","won't","aren't"],a:0,e:"'I'd rather you + past simple' expresses a wish about the present."},
+ {lv:2,q:"The team ___ won the match celebrated all night.",o:["who","which","whose","where"],a:0,e:"Who refers to people in a relative clause."},
+ {lv:2,q:"Neither my brother nor my sisters ___ coming.",o:["is","are","was","be"],a:1,e:"With neither...nor, the verb agrees with the nearer subject: sisters, so are."},
+ {lv:2,q:"He ___ have finished the report; it is still on his desk.",o:["mustn't","can't","shouldn't","needn't"],a:1,e:"Can't have + past participle: a strong deduction that something was impossible."},
+ {lv:2,q:"The more you practise, ___ you become.",o:["the better","the best","good","better"],a:0,e:"The more..., the better."},
+ {lv:2,q:"I'm used to ___ early.",o:["get up","getting up","to get up","got up"],a:1,e:"Be used to + -ing."},
+ {lv:2,q:"Hardly ___ I sat down when the bell rang.",o:["had","have","did","was"],a:0,e:"Hardly + had + subject + past participle, when..."},
+ {lv:2,q:"Choose the correct word: 'The information was ___.'",o:["useless","uselessly","use","usefulness"],a:0,e:"An adjective comes after was."},
+ {lv:2,q:"If I had studied harder, I ___ the exam.",o:["would pass","will pass","pass","passed"],a:0,e:"Third conditional: would + have + past participle."},
+ {lv:2,q:"Which word is an adverb?",o:["quickly","quick","quickness","quicken"],a:0,e:"Quickly describes how something is done."},
+ {lv:3,q:"Had I known about the traffic, I ___ earlier.",o:["would leave","would have left","will leave","left"],a:1,e:"Inverted third conditional: would have + past participle."},
+ {lv:3,q:"The report, ___ was published last week, is controversial.",o:["which","who","whom","whose"],a:0,e:"Which refers to things in a non-defining relative clause."},
+ {lv:3,q:"She denied ___ the money.",o:["to take","taking","take","took"],a:1,e:"Deny + -ing."},
+ {lv:3,q:"It's high time we ___ going.",o:["were","are","be","have been"],a:0,e:"It's high time + past simple, for something that should happen now."},
+ {lv:3,q:"Not only ___ fast, but he is also accurate.",o:["is he","he is","he's","is"],a:0,e:"After 'not only', the subject and verb are inverted."},
+ {lv:3,q:"I'd have told you if I ___ known.",o:["had","have","would","did"],a:0,e:"Third conditional: if + had + past participle."},
+ {lv:3,q:"The suspect is believed ___ the city.",o:["to have left","to leave","leaving","having left"],a:0,e:"Passive reporting: is believed to have + past participle."},
+ {lv:3,q:"Despite ___ tired, she finished the marathon.",o:["being","to be","be","been"],a:0,e:"Despite + -ing."},
+ {lv:3,q:"The results were ___ than expected.",o:["more encouraging","encouragingest","most encouraging","encouraginger"],a:0,e:"Long adjectives form the comparative with more."},
+ {lv:3,q:"He ___ to have been a doctor before he became a writer.",o:["seems","seem","seemed","seeming"],a:0,e:"Seems to have + past participle."},
+ {lv:3,q:"Scarcely ___ we arrived when it started to rain.",o:["had","did","have","were"],a:0,e:"Scarcely + had + subject + past participle, when..."},
+ {lv:3,q:"Which word is a synonym of 'reluctant'?",o:["eager","hesitant","confident","generous"],a:1,e:"Reluctant means unwilling; hesitant is close in meaning."}
+);
+AR_F.push(
+ {lv:2,s:"If I ___ earlier, I would have helped.",a:["had known","had known about it"],h:"third conditional: know"},
+ {lv:2,s:"She wishes she ___ French.",a:["could speak","spoke"],h:"wish + past"},
+ {lv:2,s:"The letter ___ yesterday.",a:["was sent"],h:"passive, past"},
+ {lv:2,s:"Neither of them ___ to the party.",a:["came"],h:"past simple of 'come'"},
+ {lv:2,s:"He ___ here since 2019.",a:["has worked","has been working"],h:"present perfect"},
+ {lv:3,s:"By next year, I ___ my degree.",a:["will have finished"],h:"future perfect"},
+ {lv:3,s:"The homework ___ by the teacher right now.",a:["is being checked"],h:"passive, present continuous"},
+ {lv:3,s:"I'd ___ stay at home tonight.",a:["rather"],h:"a preference"},
+ {lv:3,s:"Hardly anyone ___ the question.",a:["understood"],h:"past simple of 'understand'"},
+ {lv:3,s:"Make sure you ___ on time.",a:["arrive"],h:"base verb after 'make sure'"}
+);
+AR_O.push(
+ {lv:2,w:["wish","I","could","speak","French","better"],a:"I wish I could speak French better"},
+ {lv:2,w:["if","you","study","you","will","pass"],a:"If you study, you will pass"},
+ {lv:3,w:["was","The","written","book","by","a","famous","author"],a:"The book was written by a famous author"},
+ {lv:3,w:["ever","Have","been","you","to","London"],a:"Have you ever been to London"}
+);
+AR_G.push(
+ {lv:3,w:"encyclopedia",h:"A big book full of facts about everything."},
+ {lv:3,w:"hurricane",h:"A very strong storm with powerful winds."},
+ {lv:3,w:"mirror",h:"You look at your reflection in it."},
+ {lv:3,w:"volcano",h:"A mountain that can erupt with lava."},
+ {lv:3,w:"orchestra",h:"A large group of musicians playing together."},
+ {lv:3,w:"pharmacy",h:"You buy medicine here."}
+);
+const AR_LV={easy:1,medium:2,hard:3};
+function arLv(){return AR_LV[AR.level||"easy"]||1}
+function arPool(arr,n){const L=arLv();let p=arr.filter(x=>x.lv===L);if(p.length<n)p=arr.filter(x=>x.lv<=L);return arShuf(p)}
+
 const AR_MODES=[
  {id:"quiz",t:"Quiz Blitz",d:"10 questions · 15 s each",ic:"bolt",max:400},
  {id:"guess",t:"Guess the Word",d:"Letters, lives and a clock",ic:"search",max:240},
@@ -121,8 +182,8 @@ const arEsc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt
 const arNorm=s=>String(s||"").toLowerCase().replace(/’/g,"'").replace(/[.!?,]/g,"").replace(/\s+/g," ").trim();
 const arShuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
-let AR={mode:null,best:{},iv:null,tl:0,tot:0,locked:false,qs:[],items:[],i:0,score:0,streak:0,word:null,guessed:[],lives:6,pool:[],ans:[],deck:[],known:0,total:0};
-try{AR.best=JSON.parse(localStorage.getItem("ar_best")||"{}")||{}}catch(e){AR.best={}}
+let AR={mode:null,level:"easy",boardMode:"quiz",best:{},iv:null,tl:0,tot:0,locked:false,qs:[],items:[],i:0,score:0,streak:0,word:null,guessed:[],lives:6,pool:[],ans:[],deck:[],known:0,total:0};
+try{AR.best=JSON.parse(localStorage.getItem("ar_best")||"{}")||{};AR.level=localStorage.getItem("ar_level")||"easy"}catch(e){AR.best={}}
 
 /* ---------- shell ---------- */
 {const st=document.createElement("style");st.id="arcss";st.textContent=`
@@ -265,13 +326,17 @@ function arHome(){arStopT();AR.mode=null;
       ${AR.best[m.id]!=null?`<span class="ar-best">Best ${AR.best[m.id]}</span>`:""}</button>`).join("");
   arSet(`<div class="ar-top"><button class="ar-glass" data-ar="close" aria-label="Close">${arIc("x")}</button><b>Arena</b><span></span></div>
     <div class="ar-hero"><p class="ar-kicker">Practise · Play · Progress</p><h1>The English Arena</h1><p>Six ways to train your English. Beat the clock and climb the board.</p></div>
-    <div class="ar-grid">${cards}</div>`)}
-function arPlay(mode){AR.mode=mode;if(mode==="quiz"){AR.qs=arShuf(AR_Q).slice(0,10);AR.i=0;AR.score=0;AR.streak=0;return arQuiz()}
-  if(mode==="guess"){const w=arShuf(AR_G)[0];AR.word=w;AR.guessed=[];AR.lives=6;arTimer(90,()=>arGuessEnd(false));return arGuess()}
-  if(mode==="fill"){AR.items=arShuf(AR_F).slice(0,8);AR.i=0;AR.score=0;return arFill()}
-  if(mode==="order"){AR.items=arShuf(AR_O).slice(0,6);AR.i=0;AR.score=0;return arOrder()}
+    <div class="ar-grid">${cards}</div>
+    <div class="ar-tools">
+      <div class="ar-seg" role="group" aria-label="Level">${["easy","medium","hard"].map(l=>`<button class="${AR.level===l?"on":""}" data-ar="level" data-l="${l}" aria-pressed="${AR.level===l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join("")}</div>
+      <button class="ar-go" data-ar="board">Class board</button>
+    </div>`)}
+function arPlay(mode){AR.mode=mode;if(mode==="quiz"){AR.qs=arPool(AR_Q,10).slice(0,10);AR.i=0;AR.score=0;AR.streak=0;return arQuiz()}
+  if(mode==="guess"){const w=arPool(AR_G,1)[0];AR.word=w;AR.guessed=[];AR.lives=6;arTimer(90,()=>arGuessEnd(false));return arGuess()}
+  if(mode==="fill"){AR.items=arPool(AR_F,8).slice(0,8);AR.i=0;AR.score=0;return arFill()}
+  if(mode==="order"){AR.items=arPool(AR_O,6).slice(0,6);AR.i=0;AR.score=0;return arOrder()}
   if(mode==="cards"){AR.deck=arShuf(AR_C);AR.total=AR.deck.length;AR.known=0;return arCards()}
-  if(mode==="clock"){AR.qs=arShuf(AR_Q).concat(arShuf(AR_Q));AR.i=0;AR.score=0;arTimer(60,()=>arEnd("clock",AR.score,30));return arClock()}}
+  if(mode==="clock"){AR.qs=arPool(AR_Q,20).concat(arPool(AR_Q,20));AR.i=0;AR.score=0;arTimer(60,()=>arEnd("clock",AR.score,30));return arClock()}}
 
 /* quiz */
 function arQuiz(){if(AR.i>=AR.qs.length)return arEnd("quiz",AR.score,AR.qs.length*40);
@@ -364,6 +429,7 @@ function arClockAns(k){const q=AR.qs[AR.i%AR.qs.length];if(k===q.a)AR.score++;AR
 /* end */
 function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
   const prev=AR.best[mode];if(prev==null||score>prev){AR.best[mode]=score;try{localStorage.setItem("ar_best",JSON.stringify(AR.best))}catch(e){}}
+  arSubmit(mode,score);AR.boardMode=mode;
   const f=max?score/max:1;const stars=f>=0.85?3:f>=0.5?2:1;
   const names={quiz:"Quiz Blitz",guess:"Guess the Word",fill:"Fill the Gap",order:"Word Order",cards:"Flashcards",clock:"Beat the Clock"};
   const label=mode==="cards"?"cards learned":mode==="clock"?"correct answers":"points";
@@ -377,6 +443,7 @@ function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
       <p class="ar-hint">Best: ${AR.best[mode]}</p>
       <div class="ar-inrow" style="justify-content:center;flex-wrap:wrap">
         <button class="ar-go" data-ar="start" data-m="${mode}">Play again</button>
+        <button class="ar-go ghost" data-ar="board">Class board</button>
         <button class="ar-go ghost" data-ar="home">Arena</button></div></div>`)}
 
 /* clicks */
@@ -395,7 +462,45 @@ function arClick(e){const b=e.target.closest&&e.target.closest("[data-ar]");if(!
   if(a==="flip"){const c=document.getElementById("arCard");if(c)c.classList.toggle("flip");return}
   if(a==="know"){AR.known++;AR.deck.shift();return arCards()}
   if(a==="again"){AR.deck.push(AR.deck.shift());return arCards()}
-  if(a==="ck")return arClockAns(+b.dataset.k)}
+  if(a==="ck")return arClockAns(+b.dataset.k);
+  if(a==="level"){AR.level=b.dataset.l;try{localStorage.setItem("ar_level",AR.level)}catch(e){}return arHome()}
+  if(a==="board")return arBoardView(AR.boardMode||"quiz");
+  if(a==="boardmode")return arBoardView(b.dataset.m)}
+
+/* class board: one best score per student and game, shared through Supabase (see supabase/arena.sql) */
+async function arSubmit(mode,score){try{const sb=window.__sb;if(!sb)return;
+  const {error}=await sb.rpc("arena_submit",{p_mode:mode,p_score:Math.max(0,Math.min(100000,Math.round(score)))});if(error)throw error}
+  catch(e){console.warn("arena submit",e)}}
+async function arBoardView(mode){AR.boardMode=mode;const names={quiz:"Quiz Blitz",guess:"Guess the Word",fill:"Fill the Gap",order:"Word Order",cards:"Flashcards",clock:"Beat the Clock"};
+  const tabs=AR_MODES.map(m=>`<button class="${m.id===mode?"on":""}" data-ar="boardmode" data-m="${m.id}">${arEsc(m.t)}</button>`).join("");
+  arSet(arTop("Class board","")+`<div class="ar-seg ar-seg-wrap">${tabs}</div><div class="ar-card" id="arBoard"><p class="ar-hint">Loading…</p></div>`);
+  let rows=null,err="";
+  try{const sb=window.__sb;if(!sb)throw new Error("offline");const {data,error}=await sb.rpc("arena_board",{p_mode:mode});if(error)throw error;rows=data||[]}
+  catch(e){err="The class board is not set up yet. Ask your teacher to run supabase/arena.sql."}
+  if(AR.boardMode!==mode)return;
+  const box=document.getElementById("arBoard");if(!box)return;
+  if(err){box.innerHTML=`<p class="ar-hint">${arEsc(err)}</p>`;return}
+  if(!rows.length){box.innerHTML=`<p class="ar-kicker">${arEsc(names[mode]||"")}</p><p class="ar-hint">No scores yet. Be the first on the board!</p>`;return}
+  box.innerHTML=`<p class="ar-kicker">${arEsc(names[mode]||"")} · top ${rows.length}</p>`+rows.map((r,i)=>`
+    <div class="ar-row ${r.me?"me":""}"><span class="ar-rank r${i<3?i+1:""}">${i+1}</span><b>${arEsc(r.name||"Student")}</b><span class="ar-rs">${r.score}</span></div>`).join("")}
 
 /* the entry point: a floating button once the app is up */
 arRoot();arFab();
+
+/* ---------- levels and class board styling ---------- */
+{const st=document.createElement("style");st.id="arcss2";st.textContent=`
+.ar-tools{display:grid;gap:12px;justify-items:center;margin-top:4px}
+.ar-seg{display:inline-flex;padding:4px;border-radius:999px;background:rgba(8,10,28,.6);border:1px solid rgba(160,172,255,.22);gap:2px;flex-wrap:wrap;justify-content:center}
+.ar-seg button{border:0;background:transparent;color:#AEB8DC;font:inherit;font-weight:800;font-size:.85rem;padding:9px 16px;border-radius:999px;cursor:pointer}
+.ar-seg button.on{background:linear-gradient(120deg,#5EEAD4,#818CF8);color:#06201C;box-shadow:0 8px 18px -8px rgba(94,234,212,.9),inset 0 1px 0 rgba(255,255,255,.5)}
+.ar-seg-wrap{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}
+.ar-seg-wrap button{white-space:nowrap}
+.ar-row{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(160,172,255,.14);animation:arIn .4s cubic-bezier(.2,.8,.2,1) both}
+.ar-row.me{border-color:rgba(94,234,212,.6);background:rgba(94,234,212,.1)}
+.ar-rank{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-weight:900;background:rgba(255,255,255,.08);color:#C9D2F2}
+.ar-rank.r1{background:linear-gradient(135deg,#FDE68A,#F59E0B);color:#451A03;box-shadow:0 0 16px rgba(251,191,36,.6)}
+.ar-rank.r2{background:linear-gradient(135deg,#E5E7EB,#9CA3AF);color:#111827}
+.ar-rank.r3{background:linear-gradient(135deg,#FDBA74,#B45309);color:#fff}
+.ar-row b{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ar-rs{font-weight:900;font-variant-numeric:tabular-nums;color:#8EF6E4;font-size:1.1rem}
+`;document.head.appendChild(st)}
