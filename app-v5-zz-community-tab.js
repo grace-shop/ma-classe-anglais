@@ -5,6 +5,6 @@
    The tab shows only when the Community is on (the teacher's switch).
    ===================================================================== */
 {const _tf=tabsFor;tabsFor=function(){const t=_tf();
-  if(S.mode!=="teacher"&&S.me&&!isParent(S.me)&&feedOn()&&!t.some(x=>x[0]==="posts")){const i=t.findIndex(x=>x[0]==="me");t.splice(i<0?t.length:i,0,["posts","Posts","users"])}
+  if(S.mode!=="teacher"&&S.me&&!isParent(S.me)&&fcGate()&&!t.some(x=>x[0]==="posts")){const i=t.findIndex(x=>x[0]==="me");t.splice(i<0?t.length:i,0,["posts","Posts","users"])}
   return t}}
-{const _sv=studentView;studentView=function(){if(S.tab==="posts"&&feedOn()&&!S.view&&!S.run&&!S.deck&&!S.srs)return feedView(true);return _sv()}}
+{const _sv=studentView;studentView=function(){if(S.view?.type==="feed"&&fcGate()&&!S.run&&!S.deck&&!S.srs)return feedView(false);if(S.tab==="posts"&&fcGate()&&!S.view&&!S.run&&!S.deck&&!S.srs)return feedView(true);return _sv()}}

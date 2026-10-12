@@ -7978,6 +7978,30 @@ function ztTools(to){return`<div class="zt-row" role="group" aria-label="Media t
 @media (prefers-reduced-motion:reduce){.zt-orb{animation:none}}
 `;document.head.appendChild(st)}
 
+/* ---- app-v5-zz-access-stable.js ---- */
+/* =====================================================================
+   v5 · the student's access status stays steady.
+
+   The access record arrives through a live listener. For a moment it can
+   come back empty (a cached answer, a slow connection), and the screen
+   then switched to "Waiting for approval" and back to the page: it looked
+   like the page disappeared and came back. Now an empty answer keeps the
+   last known status for 4 seconds; only an empty answer that lasts longer
+   is taken as real.
+   ===================================================================== */
+{const _st=stOf,LAST={},EMPTY={};
+stOf=function(x){
+  if(!x)return "pending";
+  if(x.preview)return "active";
+  const isMe=S.mode==="student"&&x.id===S.uid;
+  const a=isMe?S.myAccess:S.access[x.id];
+  if(a&&a.status){LAST[x.id]=a.status;delete EMPTY[x.id];return a.status}
+  if(isMe&&LAST[x.id]){
+    if(!EMPTY[x.id])EMPTY[x.id]=Date.now();
+    if(Date.now()-EMPTY[x.id]<4000)return LAST[x.id];
+  }
+  return _st(x)}}
+
 /* ---- app-v5-zz-camera-chat.js ---- */
 /* =====================================================================
    v5 · camera icon in 3D (replaces the selfie icon everywhere) and the
@@ -8057,9 +8081,18 @@ body.v4chat .ar-fab{display:none!important}
    a refresh keeps the posts of the last 10 minutes that the server answer
    does not show yet.
    ===================================================================== */
+/* Community gate: a background update of the student's access can arrive empty for a moment;
+   the page then used to switch to Home and back. Now the last known answer is kept until the access is loaded. */
+let FC_LAST=false;
+function fcGate(){
+  if(!window.__feed||S.mode!=="student")return false;
+  if(!S.me||(!S.myAccess&&!S.me.preview))return FC_LAST;
+  if(isParent(S.me)||S.settings.feed===false||devBlocked())return FC_LAST=false;
+  return FC_LAST=(stOf(S.me)==="active"&&S.me.profile!=="primaire");
+}
 let FC_AGAIN=false;
 async function feedLoad(more){
-  if(!feedOn())return;
+  if(!fcGate())return;
   if(F.loading){if(!more)FC_AGAIN=true;return}
   F.loading=true;
   try{const before=more&&F.posts.length?F.posts[F.posts.length-1].created_at:null;
@@ -8094,9 +8127,9 @@ async function feedLoad(more){
    The tab shows only when the Community is on (the teacher's switch).
    ===================================================================== */
 {const _tf=tabsFor;tabsFor=function(){const t=_tf();
-  if(S.mode!=="teacher"&&S.me&&!isParent(S.me)&&feedOn()&&!t.some(x=>x[0]==="posts")){const i=t.findIndex(x=>x[0]==="me");t.splice(i<0?t.length:i,0,["posts","Posts","users"])}
+  if(S.mode!=="teacher"&&S.me&&!isParent(S.me)&&fcGate()&&!t.some(x=>x[0]==="posts")){const i=t.findIndex(x=>x[0]==="me");t.splice(i<0?t.length:i,0,["posts","Posts","users"])}
   return t}}
-{const _sv=studentView;studentView=function(){if(S.tab==="posts"&&feedOn()&&!S.view&&!S.run&&!S.deck&&!S.srs)return feedView(true);return _sv()}}
+{const _sv=studentView;studentView=function(){if(S.view?.type==="feed"&&fcGate()&&!S.run&&!S.deck&&!S.srs)return feedView(false);if(S.tab==="posts"&&fcGate()&&!S.view&&!S.run&&!S.deck&&!S.srs)return feedView(true);return _sv()}}
 
 /* ---- app-v5-zz-future.js ---- */
 /* =====================================================================
