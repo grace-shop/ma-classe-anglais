@@ -7,7 +7,7 @@
    Needs supabase/arena.sql and supabase/battle.sql.
    ===================================================================== */
 {const st=document.createElement("style");st.id="btcss";st.textContent=`
-.bt-entry{width:100%;margin:0 0 14px;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center}
+.bt-entry{width:100%;margin:0 0 14px;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;font-size:.95rem;line-height:1.3;padding:14px 16px}
 .bt-glow{position:relative;overflow:hidden}
 .bt-glow::before{content:"";position:absolute;inset:-45%;background:conic-gradient(from 0deg,transparent 0deg,rgba(94,234,212,.22) 40deg,transparent 90deg);animation:btSpin 7s linear infinite;pointer-events:none}
 .bt-glow>*{position:relative}
