@@ -202,7 +202,7 @@ document.addEventListener("input",e=>{const el=e.target;if(el&&el.id==="mdSongNa
 
 /* ---------- composers: buttons added to the post and story composers ---------- */
 const MD_TOOLS=(to)=>`<div class="md-tools" role="group" aria-label="Media tools">
-  <button type="button" class="md-tool" data-v4="mdSelfie" data-to="${to}" aria-label="Take a selfie"><span>🤳</span>Selfie</button>
+  <button type="button" class="md-tool" data-v4="mdSelfie" data-to="${to}" aria-label="Take a selfie"><span>${camIcon3D()}</span>Selfie</button>
   <button type="button" class="md-tool" data-v4="mdMusic" aria-label="Add music"><span>🎵</span>Music</button>
   <button type="button" class="md-tool" data-v4="mdText" data-to="${to}" aria-label="Add text to the photo"><span>Aa</span>Text</button>
   ${MD.music?`<span class="md-chip-on">🎵 ${mdEsc(MD.music.title)} <button type="button" class="iconbtn sm" data-v4="mdMusRm" aria-label="Remove music">${ic("x")}</button></span>`:""}</div>`;
@@ -213,7 +213,7 @@ const MD_TOOLS=(to)=>`<div class="md-tools" role="group" aria-label="Media tools
 /* chat composers (classmates and groups): a selfie button before the file button */
 {const _bar=v4Bar;v4Bar=function(kind,target,ph){let h=_bar(kind,target,ph);
   const anchor='<span class="v4att">';if(h.indexOf(anchor)>=0&&(kind==="peer"||kind==="group")){
-    h=h.replace(anchor,`<button type="button" class="iconbtn" data-v4="mdSelfie" data-to="chat" data-k="${kind}" data-s="${mdEsc(target)}" aria-label="Take a selfie" title="Selfie">🤳</button>`+anchor)}
+    h=h.replace(anchor,`<button type="button" class="iconbtn" data-v4="mdSelfie" data-to="chat" data-k="${kind}" data-s="${mdEsc(target)}" aria-label="Take a selfie" title="Selfie">${camIcon3D()}</button>`+anchor)}
   return h}}
 
 /* ---------- music in the feed: posts show a player, stories play their song while they are shown ---------- */
