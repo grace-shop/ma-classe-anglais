@@ -51,12 +51,18 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
 
 /* ---------- entrances: sections rise in one after another ---------- */
 @keyframes zfRise{from{opacity:0;transform:translateY(12px) scale(.99)}to{opacity:1;transform:none}}
-.section,.glass.list,.glass.kpi{animation:zfRise .55s cubic-bezier(.2,.8,.2,1) both}
+.section,.glass.list,.glass.kpi{animation:zfRise .55s cubic-bezier(.2,.8,.2,1) backwards}
 .section:nth-of-type(2){animation-delay:.05s}.section:nth-of-type(3){animation-delay:.1s}.section:nth-of-type(4){animation-delay:.15s}
 
 /* ---------- bottom dock: the tapped tab presses in ---------- */
 nav.tabs button{transition:transform .2s,color .25s,background .3s}
 nav.tabs button:active{transform:scale(.9)}
+
+/* ---------- messaging: the Arena button steps aside, the send bar gets room for its text ---------- */
+body.v4chat .ar-fab{display:none!important}
+body.v4chat .chatbar.v4bar{gap:6px}
+body.v4chat .chatbar.v4bar .iconbtn{width:40px;height:40px;padding:0;border-radius:14px;flex:none}
+body.v4chat .chatbar.v4bar input{font-size:16px}
 
 /* ---------- arena and battles share the same depth ---------- */
 #arena .ar-mode,#arena .ar-opt,#arena .ar-card{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s}
