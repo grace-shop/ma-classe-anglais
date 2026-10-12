@@ -9,9 +9,18 @@
    a refresh keeps the posts of the last 10 minutes that the server answer
    does not show yet.
    ===================================================================== */
+/* Community gate: a background update of the student's access can arrive empty for a moment;
+   the page then used to switch to Home and back. Now the last known answer is kept until the access is loaded. */
+let FC_LAST=false;
+function fcGate(){
+  if(!window.__feed||S.mode!=="student")return false;
+  if(!S.me||(!S.myAccess&&!S.me.preview))return FC_LAST;
+  if(isParent(S.me)||S.settings.feed===false||devBlocked())return FC_LAST=false;
+  return FC_LAST=(stOf(S.me)==="active"&&S.me.profile!=="primaire");
+}
 let FC_AGAIN=false;
 async function feedLoad(more){
-  if(!feedOn())return;
+  if(!fcGate())return;
   if(F.loading){if(!more)FC_AGAIN=true;return}
   F.loading=true;
   try{const before=more&&F.posts.length?F.posts[F.posts.length-1].created_at:null;
