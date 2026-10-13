@@ -72,7 +72,14 @@ vPlay=async function(p,t){const V=window.__vid;
   return file.__up}}
 function fPreUpload(){if(!F||!F.files)return;for(const f of F.files){if(!f.file||f.file.__up)continue;
   fUpload(f.file,f.d).catch(()=>{})}}
-{const _r0=render;render=function(){const r=_r0.apply(this,arguments);try{fPreUpload()}catch(e){}return r}}
+function fTagRemoveButtons(){document.querySelectorAll('[data-v4="fFileX"]').forEach(b=>{b.__pickedFile=(F.files||[])[+b.dataset.i]})}
+{const _r0=render;render=function(){const r=_r0.apply(this,arguments);try{fPreUpload();fTagRemoveButtons()}catch(e){}return r}}
+
+/* 3c · a picked file you remove is deleted from the server (it was uploaded early) */
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest('[data-v4="fFileX"]');if(!b)return;
+  const f=b.__pickedFile;if(!f||!f.file||!f.file.__up)return;
+  f.file.__up.then(r=>{const paths=[r&&r.p,r&&r.poster&&r.poster.p].filter(Boolean);
+    if(paths.length&&window.__chatFiles&&window.__chatFiles.remove)return window.__chatFiles.remove(paths)}).catch(()=>{})},true);
 
 /* 4 · the text you type stays visible: the floating buttons step aside */
 document.addEventListener("focusin",e=>{const t=e.target;if(!t||!t.matches)return;
