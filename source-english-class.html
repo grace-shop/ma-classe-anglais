@@ -8520,7 +8520,7 @@ vPlay=async function(p,t){const V=window.__vid;
 {const _up=fUpload;fUpload=function(file,d){
   if(!file.__up){const pr=_up(file,d);file.__up=pr.catch(e=>{delete file.__up;throw e})}
   return file.__up}}
-function fPreUpload(){if(!F||!F.files)return;for(const f of F.files){if(!f.file||f.file.__up)continue;
+function fPreUpload(){if(!F)return;if(F.sc&&F.sc.file&&!F.sc.file.__up)fUpload(F.sc.file,F.sc.d).catch(()=>{});if(!F.files)return;for(const f of F.files){if(!f.file||f.file.__up)continue;
   fUpload(f.file,f.d).catch(()=>{})}}
 function fTagRemoveButtons(){document.querySelectorAll('[data-v4="fFileX"]').forEach(b=>{b.__pickedFile=(F.files||[])[+b.dataset.i]})}
 {const _r0=render;render=function(){const r=_r0.apply(this,arguments);try{fPreUpload();fTagRemoveButtons()}catch(e){}return r}}
@@ -8530,6 +8530,20 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   const f=b.__pickedFile;if(!f||!f.file||!f.file.__up)return;
   f.file.__up.then(r=>{const paths=[r&&r.p,r&&r.poster&&r.poster.p].filter(Boolean);
     if(paths.length&&window.__chatFiles&&window.__chatFiles.remove)return window.__chatFiles.remove(paths)}).catch(()=>{})},true);
+
+/* 3d · the length of a video is already known from the editor: do not search it again (that search was slow) */
+{const _dl=ed5Deliver;ed5Deliver=function(file){try{if(file&&typeof ED5!=="undefined"&&ED5.kind==="video"){const d=file===ED5.file?ED5.dur:(ED5.e-ED5.s);if(d>0)file.__dur=d}}catch(e){}return _dl.apply(this,arguments)}}
+{const _vc=fVideoCheck;fVideoCheck=function(f,maxSec){if(!(f.__dur>0)||f.size>50*1024*1024)return _vc(f,maxSec);
+  if(f.__dur>maxSec+0.5){toast(`Video too long: ${maxSec>=120?Math.round(maxSec/60)+" minutes":maxSec+" seconds"} maximum.`,"x");return Promise.resolve(null)}
+  return Promise.resolve({d:Math.round(f.__dur)})}}
+
+/* 3e · the English check does not hold up posting: it waits at most 4 seconds, then the text is posted as written */
+{const _ff=fFix;fFix=function(t,max){const plain=String(t||"").trim();
+  return Promise.race([_ff(t,max),new Promise(r=>setTimeout(()=>r(plain),4000))])}}
+
+/* 4b · writing a story text: the options at the bottom step aside so the text shows */
+document.addEventListener("focusin",e=>{if(e.target&&e.target.id==="fsc_text")document.body.classList.add("story-typing")});
+document.addEventListener("focusout",e=>{if(e.target&&e.target.id==="fsc_text")setTimeout(()=>{if(!document.activeElement||document.activeElement.id!=="fsc_text")document.body.classList.remove("story-typing")},250)});
 
 /* 4 · the text you type stays visible: the floating buttons step aside */
 document.addEventListener("focusin",e=>{const t=e.target;if(!t||!t.matches)return;
@@ -8548,6 +8562,62 @@ document.addEventListener("focusout",e=>{const t=e.target;if(t&&t.matches&&t.mat
 .fedit-btn{margin-left:auto;font-size:.85rem}
 .fvid-v.ld{opacity:.55}
 body.kbd-typing #arFab,body.kbd-typing #aiFab,body.in-feed #arFab,body.in-feed #aiFab{display:none!important}
+body.story-typing .zc-dock{display:none!important}
+`;document.head.appendChild(st)}
+
+/* ---- app-v5-zzzb-challenges.js ---- */
+/* =====================================================================
+   v5 · English challenges in the Community, and reliable notifications.
+   - A teacher can post a challenge, a word of the day, or a sentence to
+     correct. It shows with a banner; students answer in the comments, and
+     the English check corrects their answers as for any comment.
+   - Every notification of the Community (comments, reactions, challenges…)
+     is also sent as a phone notification, even when the app is closed.
+   - The phone registers for notifications at start-up, not only when the
+     classmates or the class page is opened.
+   ===================================================================== */
+
+/* 1 · the phone registers for notifications at start-up (and again if it was not ready) */
+{let tries=0;const iv=setInterval(()=>{if(!S.uid||PUSH.started){if(PUSH.started)clearInterval(iv);return}
+  if(document.visibilityState==="hidden"||tries>=6)return;tries++;pushStart()},20000)}
+addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&S.uid&&!PUSH.started)pushStart()});
+
+/* 2 · the teacher chooses the kind of post */
+const FCH_KIND={challenge:"English challenge · reply in the comments",word:"Word of the day · use it in a comment",correct:"Correct this sentence · reply in the comments"};
+{const _fv=feedView;feedView=function(e){let h=_fv(e);
+  if(fStaff&&fStaff()&&typeof h==="string"){const at=h.indexOf('id="f_files"');
+    if(at>0){const cut=h.lastIndexOf('<div class="row between">',at);
+      if(cut>0)h=h.slice(0,cut)+`<label class="fch-pick"><span class="small muted">Post as</span><select id="f_chal" aria-label="Kind of post"><option value="">A normal post</option><option value="challenge">English challenge</option><option value="word">Word of the day</option><option value="correct">Correct this sentence</option></select></label>`+h.slice(cut)}}
+  return h}}
+
+/* 3 · publishing a challenge (text only) */
+{const _fp=fPost;fPost=async function(){const sel=document.getElementById("f_chal");const kind=sel&&sel.value;
+  if(!kind||!fStaff())return _fp.apply(this,arguments);
+  if(F.busy)return;
+  const ta=document.getElementById("f_text"),text=((ta&&ta.value)||"").trim();
+  if(!text){toast("Write the challenge first.","x");return}
+  if(F.files.length){toast("A challenge is text only: remove the photo or video.","x");return}
+  if(!navigator.onLine){toast("No network: try again when you are online.","x");return}
+  F.busy=true;render();
+  try{await window.__feed.challenge(text,kind);if(ta)ta.value="";if(S.drafts)delete S.drafts.f_text;toast("Challenge posted! Students are told.","rocket");F.busy=false;await feedLoad()}
+  catch(er){toast(er.message||"Could not post the challenge","x")}
+  finally{F.busy=false;render()}}}
+
+/* 4 · the banner of a challenge */
+{const _fp2=fPostHTML;fPostHTML=function(p){let h=_fp2(p);
+  if(p&&p.kind&&FCH_KIND[p.kind]&&!p.deleted_at){const banner=`<div class="fchal" role="note"><b>★ ${esc(FCH_KIND[p.kind])}</b></div>`;
+    h=h.replace("</header>",()=>"</header>"+banner)}
+  return h}}
+
+/* 5 · how a challenge reads in the bell */
+{const _nt=nTitle,_nb=nBody;
+  nBody=function(n){if(n&&n.kind==="challenge")return`New challenge: “${n.body||""}”`;return _nb(n)};
+  nTitle=function(n){if(n&&n.kind==="challenge")return"English challenge";return _nt(n)}}
+
+{const st=document.createElement("style");st.id="zzzbchallenges";st.textContent=`
+.fchal{margin:8px 0 6px;padding:8px 12px;border-radius:14px;background:linear-gradient(120deg,rgba(94,234,212,.18),rgba(129,140,248,.2));border:1px solid rgba(160,172,255,.32);font-size:.92rem}
+.fch-pick{display:flex;align-items:center;gap:8px;margin:6px 0;white-space:nowrap}
+.fch-pick select{border-radius:12px;border:1px solid var(--line);background:var(--surface2);color:inherit;font:inherit;padding:6px 10px}
 `;document.head.appendChild(st)}
 
 /* ==== v4 END ==== */
