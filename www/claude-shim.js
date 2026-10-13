@@ -278,6 +278,7 @@
   const feedErr = (error, def) => new Error(/create_post|create_story|toggle_like|add_comment|feed_ok|relation .*(posts|stories)|schema cache/i.test((error && error.message) || "") ? "The teacher must first run the file supabase/communaute.sql in Supabase." : ((error && error.message) || def));
   window.__feed = {
     posts: async (before) => { let q = sb.from("posts").select("*").order("created_at", { ascending: false }).limit(30); if (before) q = q.lt("created_at", before); const { data, error } = await q; if (error) throw feedErr(error, "Cannot load posts"); return data || []; },
+    edit: async (id, body) => { const { error } = await sb.rpc("edit_post", { p_id: id, p_body: body }); if (error) throw feedErr(error, "Cannot change this post"); },
     likes: async (ids) => { if (!ids.length) return []; const { data, error } = await sb.from("post_likes").select("*").in("post_id", ids); if (error) return []; return data || []; },
     comments: async (ids) => { if (!ids.length) return []; const { data, error } = await sb.from("post_comments").select("*").in("post_id", ids).order("created_at", { ascending: true }).limit(1000); if (error) return []; return data || []; },
     create: async (body, media, shared) => { const args = { p_body: body || "", p_media: media && media.length ? media : null }; if (shared) args.p_shared = shared; const { data, error } = await sb.rpc("create_post", args); if (error) throw feedErr(error, "Could not publish"); return data; },
