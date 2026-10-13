@@ -1,7 +1,7 @@
 // Envoie une notification push (Firebase Cloud Messaging) pour :
 //  • un nouveau message entre élèves (table peer_messages)
 //  • un appel qui sonne (table call_signals, kind = 'ring')
-// Appelée par un « Database Webhook » de Supabase. Secrets à définir :
+// Appelée par un « Database Webhook » de Supabase (tables peer_messages, call_signals et notifications). Secrets à définir :
 //  FIREBASE_SERVICE_ACCOUNT = contenu complet du fichier JSON de la clé de service
 //  PUSH_WEBHOOK_SECRET      = une longue phrase au hasard (la même que dans le webhook)
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
@@ -44,6 +44,20 @@ async function googleToken(): Promise<string> {
   return cached.token;
 }
 
+const PUSH_TEXT: Record<string, string> = {
+  msg: "New message from a classmate",
+  story_reply: "Someone replied to your story",
+  comment: "Someone commented on your post",
+  like: "Someone reacted to your post",
+  share: "Someone shared your post",
+  story_like: "Someone reacted to your story",
+  tmsg: "New message from your teacher",
+  smsg: "New message",
+  staff: "New message from the school",
+  report: "Something needs your attention",
+  challenge: "New English challenge: come and answer!",
+};
+
 Deno.serve(async (req) => {
   if (req.headers.get("x-webhook-secret") !== Deno.env.get("PUSH_WEBHOOK_SECRET")) {
     return new Response("forbidden", { status: 403 });
@@ -61,6 +75,11 @@ Deno.serve(async (req) => {
     uids = [rec.to_uid];
     text = "Incoming call";
     kind = "call";
+  } else if (body.table === "notifications" && body.type === "INSERT" && rec.uid) {
+    // tout ce qui apparaît dans la cloche de la Communauté (commentaires, j'aime, défis…)
+    uids = [rec.uid];
+    text = PUSH_TEXT[rec.kind] || "You have a new notification";  // texte générique : rien de privé sur l'écran verrouillé
+    kind = String(rec.kind || "");
   } else {
     return new Response("ignored");
   }
