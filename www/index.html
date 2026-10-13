@@ -8527,7 +8527,7 @@ vPlay=async function(p,t){const V=window.__vid;
 {const _up=fUpload;fUpload=function(file,d){
   if(!file.__up){const pr=_up(file,d);file.__up=pr.catch(e=>{delete file.__up;throw e})}
   return file.__up}}
-function fPreUpload(){if(!F||!F.files)return;for(const f of F.files){if(!f.file||f.file.__up)continue;
+function fPreUpload(){if(!F)return;if(F.sc&&F.sc.file&&!F.sc.file.__up)fUpload(F.sc.file,F.sc.d).catch(()=>{});if(!F.files)return;for(const f of F.files){if(!f.file||f.file.__up)continue;
   fUpload(f.file,f.d).catch(()=>{})}}
 function fTagRemoveButtons(){document.querySelectorAll('[data-v4="fFileX"]').forEach(b=>{b.__pickedFile=(F.files||[])[+b.dataset.i]})}
 {const _r0=render;render=function(){const r=_r0.apply(this,arguments);try{fPreUpload();fTagRemoveButtons()}catch(e){}return r}}
@@ -8537,6 +8537,20 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   const f=b.__pickedFile;if(!f||!f.file||!f.file.__up)return;
   f.file.__up.then(r=>{const paths=[r&&r.p,r&&r.poster&&r.poster.p].filter(Boolean);
     if(paths.length&&window.__chatFiles&&window.__chatFiles.remove)return window.__chatFiles.remove(paths)}).catch(()=>{})},true);
+
+/* 3d · the length of a video is already known from the editor: do not search it again (that search was slow) */
+{const _dl=ed5Deliver;ed5Deliver=function(file){try{if(file&&typeof ED5!=="undefined"&&ED5.kind==="video"){const d=file===ED5.file?ED5.dur:(ED5.e-ED5.s);if(d>0)file.__dur=d}}catch(e){}return _dl.apply(this,arguments)}}
+{const _vc=fVideoCheck;fVideoCheck=function(f,maxSec){if(!(f.__dur>0)||f.size>50*1024*1024)return _vc(f,maxSec);
+  if(f.__dur>maxSec+0.5){toast(`Video too long: ${maxSec>=120?Math.round(maxSec/60)+" minutes":maxSec+" seconds"} maximum.`,"x");return Promise.resolve(null)}
+  return Promise.resolve({d:Math.round(f.__dur)})}}
+
+/* 3e · the English check does not hold up posting: it waits at most 4 seconds, then the text is posted as written */
+{const _ff=fFix;fFix=function(t,max){const plain=String(t||"").trim();
+  return Promise.race([_ff(t,max),new Promise(r=>setTimeout(()=>r(plain),4000))])}}
+
+/* 4b · writing a story text: the options at the bottom step aside so the text shows */
+document.addEventListener("focusin",e=>{if(e.target&&e.target.id==="fsc_text")document.body.classList.add("story-typing")});
+document.addEventListener("focusout",e=>{if(e.target&&e.target.id==="fsc_text")setTimeout(()=>{if(!document.activeElement||document.activeElement.id!=="fsc_text")document.body.classList.remove("story-typing")},250)});
 
 /* 4 · the text you type stays visible: the floating buttons step aside */
 document.addEventListener("focusin",e=>{const t=e.target;if(!t||!t.matches)return;
@@ -8555,6 +8569,7 @@ document.addEventListener("focusout",e=>{const t=e.target;if(t&&t.matches&&t.mat
 .fedit-btn{margin-left:auto;font-size:.85rem}
 .fvid-v.ld{opacity:.55}
 body.kbd-typing #arFab,body.kbd-typing #aiFab,body.in-feed #arFab,body.in-feed #aiFab{display:none!important}
+body.story-typing .zc-dock{display:none!important}
 `;document.head.appendChild(st)}
 
 /* ==== v4 END ==== */
