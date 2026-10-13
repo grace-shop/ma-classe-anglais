@@ -3636,7 +3636,7 @@ function fPostHTML(p){const lk=F.likes[p.id]||[],cm=(F.comments[p.id]||[]).filte
   ${fMediaHTML(media)}
   ${p.shared?fSharedHTML(p.shared):""}
   <div class="fcount">${lk.length?`<span>${[...new Set(lk.map(l=>l.e||"❤️"))].slice(0,3).map(e=>E(e)).join("")} ${lk.length}</span>`:"<span></span>"}${cm.length?`<button type="button" class="linkbtn" data-v4="fCom" data-id="${esc(p.id)}">${cm.length} comment${cm.length>1?"s":""}</button>`:""}</div>
-  ${p.deleted_at?"":`${F.pick===p.id?`<div class="fpick">${FRE.map(e=>`<button type="button" data-v4="fLikeE" data-id="${esc(p.id)}" data-e="${e}" aria-label="React ${e}">${E(e)}</button>`).join("")}</div>`:""}<div class="factions"><button type="button" class="${liked?"on":""}" data-v4="fLike" data-id="${esc(p.id)}" aria-pressed="${liked}">${E(liked?(lk.find(l=>l.uid===S.uid).e||"❤️"):"🤍")} ${liked?"Liked":"Like"}</button><button type="button" class="fmore" data-v4="fPick" data-id="${esc(p.id)}" aria-label="More reactions" title="More reactions">${E("😊")}</button><button type="button" data-v4="fCom" data-id="${esc(p.id)}">${ic("chat")} Comment${cm.length?` · ${cm.length}`:""}</button><button type="button" data-v4="fShare" data-k="post" data-id="${esc(p.id)}">${ic("send")} Share</button></div>`}
+  ${p.deleted_at?"":`${F.pick===p.id?`<div class="fpick">${FRE.map(e=>`<button type="button" data-v4="fLikeE" data-id="${esc(p.id)}" data-e="${e}" aria-label="React ${e}">${E(e)}</button>`).join("")}</div>`:""}<div class="factions"><button type="button" class="${liked?"on":""}" data-v4="fLike" data-id="${esc(p.id)}" aria-pressed="${liked}">${E(liked?(lk.find(l=>l.uid===S.uid).e||"❤️"):"🤍")} ${liked?"Liked":"Like"}</button><button type="button" class="fmore" data-v4="fPick" data-id="${esc(p.id)}" aria-label="More reactions" title="More reactions">${E("😊")}</button><button type="button" data-v4="fCom" data-id="${esc(p.id)}">${ic("chat")} Comment${cm.length?` <span class="fcnt">${cm.length}</span>`:""}</button><button type="button" data-v4="fShare" data-k="post" data-id="${esc(p.id)}">${ic("send")} Share</button></div>`}
   ${shown.length||open?`<div class="fcoms">${cm.length>shown.length?`<button type="button" class="linkbtn" data-v4="fCom" data-id="${esc(p.id)}">See all ${cm.length} comments</button>`:""}${shown.map(c=>`<div class="fc">${whoAva(c.who,c.author,30)}<div class="fcb"><b>${esc(c.who?.name||"Student")}</b>${fText(c.body)}<small>${ago(+new Date(c.created_at))}${c.deleted_at?" · deleted":""}${!c.deleted_at&&(c.author===S.uid||mine||fStaff())?` · <button type="button" class="linkbtn" data-v4="fComDel" data-id="${esc(c.id)}">Delete</button>`:""}</small></div></div>`).join("")}
   ${open&&!p.deleted_at?`<form class="fcform" data-ff="com" data-id="${esc(p.id)}"><input id="fc_${esc(p.id)}" placeholder="Write a comment in English…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}</div>`:""}
   </article>`}
@@ -8618,6 +8618,152 @@ const FCH_KIND={challenge:"English challenge · reply in the comments",word:"Wor
 .fchal{margin:8px 0 6px;padding:8px 12px;border-radius:14px;background:linear-gradient(120deg,rgba(94,234,212,.18),rgba(129,140,248,.2));border:1px solid rgba(160,172,255,.32);font-size:.92rem}
 .fch-pick{display:flex;align-items:center;gap:8px;margin:6px 0;white-space:nowrap}
 .fch-pick select{border-radius:12px;border:1px solid var(--line);background:var(--surface2);color:inherit;font:inherit;padding:6px 10px}
+`;document.head.appendChild(st)}
+
+/* ---- app-v5-zzzc-magic.js ---- */
+/* =====================================================================
+   v5 · Magic touches: small, fun moments that make the app feel alive.
+   - A sparkle burst where you tap a button or a card.
+   - Hearts float up from the Like button when you like a post.
+   - Confetti when a post, a challenge or a story is shared.
+   - A warm welcome, once a day.
+   All of it is off when the phone asks for less motion (reduced motion).
+   ===================================================================== */
+const MG={calm:()=>matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches};
+const MG_COLORS=["#5EEAD4","#818CF8","#F472B6","#FBBF24","#A7F3D0","#93C5FD"];
+
+function mgBurst(x,y,n,glyphs,spread){if(MG.calm())return;
+  const max=60;const k=Math.min(n,max);
+  for(let i=0;i<k;i++){
+    const el=document.createElement("span");el.className="mg-p";
+    const g=glyphs?glyphs[i%glyphs.length]:null;
+    if(g){el.textContent=g}else{el.style.background=MG_COLORS[i%MG_COLORS.length];el.style.width="8px";el.style.height="12px";el.style.borderRadius="2px"}
+    document.body.appendChild(el);
+    const a=Math.random()*Math.PI*2,d=(spread||90)*(0.4+Math.random()*0.8),dx=Math.cos(a)*d,dy=Math.sin(a)*d-(glyphs?40:0);
+    const rot=(Math.random()*720-360);
+    const anim=el.animate([
+      {transform:`translate(${x}px,${y}px) rotate(0deg) scale(.4)`,opacity:1},
+      {transform:`translate(${x+dx}px,${y+dy}px) rotate(${rot/2}deg) scale(1)`,opacity:1,offset:.7},
+      {transform:`translate(${x+dx*1.1}px,${y+dy+(glyphs?-30:120)}px) rotate(${rot}deg) scale(.8)`,opacity:0}
+    ],{duration:900+Math.random()*700,easing:"cubic-bezier(.2,.7,.3,1)",fill:"forwards"});
+    anim.onfinish=()=>el.remove();
+  }}
+function mgAt(el){const r=el&&el.getBoundingClientRect?el.getBoundingClientRect():null;return r?{x:r.left+r.width/2,y:r.top+r.height/2}:{x:innerWidth/2,y:innerHeight/2}}
+
+/* 1 · a sparkle where you tap a button or a card */
+document.addEventListener("pointerdown",e=>{const t=e.target.closest&&e.target.closest(".btn,.card,.factions button,.fpick button,.fvid,.pcard,.role");
+  if(!t||MG.calm())return;mgBurst(e.clientX,e.clientY,8,["✦","✧","⋆"],46)},{passive:true});
+
+/* 2 · hearts float up from the Like button */
+{const _fl=fLike;fLike=function(id,e){const before=(F.likes[id]||[]).some(l=>l.uid===S.uid);
+  const r=_fl.apply(this,arguments);
+  if(!before){const btn=document.querySelector(`[data-v4="fLike"][data-id="${CSS.escape(String(id))}"]`);const p=mgAt(btn);
+    mgBurst(p.x,p.y,10,["❤️","💖","✨","😍"],70)}
+  return r}}
+
+/* 3 · confetti when something is shared */
+function mgConfetti(){mgBurst(innerWidth/2,innerHeight*0.55,60,null,260)}
+{const _c=window.__feed.create;window.__feed.create=async function(){const id=await _c.apply(this,arguments);mgConfetti();return id}}
+{const _ch=window.__feed.challenge;window.__feed.challenge=async function(){const id=await _ch.apply(this,arguments);mgConfetti();return id}}
+
+/* 4 · a warm welcome, once a day */
+setTimeout(function hello(){try{
+  if(!S.uid||!S.me||S.mode!=="student"){setTimeout(hello,3000);return}
+  const k="ec_hello_"+S.uid;const today=new Date().toISOString().slice(0,10);
+  if(localStorage.getItem(k)===today)return;
+  localStorage.setItem(k,today);
+  const first=String((S.me&&S.me.name)||"").split(" ")[0]||"friend";
+  setTimeout(()=>{try{toast(`✨ Welcome, ${first}! Let's learn something new today.`,"rocket")}catch(e){}},1200);
+}catch(e){}},4000);
+
+{const st=document.createElement("style");st.id="zzzcmagic";st.textContent=`
+.mg-p{position:fixed;left:0;top:0;z-index:9990;pointer-events:none;font-size:16px;line-height:1;will-change:transform,opacity;display:block}
+.fcnt{display:inline-block;min-width:1.25em;padding:0 6px;margin-left:2px;border-radius:999px;background:var(--surface2,rgba(255,255,255,.12));font-size:.72rem;font-weight:700;line-height:1.5;text-align:center;vertical-align:1px}
+.factions button{white-space:nowrap}
+.factions button .fcnt{font-size:.7rem}
+`;document.head.appendChild(st)}
+
+/* ---- app-v5-zzzd-mascot.js ---- */
+/* =====================================================================
+   v5 · Sakura, a kawaii mascot who cheers each right answer.
+   She pops up in the corner with a short English cheer, then slides away.
+   She is drawn in the app (SVG), so she is always sharp and light.
+   Detection: any "Correct!" shown by the Arena, the battles, the quiz…
+   She hops and shows happy eyes; with "less motion" on, she only shows.
+   ===================================================================== */
+const MAS={last:0,off:false,t:null};
+const MAS_LINES=["Yes! You got it! 🎉","Perfect, keep going!","Sugoi! You're on fire!","Nice work, superstar! ⭐","That's right! Well done! 🌸","You did it! Keep it up!"];
+const masPick=()=>MAS_LINES[Math.floor(Math.random()*MAS_LINES.length)];
+function masSVG(){return `<svg viewBox="0 0 120 150" aria-hidden="true" focusable="false">
+  <path d="M30 66c-4-26 12-44 30-44s34 18 30 44c0 14 3 26 8 36-10-2-16-8-18-16H40c-2 8-8 14-18 16 5-10 8-22 8-36z" fill="#1B1F3B"/>
+  <path d="M26 102c4 28 14 44 34 44s30-16 34-44z" fill="#1B1F3B" opacity=".25"/>
+  <ellipse cx="60" cy="66" rx="28" ry="29" fill="#FCE4D6"/>
+  <path d="M31 60c3-16 14-25 29-25 11 0 20 6 24 16-8-4-17-3-24 2-7-3-16-2-29 7z" fill="#1B1F3B"/>
+  <path d="M48 36c3 3 6 4 12 4" stroke="#fff" stroke-opacity=".35" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <g class="ey-o"><ellipse cx="49" cy="68" rx="4.6" ry="6" fill="#1B1F3B"/><ellipse cx="71" cy="68" rx="4.6" ry="6" fill="#1B1F3B"/><circle cx="50.8" cy="66" r="1.9" fill="#fff"/><circle cx="72.8" cy="66" r="1.9" fill="#fff"/></g>
+  <g class="ey-h" stroke="#1B1F3B" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M44 69q5-6 10 0"/><path d="M66 69q5-6 10 0"/></g>
+  <ellipse cx="41" cy="79" rx="5" ry="3" fill="#F9A8D4" opacity=".75"/><ellipse cx="79" cy="79" rx="5" ry="3" fill="#F9A8D4" opacity=".75"/>
+  <path class="mo-s" d="M54 80q6 5 12 0" stroke="#B4233F" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path class="mo-h" d="M52 79h16q-1 9-8 9t-8-9z" fill="#E11D48"/>
+  <path class="mo-f" d="M54 84q6-5 12 0" stroke="#B4233F" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path class="drop" d="M90 46q-5 8-5 12a5 5 0 0 0 10 0q0-4-5-12z" fill="#7DD3FC"/>
+  <path class="uni" d="M42 99q18-8 36 0l6 40H36z" fill="#6366F1"/>
+  <path d="M48 99l12 13 12-13" stroke="#fff" stroke-width="3" fill="none" stroke-linejoin="round"/>
+  <path d="M60 104l-8-4v9zM60 104l8-4v9z" fill="#F472B6"/>
+  <g class="arms" fill="none" stroke="#FCE4D6" stroke-width="7" stroke-linecap="round"><path d="M42 106q-14-8-16-36"/><path d="M78 106q14-8 16-36"/></g>
+  <g class="spk" fill="#FBBF24"><path d="M14 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M104 24l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z" fill="#F472B6"/><path d="M108 70l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z"/></g>
+</svg>`}
+const MAS_BAD=["Almost! Try again, you can do it! 💪","Not quite, but you are learning!","Good try! Look at the answer and go again.","No problem, every mistake helps you learn!"];
+const MAS_LOOKS=["","look-2","look-3"];
+function masLook(){try{return +(localStorage.getItem("ec_mas_look")||0)%MAS_LOOKS.length}catch(e){return 0}}
+function masApplyLook(box){box.classList.remove("look-2","look-3");const c=MAS_LOOKS[masLook()];if(c)box.classList.add(c)}
+function masShow(text,mood){
+  if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
+  let box=document.getElementById("mas");
+  if(!box){box=document.createElement("div");box.id="mas";box.className="mas";
+    box.innerHTML=`<div class="mas-bub" role="status" aria-live="polite"></div><div class="mas-girl">${masSVG()}</div><button type="button" class="mas-x" aria-label="Hide Sakura">×</button>`;
+    document.body.appendChild(box);
+    box.querySelector(".mas-x").onclick=()=>{MAS.off=true;box.remove()};
+    box.querySelector(".mas-girl").onclick=()=>{try{localStorage.setItem("ec_mas_look",String(masLook()+1))}catch(e){}masApplyLook(box);masShow("New look! Do you like it? 💖","happy")};
+    masApplyLook(box)}
+  box.querySelector(".mas-bub").textContent=text;
+  box.classList.toggle("sad",mood==="bad");
+  box.classList.remove("in");void box.offsetWidth;box.classList.add("in");
+  clearTimeout(MAS.t);MAS.t=setTimeout(()=>box.classList.remove("in"),3800);
+}
+/* spot the "Correct!" feedback wherever it appears */
+new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){if(n.nodeType!==1)continue;
+  const hit=(n.matches&&n.matches(".ar-note.good"))||(n.querySelector&&n.querySelector(".ar-note.good"));
+  const txt=(n.textContent||"").trim();
+  const bad=(n.matches&&n.matches(".ar-note.bad"))||(n.querySelector&&n.querySelector(".ar-note.bad"));
+  if(bad&&/^(Not quite|Time's up)/.test(txt)){masShow(MAS_BAD[Math.floor(Math.random()*MAS_BAD.length)],"bad");continue}
+  if(hit||(n.matches&&n.matches("p,div,span,b,h2")&&/^Correct!/.test(txt)&&txt.length<60))masShow(masPick(),"happy");
+}}).observe(document.body,{childList:true,subtree:true});
+
+{const st=document.createElement("style");st.id="zzzdmascot";st.textContent=`
+.mas{position:fixed;right:8px;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:70;width:96px;pointer-events:none;transform:translateY(24px) scale(.6);opacity:0;transition:transform .45s cubic-bezier(.2,1.4,.4,1),opacity .3s}
+.mas.in{transform:none;opacity:1}
+.mas-girl{pointer-events:auto;cursor:pointer;display:block}
+.mas-girl svg{width:96px;height:auto;display:block;filter:drop-shadow(0 10px 14px rgba(0,0,0,.4))}
+.mas .mo-f,.mas .drop{display:none}
+.mas.look-2 .uni{fill:#EC4899}.mas.look-3 .uni{fill:#10B981}
+.mas.sad.in .mo-s{display:none}.mas.sad.in .mo-f{display:inline}.mas.sad.in .mo-h{display:none}
+.mas.sad.in .ey-h{display:none}.mas.sad.in .ey-o{display:inline}.mas.sad.in .arms{display:none}
+.mas.sad.in .spk{display:none}.mas.sad.in .drop{display:inline}
+.mas.sad.in .mas-girl{animation:masSlump .7s ease-out 1 both}
+@keyframes masSlump{0%{transform:translateY(0)}50%{transform:translateY(4px) rotate(-3deg)}100%{transform:translateY(2px)}}
+.mas .ey-h{display:none}.mas .mo-h{display:none}.mas .arms{display:none}.mas .spk{opacity:0}
+.mas.in .ey-h{display:inline}.mas.in .ey-o{display:none}
+.mas.in .mo-h{display:inline}.mas.in .mo-s{display:none}
+.mas.in .arms{display:inline}
+.mas.in .spk{opacity:1;animation:masTw 1s ease-in-out infinite alternate}
+.mas.in .mas-girl{animation:masHop .6s ease-out 2}
+.mas.sad .mas-bub{background:#FFE4E6;color:#7F1D1D}
+.mas-bub{position:absolute;right:100px;bottom:74px;width:max-content;max-width:190px;background:#fff;color:#1B1F3B;border-radius:16px 16px 4px 16px;padding:9px 12px;font:700 .9rem/1.25 system-ui,sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+.mas-x{position:absolute;top:-6px;left:-4px;pointer-events:auto;width:24px;height:24px;border-radius:50%;border:0;background:#1B1F3B;color:#fff;font-size:16px;line-height:1;cursor:pointer;opacity:.85}
+@keyframes masHop{0%,100%{transform:translateY(0)}40%{transform:translateY(-12px)}}
+@keyframes masTw{from{opacity:.4}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.mas,.mas-girl,.mas .spk{animation:none!important;transition:none}}
 `;document.head.appendChild(st)}
 
 /* ==== v4 END ==== */
