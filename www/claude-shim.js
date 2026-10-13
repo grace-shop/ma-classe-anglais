@@ -287,7 +287,7 @@
     like: async (id, e) => { const { data, error } = await sb.rpc("toggle_like", { p_post: id, p_e: e || "❤️" }); if (error) throw feedErr(error, "Could not like"); return data; },
     comment: async (id, body) => { const { data, error } = await sb.rpc("add_comment", { p_post: id, p_body: body }); if (error) throw feedErr(error, "Could not comment"); return data; },
     delComment: async (id) => { const { error } = await sb.rpc("delete_comment", { p_id: id }); if (error) throw feedErr(error, "Could not delete"); },
-    stories: async () => { const { data, error } = await sb.from("stories").select("*").order("created_at", { ascending: true }).limit(500); if (error) throw feedErr(error, "Cannot load stories"); return data || []; },
+    stories: async () => { const cut = new Date(Date.now() - 864e5).toISOString(); const { data, error } = await sb.from("stories").select("*").gt("created_at", cut).is("deleted_at", null).order("created_at", { ascending: true }).limit(500); if (error) throw feedErr(error, "Cannot load stories"); return (data || []).filter(s => Date.parse(s.created_at) > Date.now() - 864e5); },
     storyViews: async () => { const { data, error } = await sb.from("story_views").select("*").limit(3000); if (error) return []; return data || []; },
     story: async (media, body, bg, o) => { o = o || {}; const { data, error } = await sb.rpc("create_story", { p_media: media || null, p_body: body || "", p_bg: bg || "", p_dur: o.dur || 5, p_aud: o.aud || "all", p_hide: o.hide || null }); if (error) throw feedErr(error, "Could not publish the story"); return data; },
     viewStory: async (id) => { await sb.rpc("view_story", { p_id: id }); },
