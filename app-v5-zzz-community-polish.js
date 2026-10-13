@@ -12,6 +12,9 @@
   return segG(String(str||"")).map(g=>/\p{Extended_Pictographic}/u.test(g)?`<span class="emo-nat ${cls||""}">${esc(g)}</span>`:esc(g)).join("")}}
 {const _fv=feedView;feedView=function(e){window.__natEmo=true;try{return _fv(e)}finally{window.__natEmo=false}}}
 
+/* 1b · the story viewer and the story text are drawn outside the feed: native emoji there too */
+{const _fs=feedSync;feedSync=function(){const was=window.__natEmo;window.__natEmo=true;try{return _fs.apply(this,arguments)}finally{window.__natEmo=was}}}
+
 /* 2 · edit your own post */
 {const _fp=fPostHTML;fPostHTML=function(p){let h=_fp(p);
   if(!p||p.deleted_at||p.author!==S.uid)return h;
@@ -62,6 +65,14 @@ vPlay=async function(p,t){const V=window.__vid;
   try{document.body.classList.toggle("in-feed",!!document.querySelector(".fwrap"))}catch(e){}
   try{if(V.el&&!V.el.isConnected&&V.p){const tile=vidTileOf(V.p);if(tile){tile.replaceWith(V.el);if(was)V.el.play().catch(()=>{})}}}catch(e){}
   return r}}
+
+/* 3b · the upload of a picked photo or video starts at once, while you write, not after you press Post */
+{const _up=fUpload;fUpload=function(file,d){
+  if(!file.__up){const pr=_up(file,d);file.__up=pr.catch(e=>{delete file.__up;throw e})}
+  return file.__up}}
+function fPreUpload(){if(!F||!F.files)return;for(const f of F.files){if(!f.file||f.file.__up)continue;
+  fUpload(f.file,f.d).catch(()=>{})}}
+{const _r0=render;render=function(){const r=_r0.apply(this,arguments);try{fPreUpload()}catch(e){}return r}}
 
 /* 4 · the text you type stays visible: the floating buttons step aside */
 document.addEventListener("focusin",e=>{const t=e.target;if(!t||!t.matches)return;
