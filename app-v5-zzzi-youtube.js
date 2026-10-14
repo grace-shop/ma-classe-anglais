@@ -20,8 +20,11 @@ document.addEventListener("click",e=>{
   e.preventDefault();e.stopPropagation();
   const id=b.dataset.yt;if(!/^[\w-]{11}$/.test(id))return;
   const box=document.createElement("div");box.className="yt-card yt-on";
-  box.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
-  b.replaceWith(box)},true);
+  box.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  b.replaceWith(box);
+  /* on demande à YouTube de nous dire quand la vidéo joue (pour mettre les autres en pause) */
+  const fr=box.querySelector("iframe");
+  if(fr) fr.addEventListener("load",()=>{try{fr.contentWindow.postMessage(JSON.stringify({event:"listening",id:fr.id||"yt",channel:"widget"}),"*")}catch(err){}});},true);
 {const st=document.createElement("style");st.id="zzziyoutube";st.textContent=`
 .yt-card{position:relative;display:block;width:100%;max-width:100%;box-sizing:border-box;aspect-ratio:16/9;margin:8px 0;padding:0;border:0;border-radius:14px;overflow:hidden;background:#000;cursor:pointer}
 .yt-card img{width:100%;height:100%;object-fit:cover;display:block}
