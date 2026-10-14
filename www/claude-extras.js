@@ -11,12 +11,20 @@
   /* ---------- 2) + 3) styles ---------- */
   const CSS = `
 header.top .brand{position:relative;z-index:3;flex:none}
-header.top #hdr{min-width:0;flex:0 1 auto;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain;padding:8px 8px 4px 4px;margin:-8px -8px -4px -4px}
+header.top #hdr{margin-left:auto;justify-content:flex-start!important;flex-wrap:nowrap!important;min-width:0;flex:0 1 auto;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain;padding:8px 8px 4px 4px;margin-top:-8px;margin-bottom:-4px;margin-right:-8px}
 header.top #hdr::-webkit-scrollbar{display:none}
 header.top #hdr>*{flex:none}
+@media (max-width:520px){
+  header.top{gap:6px}
+  header.top #hdr{gap:4px!important}
+  header.top #hdr .iconbtn{width:clamp(30px,8.4vw,36px)!important;height:clamp(30px,8.4vw,36px)!important;min-width:0!important;border-radius:11px}
+  header.top #hdr .iconbtn svg{width:clamp(16px,4.6vw,19px);height:clamp(16px,4.6vw,19px)}
+  header.top #hdr .pill{padding:4px 7px!important;font-size:.76rem}
+}
 html{overflow-x:clip}body{overflow-x:clip;overscroll-behavior-y:none}
 .btn,.iconbtn,.chip{-webkit-tap-highlight-color:transparent}
 .btn:active,.iconbtn:active{transform:scale(.96)}
+:root[data-skin="nuit"] body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(60% 40% at 15% 0%,rgba(94,234,212,.10),transparent 70%),radial-gradient(55% 40% at 95% 100%,rgba(124,156,255,.12),transparent 70%)}
 :focus-visible{outline:2px solid rgba(94,234,212,.85);outline-offset:2px;border-radius:12px}
 :root[data-skin="nuit"] .glass{box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 22px 55px -22px rgba(0,0,0,.75),0 0 0 1px rgba(124,156,255,.13)}
 @media (hover:hover) and (prefers-reduced-motion:no-preference){
@@ -35,7 +43,14 @@ html{overflow-x:clip}body{overflow-x:clip;overscroll-behavior-y:none}
     return out;
   };
   const ytFrames = () => [...document.querySelectorAll("iframe")].filter((f) => /youtube(-nocookie)?\.com\/embed/.test(f.src || ""));
+  const ytState = new WeakMap();
   const ytCmd = (f, func) => { try { f.contentWindow.postMessage(JSON.stringify({ event: "command", func, args: "" }), "*"); } catch (e) {} };
+  function ytPause(f) {
+    ytCmd(f, "pauseVideo");
+    setTimeout(() => {                                   // repli : si elle joue encore, on recharge la vidéo sans lecture automatique
+      if (ytState.get(f) === 1) { ytState.set(f, 0); try { f.src = f.src.replace(/([?&])autoplay=1/, "$1autoplay=0"); } catch (e) {} }
+    }, 900);
+  }
   // les vidéos muettes (flux, stories), les appels (flux en direct) et les boucles de l'éditeur ne comptent pas
   const audible = (m) => !!m && !m.paused && !m.ended && !m.muted && m.volume > 0 && !m.srcObject && !m.loop;
   const mixing = () => { try { return typeof MD !== "undefined" && MD && MD.nodes && MD.nodes.length > 0; } catch (e) { return false; } };
@@ -44,7 +59,7 @@ html{overflow-x:clip}body{overflow-x:clip;overscroll-behavior-y:none}
     if (mixing()) return;
     docs().forEach((d) => d.querySelectorAll("video,audio").forEach((m) => { if (m !== except && audible(m)) { try { m.pause(); } catch (e) {} } }));
     seen.forEach((a) => { if (a.paused || a.ended) { seen.delete(a); return; } if (a !== except && audible(a)) { try { a.pause(); } catch (e) {} } });
-    ytFrames().forEach((f) => { if (f !== exceptFrame) ytCmd(f, "pauseVideo"); });
+    ytFrames().forEach((f) => { if (f !== exceptFrame && ytState.get(f) !== 2) ytPause(f); });
   }
   const check = (m) => { if (audible(m)) pauseOthers(m, null); };
 
@@ -88,8 +103,10 @@ html{overflow-x:clip}body{overflow-x:clip;overscroll-behavior-y:none}
     let d = e.data; if (typeof d === "string") { try { d = JSON.parse(d); } catch (x) { return; } }
     if (!d) return;
     const state = d.event === "onStateChange" ? d.info : d.info && d.info.playerState;
-    if (state !== 1) return;                                // 1 = en lecture
-    pauseOthers(null, ytFrames().find((f) => f.contentWindow === e.source) || null);
+    if (typeof state !== "number") return;
+    const fr = ytFrames().find((f) => f.contentWindow === e.source) || null;
+    if (fr) ytState.set(fr, state);
+    if (state === 1) pauseOthers(null, fr);                 // 1 = en lecture : on coupe tout le reste
   });
   const scan = () => document.querySelectorAll("iframe").forEach(prepFrame);
   new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true });
