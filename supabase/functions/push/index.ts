@@ -56,6 +56,8 @@ const PUSH_TEXT: Record<string, string> = {
   staff: "New message from the school",
   report: "Something needs your attention",
   challenge: "New English challenge: come and answer!",
+  friend_req: "A classmate wants to be your friend",
+  friend_ok: "Your friend request was accepted",
 };
 
 Deno.serve(async (req) => {

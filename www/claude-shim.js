@@ -251,6 +251,10 @@
   /* ---------------- copies d'élèves (photos / PDF des devoirs et épreuves) ---------------- */
   Object.defineProperty(window, "__sb", { get: () => sb, configurable: true });   // Supabase client for feature files (tables + RPC, same rights as the user)
   window.__peer = {
+    friendList: async () => { const { data, error } = await sb.rpc("friend_list"); if (error) throw new Error(/friend_list|friend_request|schema cache/i.test(error.message || "") ? "The teacher must first run the file supabase/amis.sql in Supabase." : (error.message || "Could not load friends")); return data || []; },
+    friendRequest: async (to) => { const { data, error } = await sb.rpc("friend_request", { p_to: to }); if (error) throw new Error(/friend_request|schema cache/i.test(error.message || "") ? "The teacher must first run the file supabase/amis.sql in Supabase." : (error.message || "Could not send the request")); return data || ""; },
+    friendRespond: async (from, accept) => { const { data, error } = await sb.rpc("friend_respond", { p_from: from, p_accept: !!accept }); if (error) throw new Error(error.message || "Could not answer the request"); return data || ""; },
+    friendRemove: async (uid) => { const { error } = await sb.rpc("friend_remove", { p_uid: uid }); if (error) throw new Error(error.message || "Could not update friends"); },
     dir: async () => { const { data, error } = await sb.rpc("peer_directory"); if (error) throw new Error(mapErr(error).message); return data || []; },
     send: async (to, body, att, meta) => { const args = { p_to: to, p_body: body || "" }; if (att || meta) args.p_att = att || null; if (meta) args.p_meta = meta; const { data, error } = await sb.rpc("send_peer_message", args); if (error) throw new Error(/function .*send_peer_message|p_att|schema cache/i.test(error.message || "") ? "The teacher must first run the file supabase/messagerie.sql in Supabase." : (error.message || "Could not send")); return data; },
     read: async (from) => { const { error } = await sb.rpc("mark_peer_read", { p_from: from }); if (error) throw new Error(error.message); },
