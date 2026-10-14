@@ -8873,6 +8873,16 @@ new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){if(n.no
 @media (prefers-reduced-motion:reduce){.mas,.mas-girl,.mas .spk{animation:none!important;transition:none}}
 `;document.head.appendChild(st)}
 
+/* ---- app-v5-zzzf-friend-rules.js ---- */
+/* =====================================================================
+   v5 · Amis : les listes de choix ne proposent que des amis
+   (groupes et appels entre élèves). La base de données reste la vraie règle.
+   ===================================================================== */
+{const _g=grDir;
+  grDir=function(){const L=_g();return S.mode==="student"?L.filter(x=>frIsFriend(x.uid)):L}}
+{const _c=callCandidates;
+  callCandidates=async function(){const L=await _c();return S.mode==="student"?L.filter(x=>frIsFriend(x.uid)):L}}
+
 /* ==== v4 END ==== */
 render();
 loadThree();
