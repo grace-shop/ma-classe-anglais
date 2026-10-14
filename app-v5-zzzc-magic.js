@@ -6,7 +6,7 @@
    - A warm welcome, once a day.
    All of it is off when the phone asks for less motion (reduced motion).
    ===================================================================== */
-const MG={calm:()=>matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches};
+const MG={calm:()=>document.documentElement.getAttribute("data-lite")==="1"||(matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)};
 const MG_COLORS=["#5EEAD4","#818CF8","#F472B6","#FBBF24","#A7F3D0","#93C5FD"];
 
 function mgBurst(x,y,n,glyphs,spread){if(MG.calm())return;
