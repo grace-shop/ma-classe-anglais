@@ -5,7 +5,7 @@
    Detection: any "Correct!" shown by the Arena, the battles, the quiz…
    She hops and shows happy eyes; with "less motion" on, she only shows.
    ===================================================================== */
-const MAS={last:0,off:false,t:null};
+const MAS={last:0,off:false,t:null,sig:""};
 const MAS_LINES=["Yes! You got it! 🎉","Perfect, keep going!","Sugoi! You're on fire!","Nice work, superstar! ⭐","That's right! Well done! 🌸","You did it! Keep it up!"];
 const masPick=()=>MAS_LINES[Math.floor(Math.random()*MAS_LINES.length)];
 function masSVG(){return `<svg viewBox="0 0 120 150" aria-hidden="true" focusable="false">
@@ -31,7 +31,9 @@ const MAS_BAD=["Almost! Try again, you can do it! 💪","Not quite, but you are 
 const MAS_LOOKS=["","look-2","look-3"];
 function masLook(){try{return +(localStorage.getItem("ec_mas_look")||0)%MAS_LOOKS.length}catch(e){return 0}}
 function masApplyLook(box){box.classList.remove("look-2","look-3");const c=MAS_LOOKS[masLook()];if(c)box.classList.add(c)}
-function masShow(text,mood){
+/* L'avatar n'est caché que si l'élève a choisi lui-même l'économie d'énergie (pas quand elle s'active toute seule). */
+function masHidden(){try{return LITE&&LITE_SRC==="user"}catch(e){return false}}
+function masShow(text,mood){if(masHidden()){const b=document.getElementById("mas");if(b)b.remove();return}
   if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
   let box=document.getElementById("mas");
   if(!box){box=document.createElement("div");box.id="mas";box.className="mas";
@@ -46,7 +48,23 @@ function masShow(text,mood){
   clearTimeout(MAS.t);MAS.t=setTimeout(()=>box.classList.remove("in"),3800);
 }
 /* spot the "Correct!" feedback wherever it appears */
+/* quiz classiques : choix à cocher, réponse à écrire, écoute (feedback = classes right / wrong) */
+function masQuizFeedback(n){
+  const q=(sel)=>(n.matches&&n.matches(sel))?[n]:[...(n.querySelectorAll?n.querySelectorAll(sel):[])];
+  const inp=q(".answer-input.right,.answer-input.wrong")[0];
+  if(inp){const ok=inp.classList.contains("right"),sig="i|"+inp.id+"|"+inp.value+"|"+ok;
+    if(sig===MAS.sig)return true;MAS.sig=sig;
+    masShow(ok?masPick():MAS_BAD[Math.floor(Math.random()*MAS_BAD.length)],ok?"happy":"bad");return true}
+  const ch=q(".choice.right,.choice.wrong");
+  if(ch.length){const box=ch[0].closest(".choices")||ch[0].parentNode,all=[...box.querySelectorAll(".choice")];
+    const ok=!all.some(b=>b.classList.contains("wrong")),sig="c|"+(box.parentNode&&box.parentNode.textContent||"").slice(0,80)+"|"+all.map(b=>b.classList.contains("wrong")?"w":b.classList.contains("right")?"r":"-").join("");
+    if(sig===MAS.sig)return true;MAS.sig=sig;
+    masShow(ok?masPick():MAS_BAD[Math.floor(Math.random()*MAS_BAD.length)],ok?"happy":"bad");return true}
+  /* nouvelle question sans réponse : on réinitialise */
+  if(q(".choice:not(.right):not(.wrong),.answer-input:not(.right):not(.wrong)").length)MAS.sig="";
+  return false}
 new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){if(n.nodeType!==1)continue;
+  if(masQuizFeedback(n))continue;
   const hit=(n.matches&&n.matches(".ar-note.good"))||(n.querySelector&&n.querySelector(".ar-note.good"));
   const txt=(n.textContent||"").trim();
   const bad=(n.matches&&n.matches(".ar-note.bad"))||(n.querySelector&&n.querySelector(".ar-note.bad"));
