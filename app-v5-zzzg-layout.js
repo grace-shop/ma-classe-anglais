@@ -25,5 +25,5 @@
 /* économie d'énergie : plus d'animations, de flous ni d'effets */
 :root[data-lite="1"] *,:root[data-lite="1"] *::before,:root[data-lite="1"] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 :root[data-lite="1"] .glass,:root[data-lite="1"] header.top,:root[data-lite="1"] nav.tabs{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-:root[data-lite="1"] .mas,:root[data-lite="1"] .mas-x,:root[data-lite="1"] .mg-p,:root[data-lite="1"] #bg3d,:root[data-lite="1"] .torus{display:none!important}
+:root[data-lite="1"] .mg-p,:root[data-lite="1"] #bg3d,:root[data-lite="1"] .torus{display:none!important}
 `;document.head.appendChild(st)}

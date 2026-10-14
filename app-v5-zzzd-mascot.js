@@ -31,7 +31,7 @@ const MAS_BAD=["Almost! Try again, you can do it! 💪","Not quite, but you are 
 const MAS_LOOKS=["","look-2","look-3"];
 function masLook(){try{return +(localStorage.getItem("ec_mas_look")||0)%MAS_LOOKS.length}catch(e){return 0}}
 function masApplyLook(box){box.classList.remove("look-2","look-3");const c=MAS_LOOKS[masLook()];if(c)box.classList.add(c)}
-function masShow(text,mood){if(document.documentElement.getAttribute("data-lite")==="1")return;
+function masShow(text,mood){
   if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
   let box=document.getElementById("mas");
   if(!box){box=document.createElement("div");box.id="mas";box.className="mas";
