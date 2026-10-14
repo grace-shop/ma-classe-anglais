@@ -7,6 +7,8 @@
 //  YT_AUTHOR_NAME   = (facultatif) nom affiché sur le post ; sinon « YouTube »
 //  YT_MAX_PER_RUN   = (facultatif) nombre max de posts par passage (3 par défaut)
 //  YT_BACKFILL      = (facultatif, pour tester) publier les N plus récentes vidéos au 1er passage (1 à 5)
+//  YT_API_KEY       = (pour importer TOUTES les vidéos) clé « YouTube Data API v3 » de Google Cloud
+//  YT_IMPORT_ALL    = 1 pour importer toute la chaîne (nécessite YT_API_KEY) ; à retirer ensuite
 // SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY sont fournis automatiquement par Supabase.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
@@ -46,6 +48,32 @@ function parseFeed(xml: string): { author: string; vids: Vid[] } {
   return { author, vids };
 }
 
+// Toutes les vidéos de la chaîne (playlist « Mises en ligne », 50 par page) via l'API YouTube Data.
+async function allVideos(cid: string, key: string): Promise<Vid[]> {
+  const out: Vid[] = [];
+  let token = "";
+  for (let i = 0; i < 40; i++) { // 40 pages x 50 = 2000 vidéos au maximum
+    const u = new URL("https://www.googleapis.com/youtube/v3/playlistItems");
+    u.searchParams.set("part", "snippet,contentDetails");
+    u.searchParams.set("playlistId", "UU" + cid.slice(2));
+    u.searchParams.set("maxResults", "50");
+    u.searchParams.set("key", key);
+    if (token) u.searchParams.set("pageToken", token);
+    const r = await fetch(u);
+    const j = await r.json();
+    if (!r.ok) throw new Error("API YouTube : " + (j?.error?.message || r.status));
+    for (const it of j.items || []) {
+      const id = it?.contentDetails?.videoId || it?.snippet?.resourceId?.videoId;
+      const title = String(it?.snippet?.title || "");
+      if (!id || /^(Private|Deleted) video$/i.test(title)) continue;
+      out.push({ id, title, published: it?.contentDetails?.videoPublishedAt || it?.snippet?.publishedAt || "", desc: "" });
+    }
+    token = j.nextPageToken || "";
+    if (!token) break;
+  }
+  return out; // de la plus récente à la plus ancienne
+}
+
 Deno.serve(async (req) => {
   const secret = Deno.env.get("YT_SYNC_SECRET") || "";
   if (!secret || req.headers.get("x-sync-secret") !== secret) return new Response("forbidden", { status: 403 });
@@ -54,20 +82,35 @@ Deno.serve(async (req) => {
       auth: { persistSession: false },
     });
     const cid = await channelId();
-    const fr = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${cid}`, { headers: { "user-agent": UA } });
-    if (!fr.ok) throw new Error("Flux YouTube indisponible (" + fr.status + ")");
-    const { author: chName, vids } = parseFeed(await fr.text());
-    if (!vids.length) return Response.json({ ok: true, posted: 0, note: "aucune vidéo dans le flux" });
+    const importAll = Deno.env.get("YT_IMPORT_ALL") === "1";
+    const apiKey = (Deno.env.get("YT_API_KEY") || "").trim();
+    if (importAll && !apiKey) throw new Error("YT_IMPORT_ALL demande YT_API_KEY (clé YouTube Data API)");
+    let chName = "";
+    let vids: Vid[];
+    if (apiKey) {
+      vids = await allVideos(cid, apiKey);
+      if (!importAll) vids = vids.slice(0, 15); // fonctionnement normal : seulement les plus récentes
+    } else {
+      const fr = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${cid}`, { headers: { "user-agent": UA } });
+      if (!fr.ok) throw new Error("Flux YouTube indisponible (" + fr.status + ")");
+      const parsed = parseFeed(await fr.text());
+      chName = parsed.author;
+      vids = parsed.vids;
+    }
+    if (!vids.length) return Response.json({ ok: true, posted: 0, note: "aucune vidéo trouvée" });
 
     const ids = vids.map((v) => v.id);
-    const { data: seenRows } = await sb.from("yt_seen").select("video_id").in("video_id", ids);
-    const seen = new Set((seenRows || []).map((r) => r.video_id));
+    const seen = new Set<string>();
+    for (let i = 0; i < ids.length; i += 100) {
+      const { data: rows } = await sb.from("yt_seen").select("video_id").in("video_id", ids.slice(i, i + 100));
+      for (const r of rows || []) seen.add(r.video_id);
+    }
     const { count } = await sb.from("yt_seen").select("video_id", { count: "exact", head: true }).eq("channel", cid);
 
     let fresh = vids.filter((v) => !seen.has(v.id)).reverse(); // de la plus ancienne à la plus récente
     // 1er passage : on note les vidéos existantes sans les publier (pour ne pas inonder « Posts »),
     // sauf les N plus récentes si le secret YT_BACKFILL = N (test : 1 à 5).
-    if (!count) {
+    if (!count && !importAll) {
       const back = Math.max(0, Math.min(5, Math.floor(+(Deno.env.get("YT_BACKFILL") || 0)) || 0));
       const old = vids.slice(back).map((v) => ({ video_id: v.id, channel: cid }));
       if (old.length) await sb.from("yt_seen").upsert(old, { onConflict: "video_id" });
@@ -93,7 +136,7 @@ Deno.serve(async (req) => {
     if (!uid) throw new Error("Compte introuvable pour " + email + " : définissez YT_AUTHOR_EMAIL");
 
     const name = (Deno.env.get("YT_AUTHOR_NAME") || chName || "YouTube").slice(0, 60);
-    const max = Math.max(1, Math.min(10, +(Deno.env.get("YT_MAX_PER_RUN") || 3)));
+    const max = Math.max(1, Math.min(importAll ? 100 : 10, +(Deno.env.get("YT_MAX_PER_RUN") || (importAll ? 40 : 3))));
     let posted = 0;
     for (const v of fresh) {
       if (posted >= max) break; // les autres seront publiées au prochain passage
