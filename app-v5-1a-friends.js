@@ -14,6 +14,8 @@ function frState(uid){
   return r.incoming?"in":"out";
 }
 
+const frIsFriend=uid=>frState(uid)==="friends";
+
 async function frRefresh(){
   if(!window.__peer||!window.__peer.friendList) return;
   try{
