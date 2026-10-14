@@ -8800,7 +8800,7 @@ setTimeout(function hello(){try{
    Detection: any "Correct!" shown by the Arena, the battles, the quiz…
    She hops and shows happy eyes; with "less motion" on, she only shows.
    ===================================================================== */
-const MAS={last:0,off:false,t:null};
+const MAS={last:0,off:false,t:null,sig:""};
 const MAS_LINES=["Yes! You got it! 🎉","Perfect, keep going!","Sugoi! You're on fire!","Nice work, superstar! ⭐","That's right! Well done! 🌸","You did it! Keep it up!"];
 const masPick=()=>MAS_LINES[Math.floor(Math.random()*MAS_LINES.length)];
 function masSVG(){return `<svg viewBox="0 0 120 150" aria-hidden="true" focusable="false">
@@ -8826,7 +8826,9 @@ const MAS_BAD=["Almost! Try again, you can do it! 💪","Not quite, but you are 
 const MAS_LOOKS=["","look-2","look-3"];
 function masLook(){try{return +(localStorage.getItem("ec_mas_look")||0)%MAS_LOOKS.length}catch(e){return 0}}
 function masApplyLook(box){box.classList.remove("look-2","look-3");const c=MAS_LOOKS[masLook()];if(c)box.classList.add(c)}
-function masShow(text,mood){if(document.documentElement.getAttribute("data-lite")==="1")return;
+/* L'avatar n'est caché que si l'élève a choisi lui-même l'économie d'énergie (pas quand elle s'active toute seule). */
+function masHidden(){try{return LITE&&LITE_SRC==="user"}catch(e){return false}}
+function masShow(text,mood){if(masHidden()){const b=document.getElementById("mas");if(b)b.remove();return}
   if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
   let box=document.getElementById("mas");
   if(!box){box=document.createElement("div");box.id="mas";box.className="mas";
@@ -8841,7 +8843,23 @@ function masShow(text,mood){if(document.documentElement.getAttribute("data-lite"
   clearTimeout(MAS.t);MAS.t=setTimeout(()=>box.classList.remove("in"),3800);
 }
 /* spot the "Correct!" feedback wherever it appears */
+/* quiz classiques : choix à cocher, réponse à écrire, écoute (feedback = classes right / wrong) */
+function masQuizFeedback(n){
+  const q=(sel)=>(n.matches&&n.matches(sel))?[n]:[...(n.querySelectorAll?n.querySelectorAll(sel):[])];
+  const inp=q(".answer-input.right,.answer-input.wrong")[0];
+  if(inp){const ok=inp.classList.contains("right"),sig="i|"+inp.id+"|"+inp.value+"|"+ok;
+    if(sig===MAS.sig)return true;MAS.sig=sig;
+    masShow(ok?masPick():MAS_BAD[Math.floor(Math.random()*MAS_BAD.length)],ok?"happy":"bad");return true}
+  const ch=q(".choice.right,.choice.wrong");
+  if(ch.length){const box=ch[0].closest(".choices")||ch[0].parentNode,all=[...box.querySelectorAll(".choice")];
+    const ok=!all.some(b=>b.classList.contains("wrong")),sig="c|"+(box.parentNode&&box.parentNode.textContent||"").slice(0,80)+"|"+all.map(b=>b.classList.contains("wrong")?"w":b.classList.contains("right")?"r":"-").join("");
+    if(sig===MAS.sig)return true;MAS.sig=sig;
+    masShow(ok?masPick():MAS_BAD[Math.floor(Math.random()*MAS_BAD.length)],ok?"happy":"bad");return true}
+  /* nouvelle question sans réponse : on réinitialise */
+  if(q(".choice:not(.right):not(.wrong),.answer-input:not(.right):not(.wrong)").length)MAS.sig="";
+  return false}
 new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){if(n.nodeType!==1)continue;
+  if(masQuizFeedback(n))continue;
   const hit=(n.matches&&n.matches(".ar-note.good"))||(n.querySelector&&n.querySelector(".ar-note.good"));
   const txt=(n.textContent||"").trim();
   const bad=(n.matches&&n.matches(".ar-note.bad"))||(n.querySelector&&n.querySelector(".ar-note.bad"));
@@ -8929,7 +8947,7 @@ const FR_CALL_BAR=/<div class="call-entry">[\s\S]*?<\/div>/;
 /* économie d'énergie : plus d'animations, de flous ni d'effets */
 :root[data-lite="1"] *,:root[data-lite="1"] *::before,:root[data-lite="1"] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 :root[data-lite="1"] .glass,:root[data-lite="1"] header.top,:root[data-lite="1"] nav.tabs{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-:root[data-lite="1"] .mas,:root[data-lite="1"] .mas-x,:root[data-lite="1"] .mg-p,:root[data-lite="1"] #bg3d,:root[data-lite="1"] .torus{display:none!important}
+:root[data-lite="1"] .mg-p,:root[data-lite="1"] #bg3d,:root[data-lite="1"] .torus{display:none!important}
 `;document.head.appendChild(st)}
 
 /* ---- app-v5-zzzh-downloads.js ---- */
@@ -8983,6 +9001,28 @@ document.addEventListener("click",async e=>{
   if(!p){toast("Post not found","x");return}
   try{ await fDownloadPost(p) }catch(er){ toast(er.message||"Could not download","x") }
 },true);
+
+/* ---- app-v5-zzzi-youtube.js ---- */
+/* =====================================================================
+   v5 · Les vidéos YouTube publiées automatiquement dans « Posts »
+   (voir supabase/functions/youtube-sync). Un post dont le texte contient un lien
+   YouTube affiche la miniature de la vidéo ; un appui ouvre la vidéo sur YouTube.
+   ===================================================================== */
+{const _fp=fPostHTML;
+  fPostHTML=function(p){const h=_fp(p);
+    if(!p||p.deleted_at)return h;
+    const m=String(p.body||"").match(/https?:\/\/(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:[^\s&]*&)*v=|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/);
+    if(!m)return h;
+    const id=m[1];
+    const card=`<a class="yt-card" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener noreferrer" aria-label="Watch this video on YouTube"><img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="yt-play" aria-hidden="true"></span><span class="yt-label">Watch on YouTube</span></a>`;
+    return h.replace('<div class="fcount">',card+'<div class="fcount">')}}
+{const st=document.createElement("style");st.id="zzziyoutube";st.textContent=`
+.yt-card{position:relative;display:block;width:100%;max-width:100%;box-sizing:border-box;aspect-ratio:16/9;margin:8px 0;border-radius:14px;overflow:hidden;background:#000;text-decoration:none}
+.yt-card img{width:100%;height:100%;object-fit:cover;display:block}
+.yt-play{position:absolute;left:50%;top:50%;width:64px;height:44px;margin:-22px 0 0 -32px;border-radius:12px;background:#E11D48;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+.yt-play::after{content:"";position:absolute;left:26px;top:13px;border-left:16px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent}
+.yt-label{position:absolute;left:10px;bottom:8px;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font:700 .78rem/1.3 system-ui,sans-serif}
+`;document.head.appendChild(st)}
 
 /* ==== v4 END ==== */
 render();
