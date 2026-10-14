@@ -850,12 +850,12 @@ const S={liveSeen:{},db:null,user:null,room:null,uid:null,isOwner:false,mode:"st
   offline:false,writeBlocked:false,animate:true,sound:true,msgs:[],chatFor:null,chatUnsub:null,editing:null,dl:undefined,eps:[],corriges:{},epFilter:"",epTimer:null,assets:null,showAll:false,profFilter:"",parents:[],who:null,scan:{},progClass:null,lessonFilter:"",access:{},myAccess:null,staff:[],staffLoaded:false,isStaff:false,canEdit:false,allPeople:[],reqs:[],myReq:null};
 try{S.sound=localStorage.getItem("mca_sound")!=="0"}catch(e){}
 /* ===== Mode économie de données ===== */
-function autoLite(){try{const c=navigator.connection;if(c&&(c.saveData||/(^|-)2g|3g/.test(c.effectiveType||"")))return true}catch(e){}if((navigator.deviceMemory||8)<=2)return true;if((navigator.hardwareConcurrency||8)<=2)return true;return false}
-let LITE=false,LITE_SRC="default";try{if(localStorage.getItem("mca_lite")==="1"){LITE=true;LITE_SRC="user"}}catch(e){}
+function autoLite(){try{const c=navigator.connection;if(c&&(c.saveData||/(^|-)2g|3g/.test(c.effectiveType||"")))return true}catch(e){}if((navigator.deviceMemory||8)<=3)return true;if((navigator.hardwareConcurrency||8)<=4)return true;return false}
+let LITE=false,LITE_SRC="default";try{if(localStorage.getItem("mca_lite")==="1"){LITE=true;LITE_SRC="user"}else if(localStorage.getItem("mca_lite")==="0"){LITE_SRC="user"}}catch(e){}if(LITE_SRC!=="user"&&autoLite()){LITE=true;LITE_SRC="auto"}
 document.documentElement.setAttribute("data-lite",LITE?"1":"0");
 let threeState="idle";function loadThree(){if(LITE||threeState!=="idle")return;threeState="loading";const sc=document.createElement("script");sc.src=(window.__THREE_URL||"https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js");sc.onload=()=>{threeState="ready";try{initBg3d()}catch(e){console.warn(e)}try{initMascot()}catch(e){console.warn(e)}if(typeof render==="function")render()};sc.onerror=()=>{if(window.__THREE_URL){window.__THREE_URL=null;threeState="idle";loadThree()}else threeState="failed"};document.head.appendChild(sc)}
 function setLite(v){LITE=v;LITE_SRC="user";try{localStorage.setItem("mca_lite",v?"1":"0")}catch(e){}document.documentElement.setAttribute("data-lite",v?"1":"0");const c=document.getElementById("bg3d");if(v){if(c)c.style.display="none"}else{if(threeState==="idle")loadThree();else if(threeState==="ready"){if(window.__bgResume)window.__bgResume();else try{initBg3d()}catch(e){}if(!mascot.canvas)try{initMascot()}catch(e){}}}}
-function liteHTML(){return`<div class="section"><div><span class="eyebrow">Data and battery</span><h2>Data saver mode</h2></div><div class="glass card"><div class="row between" style="flex-wrap:nowrap"><div><h3>${LITE?"On":"Off"}</h3><p class="sub small" style="margin:0">Turns off the 3D background, the mascot and the animations. The app loads faster and uses much less mobile data and battery. Great for small data plans and old phones.${!LITE&&autoLite()?" Your phone or connection seems slow: turn on this mode if the app is slow.":""}</p></div><button class="toggle" role="switch" aria-checked="${LITE}" aria-label="Data saver mode" data-a="toggleLite"></button></div></div></div>`}
+function liteHTML(){return`<div class="section"><div><span class="eyebrow">Data and battery</span><h2>Battery saver mode</h2></div><div class="glass card"><div class="row between" style="flex-wrap:nowrap"><div><h3>${LITE?"On":"Off"}</h3><p class="sub small" style="margin:0">Turns off the 3D background, the mascot and the animations. The app loads faster and uses much less mobile data and battery. Great for small data plans and old phones.${!LITE&&autoLite()?" Your phone or connection seems slow: turn on this mode if the app is slow.":""}</p></div><button class="toggle" role="switch" aria-checked="${LITE}" aria-label="Battery saver mode" data-a="toggleLite"></button></div></div></div>`}
 const SKINS=[["nuit","Night","Dark, starry, elegant",["#0B0E1C","#C9D3FF","#E3C173"]],["porcelaine","Porcelain","Light and elegant",["#F2F3F7","#1E2558","#A8823A"]],["auto","Automatic","Follows the light or dark mode of your device",["#F2F3F7","#1E2558","#0E1120"]],["savane","Savanna","Warm colours, green and gold",["#F5EFE3","#1F5C3F","#A8731C"]],["ocean","Ocean","Lagoon blue, fresh",["#EDF4F6","#0B4F6C","#11809F"]]];
 let SKIN="aurora";try{SKIN=localStorage.getItem("mca_skin4")||"aurora"}catch(e){}
 function isDarkSkin(){return SKIN==="nuit"||(SKIN==="auto"&&(document.documentElement.getAttribute("data-theme")==="dark"||(document.documentElement.getAttribute("data-theme")!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches)))}
@@ -1115,7 +1115,7 @@ function tabsFor(){
 function render(){
   const ae=document.activeElement,aeId=ae&&ae.id,sel=aeId&&ae.selectionStart!=null?[ae.selectionStart,ae.selectionEnd]:null;
   $("#roleTag").textContent=S.mode==="teacher"?"Teacher space":isParent(S.me)?"Parent space":"Student space";
-  const soundBtn=`<button class="iconbtn" data-a="toggleLite" aria-label="${LITE?"Turn off":"Turn on"} data saver mode" title="Data saver mode: ${LITE?"on":"off"}" aria-pressed="${LITE}">${ic(LITE?"leaf":"bolt2")}</button><button class="iconbtn" data-a="skinNext" aria-label="Change theme" title="Change theme">${ic("palette")}</button><button class="iconbtn" data-a="sound" aria-label="${S.sound?"Mute sound":"Turn sound on"}">${ic(S.sound?"speaker":"mute")}</button>`;
+  const soundBtn=`<button class="iconbtn" data-a="toggleLite" aria-label="${LITE?"Turn off":"Turn on"} battery saver mode" title="Battery saver mode: ${LITE?"on":"off"}" aria-pressed="${LITE}">${ic(LITE?"leaf":"bolt2")}</button><button class="iconbtn" data-a="skinNext" aria-label="Change theme" title="Change theme">${ic("palette")}</button><button class="iconbtn" data-a="sound" aria-label="${S.sound?"Mute sound":"Turn sound on"}">${ic(S.sound?"speaker":"mute")}</button>`;
   let hdr="";
   if(S.mode==="student"&&S.me){hdr=`${peerBtn()}<button class="iconbtn" data-a="openChat" aria-label="Messages with the teacher" title="Messages">${ic("chat")}${studentUnread(S.me)?`<span class="unread"></span>`:""}</button>`+(isParent(S.me)?"":`<span class="pill fire">${ic("flame")}${liveStreak(S.me)}${(S.me.freezes||0)?`<span class="frz" title="Streak freezes">${ic("snow")}${S.me.freezes}</span>`:""}</span><button class="pill xp" data-a="openShop" title="Shop: spend your XP">${ic("bolt")}${S.me.xp||0}</button>`)}
   if(S.isOwner||S.isStaff)hdr+=`<button class="iconbtn" data-a="switch" aria-label="${S.mode==="teacher"?"View as a student":"Back to teacher space"}" title="${S.mode==="teacher"?"View as a student":"Back to teacher space"}">${ic(S.mode==="teacher"?"eye":"users")}</button>`;
@@ -2506,7 +2506,7 @@ document.addEventListener("click",e=>{const say_=e.target.closest("[data-say]");
   case"askRemoveStaff":S.confirm="staff"+id;break;
   case"removeStaff":{S.confirm=null;const pid=principalId();const theirs=S.allPeople.filter(x=>x.teacherId===id);
     (async()=>{await write(()=>S.db.doc("staff/"+id).delete());for(const p of theirs)await write(()=>S.db.doc("students/"+p.id).update({teacherId:pid}));toast(`Teacher removed · ${theirs.length} student(s) moved to you`,"users")})();break}
-  case"toggleLite":setLite(!LITE);toast(LITE?"Data saver mode on":"Data saver mode off","leaf");break;
+  case"toggleLite":setLite(!LITE);toast(LITE?"Battery saver mode on":"Battery saver mode off","leaf");break;
   case"skin":applySkin(el.dataset.k,true);toast("Theme: "+SKINS.find(x=>x[0]===SKIN)[1],"palette");break;
   case"skinNext":{const i=SKINS.findIndex(x=>x[0]===SKIN);applySkin(SKINS[(i+1)%SKINS.length][0],true);toast("Theme: "+SKINS.find(x=>x[0]===SKIN)[1],"palette");break}
   case"approveSt":write(()=>S.db.doc("access/"+id).set({status:"active",at:Date.now(),by:S.uid})).then(()=>toast("Sign-up accepted","check"));break;
@@ -3946,7 +3946,7 @@ document.addEventListener("input",e=>{if(e.target&&e.target.id==="fsh_q"&&F.shar
 .fsv-media video{max-width:100%;max-height:100%;width:100%;object-fit:contain}
 .fsv-snd{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;border:0;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font:inherit;font-weight:700;padding:10px 16px;cursor:pointer}
 #hdr .nbell{position:relative}.nbadge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#E5484D;color:#fff;font-size:.68rem;font-weight:800;display:grid;place-items:center;line-height:1}
-@media (max-width:430px){#hdr{gap:4px!important;flex-wrap:nowrap!important}#hdr .iconbtn{width:34px!important;height:34px!important;min-width:34px}#hdr .pill{padding-inline:7px!important}#hdr [data-a="toggleLite"]{display:none!important}}
+@media (max-width:430px){#hdr{gap:4px!important;flex-wrap:nowrap!important}#hdr .iconbtn{width:34px!important;height:34px!important;min-width:34px}#hdr .pill{padding-inline:7px!important}}
 .fsv-bot{row-gap:10px}
 .nbig{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--surface2)}
 .it.nun{background:color-mix(in srgb,var(--ink-soft) 55%,transparent)}.ndot{width:10px;height:10px;border-radius:50%;background:#34B7F1;flex:none;margin-left:auto;align-self:center}
@@ -8745,7 +8745,7 @@ const FCH_KIND={challenge:"English challenge · reply in the comments",word:"Wor
    - A warm welcome, once a day.
    All of it is off when the phone asks for less motion (reduced motion).
    ===================================================================== */
-const MG={calm:()=>matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches};
+const MG={calm:()=>document.documentElement.getAttribute("data-lite")==="1"||(matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)};
 const MG_COLORS=["#5EEAD4","#818CF8","#F472B6","#FBBF24","#A7F3D0","#93C5FD"];
 
 function mgBurst(x,y,n,glyphs,spread){if(MG.calm())return;
@@ -8833,7 +8833,7 @@ const MAS_BAD=["Almost! Try again, you can do it! 💪","Not quite, but you are 
 const MAS_LOOKS=["","look-2","look-3"];
 function masLook(){try{return +(localStorage.getItem("ec_mas_look")||0)%MAS_LOOKS.length}catch(e){return 0}}
 function masApplyLook(box){box.classList.remove("look-2","look-3");const c=MAS_LOOKS[masLook()];if(c)box.classList.add(c)}
-function masShow(text,mood){
+function masShow(text,mood){if(document.documentElement.getAttribute("data-lite")==="1")return;
   if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
   let box=document.getElementById("mas");
   if(!box){box=document.createElement("div");box.id="mas";box.className="mas";
@@ -8907,6 +8907,89 @@ const FR_CALL_BAR=/<div class="call-entry">[\s\S]*?<\/div>/;
   const stranger=mem.some(m=>m.uid!==S.uid&&PR.dir.some(x=>x.uid===m.uid)&&!frIsFriend(m.uid));
   return stranger?h.replace(FR_CALL_BAR,""):h;
 }}
+
+/* ---- app-v5-zzzg-layout.js ---- */
+/* =====================================================================
+   v5 · Mise en page et économie d'énergie.
+   - Réponse fausse ou juste : texte lisible dans les deux thèmes.
+   - Publications : photos et vidéos restent dans le fond de la carte.
+   - Économie d'énergie : animations et effets coupés (voir liteHTML).
+   ===================================================================== */
+{const st=document.createElement("style");st.id="zzzglayout";st.textContent=`
+/* réponse à remplir : rouge ou vert lisible, pas de texte blanc sur fond clair */
+.answer-input.wrong{color:var(--bad-ink)!important;background:var(--bad-soft)!important}
+.answer-input.right{color:var(--ok-ink)!important;background:var(--ok-soft)!important}
+:root[data-theme="light"] .answer-input.wrong,:root:not([data-theme="dark"]) .answer-input.wrong{color:#9E2A3E!important}
+:root[data-theme="light"] .answer-input.right,:root:not([data-theme="dark"]) .answer-input.right{color:#13674A!important}
+
+/* publications : rien ne dépasse du fond */
+.fpost{grid-template-columns:minmax(0,1fr);min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden}
+.fpost>*{min-width:0;max-width:100%}
+.fmedia,.fmedia>*,.fvid,.fvid-v,.fvid img,.fmedia img{max-width:100%;box-sizing:border-box}
+.fvid,.fvid-v{width:100%;object-fit:contain}
+.fvid-v{max-height:min(70vh,520px)}
+.fshared{min-width:0;max-width:100%;box-sizing:border-box}
+.factions{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) minmax(0,1fr)!important;max-width:100%}
+.factions button{min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:430px){.factions button{font-size:.86rem;padding:8px 4px;gap:4px}}
+
+/* économie d'énergie : plus d'animations, de flous ni d'effets */
+:root[data-lite="1"] *,:root[data-lite="1"] *::before,:root[data-lite="1"] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+:root[data-lite="1"] .glass,:root[data-lite="1"] header.top,:root[data-lite="1"] nav.tabs{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+:root[data-lite="1"] .mas,:root[data-lite="1"] .mas-x,:root[data-lite="1"] .mg-p,:root[data-lite="1"] #bg3d,:root[data-lite="1"] .torus{display:none!important}
+`;document.head.appendChild(st)}
+
+/* ---- app-v5-zzzh-downloads.js ---- */
+/* =====================================================================
+   v5 · Chaque publication peut être téléchargée.
+   - Une publication avec photos ou vidéos : on télécharge les fichiers.
+   - Une publication sans fichier : on télécharge son texte (.txt).
+   ===================================================================== */
+{const _fp=fPostHTML;
+  fPostHTML=function(p){const h=_fp(p);
+    const btn=`<button type="button" class="iconbtn sm" data-fdl="${esc(p.id)}" aria-label="Download this post" title="Download this post">${ic("download")}</button>`;
+    return h.replace("</header>",btn+"</header>")}}
+
+function frSaveBlob(blob,name){
+  if(S.dl&&S.dl.save) return S.dl.save({filename:name,data:blob});
+  const u=URL.createObjectURL(blob);const a=document.createElement("a");
+  a.href=u;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},4000);
+}
+
+async function fDownloadPost(p){
+  const stamp=new Date(p.created_at||Date.now()).toISOString().slice(0,10);
+  const id=String(p.id).slice(0,6);
+  const media=[...(Array.isArray(p.media)?p.media:[]),...(p.shared&&Array.isArray(p.shared.media)?p.shared.media:[])];
+  if(!media.length){
+    const txt=`${p.who?.name||"Student"} · ${stamp}\n\n${p.body||""}\n`;
+    await frSaveBlob(new Blob([txt],{type:"text/plain"}),`post-${stamp}-${id}.txt`);
+    toast("Post saved","download");
+    return;
+  }
+  toast(`Downloading ${media.length} file${media.length>1?"s":""}…`,"download");
+  let i=0;
+  for(const m of media){
+    i++;
+    const url=await srcURL({k:"m",id:m.p,t:m.t});
+    const res=await fetch(url);
+    if(!res.ok) throw new Error("Could not download the file");
+    const blob=await res.blob();
+    const ext=(EXT[m.t]||String(m.t||"").split("/")[1]||"bin").replace(/[^a-z0-9]/gi,"");
+    await frSaveBlob(blob,`post-${stamp}-${id}-${i}.${ext}`);
+    if(i<media.length) await new Promise(r=>setTimeout(r,400));
+  }
+  toast("Post saved","download");
+}
+
+document.addEventListener("click",async e=>{
+  const el=e.target.closest&&e.target.closest("[data-fdl]");
+  if(!el) return;
+  e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation();
+  const p=(F.posts||[]).find(x=>String(x.id)===el.dataset.fdl);
+  if(!p){toast("Post not found","x");return}
+  try{ await fDownloadPost(p) }catch(er){ toast(er.message||"Could not download","x") }
+},true);
 
 /* ==== v4 END ==== */
 render();
