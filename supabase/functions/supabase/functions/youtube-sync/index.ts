@@ -6,6 +6,7 @@
 //  YT_AUTHOR_EMAIL  = (facultatif) e-mail du compte qui « publie » ; sinon l'e-mail du propriétaire (app_config.owner_email)
 //  YT_AUTHOR_NAME   = (facultatif) nom affiché sur le post ; sinon « YouTube »
 //  YT_MAX_PER_RUN   = (facultatif) nombre max de posts par passage (3 par défaut)
+//  YT_BACKFILL      = (facultatif, pour tester) publier les N plus récentes vidéos au 1er passage (1 à 5)
 // SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY sont fournis automatiquement par Supabase.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
@@ -63,13 +64,18 @@ Deno.serve(async (req) => {
     const seen = new Set((seenRows || []).map((r) => r.video_id));
     const { count } = await sb.from("yt_seen").select("video_id", { count: "exact", head: true }).eq("channel", cid);
 
-    // 1er passage : on note les vidéos existantes sans les publier (pour ne pas inonder « Posts »).
+    let fresh = vids.filter((v) => !seen.has(v.id)).reverse(); // de la plus ancienne à la plus récente
+    // 1er passage : on note les vidéos existantes sans les publier (pour ne pas inonder « Posts »),
+    // sauf les N plus récentes si le secret YT_BACKFILL = N (test : 1 à 5).
     if (!count) {
-      await sb.from("yt_seen").upsert(ids.map((id) => ({ video_id: id, channel: cid })), { onConflict: "video_id" });
-      return Response.json({ ok: true, posted: 0, note: "première synchronisation : " + ids.length + " vidéos existantes ignorées" });
+      const back = Math.max(0, Math.min(5, Math.floor(+(Deno.env.get("YT_BACKFILL") || 0)) || 0));
+      const old = vids.slice(back).map((v) => ({ video_id: v.id, channel: cid }));
+      if (old.length) await sb.from("yt_seen").upsert(old, { onConflict: "video_id" });
+      fresh = vids.slice(0, back).filter((v) => !seen.has(v.id)).reverse();
+      if (!fresh.length) {
+        return Response.json({ ok: true, posted: 0, note: "première synchronisation : " + vids.length + " vidéos existantes ignorées" });
+      }
     }
-
-    const fresh = vids.filter((v) => !seen.has(v.id)).reverse(); // de la plus ancienne à la plus récente
     if (!fresh.length) return Response.json({ ok: true, posted: 0 });
 
     // compte qui « publie »
