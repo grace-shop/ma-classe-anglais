@@ -319,29 +319,29 @@ to succeed | to achieve a goal | She succeeded in her exams.`,
 hw:{t:"Girls and school",b:"Write 6 sentences about girls' schooling. Use at least two comparatives (more ... than, as ... as) and one question tag."}},
 
 {c:"2nde",u:4,lv:"B1",t:"Women's Place in the Family",th:"Role and place of women in the family",g:"Comparative of inferiority, comparative of superiority, comparative of equality, however / yet, question tags",
-body:`Dans la famille togolaise, le role des femmes change. Comment les taches sont-elles partagees entre l'homme et la femme ?
+body:`In the Togolese family, the role of women is changing. How are tasks shared between the husband and the wife?
 
-**Vocabulary** (mots et expressions) :
-**husband** (mari) ; **wife** (epouse) ; **to share** (partager) ; **responsibility** (responsabilite) ; **decision** (decision) ; **to raise children** (elever des enfants) ; **to cook** (cuisiner) ; **family meeting** (reunion familiale) ; **duty** (devoir) ; **to contribute** (contribuer) ; **role** (role) ; **income** (revenu) ; **respect** (respect) ; **equality** (egalite) ; **tradition** (tradition).
+**Vocabulary** (words and expressions):
+**husband** (a man married to a woman) ; **wife** (a woman married to a man) ; **to share** (to divide and use together) ; **responsibility** (a duty you must carry out) ; **decision** (a choice made after thinking) ; **to raise children** (to bring up children) ; **to cook** (to prepare food) ; **family meeting** (a gathering of the family to decide things) ; **duty** (something you must do) ; **to contribute** (to give or add something) ; **role** (the part someone plays) ; **income** (money earned) ; **respect** (a feeling of honour for someone) ; **equality** (the same rights for everyone) ; **tradition** (customs passed down over time).
 
-**Grammar 1 : Comparative of superiority.** Avec un adjectif court : **adjectif + -er + than**. Avec un adjectif long : **more + adjectif + than**.
-Women's contribution is **more visible than** before. (La contribution des femmes est plus visible qu'avant.)
+**Grammar 1: Comparative of superiority.** With a short adjective: **adjective + -er + than**. With a long adjective: **more + adjective + than**.
+Women's contribution is **more visible than** before.
 
-**Grammar 2 : Comparative of inferiority.** **less ... than**.
-In some families, women have **less say than** men in decisions. (Dans certaines familles, les femmes ont moins de voix que les hommes dans les decisions.)
+**Grammar 2: Comparative of inferiority.** **less ... than**.
+In some families, women have **less say than** men in decisions.
 
-**Grammar 3 : Comparative of equality.**
-A mother can be **as responsible as** a father. (Une mere peut etre aussi responsable qu'un pere.)
+**Grammar 3: Comparative of equality.**
+A mother can be **as responsible as** a father.
 
-**Grammar 4 : However and yet.**
-Tradition gives men the final word. Yet, many women now take part in family decisions. (La tradition donne le dernier mot aux hommes. Pourtant, beaucoup de femmes participent maintenant aux decisions familiales.)
+**Grammar 4: However and yet.**
+Tradition gives men the final word. Yet, many women now take part in family decisions.
 
-**Grammar 5 : Question tags.** Apres un verbe positif, la question tag est negative.
-Women work hard at home, **don't they ?** (Les femmes travaillent dur a la maison, n'est-ce pas ?)
+**Grammar 5: Question tags.** After a positive verb, the question tag is negative.
+Women work hard at home, **don't they?**
 
-**Skill : model sentences for a sketch.** Mother : We must share the housework, my dear. Father : You are right. I will cook on Sunday, won't I ?
+**Skill: model sentences for a sketch.** Mother: We must share the housework, my dear. Father: You are right. I will cook on Sunday, won't I?
 
-**Final activity.** Ecris un court sketch (8 repliques) entre un pere, une mere et un enfant sur le partage des taches a la maison.`,
+**Final activity.** Write a short sketch (8 lines) between a father, a mother and a child about sharing the housework at home.`,
 quiz:`Women's voice is ___ heard today ___ in the past.
 * more / than
 - less / than
@@ -367,13 +367,13 @@ Tradition is strong here, ___ ?
 - is it
 - doesn't it
 
-Ecris en anglais « elever des enfants ».
+Write in English: "to raise children".
 = to raise children
 
-« Income » veut dire :
-* revenu
-- devoir
-- decision
+"Income" means:
+* money earned
+- a duty
+- a decision
 
 Men and women have ___ rights in the family.
 * equal
@@ -385,43 +385,43 @@ She cooks every day, ___ she never complains.
 - however
 - unless
 
-Choisis la bonne forme : Our father ___ the eldest, ___ the youngest.
+Choose the correct form: Our father ___ the eldest, ___ the youngest.
 * is older than
 - is older as
 - is more old than
 
-Corrige la phrase : Men work as hard than women, don't they ?
-* Men work as hard as women, don't they ?
-- Men work as hard than women, do they ?
-- Men work as hard as women, do they ?
+Correct the sentence: Men work as hard than women, don't they?
+* Men work as hard as women, don't they?
+- Men work as hard than women, do they?
+- Men work as hard as women, do they?
 
-« Responsibility » se traduit par :
-* responsabilite
+"Responsibility" means:
+* a duty you must carry out
 - respect
-- reunion
+- a family meeting
 
-Le mot « husband » designe :
-* le mari
-- l'epouse
-- l'enfant
+The word "husband" means:
+* a man married to a woman
+- a wife
+- a child
 
-Ecris en anglais « partager ».
+Write in English: "to share".
 = to share`,
-deck:`husband | mari | My husband works in Lome.
-wife | epouse | His wife teaches at a primary school.
-to share | partager | We share the housework.
-responsibility | responsabilite | Caring for children is a big responsibility.
-decision | decision | The decision was taken together.
-to raise children | elever des enfants | They raise their children with love.
-to cook | cuisiner | Who will cook tonight?
-family meeting | reunion familiale | We hold a family meeting every Sunday.
-duty | devoir | It is a duty to help elders.
-to contribute | contribuer | Each member can contribute ideas.
-role | role | The mother has an important role.
-income | revenu | The family income is small this year.
-equality | egalite | Equality begins at home.
-tradition | tradition | This tradition is very old.`,
-hw:{t:"Family roles",b:"Ecris un petit texte de 6 phrases sur le role de la femme et de l'homme dans ta famille. Utilise au moins un comparatif de superiorite, une phrase avec However et une question tag."}},
+deck:`husband | a man married to a woman | My husband works in Lome.
+wife | a woman married to a man | His wife teaches at a primary school.
+to share | to divide and use together | We share the housework.
+responsibility | a duty you must carry out | Caring for children is a big responsibility.
+decision | a choice made after thinking | The decision was taken together.
+to raise children | to bring up children | They raise their children with love.
+to cook | to prepare food | Who will cook tonight?
+family meeting | a gathering of the family to decide things | We hold a family meeting every Sunday.
+duty | something you must do | It is a duty to help elders.
+to contribute | to give or add something | Each member can contribute ideas.
+role | the part someone plays | The mother has an important role.
+income | money earned | The family income is small this year.
+equality | the same rights for everyone | Equality begins at home.
+tradition | customs passed down over time | This tradition is very old.`,
+hw:{t:"Family roles",b:"Write a short text of 6 sentences about the role of women and men in your family. Use at least one comparative of superiority, one sentence with However and one question tag."}},
 
 {c:"2nde",u:5,lv:"B1",t:"Bushfires and Deforestation",th:"The environment: fires and forests",g:"Active and passive voice, the use of unless, relative pronouns",
 body:`Les feux de brousse et la deforestation menacent les forets du Togo. Que se passe-t-il et comment proteger la nature ?
