@@ -38,8 +38,8 @@ document.head.insertAdjacentHTML("beforeend",`<style id="v4css">
 .docv-body{overflow:auto;-webkit-overflow-scrolling:touch;display:grid;justify-items:center;align-content:start;padding:12px 8px 40px;gap:10px;touch-action:pan-x pan-y pinch-zoom}
 .docv-page{background:#fff;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.45);max-width:none}
 .docv-img{display:block;width:100%;height:100%;object-fit:contain;border-radius:8px;background:transparent;transform-origin:50% 50%;user-select:none;-webkit-user-drag:none;touch-action:none}
-.docv-body.docv-pic{display:block;padding:0;overflow:hidden;min-height:0;height:100%;touch-action:none}
-.docv-body.docv-pic .docv-img{transition:transform .18s ease}
+.docv-body.docv-pic{position:relative;display:block;padding:0;overflow:hidden;min-height:0;height:100%;touch-action:none}
+.docv-body.docv-pic .docv-img{position:absolute;left:50%;top:50%;width:auto;height:auto;max-width:100%;max-height:100%;transform:translate(-50%,-50%);object-fit:contain;transition:transform .18s ease}
 .docv-msg{display:grid;justify-items:center;gap:14px;text-align:center;max-width:420px;margin:12vh auto 0;color:#C9CFEA;line-height:1.5}
 .docv-msg svg{width:48px;height:48px;fill:none;stroke:#93ABFF;stroke-width:1.6}
 .docv-wait{display:flex;align-items:center;gap:10px;margin-top:20vh;color:#C9CFEA}
@@ -182,7 +182,7 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
 {const PV={s:1,x:0,y:0,p:new Map(),d0:0,s0:1,img:null,tap:0,tx:0,ty:0};
  const dist=()=>{const[a,b]=[...PV.p.values()];return Math.hypot(a.x-b.x,a.y-b.y)||1};
  const bounds=img=>{const w=img.clientWidth,h=img.clientHeight;return{mx:(PV.s-1)*w/2,my:(PV.s-1)*h/2}};
- const paint=img=>{const b=bounds(img);PV.x=Math.max(-b.mx,Math.min(b.mx,PV.x));PV.y=Math.max(-b.my,Math.min(b.my,PV.y));if(PV.s<=1){PV.x=0;PV.y=0}img.style.transform=`translate(${PV.x}px,${PV.y}px) scale(${PV.s})`};
+ const paint=img=>{const b=bounds(img);PV.x=Math.max(-b.mx,Math.min(b.mx,PV.x));PV.y=Math.max(-b.my,Math.min(b.my,PV.y));if(PV.s<=1){PV.x=0;PV.y=0}img.style.transform=`translate(calc(-50% + ${PV.x}px),calc(-50% + ${PV.y}px)) scale(${PV.s})`};
  const reset=img=>{PV.s=1;PV.x=0;PV.y=0;if(img)img.style.transform=""};
  const setup=()=>{const body=document.getElementById("docvBody"),img=body&&body.querySelector("img.docv-img");
    if(!img){if(PV.img){PV.img=null}return}
