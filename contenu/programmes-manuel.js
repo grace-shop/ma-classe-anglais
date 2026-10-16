@@ -956,30 +956,30 @@ community | a group of people living together | The whole community helped build
 hw:{t:"Respect public goods",b:"Write 5 sentences with wish or if only about public goods in your town. Use at least one question tag."}},
 
 {c:"2nde",u:10,lv:"B1",t:"Patriotic Acts",th:"Patriotism and civic action",g:"Wish and if only, question tags, active and passive voice",
-body:`Etre patriote, c'est aimer son pays et agir pour lui. Quels gestes patriotiques peut-on faire chaque jour ?
+body:`To be patriotic is to love your country and act for it. What patriotic acts can we do every day?
 
-**Vocabulary** (mots et expressions) :
-**patriotism** (patriotisme) ; **patriot** (patriote) ; **national flag** (drapeau national) ; **national anthem** (hymne national) ; **to honour** (honorer) ; **to serve** (servir) ; **national service** (service national) ; **sacrifice** (sacrifice) ; **nation** (nation) ; **hero** (heros) ; **duty** (devoir) ; **to vote** (voter) ; **to pay taxes** (payer les impots) ; **pride** (fierte) ; **to celebrate** (celebrer).
+**Vocabulary** (words and expressions):
+**patriotism** (love and loyalty for one's country) ; **patriot** (a person who loves and serves their country) ; **national flag** (the flag of a country) ; **national anthem** (the official song of a country) ; **to honour** (to show respect) ; **to serve** (to work for others or for the state) ; **national service** (a period of service to the nation) ; **sacrifice** (giving up something for others) ; **nation** (a large community of people with a shared history) ; **hero** (a person admired for courage) ; **duty** (something you must do) ; **to vote** (to choose by voting) ; **to pay taxes** (to give money to the state) ; **pride** (a feeling of satisfaction in what you achieve) ; **to celebrate** (to mark a special day).
 
-**Grammar 1 : Wish and if only.** Pour exprimer un regret sur le present.
-I **wish** I **could** serve my country. (J'aimerais pouvoir servir mon pays.)
-If only the young **knew** the history of the nation. (Si seulement les jeunes connaissaient l'histoire de la nation !)
+**Grammar 1: Wish and if only.** To express a regret about the present.
+I **wish** I **could** serve my country.
+If only the young **knew** the history of the nation!
 
-**Grammar 2 : Question tags.**
-Our flag is a symbol of unity, **isn't it ?** (Notre drapeau est un symbole d'unite, n'est-ce pas ?)
-Children should sing the anthem with pride, **shouldn't they ?**
+**Grammar 2: Question tags.**
+Our flag is a symbol of unity, **isn't it?**
+Children should sing the anthem with pride, **shouldn't they?**
 
-**Grammar 3 : Passive voice.**
-The national anthem **is sung** on public holidays. (L'hymne national est chante les jours feries.)
-Heroes **are remembered** by the nation. (Les heros sont honores par la nation.)
+**Grammar 3: Passive voice.**
+The national anthem **is sung** on public holidays.
+Heroes **are remembered** by the nation.
 
-**Skill : discussion.** Model sentences : Patriotism means working for the nation. In my opinion, paying taxes is a patriotic act.
+**Skill: discussion.** Model sentences: Patriotism means working for the nation. In my opinion, paying taxes is a patriotic act.
 
-**Skill : translation.** FR : Le drapeau est hisse chaque matin devant l'ecole. EN : The flag is raised every morning in front of the school.
+**Skill: translation.** FR: Le drapeau est hisse chaque matin devant l'ecole. EN: The flag is raised every morning in front of the school.
 
-**Skill : formal letter.** Dear Sir, I am writing to suggest that the school celebrate National Day with a parade. Yours faithfully,
+**Skill: formal letter.** Dear Sir, I am writing to suggest that the school celebrate National Day with a parade. Yours faithfully,
 
-**Final activity.** Ecris une lettre formelle de 6 lignes a ton directeur pour proposer un acte patriotique pour ton ecole.`,
+**Final activity.** Write a formal letter of 6 lines to your headteacher proposing a patriotic act for your school.`,
 quiz:`I wish I ___ more about our national history.
 * knew
 - know
@@ -995,12 +995,12 @@ The national flag ___ every morning at school.
 - raises
 - is raise
 
-« Patriotism » veut dire :
-* patriotisme
+"Patriotism" means:
+* love and loyalty for one's country
 - sacrifice
-- fierte
+- pride
 
-Ecris en anglais « honorer ».
+Write in English: "to honour".
 = to honour
 
 If only we ___ vote in every election.
@@ -1013,27 +1013,27 @@ The students ___ the anthem on Monday.
 - were sang
 - are sing
 
-« National service » se traduit par :
-* service national
-- service public
-- service militaire
+"National service" means:
+* a period of service to the nation
+- public service
+- military service
 
-Ecris la phrase au passif : The people celebrate Independence Day.
+Choose the passive: The people celebrate Independence Day.
 * Independence Day is celebrated by the people.
 - Independence Day celebrates by the people.
 - Independence Day is celebrate by the people.
 
-« Sacrifice » veut dire :
-* sacrifice
-- devoir
-- nation
+"Sacrifice" means:
+* giving up something for others
+- a duty
+- a nation
 
-Corrige la phrase : I wish I was a doctor for my people.
+Correct the sentence: I wish I was a doctor for my people.
 * I wish I were a doctor for my people.
-- I wish I was a doctor for my people, am I ?
+- I wish I was a doctor for my people, am I?
 - I wish I be a doctor for my people.
 
-Ecris en anglais « payer les impots ».
+Write in English: "to pay taxes".
 = to pay taxes
 
 Our parents served the nation, ___ ?
@@ -1041,45 +1041,45 @@ Our parents served the nation, ___ ?
 - did they
 - don't they
 
-« Pride » veut dire :
-* fierte
-- hymne
-- drapeau`,
-deck:`patriotism | patriotisme | Patriotism means love of one's country.
-patriot | patriote | She is a patriot who works for the town.
-national flag | drapeau national | The national flag is green, yellow and red.
-national anthem | hymne national | We sing the national anthem at school.
-to honour | honorer | We honour our heroes each year.
-to serve | servir | Soldiers serve the nation.
-national service | service national | Some young people do national service.
-sacrifice | sacrifice | Their sacrifice saved many lives.
-nation | nation | The nation celebrates its independence.
-hero | heros | He is a hero for the village.
-duty | devoir | It is our duty to vote.
-to pay taxes | payer les impots | Citizens must pay taxes.
-pride | fierte | I feel pride when I see the flag.
-to celebrate | celebrer | We celebrate National Day in October.`,
-hw:{t:"My patriotic act",b:"Ecris 5 phrases sur un geste patriotique que tu peux faire cette semaine. Utilise I wish ou If only, une question tag et une phrase au passif."}},
+"Pride" means:
+* a feeling of satisfaction in what you achieve
+- an anthem
+- a flag`,
+deck:`patriotism | love and loyalty for one's country | Patriotism means love of one's country.
+patriot | a person who loves and serves their country | She is a patriot who works for the town.
+national flag | the flag of a country | The national flag is green, yellow and red.
+national anthem | the official song of a country | We sing the national anthem at school.
+to honour | to show respect | We honour our heroes each year.
+to serve | to work for others or for the state | Soldiers serve the nation.
+national service | a period of service to the nation | Some young people do national service.
+sacrifice | giving up something for others | Their sacrifice saved many lives.
+nation | a large community with a shared history | The nation celebrates its independence.
+hero | a person admired for courage | He is a hero for the village.
+duty | something you must do | It is our duty to vote.
+to pay taxes | to give money to the state | Citizens must pay taxes.
+pride | a feeling of satisfaction in what you achieve | I feel pride when I see the flag.
+to celebrate | to mark a special day | We celebrate National Day in October.`,
+hw:{t:"My patriotic act",b:"Write 5 sentences about a patriotic act you can do this week. Use I wish or If only, one question tag and one passive sentence."}},
 
 {c:"2nde",u:11,lv:"B1",t:"Land Issues",th:"Land, inheritance and women's rights",g:"Correlative conjunctions, emphasis with if clause type three",
-body:`La terre est une source de conflits au Togo, surtout lorsqu'il s'agit d'heritage. Les femmes sont souvent exclues. Comment changer cela ?
+body:`Land is a source of conflict in Togo, especially when inheritance is involved. Women are often excluded. How can this change?
 
-**Vocabulary** (mots et expressions) :
-**land** (terre) ; **land issue** (question fonciere) ; **inheritance** (heritage) ; **to inherit** (heriter) ; **heir** (heritier) ; **will** (testament) ; **widow** (veuve) ; **property** (propriete) ; **dispute** (litige) ; **to deny** (refuser, nier) ; **title deed** (titre foncier) ; **court case** (proces) ; **injustice** (injustice) ; **to claim** (revendiquer) ; **family member** (membre de la famille).
+**Vocabulary** (words and expressions):
+**land** (ground used for farming or building) ; **land issue** (a problem about land ownership) ; **inheritance** (property received from a family member who has died) ; **to inherit** (to receive property after a death) ; **heir** (a person who inherits) ; **will** (a document saying who gets your property) ; **widow** (a woman whose husband has died) ; **property** (things or land that someone owns) ; **dispute** (a disagreement) ; **to deny** (to refuse to give, or to say something is not true) ; **title deed** (an official document proving land ownership) ; **court case** (a legal process in court) ; **injustice** (unfair treatment) ; **to claim** (to demand something you believe is yours) ; **family member** (a person related to you).
 
-**Grammar 1 : Correlative conjunctions.** Ce sont des paires de mots de liaison : **either ... or** (soit ... soit), **neither ... nor** (ni ... ni), **both ... and** (a la fois ... et), **not only ... but also** (non seulement ... mais aussi).
-Either the family or the court **will decide**. (Soit la famille, soit le tribunal decidera.)
-Neither the widow **nor** her children **received** the land. (Ni la veuve ni ses enfants n'ont recu la terre.)
-Both men **and** women **should inherit** property. (Les hommes comme les femmes devraient heriter.)
+**Grammar 1: Correlative conjunctions.** These are pairs of linking words: **either ... or** (one or the other), **neither ... nor** (not one, not the other), **both ... and** (the two together), **not only ... but also** (more than one thing).
+Either the family or the court **will decide**.
+Neither the widow **nor** her children **received** the land.
+Both men **and** women **should inherit** property.
 
-**Grammar 2 : Emphasis with if clause type three.** Pour insister, on utilise **It is ... that** avec un passe perfect dans la condition.
-It was because she **had not registered** the land that she lost it. (C'est parce qu'elle n'avait pas enregistre la terre qu'elle l'a perdue.)
+**Grammar 2: Emphasis with if clause type three.** To emphasise, we use **It is ... that** with a past perfect in the condition.
+It was because she **had not registered** the land that she lost it.
 
-**Skill : acting a dispute.** Model lines : Widow : My husband wanted me to keep the house. Brother-in-law : Not only is the land ours, but the will says so.
+**Skill: acting a dispute.** Model lines: Widow: My husband wanted me to keep the house. Brother-in-law: Not only is the land ours, but the will says so.
 
-**Skill : formal letter to denounce injustice.** Model sentence : I am writing to denounce the injustice suffered by women who are denied land after the death of their husbands.
+**Skill: formal letter to denounce injustice.** Model sentence: I am writing to denounce the injustice suffered by women who are denied land after the death of their husbands.
 
-**Final activity.** Ecris 5 phrases sur les difficultes des femmes pour heriter de la terre. Utilise either ... or, neither ... nor et une phrase emphasis avec It was ... that.`,
+**Final activity.** Write 5 sentences about the difficulties women face in inheriting land. Use either ... or, neither ... nor, and one emphasis sentence with It was ... that.`,
 quiz:`Either the court ___ the family will decide.
 * or
 - nor
@@ -1095,12 +1095,12 @@ Not only ___ she a widow, but she is also poor.
 - was
 - be
 
-« Inheritance » veut dire :
+"Inheritance" means:
 * heritage
-- testament
-- propriete
+- a will
+- property
 
-Ecris en anglais « veuve ».
+Write in English: "widow".
 = widow
 
 Both men ___ women should own land.
@@ -1113,79 +1113,79 @@ It was because he ___ the will that he lost the house.
 - did not find
 - has not find
 
-« Dispute » signifie :
-* litige
-- heritier
-- injustice
+"Dispute" means:
+* a disagreement
+- an heir
+- an injustice
 
-Choisis la paire correcte : ___ the father ___ the mother can sign the papers.
+Choose the correct pair: ___ the father ___ the mother can sign the papers.
 * Both / and
 - Either / and
 - Neither / or
 
-« Title deed » se dit :
-* titre foncier
-- testament
-- acte de naissance
+"Title deed" means:
+* an official document proving land ownership
+- a will
+- a birth certificate
 
-Ecris en anglais « heriter ».
+Write in English: "to inherit".
 = to inherit
 
-Corrige la phrase : Neither the chief nor the elders was present.
+Correct the sentence: Neither the chief nor the elders was present.
 * Neither the chief nor the elders were present.
 - Neither the chief or the elders was present.
 - Neither the chief nor the elders is presents.
 
-« To deny » veut dire :
-* refuser ou nier
-- revendiquer
-- heriter
+"To deny" means:
+* to refuse to give, or to say something is not true
+- to claim
+- to inherit
 
 It was the court case ___ changed the family's decision.
 * that
 - which
 - who
 
-« Family member » veut dire :
-* membre de la famille
-- chef de village
-- proprietaire`,
-deck:`land | terre | The land belongs to our village.
-land issue | question fonciere | Land issues cause many quarrels.
-inheritance | heritage | The inheritance was shared between the children.
-to inherit | heriter | He inherited his father's farm.
-heir | heritier | The eldest son is the heir.
-will | testament | The will was read at the funeral.
-widow | veuve | The widow kept the family house.
-property | propriete | The property has three rooms.
-dispute | litige | The dispute went to court.
-to deny | refuser, nier | They denied her the right to land.
-title deed | titre foncier | Keep your title deed in a safe place.
-court case | proces | The court case lasted two years.
-injustice | injustice | Denying women land is an injustice.
-to claim | revendiquer | She claimed her share of the land.`,
-hw:{t:"Land rights",b:"Ecris 6 phrases sur le droit des femmes a la terre. Utilise either ... or, neither ... nor, both ... and et une phrase avec It was ... that."}},
+"Family member" means:
+* a person related to you
+- a village chief
+- an owner`,
+deck:`land | ground used for farming or building | The land belongs to our village.
+land issue | a problem about land ownership | Land issues cause many quarrels.
+inheritance | property received from a family member who has died | The inheritance was shared between the children.
+to inherit | to receive property after a death | He inherited his father's farm.
+heir | a person who inherits | The eldest son is the heir.
+will | a document saying who gets your property | The will was read at the funeral.
+widow | a woman whose husband has died | The widow kept the family house.
+property | things or land that someone owns | The property has three rooms.
+dispute | a disagreement | The dispute went to court.
+to deny | to refuse to give | They denied her the right to land.
+title deed | an official document proving land ownership | Keep your title deed in a safe place.
+court case | a legal process in court | The court case lasted two years.
+injustice | unfair treatment | Denying women land is an injustice.
+to claim | to demand something you believe is yours | She claimed her share of the land.`,
+hw:{t:"Land rights",b:"Write 6 sentences about women's right to land. Use either ... or, neither ... nor, both ... and and one sentence with It was ... that."}},
 
 {c:"2nde",u:12,lv:"B1",t:"The Value of Traditional Arts in Togo",th:"Traditional arts, culture and identity",g:"No matter (what, who, how), direct and indirect speech",
-body:`Les arts traditionnels togolais (sculpture, tissage, masques, danses) font partie de notre identite. Pourquoi sont-ils precieux ?
+body:`Togolese traditional arts (carving, weaving, masks, dances) are part of our identity. Why are they precious?
 
-**Vocabulary** (mots et expressions) :
-**traditional art** (art traditionnel) ; **carving** (sculpture sur bois) ; **mask** (masque) ; **weaving** (tissage) ; **pottery** (poterie) ; **drum** (tambour) ; **dance** (danse) ; **craftsman** (artisan) ; **heritage** (patrimoine) ; **to preserve** (preserver) ; **value** (valeur) ; **tourist** (touriste) ; **extremism** (extremisme) ; **religious extremism** (extremisme religieux) ; **tolerance** (tolerance).
+**Vocabulary** (words and expressions):
+**traditional art** (art made with long-established local methods) ; **carving** (shaping wood into a figure) ; **mask** (an object worn on the face in ceremonies) ; **weaving** (making cloth on a loom) ; **pottery** (clay objects made by hand) ; **drum** (an instrument you hit to make sound) ; **dance** (moving to music in a set way) ; **craftsman** (a skilled worker who makes things by hand) ; **heritage** (things passed down from the past) ; **to preserve** (to keep safe for the future) ; **value** (how important something is) ; **tourist** (a person who visits a place for fun) ; **extremism** (holding very extreme views) ; **religious extremism** (extreme views about religion) ; **tolerance** (accepting people who are different).
 
-**Grammar 1 : No matter (what, who, how, where).** Cela veut dire peu importe (quoi, qui, comment, ou). Il est suivi d'un sujet et d'un verbe.
-No matter how old a craftsman is, he can still teach. (Peu importe son age, un artisan peut toujours enseigner.)
-No matter what the tourists say, the masks remain beautiful. (Peu importe ce que disent les touristes, les masques restent beaux.)
+**Grammar 1: No matter (what, who, how, where).** It means it does not matter (what, who, how, where). It is followed by a subject and a verb.
+No matter how old a craftsman is, he can still teach.
+No matter what the tourists say, the masks remain beautiful.
 
-**Grammar 2 : Direct and indirect speech.** Au discours indirect, le temps recule souvent (present -> past, will -> would) et on change les pronoms.
-Direct : "The weaver is working today," she said.
-Indirect : She said that the weaver **was working** that day.
-Direct : "I will teach you the dance," he said. Indirect : He said that he **would teach** me the dance.
+**Grammar 2: Direct and indirect speech.** In indirect speech, the tense often moves back (present to past, will to would), and pronouns change.
+Direct: "The weaver is working today," she said.
+Indirect: She said that the weaver **was working** that day.
+Direct: "I will teach you the dance," he said. Indirect: He said that he **would teach** me the dance.
 
-**Skill : talking about value.** Model text : Traditional arts show who we are. They create jobs for craftsmen and attract tourists.
+**Skill: talking about value.** Model text: Traditional arts show who we are. They create jobs for craftsmen and attract tourists.
 
-**Skill : translation.** FR : Les artisans preservent nos traditions. EN : Craftsmen preserve our traditions.
+**Skill: translation.** FR: Les artisans preservent nos traditions. EN: Craftsmen preserve our traditions.
 
-**Final activity.** Ecris un court texte (5 phrases) sur la valeur d'un art traditionnel de ta region, puis rapporte les paroles d'un artisan en discours indirect.`,
+**Final activity.** Write a short text (5 sentences) about the value of a traditional art from your region, then report the words of a craftsman in indirect speech.`,
 quiz:`No matter ___ tired the dancer is, she performs every night.
 * how
 - what
@@ -1206,18 +1206,18 @@ She said, "I will sell the pottery." She said she ___ the pottery.
 - will sell
 - sells
 
-« Weaving » veut dire :
-* tissage
-- poterie
-- sculpture
+"Weaving" means:
+* making cloth on a loom
+- pottery
+- carving
 
-Ecris en anglais « preserver ».
+Write in English: "to preserve".
 = to preserve
 
-« Heritage » se traduit par :
-* patrimoine
-- valeur
-- artisanat
+"Heritage" means:
+* things passed down from the past
+- value
+- craft
 
 He said, "We are happy." He said that they ___ happy.
 * were
@@ -1229,17 +1229,17 @@ No matter ___ you are, you can learn a traditional dance.
 - what
 - which
 
-« Religious extremism » veut dire :
-* extremisme religieux
-- tolerance religieuse
-- art religieux
+"Religious extremism" means:
+* extreme views about religion
+- religious tolerance
+- religious art
 
-Le mot « tolerance » veut dire :
-* tolerance
-- extremisme
-- valeur
+"Tolerance" means:
+* accepting people who are different
+- extremism
+- value
 
-Ecris en anglais « tambour ».
+Write in English: "drum".
 = drum
 
 She asked, "Where is the market?" She asked me where the market ___.
@@ -1247,31 +1247,31 @@ She asked, "Where is the market?" She asked me where the market ___.
 - is
 - will be
 
-Corrige la phrase : No matter how much it costs, we will buy the mask.
+Correct the sentence: No matter how much it costs, we will buy the mask.
 * No matter how much it costs, we will buy the mask.
 - No matter how much it cost, we will buying the mask.
 - No matter how much costs it, we will buy the mask.
 
-« Craftsman » veut dire :
-* artisan
-- touriste
-- danseur`,
-deck:`traditional art | art traditionnel | Traditional art attracts many visitors.
-carving | sculpture sur bois | The carving shows an ancestor.
-mask | masque | The mask is used in a dance.
-weaving | tissage | Weaving is done on a narrow loom.
-pottery | poterie | Pottery is made by women in this village.
-drum | tambour | The drum announces the festival.
-dance | danse | The dance tells a story.
-craftsman | artisan | The craftsman sells his work at the market.
-heritage | patrimoine | Our heritage must be protected.
-to preserve | preserver | We must preserve our customs.
-value | valeur | Culture has a great value.
-tourist | touriste | The tourist bought a wooden statue.
-extremism | extremisme | Extremism divides communities.
-religious extremism | extremisme religieux | Religious extremism is a danger.
-tolerance | tolerance | Tolerance makes peace possible.`,
-hw:{t:"A traditional art",b:"Ecris 6 phrases sur un art traditionnel de ta region. Utilise deux phrases avec No matter ... et deux phrases au discours indirect (He said that ...)."}},
+"Craftsman" means:
+* a skilled worker who makes things by hand
+- a tourist
+- a dancer`,
+deck:`traditional art | art made with long-established local methods | Traditional art attracts many visitors.
+carving | shaping wood into a figure | The carving shows an ancestor.
+mask | an object worn on the face in ceremonies | The mask is used in a dance.
+weaving | making cloth on a loom | Weaving is done on a narrow loom.
+pottery | clay objects made by hand | Pottery is made by women in this village.
+drum | an instrument you hit to make sound | The drum announces the festival.
+dance | moving to music in a set way | The dance tells a story.
+craftsman | a skilled worker who makes things by hand | The craftsman sells his work at the market.
+heritage | things passed down from the past | Our heritage must be protected.
+to preserve | to keep safe for the future | We must preserve our customs.
+value | how important something is | Culture has a great value.
+tourist | a person who visits a place for fun | The tourist bought a wooden statue.
+extremism | holding very extreme views | Extremism divides communities.
+religious extremism | extreme views about religion | Religious extremism is a danger.
+tolerance | accepting people who are different | Tolerance makes peace possible.`,
+hw:{t:"A traditional art",b:"Write 6 sentences about a traditional art from your region. Use two sentences with No matter ... and two sentences in indirect speech (He said that ...)."}},
 
 {c:"2nde",u:13,lv:"B1",t:"Violent Extremism",th:"Extremism, violence and peace",g:"No matter (what, who, how), direct and indirect speech",
 body:`L'extremisme violent menace la paix dans plusieurs pays. Comment le decrire, et comment le combattre ?
