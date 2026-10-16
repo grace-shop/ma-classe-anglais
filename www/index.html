@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>English Classes</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://i.ytimg.com https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src https://www.youtube-nocookie.com; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="theme-color" content="#0E1120"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
+<title>English Classes</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://i.ytimg.com https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src https://www.youtube-nocookie.com; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="theme-color" content="#0E1120"><meta name="description" content="Learn English in Togo with your teacher: lessons, quizzes, Nova, and class follow-up.">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="English Classes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;background:#0E1120}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <script>window.__pageBuild=0;</script><script src="config.js"></script><script src="claude-shim.js"></script>
@@ -948,31 +948,79 @@ setTimeout(hideSplash,4500);
 const TIPS_STUDENT=["Practice makes perfect!","One activity a day keeps your streak going.","Tap the coloured words to hear them.","Mistakes help you learn!","The word of the day is worth +2 XP.","You're doing great!"];
 const TIPS_TEACHER=["Your class is live!","Difficult points help you plan the next lesson.","An announcement motivates the whole class.","Great teachers inspire!"];
 let mascot={jump(){},canvas:null};
-function initMascot(){mascot=(function(){const api={jump(){},canvas:null};if(!window.THREE)return api;const T=THREE;const cv=document.createElement("canvas");cv.setAttribute("aria-hidden","true");api.canvas=cv;
-  let r;try{r=new T.WebGLRenderer({canvas:cv,alpha:true,antialias:true})}catch(e){return api}
-  r.setPixelRatio(Math.min(devicePixelRatio||1,2));r.setSize(300,300,false);
-  const sc=new T.Scene(),cam=new T.PerspectiveCamera(35,1,.1,50);cam.position.set(0,.2,7);
-  sc.add(new T.AmbientLight(0xffffff,.55));const k=new T.DirectionalLight(0xffffff,.9);k.position.set(3,4,5);sc.add(k);
-  const p1=new T.PointLight(0x9fb2ff,.8,20);p1.position.set(-3,1,3);sc.add(p1);const p2=new T.PointLight(0xf0d49a,.7,20);p2.position.set(3,-2,3);sc.add(p2);
-  const bot=new T.Group();sc.add(bot);
-  const body=new T.Mesh(new T.SphereGeometry(1.25,64,64),new T.MeshStandardMaterial({color:0xf7f8fc,metalness:.12,roughness:.2}));bot.add(body);
-  const visor=new T.Mesh(new T.SphereGeometry(1,48,48),new T.MeshStandardMaterial({color:0x1e2558,metalness:.5,roughness:.12}));visor.scale.set(.86,.62,.42);visor.position.set(0,.1,.93);bot.add(visor);
-  const eyeMat=new T.MeshBasicMaterial({color:0xbcd0ff});const eyes=[-.32,.32].map(x=>{const e=new T.Mesh(new T.SphereGeometry(.13,24,24),eyeMat);e.scale.set(1,1.35,.5);e.position.set(x,.2,1.32);bot.add(e);return e});
-  const smile=new T.Mesh(new T.TorusGeometry(.24,.045,10,30,Math.PI),new T.MeshBasicMaterial({color:0xe8c780}));smile.rotation.z=Math.PI;smile.position.set(0,-.05,1.33);bot.add(smile);
-  const ant=new T.Mesh(new T.CylinderGeometry(.035,.035,.45,12),new T.MeshStandardMaterial({color:0xcfd8f5,metalness:.8,roughness:.2}));ant.position.set(0,1.42,0);bot.add(ant);
-  const tip=new T.Mesh(new T.SphereGeometry(.12,20,20),new T.MeshStandardMaterial({color:0xd8b46a,metalness:.8,roughness:.25}));tip.position.set(0,1.7,0);bot.add(tip);
-  const ring=new T.Mesh(new T.TorusGeometry(1.85,.05,12,90),new T.MeshStandardMaterial({color:0xd8b46a,metalness:.85,roughness:.25}));ring.rotation.x=1.25;sc.add(ring);
-  const ring2=new T.Mesh(new T.TorusGeometry(2.05,.025,10,90),new T.MeshBasicMaterial({color:0x4b6bd6,transparent:true,opacity:.35}));ring2.rotation.set(1.1,.4,0);sc.add(ring2);
-  const orbs=[0,1,2].map(i=>{const o=new T.Mesh(new T.SphereGeometry(.09,16,16),new T.MeshStandardMaterial({color:[0x4b6bd6,0xd8b46a,0xb4546f][i],metalness:.4,roughness:.3}));sc.add(o);return o});
-  let mx=0,my=0,jumpT=-10;addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
-  api.jump=()=>{jumpT=clk.getElapsedTime()};const clk=new T.Clock();
-  function frame(){const calm=document.body.dataset.mode==="teacher",t=calm?2.4:clk.getElapsedTime(),j=calm?9:t-jumpT;bot.position.y=Math.sin(t*1.6)*.12+(j<1?Math.sin(j*Math.PI)*.9:0);
-    if(calm){bot.rotation.y=0;bot.rotation.x=0}else{bot.rotation.y+=((mx*1.1)+(j<1?j*Math.PI*2:0)-bot.rotation.y)*.12;bot.rotation.x+=(my*.6-bot.rotation.x)*.08}
-    const blink=(t%4)<.12;eyes.forEach(e=>e.scale.y=blink?.15:1.35);
-    ring.rotation.z=t*.5;ring2.rotation.z=-t*.35;
-    orbs.forEach((o,i)=>{const a=t*(.8+i*.25)+i*2.1;o.position.set(Math.cos(a)*2.05,Math.sin(a*1.3)*.5,Math.sin(a)*2.05)});r.render(sc,cam)}
-  let lastCalm=0;(function loop(){if(cv.isConnected&&!document.hidden){if(document.body.dataset.mode!=="teacher"){frame()}else if(performance.now()-lastCalm>400){frame();lastCalm=performance.now()}}if(!reduceMotion)requestAnimationFrame(loop)})();if(reduceMotion)setInterval(()=>{if(cv.isConnected)frame()},1000);
-  return api})()}
+function initMascot(){mascot=(function(){
+ const api={jump(){},canvas:null};
+ if(!window.THREE)return api;
+ const T=THREE;
+ const cv=document.createElement("canvas");cv.setAttribute("aria-hidden","true");api.canvas=cv;
+ let r;try{r=new T.WebGLRenderer({canvas:cv,alpha:true,antialias:true})}catch(e){return api}
+ r.setPixelRatio(Math.min(devicePixelRatio||1,2));r.setSize(300,300,false);
+ const sc=new T.Scene(),cam=new T.PerspectiveCamera(32,1,.1,50);cam.position.set(0,.3,8.2);
+ sc.add(new T.AmbientLight(0xffffff,.62));
+ const key=new T.DirectionalLight(0xffffff,1);key.position.set(3,5,5);sc.add(key);
+ const rim=new T.PointLight(0x9fb2ff,.9,20);rim.position.set(-3,2,3);sc.add(rim);
+ const warm=new T.PointLight(0xf0d49a,.7,20);warm.position.set(3,-1,3);sc.add(warm);
+ const M=(c,o)=>new T.MeshStandardMaterial(Object.assign({color:c,roughness:.45,metalness:.05},o||{}));
+ const SKIN=0xF2C7A0,HAIR=0x1B1A24,HOOD=0x4B6BD6,HOOD_D=0x3A55B8,WHITE=0xffffff,INK=0x141833;
+ const bot=new T.Group();sc.add(bot);
+ // torse : sweat à capuche bleu
+ const torso=new T.Mesh(new T.SphereGeometry(1,48,36),M(HOOD));torso.scale.set(.84,.8,.72);torso.position.set(0,-1.38,0);bot.add(torso);
+ const collar=new T.Mesh(new T.TorusGeometry(.42,.085,16,44),M(WHITE));collar.rotation.x=Math.PI/2;collar.position.set(0,-.66,.05);bot.add(collar);
+ const pocket=new T.Mesh(new T.BoxGeometry(.5,.2,.07),M(HOOD_D));pocket.position.set(0,-1.78,.66);pocket.rotation.x=-.1;bot.add(pocket);
+ const logo=new T.Mesh(new T.CircleGeometry(.12,32),M(0xD8B46A,{metalness:.7,roughness:.25}));logo.position.set(-.34,-1.12,.66);bot.add(logo);
+ // tête
+ const head=new T.Group();head.position.set(0,.4,0);bot.add(head);
+ const face=new T.Mesh(new T.SphereGeometry(1,64,56),M(SKIN,{roughness:.55}));face.scale.set(1,.98,.92);head.add(face);
+ // cheveux noirs : calotte + frange
+ const hair=new T.Mesh(new T.SphereGeometry(1.06,56,40,0,Math.PI*2,0,Math.PI*.55),M(HAIR,{roughness:.35}));hair.position.set(0,.06,-.02);hair.scale.set(1.03,1.02,.98);head.add(hair);
+ [[-.5,.74,.62,.44,-.25],[-.08,.8,.7,.42,.05],[.36,.78,.66,.42,.3]].forEach(([x,y,z,s,rz])=>{const f=new T.Mesh(new T.SphereGeometry(s,32,24),M(HAIR,{roughness:.35}));f.position.set(x,y,z);f.scale.set(1,.72,.8);f.rotation.z=rz;head.add(f)});
+ // oreilles
+ [-1,1].forEach(s=>{const e=new T.Mesh(new T.SphereGeometry(.17,24,20),M(SKIN));e.position.set(s*.98,-.08,0);e.scale.set(.5,.72,.62);head.add(e)});
+ // yeux expressifs (type Duolingo)
+ const eyeK=new T.MeshBasicMaterial({color:INK}),eyeW=new T.MeshBasicMaterial({color:WHITE});
+ const eyes=[-.36,.36].map(x=>{const g=new T.Group();g.position.set(x,-.06,.9);
+   const w=new T.Mesh(new T.SphereGeometry(.17,32,24),eyeK);w.scale.set(1,1.22,.42);g.add(w);
+   const sh=new T.Mesh(new T.SphereGeometry(.055,16,12),eyeW);sh.position.set(.06,.08,.12);g.add(sh);
+   const sh2=new T.Mesh(new T.SphereGeometry(.024,12,10),eyeW);sh2.position.set(-.05,-.06,.13);g.add(sh2);
+   head.add(g);return g});
+ // joues roses
+ const blush=new T.MeshBasicMaterial({color:0xF08FA0,transparent:true,opacity:.45});
+ [-.6,.6].forEach(x=>{const b=new T.Mesh(new T.CircleGeometry(.16,32),blush);b.position.set(x,-.32,.93);b.scale.set(1.3,.8,1);head.add(b)});
+ // sourire
+ const mouth=new T.Mesh(new T.TorusGeometry(.15,.032,10,28,Math.PI),new T.MeshBasicMaterial({color:0x7A2E3E}));mouth.rotation.z=Math.PI;mouth.position.set(0,-.42,.97);head.add(mouth);
+ // bras : manches bleues + mains
+ const arms=[-1,1].map(s=>{const p=new T.Group();p.position.set(s*.92,-1.3,0);bot.add(p);
+   const a=new T.Mesh(new T.SphereGeometry(.26,32,24),M(HOOD));a.scale.set(1,2.05,1);a.position.y=-.45;p.add(a);
+   const hand=new T.Mesh(new T.SphereGeometry(.22,24,20),M(SKIN));hand.position.set(0,-1.12,0);p.add(hand);
+   p.userData.s=s;return p});
+ // chaussures
+ [-.32,.32].forEach(x=>{const sh=new T.Mesh(new T.SphereGeometry(.26,24,20),M(INK,{roughness:.3}));sh.scale.set(1.1,.6,1.35);sh.position.set(x,-2.5,.12);bot.add(sh)});
+ // décor 3D
+ const ring=new T.Mesh(new T.TorusGeometry(2.05,.05,12,90),new T.MeshStandardMaterial({color:0xd8b46a,metalness:.85,roughness:.25}));ring.rotation.x=1.25;sc.add(ring);
+ const ring2=new T.Mesh(new T.TorusGeometry(2.25,.025,10,90),new T.MeshBasicMaterial({color:0x4b6bd6,transparent:true,opacity:.35}));ring2.rotation.set(1.1,.4,0);sc.add(ring2);
+ const orbs=[0,1,2].map(i=>{const o=new T.Mesh(new T.SphereGeometry(.09,16,16),new T.MeshStandardMaterial({color:[0x4b6bd6,0xd8b46a,0xb4546f][i],metalness:.4,roughness:.3}));sc.add(o);return o});
+ // interaction
+ let mx=0,my=0,jumpT=-10;const clk=new T.Clock();
+ addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
+ api.jump=()=>{jumpT=clk.getElapsedTime()};
+ function frame(){
+   const calm=document.body.dataset.mode==="teacher",t=calm?2.4:clk.getElapsedTime(),j=calm?9:t-jumpT;
+   bot.position.y=Math.sin(t*1.6)*.1+(j<1?Math.sin(j*Math.PI)*.9:0);
+   if(calm){bot.rotation.y=0;bot.rotation.x=0;head.rotation.y=0}
+   else{bot.rotation.y+=((mx*.9)+(j<1?j*Math.PI*2:0)-bot.rotation.y)*.12;bot.rotation.x+=(my*.5-bot.rotation.x)*.08;head.rotation.y=mx*.35}
+   head.rotation.z=Math.sin(t*1.2)*.05;
+   // salut de la main (au saut et de temps en temps)
+   const waving=j<1.4||(t%9)<1.4;
+   arms.forEach(p=>{const s=p.userData.s;
+     if(s===1)p.rotation.z=waving?2.35+Math.sin(t*9)*.32:.12;
+     else p.rotation.z=-.12});
+   const blink=(t%4)<.12;eyes.forEach(g=>g.scale.y=blink?.12:1);
+   ring.rotation.z=t*.5;ring2.rotation.z=-t*.35;
+   orbs.forEach((o,i)=>{const a=t*(.8+i*.25)+i*2.1;o.position.set(Math.cos(a)*2.25,Math.sin(a*1.3)*.5,Math.sin(a)*2.25)});
+   r.render(sc,cam)}
+ let lastCalm=0;(function loop(){if(cv.isConnected&&!document.hidden){if(document.body.dataset.mode!=="teacher"){frame()}else if(performance.now()-lastCalm>400){frame();lastCalm=performance.now()}}if(!reduceMotion)requestAnimationFrame(loop)})();
+ if(reduceMotion)setInterval(()=>{if(cv.isConnected)frame()},1000);
+ return api})()}
 const mascotHTML=tips=>mascot.canvas&&!LITE?`<div class="mascot-wrap"><div id="mascotSlot"></div><div class="bubble">${esc(tips[Math.floor(Date.now()/600000)%tips.length])}</div></div>`:"";
 
 /* ============ word of the day ============ */
@@ -1211,7 +1259,7 @@ const knownOf=d=>((S.me?.deckProgress||{})[d.id]?.known||[]);
 function studentView(){
   if(isParent(S.me)){if(S.view?.type==="chat"||S.tab==="pmsg"){if(S.chatFor!==S.uid)subChat(S.uid);return`<div class="section" style="max-width:720px;margin-inline:auto"><div class="row">${ic("chat")}<div><span class="eyebrow">Private messages</span><h2>The teacher</h2></div></div><p class="sub">Only you and the teacher can see this conversation.</p>${chatHTML(S.uid,"student")}</div>`}return S.tab==="me"?parentProfileView():parentHomeView()}
   if(S.liveOn&&liveOpen(S.live))return liveStudentView();if(S.srs)return srsRunView();if(S.run)return quizRunView();if(S.deck)return deckRunView();
-  if(S.view?.type==="peers"&&peerOn())return peersView();if(S.view?.type==="peer"&&peerOn())return peerChatView();
+  if(S.view?.type==="friends"&&peerOn())return friendsView();if(S.view?.type==="addfriends"&&peerOn())return addFriendsView();if(S.view?.type==="peers"&&peerOn())return peersView();if(S.view?.type==="peer"&&peerOn())return peerChatView();
   if(S.view?.type==="chat")return`<div class="section" style="max-width:720px;margin-inline:auto">${backBtn()}<div class="row">${ic("chat")}<div><span class="eyebrow">Private messages</span><h2>My teacher</h2></div></div><p class="sub">Only you and your teacher can see this conversation.</p>${chatHTML(S.uid,"student")}</div>`;
   if(S.view?.type==="lesson")return lessonView();if(S.view?.type==="hw")return hwView();
   if(S.view?.type==="ep")return epView();if(S.view?.type==="shop")return shopView();if(S.view?.type==="talk")return talkView();
@@ -2085,7 +2133,7 @@ const PR={dir:[],inbox:[],loaded:false,err:"",with:null,sending:false,un:null,ti
 const peerOn=()=>S.mode==="student"&&!!S.me&&!isParent(S.me)&&stOf(S.me)==="active"&&S.me.profile!=="primaire"&&S.settings.peerChat!==false&&!(S.myAccess&&S.myAccess.noChat)&&!devBlocked()&&!!window.__peer;
 const peerName=id=>(PR.dir.find(x=>x.uid===id)||{}).name||"Classmate";
 const peerUnread=()=>PR.inbox.filter(m=>m.receiver===S.uid&&!m.read_at).length;
-const peerBtn=()=>peerOn()?`<button class="iconbtn" data-a="openPeers" aria-label="Messages between students" title="Classmates" style="position:relative">${ic("users")}${peerUnread()?`<span class="chip warn" style="position:absolute;top:-6px;right:-6px;min-width:18px;padding:0 5px;font-size:.68rem">${peerUnread()}</span>`:""}</button>`:"";
+const peerBtn=()=>peerOn()?`${frBtn()}<button class="iconbtn" data-a="openPeers" aria-label="Messages between students" title="Classmates" style="position:relative">${ic("users")}${peerUnread()?`<span class="chip warn" style="position:absolute;top:-6px;right:-6px;min-width:18px;padding:0 5px;font-size:.68rem">${peerUnread()}</span>`:""}</button>`:"";
 async function peerRefresh(){if(!peerOn())return;
   try{const[d,i]=await Promise.all([window.__peer.dir(),window.__peer.inbox()]);PR.dir=d;PR.inbox=i;PR.loaded=true;PR.err=""}
   catch(e){PR.loaded=true;PR.err=navigator.onLine?"Cannot load messages right now.":"No network: your messages will arrive as soon as you are connected."}
@@ -2097,15 +2145,57 @@ function peerStart(){if(PR.un||!peerOn())return;peerRefresh();
   PR.timer=setInterval(()=>{if(document.visibilityState==="visible"&&peerOn())peerRefresh()},45000)}
 setInterval(()=>{if(peerOn()&&!PR.un)peerStart()},3000);
 function peerMarkRead(id){window.__peer.read(id).then(()=>{for(const m of PR.inbox)if(m.sender===id&&m.receiver===S.uid&&!m.read_at)m.read_at=new Date().toISOString();render()}).catch(()=>{})}
+/* Page Amis : demandes, amis, recherche de camarades (séparée de la messagerie) */
+function frBtn(){const n=FR.list.filter(x=>x.status==="pending"&&x.incoming).length;return `<button class="iconbtn" data-a="openFriends" aria-label="Friends" title="Friends" style="position:relative">${ic("plus")}${n?`<span class="chip warn" style="position:absolute;top:-6px;right:-6px;min-width:18px;padding:0 5px;font-size:.68rem">${n}</span>`:""}</button>`}
+function friendsView(){
+  const nm=id=>(PR.dir.find(x=>x.uid===id)||{}).name||"Classmate";
+  const cls=id=>(PR.dir.find(x=>x.uid===id)||{}).classe||"";
+  const inc=FR.list.filter(x=>x.status==="pending"&&x.incoming).map(x=>x.uid);
+  const out=FR.list.filter(x=>x.status==="pending"&&!x.incoming).map(x=>x.uid);
+  const fri=FR.list.filter(x=>x.status==="accepted").map(x=>x.uid).sort((a,b)=>nm(a).localeCompare(nm(b)));
+  const row=(uid,sub,act)=>`<div class="it">${avatar(uid,nm(uid))}<div class="txt"><b>${esc(nm(uid))}</b><span>${sub}</span></div><div class="fr-acts">${act}</div></div>`;
+  const block=(title,n,rows,none)=>`<section class="fr-sec"><div class="fr-head"><h3>${title}</h3>${n?`<span class="chip">${n}</span>`:""}</div>${rows.length?`<div class="glass list">${rows.join("")}</div>`:(none?`<div class="empty">${none}</div>`:"")}</section>`;
+  return`<div class="section fr-page" style="max-width:720px;margin-inline:auto">
+  <div><button class="back" data-a="peerBack">${ic("left")}Messages</button></div>
+  <div class="fr-top"><div class="row">${ic("users")}<div><span class="eyebrow">Friends</span><h2>Your friends</h2></div></div><button class="btn sm" data-a="openAddFriends">${ic("plus")}Find friends</button></div>
+  <p class="sub">Your friends appear here. Open Messages to chat with them.</p>
+  ${block("Friend requests",inc.length,inc.map(u=>row(u,"Wants to be your friend",`<button class="btn sm" data-fr="accept" data-id="${u}">${ic("check")}Accept</button><button class="btn ghost sm" data-fr="refuse" data-id="${u}">Decline</button>`)),"")}
+  ${block("Your friends",fri.length,fri.map(u=>row(u,esc(cls(u)||"Classmate"),`<button class="btn ghost sm" data-a="openPeer" data-id="${u}">${ic("chat")}Message</button><button class="btn ghost sm" data-fr="cancel" data-id="${u}">Remove</button>`)),"No friends yet. Tap “Find friends” to add classmates.")}
+  ${block("Requests sent",out.length,out.map(u=>row(u,"Waiting for an answer",`<button class="btn ghost sm" data-fr="cancel" data-id="${u}">Cancel</button>`)),"")}
+  ${PR.err?`<div class="glass card small">${esc(PR.err)}</div>`:""}
+  </div>`;
+}
+/* page « Find friends » : recherche et ajout, à part de la liste d'amis */
+function addFriendsView(){
+  const me=S.uid,q=(S.drafts.fr_q||"").trim().toLowerCase();
+  const pool=PR.dir.filter(x=>x.uid!==me&&frState(x.uid)==="none"&&(!q||x.name.toLowerCase().includes(q)));
+  const item=x=>`<div class="it">${avatar(x.uid,x.name)}<div class="txt"><b>${esc(x.name)}</b><span>${esc(x.classe||"Classmate")}${x.same?" · your class":""}</span></div><div class="fr-acts"><button class="btn sm" data-fr="add" data-id="${x.uid}">${ic("plus")}Add friend</button></div></div>`;
+  const list=(title,arr)=>arr.length?`<section class="fr-sec"><div class="fr-head"><h3>${title}</h3></div><div class="glass list">${arr.map(item).join("")}</div></section>`:"";
+  let body;
+  if(!PR.loaded) body=`<div class="empty">Loading…</div>`;
+  else if(q) body=pool.length?list("Results",pool.slice(0,100)):`<div class="empty">No classmate found with that name.</div>`;
+  else{
+    const cls=pool.filter(x=>x.same),others=pool.filter(x=>!x.same).slice(0,30);
+    body=(cls.length||others.length)?list("In your class",cls)+list("Other classmates",others):`<div class="empty">Everyone is already your friend or waiting.</div>`;
+  }
+  return`<div class="section fr-page" style="max-width:720px;margin-inline:auto">
+  <div><button class="back" data-a="openFriends">${ic("left")}Friends</button></div>
+  <div class="row">${ic("plus")}<div><span class="eyebrow">Find friends</span><h2>Add a classmate</h2></div></div>
+  <p class="sub">Search for a classmate and send them a friend request. Once they accept, they appear in your Friends page.</p>
+  <input id="fr_q" type="search" placeholder="Search for a classmate" value="${esc(S.drafts.fr_q||"")}" aria-label="Search for a classmate">
+  <div style="margin-top:14px">${body}</div>
+  ${PR.err?`<div class="glass card small">${esc(PR.err)}</div>`:""}
+  </div>`;
+}
 function peersView(){const me=S.uid,last={},un={};
   for(const m of PR.inbox){const o=m.sender===me?m.receiver:m.sender;if(!last[o])last[o]=m;if(m.receiver===me&&!m.read_at)un[m.sender]=(un[m.sender]||0)+1}
   const q=(S.drafts.peer_q||"").trim().toLowerCase(),t=m=>m?+new Date(m.created_at):0;
-  const rows=PR.dir.filter(x=>!q||x.name.toLowerCase().includes(q)).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid]})).sort((a,b)=>(b.un-a.un)||(t(b.last)-t(a.last))||(b.on-a.on)||a.name.localeCompare(b.name));
+  const rows=PR.dir.filter(x=>frIsFriend(x.uid)&&(!q||x.name.toLowerCase().includes(q))).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid]})).sort((a,b)=>(b.un-a.un)||(t(b.last)-t(a.last))||(b.on-a.on)||a.name.localeCompare(b.name));
   return`<div class="section" style="max-width:720px;margin-inline:auto">${backBtn()}<div class="row">${ic("users")}<div><span class="eyebrow">Classmates</span><h2>Messages between students</h2></div></div>
-  <p class="sub">Write to other learners at school: messages, voice notes, photos, files and stickers. Be kind and respectful.</p>
+  <p class="sub">Chat with your friends: messages, voice notes, photos, files and stickers. Be kind and respectful.</p>
   ${PR.err?`<div class="glass card small">${esc(PR.err)}</div>`:""}
-  <input id="peer_q" type="search" placeholder="Search for a classmate…" value="${esc(S.drafts.peer_q||"")}" aria-label="Search for a classmate">
-  ${!PR.loaded?`<div class="empty">Loading…</div>`:rows.length?`${rows.length>60&&!q?`<p class="hint">${rows.length} learners: the 60 most recent are shown. Search for a name to find the others.</p>`:""}<div class="glass list">${rows.slice(0,q?200:60).map(x=>`<div class="it click" data-a="openPeer" data-id="${x.uid}" style="cursor:pointer">${avatar(x.uid,x.name)}<div class="txt"><b>${esc(x.name)}${x.on?` <span class="chip ok">Online</span>`:""}</b><span>${x.last?esc((x.last.sender===me?"You: ":"")+String(v4Plain(x.last.body)||attLabel(x.last.att)).slice(0,60)):esc((x.classe?x.classe+(x.same?" · your class":""):"")||"Say hello!")}</span></div>${x.un?`<span class="chip warn">${x.un}</span>`:""}</div>`).join("")}</div>`:`<div class="empty"><b>No other learners yet.</b><br>Learners will appear here as soon as the teacher approves their registration.</div>`}</div>`}
+  <input id="peer_q" type="search" placeholder="Search your friends…" value="${esc(S.drafts.peer_q||"")}" aria-label="Search your friends">
+  ${!PR.loaded?`<div class="empty">Loading…</div>`:rows.length?`${rows.length>60&&!q?`<p class="hint">${rows.length} learners: the 60 most recent are shown. Search for a name to find the others.</p>`:""}<div class="glass list">${rows.slice(0,q?200:60).map(x=>`<div class="it click" data-a="openPeer" data-id="${x.uid}" style="cursor:pointer">${avatar(x.uid,x.name)}<div class="txt"><b>${esc(x.name)}${x.on?` <span class="chip ok">Online</span>`:""}</b><span>${x.last?esc((x.last.sender===me?"You: ":"")+String(v4Plain(x.last.body)||attLabel(x.last.att)).slice(0,60)):esc((x.classe?x.classe+(x.same?" · your class":""):"")||"Say hello!")}</span></div>${x.un?`<span class="chip warn">${x.un}</span>`:""}</div>`).join("")}</div>`:`<div class="empty"><b>No friends yet.</b><br>Send a friend request to a classmate. Once they accept, you can chat here.<br><button class="btn sm" style="margin-top:12px" data-a="openFriends">Find friends</button></div>`}</div>`}
 function peerChatView(){const id=S.view.id,me=S.uid,nm=peerName(id),msgs=PR.inbox.filter(m=>(m.sender===me&&m.receiver===id)||(m.sender===id&&m.receiver===me)).slice().reverse();
   return`<div class="section" style="max-width:720px;margin-inline:auto"><div><button class="back" data-a="peerBack">${ic("left")}Classmates</button></div><div class="row">${avatar(id,nm,48)}<div><span class="eyebrow">Classmate</span><h2>${esc(nm)}${S.peers[id]?` <span class="chip ok">Online</span>`:""}</h2></div></div>
   <div class="glass chat"><div class="msgs" id="chatScroll">${msgs.length?msgs.map(m=>`<div class="msg ${m.sender===me?"mine":""}"><div>${esc(m.body)}</div><span>${fmtTime(+new Date(m.created_at))}</span></div>`).join(""):`<div class="muted" style="margin:auto;text-align:center">No messages yet.<br>Say hello to ${esc(nm.split(" ")[0])}!</div>`}</div>
@@ -2433,7 +2523,7 @@ function classViewInner(){const c=S.confirm;
 
 /* ============ events ============ */
 document.addEventListener("input",e=>{const el=e.target;if(!el.id||el.type==="file")return;S.drafts[el.id]=el.type==="checkbox"?(el.checked?"1":""):el.value;
-  if(el.id==="peer_q"||el.id==="st_q"||el.id==="st_cls"||el.id==="st_on"||el.id==="gv_q"||el.id==="gv_all"){S.stLim=ST_STEP;S.gvLim=GV_STEP;render();return}
+  if(el.id==="peer_q"||el.id==="fr_q"||el.id==="st_q"||el.id==="st_cls"||el.id==="st_on"||el.id==="gv_q"||el.id==="gv_all"){S.stLim=ST_STEP;S.gvLim=GV_STEP;render();return}
   if(el.id==="q_exam"){render();return}
   if(/_prof$/.test(el.id)){delete S.drafts[el.id.replace(/_prof$/,"_cls")];render();return}
   if(el.id==="q_body"){const n=parseQuiz(el.value).length,p=$("#q_preview");if(p)p.textContent=n?`${n} question(s) found.`:"No questions found yet."}
@@ -2518,7 +2608,7 @@ document.addEventListener("click",e=>{const say_=e.target.closest("[data-say]");
   case"toggleClosed":{const v=!S.settings.closed;write(()=>S.db.doc("settings/main").set({...S.settings,closed:v})).then(()=>toast(v?"Sign-ups closed":"Sign-ups open","shield"));break}
   case"pickRole":S.drafts.j_role=el.dataset.k||"";S.animate=true;break;
   case"showAll":S.showAll=!S.showAll;S.animate=true;break;
-  case"profFilter":S.profFilter=el.dataset.k||"";S.stLim=ST_STEP;break;case"pronMic":pronListen();return;case"pronHear":speak(S.pron?.target||"","en");return;case"pronWord":speak(el.dataset.w||"","en");return;case"pronNext":pronNext();break;case"pronAI":pronAI();return;case"notifOn":notifEnable();return;case"notifOff":notifOff().then(render);return;case"devBlock":devSet(el.dataset.id,el.dataset.dev,true);return;case"devUnblock":devSet(el.dataset.id,el.dataset.dev,false);return;case"installProg":installProg();return;case"openPeers":S.view={type:"peers"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeer":{const id=el.dataset.id;S.view={type:"peer",id};PR.with=id;S.animate=true;peerMarkRead(id);scrollTo(0,0);break}case"peerBack":PR.with=null;S.view={type:"peers"};S.animate=true;break;
+  case"profFilter":S.profFilter=el.dataset.k||"";S.stLim=ST_STEP;break;case"pronMic":pronListen();return;case"pronHear":speak(S.pron?.target||"","en");return;case"pronWord":speak(el.dataset.w||"","en");return;case"pronNext":pronNext();break;case"pronAI":pronAI();return;case"notifOn":notifEnable();return;case"notifOff":notifOff().then(render);return;case"devBlock":devSet(el.dataset.id,el.dataset.dev,true);return;case"devUnblock":devSet(el.dataset.id,el.dataset.dev,false);return;case"installProg":installProg();return;case"openAddFriends":S.view={type:"addfriends"};S.drafts.fr_q="";S.animate=true;scrollTo(0,0);break;case"openFriends":S.view={type:"friends"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeers":S.view={type:"peers"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeer":{const id=el.dataset.id;S.view={type:"peer",id};PR.with=id;S.animate=true;peerMarkRead(id);scrollTo(0,0);break}case"peerBack":PR.with=null;S.view={type:"peers"};S.animate=true;break;
   case"msgsTab":S.msgsTab=el.dataset.k;if(el.dataset.k==="peers")peerModLoad();break;case"peerHide":{const id=el.dataset.id,on=el.dataset.on==="1";window.__peer.hide(id,on).then(()=>{const m=(PR.mod||[]).find(x=>x.id===id);if(m)m.hidden=on;render()}).catch(e=>toast(e.message||"Could not hide","x"));return}
   case"togglePeer":{const on=S.settings.peerChat===false;write(()=>S.db.doc("settings/main").set({...S.settings,peerChat:on})).then(()=>toast(on?"Student-to-student messages on":"Student-to-student messages off","check"));break}
   case"toggleNoChat":{const id=el.dataset.id,cur=S.access[id]||{};write(()=>S.db.doc("access/"+id).set({...cur,status:cur.status||"active",at:cur.at||Date.now(),by:cur.by||S.uid,noChat:!cur.noChat})).then(()=>toast(!cur.noChat?"Chat turned off for this student":"Chat turned back on for this student","check"));return}
@@ -4849,7 +4939,7 @@ function arCards(){if(!AR.deck.length)return arEnd("cards",AR.known,AR.total);
   arSet(arTop("Flashcards",`${AR.known} / ${AR.total} learned`)+arBar(AR.known/AR.total)+
     `<div class="ar-scene"><div class="ar-card3d" id="arCard" data-ar="flip">
        <div class="ar-face front"><span class="ar-kicker">English</span><h2>${arEsc(c[0])}</h2><small>Tap to flip</small></div>
-       <div class="ar-face back"><span class="ar-kicker">Français</span><h2>${arEsc(c[1])}</h2><p>${arEsc(c[2])}</p></div>
+       <div class="ar-face back"><span class="ar-kicker">Meaning</span><h2>${arEsc(c[1])}</h2><p>${arEsc(c[2])}</p></div>
      </div></div>
      <div class="ar-inrow" style="justify-content:center"><button class="ar-go ghost" data-ar="again">Again</button><button class="ar-go" data-ar="know">I know it</button></div>`)}
 
@@ -8830,7 +8920,7 @@ setTimeout(function hello(){try{
    She hops and shows happy eyes; with "less motion" on, she only shows.
    ===================================================================== */
 const MAS={last:0,off:false,t:null,sig:""};
-const MAS_LINES=["Yes! You got it! 🎉","Perfect, keep going!","Sugoi! You're on fire!","Nice work, superstar! ⭐","That's right! Well done! 🌸","You did it! Keep it up!"];
+const MAS_LINES=["Yes! You got it! 🎉","Perfect, keep going!","Awesome! You are on fire!","Nice work, superstar! ⭐","That is right! Well done! 🌟","You did it! Keep it up!"];
 const masPick=()=>MAS_LINES[Math.floor(Math.random()*MAS_LINES.length)];
 function masSVG(){return `<svg viewBox="0 0 120 150" aria-hidden="true" focusable="false">
   <path d="M30 66c-4-26 12-44 30-44s34 18 30 44c0 14 3 26 8 36-10-2-16-8-18-16H40c-2 8-8 14-18 16 5-10 8-22 8-36z" fill="#1B1F3B"/>
@@ -8861,7 +8951,7 @@ function masShow(text,mood){if(masHidden()){const b=document.getElementById("mas
   if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
   let box=document.getElementById("mas");
   if(!box){box=document.createElement("div");box.id="mas";box.className="mas";
-    box.innerHTML=`<div class="mas-bub" role="status" aria-live="polite"></div><div class="mas-girl">${masSVG()}</div><button type="button" class="mas-x" aria-label="Hide Sakura">×</button>`;
+    box.innerHTML=`<div class="mas-bub" role="status" aria-live="polite"></div><div class="mas-girl">${masSVG()}</div><button type="button" class="mas-x" aria-label="Hide Jiho">×</button>`;
     document.body.appendChild(box);
     box.querySelector(".mas-x").onclick=()=>{MAS.off=true;box.remove()};
     box.querySelector(".mas-girl").onclick=()=>{try{localStorage.setItem("ec_mas_look",String(masLook()+1))}catch(e){}masApplyLook(box);masShow("New look! Do you like it? 💖","happy")};
@@ -10240,7 +10330,7 @@ function btKindOf(){return (BT.st&&BT.st.kind)||(BT.room&&BT.room.kind)||BTNAV.k
 `;document.head.appendChild(s)})();
 
 /* 1 · the back button: "‹ Retour" */
-function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Retour">${arIc("back")}<span>Retour</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
+function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Back">${arIc("back")}<span>Back</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
 
 /* 2 · the join box (used on the hub and on each kind page) */
 function btJoinBox(){return `<div class="ar-card"><p class="ar-kicker">Join a battle with a code</p>
@@ -10646,9 +10736,104 @@ mdUseSelfie=function(c,blob){
 };
 
 /* ==== v4 END ==== */
+/* Battle Royale : page rangée par familles, une liste lisible (même logique de jeu) */
+const _btKindPageRoy=btKindPage;
+const ROY_ORDER=["Mixed","Grammar","Vocabulary","Word games","Themes"];
+function royGroupOf(ch){const k=String(ch.kind||"");if(k.indexOf("theme:")===0)return"Themes";if(k==="grammar")return"Grammar";if(k==="vocab")return"Vocabulary";if(k==="all")return"Mixed";return"Word games"}
+btKindPage=function(k){
+  if(k!=="royale")return _btKindPageRoy(k);
+  btStop();BT.on=false;BT.inHub=true;BT.key="";BTNAV.view="kind";BTNAV.kind="royale";
+  const K=BT_KINDS.royale;
+  const live=BT.room&&(!BT.st||!btFinished(BT.st))&&btKindOf()==="royale";
+  const groups={};ROYALE_CH.forEach((ch,i)=>{const g=royGroupOf(ch);(groups[g]=groups[g]||[]).push({ch,i})});
+  const cap=s=>s[0].toUpperCase()+s.slice(1);
+  const sections=ROY_ORDER.filter(g=>groups[g]).map(g=>`<section class="roy-sec"><p class="ar-kicker">${g} · ${groups[g].length}</p><div class="roy-list">${groups[g].map(({ch,i})=>`<button class="roy-row roy-${ch.lv}" data-ar="bt-rch" data-i="${i}"><span class="roy-ic">${arIc(K.ic)}</span><span class="roy-txt"><b>${arEsc(ch.t)}</b><small>${arEsc(ch.d)}</small></span><span class="roy-meta"><em>${arEsc(cap(ch.lv))}</em><i>${ch.n} Q</i></span></button>`).join("")}</div></section>`).join("");
+  arSet(arTop(K.t,"")+`<div class="roy-page"><div class="ar-hero"><p class="ar-kicker">${arEsc(K.d)}</p><h1>${arEsc(K.t)}</h1><p>Pick a challenge. Each one has its own questions. Then share the code with your classmates.</p></div>${live?`<button class="ar-go bt-entry" data-ar="bt-back" style="width:100%">Back to my battle</button>`:""}<section class="roy-sec"><p class="ar-kicker">Random mix</p><button class="ar-go" data-ar="bt-kind" data-m="royale" style="width:100%">Start a random Battle Royale</button></section>${sections}${btJoinBox()}${btErr()}</div>`);
+  BT.err="";
+};
+/* ===== Jiho : l'avatar (garçon coréen, style Duolingo) ===== */
+masSVG=function(){
+  const g="j"+Math.floor(Math.random()*1e6);
+  return `<svg viewBox="0 0 120 150" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="${g}halo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#BAE6FD" stop-opacity=".55"/><stop offset="1" stop-color="#818CF8" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${g}skin" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#FFF6EE"/><stop offset=".6" stop-color="#F8D5BC"/><stop offset="1" stop-color="#E7B596"/></radialGradient>
+    <linearGradient id="${g}hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2D2A55"/><stop offset="1" stop-color="#0E0C26"/></linearGradient>
+    <linearGradient id="${g}uni" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7DD3FC"/><stop offset=".5" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E3A8A"/></linearGradient>
+    <radialGradient id="${g}blush" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FB7185" stop-opacity=".7"/><stop offset="1" stop-color="#FB7185" stop-opacity="0"/></radialGradient>
+    <filter id="${g}blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+  <ellipse cx="60" cy="72" rx="58" ry="68" fill="url(#${g}halo)"/>
+  <ellipse cx="60" cy="144" rx="34" ry="5" fill="#000" opacity=".3" filter="url(#${g}blur)"/>
+  <path d="M30 62c-2-28 12-42 30-42s32 14 30 42c0 6-2 10-4 12H34c-2-2-4-6-4-12z" fill="url(#${g}hair)"/>
+  <path d="M38 102q22-10 44 0l8 40H30z" fill="url(#${g}uni)" class="uni"/>
+  <path d="M48 101q12 11 24 0" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M60 110v30" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/>
+  <ellipse cx="60" cy="66" rx="30" ry="31" fill="url(#${g}skin)"/>
+  <ellipse cx="30" cy="70" rx="5" ry="7" fill="#F2C2A2"/><ellipse cx="90" cy="70" rx="5" ry="7" fill="#F2C2A2"/>
+  <path d="M31 60c4-18 16-26 30-24 10 1 19 8 22 20-10-6-22-8-34-2-6 3-12 4-18 6z" fill="url(#${g}hair)"/>
+  <g class="ey-o"><ellipse cx="49" cy="70" rx="5.2" ry="7" fill="#1B1F3B"/><ellipse cx="71" cy="70" rx="5.2" ry="7" fill="#1B1F3B"/><circle cx="51" cy="67.6" r="2.3" fill="#fff"/><circle cx="73" cy="67.6" r="2.3" fill="#fff"/><circle cx="47.6" cy="72.4" r="1" fill="#fff"/><circle cx="69.6" cy="72.4" r="1" fill="#fff"/></g>
+  <g class="ey-h" stroke="#1B1F3B" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M43 71q6-7 12 0"/><path d="M65 71q6-7 12 0"/></g>
+  <ellipse cx="41" cy="82" rx="6" ry="3.4" fill="url(#${g}blush)"/><ellipse cx="79" cy="82" rx="6" ry="3.4" fill="url(#${g}blush)"/>
+  <path class="mo-s" d="M52 82q8 7 16 0" stroke="#8A2A3A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <path class="mo-h" d="M50 81h20q-1 11-10 11t-10-11z" fill="#7F1D2D"/>
+  <path class="mo-f" d="M54 88q6-5 12 0" stroke="#8A2A3A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <g class="arms" fill="none" stroke="#3B82F6" stroke-width="9" stroke-linecap="round"><path d="M38 110q-14-6-16-34"/><path d="M82 110q14-6 16-34"/></g>
+  <circle cx="22" cy="74" r="6" fill="#F8D5BC"/><circle cx="98" cy="74" r="6" fill="#F8D5BC"/>
+  <g class="spk" fill="#FBBF24"><path d="M12 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M104 24l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z" fill="#60A5FA"/></g>
+</svg>`};
+
+/* Jiho parle : la bulle s'affiche et il lit la phrase à voix haute (sans les emojis) */
+{const _mj=masShow;
+ masShow=function(text,mood){
+   const before=MAS.last;
+   _mj(text,mood);
+   if(MAS.last!==before&&!LITE&&text){
+     try{speak(String(text).replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu,"").trim(),"en")}catch(e){}
+   }
+ };
+}
+
+/* Jiho dit bonjour une fois par session à l'élève */
+if(!window.__jihoHi){window.__jihoHi=true;
+  setTimeout(()=>{try{if(S&&S.mode==="student"&&S.me)masShow("Hi! I'm Jiho. Ready for today's English? 👋","happy")}catch(e){}},5000);
+}
+
 render();
 loadThree();
 </script>
+<style id="friends-page">
+.fr-page{display:grid;gap:12px}
+.fr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fr-head{display:flex;align-items:center;gap:8px;margin:22px 0 10px}
+.fr-head h3{margin:0}
+.fr-sec{display:grid;gap:4px}
+.fr-acts{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+</style>
+<style id="arena-calm">
+/* Arena stable : rien ne bouge pendant le défilement ni après un redessin */
+#arena{perspective:none;overscroll-behavior:contain}
+#arena::before{animation:none!important;transform:none!important;opacity:.35!important}
+#arena .ar-orb{animation:none!important}
+#arena .ar-hero,#arena .ar-row,#arena .ar-end{animation:none!important}
+.roy-page{display:grid;gap:18px}
+.roy-sec{display:grid;gap:10px}
+.roy-list{display:grid;gap:8px}
+.roy-row{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;box-sizing:border-box;border-radius:18px;border:1px solid rgba(160,172,255,.2);background:linear-gradient(170deg,rgba(40,48,110,.6),rgba(14,17,40,.8));color:#EAF0FF;font:inherit;text-align:left;cursor:pointer}
+.roy-row:active{transform:scale(.985)}
+.roy-ic{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:radial-gradient(circle at 30% 25%,#fff,#8EF6E4 30%,#5EEAD4 60%,#818CF8);color:#06201C}
+.roy-ic svg{width:20px;height:20px}
+.roy-txt{flex:1;min-width:0;display:grid;gap:2px}
+.roy-txt b{font-size:1rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roy-txt small{color:#B9C3E6;font-size:.82rem;line-height:1.3}
+.roy-meta{flex:none;display:grid;justify-items:end;gap:2px}
+.roy-meta em{font-style:normal;font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8EF6E4}
+.roy-medium .roy-meta em{color:#FBBF24}
+.roy-hard .roy-meta em{color:#F472B6}
+.roy-meta i{font-style:normal;font-size:.8rem;color:#9FB4FF}
+@media (hover:none){#arena .ar-mode:hover,#arena .ar-mode:focus-visible{transform:none!important}}
+</style>
+
 
 <script>if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
 </body></html>
