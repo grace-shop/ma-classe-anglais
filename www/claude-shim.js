@@ -735,7 +735,7 @@
   function brandAI() { const el = document.getElementById("aiSub"); if (el) el.textContent = "AI assistant powered by Gemini"; }
   async function afterLogin() {
     if (started) return; started = true;
-    hideGate(); brandAI(); await loadMember(); await offerStarterContent().catch(() => {}); resolveReady();
+    hideGate(); brandAI(); await loadMember(); resolveReady(); offerStarterContent().catch(() => {});
   }
   async function boot() {
     if (!CFG.supabaseUrl || !CFG.supabaseAnonKey || /VOTRE/.test(CFG.supabaseUrl)) {
