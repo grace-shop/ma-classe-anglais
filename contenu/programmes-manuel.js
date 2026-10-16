@@ -744,131 +744,131 @@ skill | an ability you have learned | Computer skill is important today.`,
 hw:{t:"AI in my life",b:"Write a short text of 6 sentences: give one advantage and one disadvantage of artificial intelligence. Use at least 2 passive sentences."}},
 
 {c:"2nde",u:8,lv:"B1",t:"Phytotherapy and Health",th:"Medicinal plants and health",g:"Active and passive voice",
-body:`La phytotherapie, c'est-a-dire le traitement par les plantes, est tres utilisee au Togo. Quels sont ses avantages pour la sante ?
+body:`Phytotherapy, meaning treatment with plants, is widely used in Togo. What are its advantages for health?
 
-**Vocabulary** (mots et expressions) :
-**phytotherapy** (phytotherapie) ; **medicinal plant** (plante medicinale) ; **herbal medicine** (medecine a base de plantes) ; **symptom** (symptome) ; **fever** (fievre) ; **cough** (toux) ; **headache** (mal de tete) ; **wound** (blessure) ; **prescription** (ordonnance) ; **doctor** (medecin) ; **nurse** (infirmiere) ; **hospital** (hopital) ; **to cure** (guerir) ; **side effect** (effet secondaire) ; **patient** (patient).
+**Vocabulary** (words and expressions):
+**phytotherapy** (treatment with plants) ; **medicinal plant** (a plant used to treat illness) ; **herbal medicine** (medicine made from plants) ; **symptom** (a sign of illness) ; **fever** (a high body temperature) ; **cough** (a sudden noise made by the throat) ; **headache** (pain in the head) ; **wound** (an injury to the skin) ; **prescription** (a written order for medicine) ; **doctor** (a person who treats patients) ; **nurse** (a person who cares for patients) ; **hospital** (a place where sick people are treated) ; **to cure** (to make someone well) ; **side effect** (an unwanted result of a medicine) ; **patient** (a person receiving medical care).
 
-**Grammar : Active and passive voice.** Dans les textes de sante, on utilise souvent le passif.
-Many illnesses **are treated** with plants. (Beaucoup de maladies sont soignees avec des plantes.)
-The patient **was given** a prescription. (Le patient a recu une ordonnance.)
-Active : The nurse **gives** the medicine. (L'infirmiere donne le medicament.)
+**Grammar: Active and passive voice.** In health texts, we often use the passive.
+Many illnesses **are treated** with plants.
+The patient **was given** a prescription.
+Active: The nurse **gives** the medicine.
 
-**Skill : speaking about advantages.** Model sentences : Herbal medicine is cheap and easy to find. It has fewer side effects than some chemical drugs.
+**Skill: speaking about advantages.** Model sentences: Herbal medicine is cheap and easy to find. It has fewer side effects than some chemical drugs.
 
-**Skill : discussion on AI in medicine.** Model sentence : AI can help doctors to diagnose diseases, but it cannot replace them.
+**Skill: discussion on AI in medicine.** Model sentence: AI can help doctors to diagnose diseases, but it cannot replace them.
 
-**Skill : medical vocabulary in context.** The patient has a fever and a headache. The doctor will write a prescription.
+**Skill: medical vocabulary in context.** The patient has a fever and a headache. The doctor will write a prescription.
 
-**Final activity.** Imagine que tu parles a un patient. Ecris 5 phrases pour lui expliquer les avantages et les limites des plantes medicinales.`,
+**Final activity.** Imagine you are speaking to a patient. Write 5 sentences to explain the advantages and limits of medicinal plants.`,
 quiz:`The fever ___ cured by this plant last year.
 * was
 - were
 - is be
 
-« Herbal medicine » veut dire :
-* medecine a base de plantes
-- hopital
-- ordonnance
+"Herbal medicine" means:
+* medicine made from plants
+- a hospital
+- a prescription
 
 The patient ___ a prescription by the doctor.
 * was given
 - gave
 - was give
 
-Ecris en anglais « guerir ».
+Write in English: "to cure".
 = to cure
 
-Choisis le passif : The doctor treats the wound.
+Choose the passive: The doctor treats the wound.
 * The wound is treated by the doctor.
 - The wound treats the doctor.
 - The wound is treating by the doctor.
 
-« Side effect » se traduit par :
-* effet secondaire
-- symptome
-- blessure
+"Side effect" means:
+* an unwanted result of a medicine
+- a symptom
+- a wound
 
 Many plants ___ used in traditional medicine.
 * are
 - is
 - be
 
-« Cough » est :
-* une toux
-- une fievre
-- un mal de tete
+"Cough" means:
+* a sudden noise made by the throat
+- a fever
+- a headache
 
 The nurse ___ the patient at night.
 * watches
 - is watched by the patient
 - watch
 
-Ecris en anglais « infirmiere ».
+Write in English: "nurse".
 = nurse
 
 Plants ___ are cheap are often used by poor families.
 * that
 - who
-- whose man
+- whose
 
-« Patient » veut dire :
-* patient
-- medecin
-- ordonnance
+"Patient" means:
+* a person receiving medical care
+- a doctor
+- a prescription
 
-Corrige la phrase : The medicine has be given to the child.
+Correct the sentence: The medicine has be given to the child.
 * The medicine has been given to the child.
 - The medicine has be give to the child.
 - The medicine was giving to the child.
 
-Choisis la phrase correcte :
+Choose the correct sentence:
 * Herbal medicine has fewer side effects than some drugs.
 - Herbal medicine has less side effects than some drugs.
 - Herbal medicine have fewer side effect than some drugs.
 
-Ecris en anglais « mal de tete ».
+Write in English: "headache".
 = headache`,
-deck:`phytotherapy | phytotherapie | Phytotherapy uses plants to heal.
-medicinal plant | plante medicinale | This medicinal plant treats fever.
-herbal medicine | medecine a base de plantes | Herbal medicine is popular in our villages.
-symptom | symptome | A cough is a common symptom.
-fever | fievre | The child has a high fever.
-cough | toux | Her cough lasted two weeks.
-headache | mal de tete | I have a headache after the exam.
-wound | blessure | The wound must be cleaned.
-prescription | ordonnance | The doctor wrote a prescription.
-doctor | medecin | The doctor works at the health centre.
-nurse | infirmiere | The nurse gave me the medicine.
-hospital | hopital | The hospital is near the market.
-to cure | guerir | This plant can cure many illnesses.
-side effect | effet secondaire | This medicine has a side effect.
-patient | patient | The patient is waiting outside.`,
-hw:{t:"A health advice",b:"Ecris 6 phrases pour donner un conseil de sante a un ami qui a de la fievre. Utilise au moins une phrase au passif et une phrase avec fewer ... than."}},
+deck:`phytotherapy | treatment with plants | Phytotherapy uses plants to heal.
+medicinal plant | a plant used to treat illness | This medicinal plant treats fever.
+herbal medicine | medicine made from plants | Herbal medicine is popular in our villages.
+symptom | a sign of illness | A cough is a common symptom.
+fever | a high body temperature | The child has a high fever.
+cough | a sudden noise made by the throat | Her cough lasted two weeks.
+headache | pain in the head | I have a headache after the exam.
+wound | an injury to the skin | The wound must be cleaned.
+prescription | a written order for medicine | The doctor wrote a prescription.
+doctor | a person who treats patients | The doctor works at the health centre.
+nurse | a person who cares for patients | The nurse gave me the medicine.
+hospital | a place where sick people are treated | The hospital is near the market.
+to cure | to make someone well | This plant can cure many illnesses.
+side effect | an unwanted result of a medicine | This medicine has a side effect.
+patient | a person receiving medical care | The patient is waiting outside.`,
+hw:{t:"A health advice",b:"Write 6 sentences giving health advice to a friend who has a fever. Use at least one passive sentence and one sentence with fewer ... than."}},
 
 {c:"2nde",u:9,lv:"B1",t:"Respect of State Property",th:"Citizenship and public goods",g:"Wish and if only, question tags, active and passive voice",
-body:`Les biens de l'Etat (ecoles, routes, batiments publics) appartiennent a tous. Pourquoi faut-il les respecter ?
+body:`State property (schools, roads, public buildings) belongs to everyone. Why must we respect it?
 
-**Vocabulary** (mots et expressions) :
-**state property** (biens de l'Etat) ; **citizen** (citoyen) ; **citizenship** (citoyennete) ; **public building** (batiment public) ; **road** (route) ; **to damage** (endommager) ; **to steal** (voler) ; **to repair** (reparer) ; **responsibility** (responsabilite) ; **to report** (signaler) ; **penalty** (sanction) ; **law** (loi) ; **to protect** (proteger) ; **to take care of** (prendre soin de) ; **community** (communaute).
+**Vocabulary** (words and expressions):
+**state property** (property owned by the government) ; **citizen** (a member of a country) ; **citizenship** (the status of being a citizen) ; **public building** (a building open to the public) ; **road** (a way for vehicles and people) ; **to damage** (to harm or spoil) ; **to steal** (to take something that belongs to someone else) ; **to repair** (to fix) ; **responsibility** (a duty you must carry out) ; **to report** (to inform an authority) ; **penalty** (a punishment) ; **law** (a rule made by the state) ; **to protect** (to keep safe) ; **to take care of** (to look after) ; **community** (a group of people living together).
 
-**Grammar 1 : Wish and if only.** On utilise **wish** ou **if only** pour exprimer un regret ou un souhait irreel. Apres **wish** et **if only**, on utilise le passe simple (ou **were**).
-I **wish** people **took** better care of the schools. (J'aimerais que les gens prennent mieux soin des ecoles.)
-If only the road **were** repaired. (Si seulement la route etait reparee !)
+**Grammar 1: Wish and if only.** We use **wish** or **if only** to express a regret or an unreal wish. After **wish** and **if only**, we use the past simple (or **were**).
+I **wish** people **took** better care of the schools.
+If only the road **were** repaired!
 
-**Grammar 2 : Question tags.**
-Public property belongs to us all, **doesn't it ?** (Les biens publics nous appartiennent a tous, n'est-ce pas ?)
-Nobody should damage the bridge, **should they ?** (Personne ne devrait endommager le pont, n'est-ce pas ?)
+**Grammar 2: Question tags.**
+Public property belongs to us all, **doesn't it?**
+Nobody should damage the bridge, **should they?**
 
-**Grammar 3 : Active and passive voice.**
-The bridge **was damaged** by a storm. (Le pont a ete endommage par une tempete.)
-Active : The council **repairs** the road every year. (Le conseil repare la route chaque annee.)
+**Grammar 3: Active and passive voice.**
+The bridge **was damaged** by a storm.
+Active: The council **repairs** the road every year.
 
-**Skill : reporting.** Model sentence : He reported that the school gate had been stolen.
+**Skill: reporting.** Model sentence: He reported that the school gate had been stolen.
 
-**Skill : formal letter.** Model structure : Your address / Date / Dear Sir or Madam, / Body / Yours faithfully,
+**Skill: formal letter.** Model structure: Your address / Date / Dear Sir or Madam, / Body / Yours faithfully,
 
-**Final activity.** Ecris une phrase avec wish pour chaque situation : une route abimee, une ecole sale, un parc sans arbres.`,
+**Final activity.** Write one sentence with wish for each situation: a damaged road, a dirty school, a park without trees.`,
 quiz:`I wish the government ___ more schools in our town.
 * would build
 - builds
@@ -889,12 +889,12 @@ The school gate ___ by a storm last night.
 - damaged was
 - was damage
 
-« Public property » se traduit par :
-* biens publics
-- ecole publique
-- loi publique
+"Public property" means:
+* property belonging to the public
+- a public school
+- a public law
 
-Ecris en anglais « signaler ».
+Write in English: "to report".
 = to report
 
 Our community must ___ the water pump.
@@ -902,32 +902,32 @@ Our community must ___ the water pump.
 - repairs
 - repaired
 
-« Penalty » veut dire :
-* sanction
-- citoyen
-- route
+"Penalty" means:
+* a punishment
+- a citizen
+- a road
 
-Choisis la forme correcte : I wish I ___ more time to help the school.
+Choose the correct form: I wish I ___ more time to help the school.
 * had
 - have
 - will have
 
-« Citizenship » veut dire :
-* citoyennete
-- responsabilite
-- communaute
+"Citizenship" means:
+* the status of being a citizen
+- responsibility
+- community
 
-Choisis la phrase au passif : The council painted the building.
+Choose the passive: The council painted the building.
 * The building was painted by the council.
 - The building painted by the council.
 - The building was painting by the council.
 
-Corrige la phrase : If only I can help the village.
+Correct the sentence: If only I can help the village.
 * If only I could help the village.
 - If only I can helped the village.
 - If only I could helping the village.
 
-Ecris en anglais « endommager ».
+Write in English: "to damage".
 = to damage
 
 He should respect the rules, ___ ?
@@ -935,25 +935,25 @@ He should respect the rules, ___ ?
 - should he
 - doesn't he
 
-« To take care of » signifie :
-* prendre soin de
-- voler
-- reparer`,
-deck:`state property | biens de l'Etat | State property belongs to every citizen.
-citizen | citoyen | Every citizen must pay taxes.
-citizenship | citoyennete | Citizenship means respecting others.
-public building | batiment public | The public building needs paint.
-road | route | The road to the market is muddy.
-to damage | endommager | The rain damaged the roof.
-to steal | voler | Do not steal school books.
-to repair | reparer | The workers repair the well.
-responsibility | responsabilite | It is our responsibility to keep it clean.
-to report | signaler | Report any damage to the chief.
-penalty | sanction | The penalty for theft is high.
-law | loi | The law protects public goods.
-to take care of | prendre soin de | We take care of our school.
-community | communaute | The whole community helped build the clinic.`,
-hw:{t:"A wish for my town",b:"Ecris 5 phrases avec I wish ou If only sur ce que tu voudrais changer dans ta ville. Ajoute deux question tags et une phrase au passif."}},
+"To take care of" means:
+* to look after
+- to steal
+- to repair`,
+deck:`state property | property owned by the government | State property belongs to every citizen.
+citizen | a member of a country | Every citizen must pay taxes.
+citizenship | the status of being a citizen | Citizenship means respecting others.
+public building | a building open to the public | The public building needs paint.
+road | a way for vehicles and people | The road to the market is muddy.
+to damage | to harm or spoil | The rain damaged the roof.
+to steal | to take something that belongs to someone else | Do not steal school books.
+to repair | to fix | The workers repair the well.
+responsibility | a duty you must carry out | It is our responsibility to keep it clean.
+to report | to inform an authority | Report any damage to the chief.
+penalty | a punishment | The penalty for theft is high.
+law | a rule made by the state | The law protects public goods.
+to take care of | to look after | We take care of our school.
+community | a group of people living together | The whole community helped build the clinic.`,
+hw:{t:"Respect public goods",b:"Write 5 sentences with wish or if only about public goods in your town. Use at least one question tag."}},
 
 {c:"2nde",u:10,lv:"B1",t:"Patriotic Acts",th:"Patriotism and civic action",g:"Wish and if only, question tags, active and passive voice",
 body:`Etre patriote, c'est aimer son pays et agir pour lui. Quels gestes patriotiques peut-on faire chaque jour ?
