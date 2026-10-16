@@ -2,26 +2,26 @@
    Formats = ceux de curriculum-togo.js (quiz : * bonne reponse, - fausse, "= reponse ecrite ; vocabulaire : anglais | francais | exemple). */
 const PROGRAMMES_MANUEL=[
 {c:"2nde",u:1,lv:"B1",t:"Chieftaincy in Togo",th:"Traditional chieftaincy",g:"Conditional type one, conditional type two, although / even though / though",
-body:`Le chef traditionnel joue un role important dans la vie des villages au Togo. Dans cette lecon, on parle de la **chefferie** et de ses regles.
+body:`The traditional chief plays an important role in village life in Togo. In this lesson, we talk about the **chieftaincy** and its rules.
 
-**Vocabulary** (mots et expressions) :
-**chief** (chef traditionnel) ; **chieftaincy** (chefferie) ; **palace** (palais) ; **royal court** (cour royale) ; **elder** (ancien) ; **council** (conseil) ; **ancestor** (ancetre) ; **custom** (coutume) ; **ruler** (souverain) ; **to settle a dispute** (regler un conflit) ; **to judge** (juger) ; **verdict** (verdict) ; **to obey** (obeir) ; **to appoint** (nommer) ; **loyalty** (loyaute) ; **throne** (trone).
+**Vocabulary** (words and expressions):
+**chief** (traditional leader) ; **chieftaincy** (the system of chiefs) ; **palace** (the chief's residence) ; **royal court** (where the king holds his council and trials) ; **elder** (respected older member of the community) ; **council** (group that advises or decides) ; **ancestor** (a family member from long ago) ; **custom** (a traditional practice) ; **ruler** (the person who governs) ; **to settle a dispute** (to solve a disagreement) ; **to judge** (to decide a case) ; **verdict** (the final decision of a court) ; **to obey** (to do what you are told) ; **to appoint** (to choose someone for a job) ; **loyalty** (faithfulness to a person or group) ; **throne** (the seat of a king).
 
-**Grammar 1 : Conditional type one** (condition reelle, present + futur). On utilise **if + present simple, will + verbe**.
-If the chief listens to us, the problem **will be** solved. (Si le chef nous ecoute, le probleme sera regle.)
-If you respect the elders, they **will help** you. (Si tu respectes les anciens, ils t'aideront.)
+**Grammar 1: Conditional type one** (a real condition, present + future). We use **if + present simple, will + verb**.
+If the chief listens to us, the problem **will be** solved.
+If you respect the elders, they **will help** you.
 
-**Grammar 2 : Conditional type two** (condition irreelle, present). On utilise **if + past simple, would + verbe**. Avec **I / he / she**, on ecrit souvent **were**.
-If I **were** the chief, I **would help** the young people. (Si j'etais le chef, j'aiderais les jeunes.)
-If the council **met** every week, the village **would be** calmer. (Si le conseil se reunissait chaque semaine, le village serait plus calme.)
+**Grammar 2: Conditional type two** (an unreal or imagined condition, present). We use **if + past simple, would + verb**. With **I / he / she**, we often write **were**.
+If I **were** the chief, I **would help** the young people.
+If the council **met** every week, the village **would be** calmer.
 
-**Grammar 3 : Although, even though, though** (bien que). On utilise une proposition avec un sujet et un verbe ; on ne met pas **but** apres.
-Although the chief was old, he **was** very active. (Bien que le chef soit age, il est tres actif.)
-Even though the trial was long, everyone **accepted** the verdict. (Bien que le proces ait ete long, tout le monde a accepte le verdict.)
+**Grammar 3: Although, even though, though** (despite the fact that). We use a clause with a subject and a verb; we do not put **but** after it.
+Although the chief was old, he **was** very active.
+Even though the trial was long, everyone **accepted** the verdict.
 
-**Skill : model text.** At the royal palace, a visitor says : Good morning, Your Majesty. We come to ask for your help. The chief answers : Welcome. Tell me your problem.
+**Skill: model text.** At the royal palace, a visitor says: "Good morning, Your Majesty. We have come to ask for your help." The chief answers: "Welcome. Tell me your problem."
 
-**Final activity.** Lis le texte, puis reponds par ecrit : What is the main role of a traditional chief in your village ?`,
+**Final activity.** Read the text, then answer in writing: What is the main role of a traditional chief in your village?`,
 quiz:`If the chief listens to us, the problem ___ solved.
 * will be
 - would be
@@ -47,10 +47,10 @@ The chief lives in the ___.
 - verdict
 - ancestor
 
-What does « ancestor » mean ?
-* ancetre
-- descendant
-- conseiller
+What does "ancestor" mean?
+* a family member from long ago
+- a descendant
+- a counsellor
 
 If you break the rules, you ___ be punished.
 * will
@@ -67,39 +67,39 @@ The chief refused to judge the case, ___ he knew the family.
 - so
 - therefore
 
-To settle a dispute means :
-* regler un conflit
-- obeir
-- nommer
+To settle a dispute means:
+* to solve a disagreement
+- to obey
+- to appoint
 
 The people ___ the chief's verdict every year.
 * respect
 - respects not
 - respecting
 
-Choisis la phrase correcte :
+Choose the correct sentence:
 * If I were chief, I would help people.
 - If I would be chief, I helped people.
 - If I am chief, I would helped people.
 
-Ecris en anglais « chefferie ».
+Write in English: "chieftaincy".
 = chieftaincy
 
-Ecris en anglais « verdict ».
+Write in English: "verdict".
 = verdict`,
-deck:`chief | chef traditionnel | The chief settles the dispute at the palace.
-chieftaincy | chefferie | The chieftaincy is important in our region.
-royal court | cour royale | The case was heard at the royal court.
-elder | ancien | The elders give advice to the young.
-council | conseil | The council meets on Monday.
-ancestor | ancetre | Our ancestors respected the land.
-custom | coutume | It is an old custom in this village.
-verdict | verdict | The verdict was fair.
-to obey | obeir | Children must obey their parents.
-to appoint | nommer | The people appointed a new chief.
-loyalty | loyaute | Loyalty is a great value.
-throne | trone | The king sits on the throne.`,
-hw:{t:"A visit to the palace",b:"Ecris un dialogue de 8 a 10 lignes entre un visiteur et le chef au palais. Le visiteur explique un probleme. Utilise au moins une phrase en If ... will et une phrase en Although ... ."}},
+deck:`chief | the traditional leader of a village or community | The chief settles the dispute at the palace.
+chieftaincy | the system of traditional chiefs | The chieftaincy is important in our region.
+royal court | the place where a king holds his council and trials | The case was heard at the royal court.
+elder | a respected older member of the community | The elders give advice to the young.
+council | a group of people who advise or decide together | The council meets on Monday.
+ancestor | a family member from long ago | Our ancestors respected the land.
+custom | a traditional practice of a community | It is an old custom in this village.
+verdict | the final decision of a court | The verdict was fair.
+to obey | to do what you are told | Children must obey their parents.
+to appoint | to choose someone for a job | The people appointed a new chief.
+loyalty | faithfulness to a person or group | Loyalty is a great value.
+throne | the seat of a king | The king sits on the throne.`,
+hw:{t:"A visit to the palace",b:"Write a dialogue of 8 to 10 lines between a visitor and the chief at the palace. The visitor explains a problem. Use at least one sentence with If ... will and one sentence with Although ... ."}},
 
 {c:"2nde",u:2,lv:"B1",t:"Chieftaincy in Africa",th:"Strengths and weaknesses of chiefs in Africa",g:"Conditional type one, conditional type two, although / even though / though",
 body:`Dans beaucoup de pays africains, la chefferie traditionnelle existe a cote de l'Etat moderne. Quelles sont ses forces et ses faiblesses ?
