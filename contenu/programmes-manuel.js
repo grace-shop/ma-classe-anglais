@@ -424,27 +424,27 @@ tradition | customs passed down over time | This tradition is very old.`,
 hw:{t:"Family roles",b:"Write a short text of 6 sentences about the role of women and men in your family. Use at least one comparative of superiority, one sentence with However and one question tag."}},
 
 {c:"2nde",u:5,lv:"B1",t:"Bushfires and Deforestation",th:"The environment: fires and forests",g:"Active and passive voice, the use of unless, relative pronouns",
-body:`Les feux de brousse et la deforestation menacent les forets du Togo. Que se passe-t-il et comment proteger la nature ?
+body:`Bushfires and deforestation threaten the forests of Togo. What is happening, and how can nature be protected?
 
-**Vocabulary** (mots et expressions) :
-**bushfire** (feu de brousse) ; **deforestation** (deforestation) ; **forest** (foret) ; **to cut down trees** (abattre des arbres) ; **drought** (secheresse) ; **soil** (sol) ; **erosion** (erosion) ; **to burn** (bruler) ; **smoke** (fumee) ; **to plant** (planter) ; **to protect** (proteger) ; **wildlife** (faune sauvage) ; **to spread** (se propager) ; **charcoal** (charbon de bois) ; **rainfall** (pluviometrie).
+**Vocabulary** (words and expressions):
+**bushfire** (a fire that spreads across grassland or bush) ; **deforestation** (the clearing of forests) ; **forest** (a large area covered with trees) ; **to cut down trees** (to fell trees) ; **drought** (a long period with no rain) ; **soil** (the earth in which plants grow) ; **erosion** (the wearing away of soil by wind or water) ; **to burn** (to set on fire) ; **smoke** (the grey cloud from a fire) ; **to plant** (to put seeds or trees in the ground) ; **to protect** (to keep safe) ; **wildlife** (animals living in nature) ; **to spread** (to grow over a wider area) ; **charcoal** (wood burnt to make fuel) ; **rainfall** (the amount of rain).
 
-**Grammar 1 : Active and passive voice.** Voix active : **subject + verb + object**. Voix passive : **subject + be + past participle (by + agent)**.
-Farmers burn the grass. (active) / The grass **is burnt by** farmers. (passive) (Les paysans brulent l'herbe.)
-Many trees **were cut down** last year. (Beaucoup d'arbres ont ete abattus l'an dernier.)
+**Grammar 1: Active and passive voice.** Active voice: **subject + verb + object**. Passive voice: **subject + be + past participle (by + agent)**.
+Farmers burn the grass. (active) / The grass **is burnt by** farmers. (passive)
+Many trees **were cut down** last year.
 
-**Grammar 2 : The use of unless.** **Unless** = **if not** (sauf si, a moins que). Le verbe reste au present.
-The forest will disappear **unless** we plant new trees. (La foret disparaitra a moins que nous ne plantions de nouveaux arbres.)
+**Grammar 2: The use of unless.** **Unless** = **if not**. The verb stays in the present.
+The forest will disappear **unless** we plant new trees.
 
-**Grammar 3 : Relative pronouns.** **who** (personnes), **which** (choses), **that** (personnes ou choses), **whose** (dont).
-The farmer **who** lost his land is angry. (Le paysan qui a perdu sa terre est en colere.)
-The fire, **which** started at night, spread fast. (Le feu, qui a commence la nuit, s'est vite propage.)
+**Grammar 3: Relative pronouns.** **who** (for people), **which** (for things), **that** (for people or things), **whose** (showing possession).
+The farmer **who** lost his land is angry.
+The fire, **which** started at night, spread fast.
 
-**Skill : reading.** Model text : Bushfires destroy the soil and kill small animals. Trees that are cut down cannot protect the land from erosion.
+**Skill: reading.** Model text: Bushfires destroy the soil and kill small animals. Trees that are cut down cannot protect the land from erosion.
 
-**Skill : writing about protection.** Model sentences : We should protect our forests. Young people can plant trees every year.
+**Skill: writing about protection.** Model sentences: We should protect our forests. Young people can plant trees every year.
 
-**Final activity.** Ecris 5 phrases sur les causes et les effets des feux de brousse. Utilise au moins une phrase au passif et une phrase avec unless.`,
+**Final activity.** Write 5 sentences about the causes and effects of bushfires. Use at least one passive sentence and one sentence with unless.`,
 quiz:`The forest ___ by farmers last year.
 * was burnt
 - burnt
@@ -460,12 +460,12 @@ The man ___ planted trees is my uncle.
 - which
 - whose
 
-« Bushfire » veut dire :
-* feu de brousse
-- secheresse
-- fumee
+"Bushfire" means:
+* a fire that spreads across grassland or bush
+- drought
+- smoke
 
-Choisis la voix passive : Farmers cut down the trees.
+Choose the passive voice: Farmers cut down the trees.
 * The trees were cut down by farmers.
 - The trees cut down farmers.
 - The trees have been cut farmers.
@@ -475,30 +475,30 @@ The river ___ dirty since the factory opened.
 - was become
 - become
 
-Ecris en anglais « proteger ».
+Write in English: "to protect".
 = to protect
 
 The soil, ___ is dry, cannot grow food.
 * which
 - who
-- whose man
+- whose
 
-Les arbres ___ sont abattus ne repoussent pas.
+Trees ___ are cut down do not grow back.
 * that
 - what
 - where
 
-« Erosion » designe :
-* l'erosion du sol
-- la pluie
-- le charbon
+"Erosion" means:
+* the wearing away of soil
+- rain
+- charcoal
 
 The fire ___ by a careless child.
 * was started
 - started was
 - was start
 
-Corrige la phrase : Unless we will stop, the forest will disappear.
+Correct the sentence: Unless we will stop, the forest will disappear.
 * Unless we stop, the forest will disappear.
 - Unless we will stop, the forest disappears not.
 - Unless we stopped, the forest will disappear.
@@ -508,28 +508,28 @@ The woman ___ house burned is very sad.
 - who
 - which
 
-Ecris en anglais « charbon de bois ».
+Write in English: "charcoal".
 = charcoal
 
 The drought ___ every year in our region.
 * happens
 - is happened
 - is happen`,
-deck:`bushfire | feu de brousse | A bushfire destroyed the grass.
-deforestation | deforestation | Deforestation is a serious problem.
-forest | foret | The forest is full of birds.
-to cut down trees | abattre des arbres | They cut down trees for wood.
-drought | secheresse | The drought lasted six months.
-soil | sol | The soil needs water and care.
-erosion | erosion | Erosion takes away the top soil.
-to burn | bruler | Do not burn the dry leaves.
-smoke | fumee | Smoke came from the fire.
-to plant | planter | We plant maize in June.
-to protect | proteger | We must protect wildlife.
-wildlife | faune sauvage | Wildlife needs a safe place.
-to spread | se propager | The fire began to spread.
-charcoal | charbon de bois | Many families cook with charcoal.`,
-hw:{t:"Our forest",b:"Ecris 6 phrases sur la foret pres de chez toi. Utilise au moins une phrase au passif, une phrase avec unless et une phrase avec who ou which."}},
+deck:`bushfire | a fire that spreads across grassland or bush | A bushfire destroyed the grass.
+deforestation | the clearing of forests | Deforestation is a serious problem.
+forest | a large area covered with trees | The forest is full of birds.
+to cut down trees | to fell trees | They cut down trees for wood.
+drought | a long period with no rain | The drought lasted six months.
+soil | the earth in which plants grow | The soil needs water and care.
+erosion | the wearing away of soil by wind or water | Erosion takes away the top soil.
+to burn | to set on fire | Do not burn the dry leaves.
+smoke | the grey cloud from a fire | Smoke came from the fire.
+to plant | to put seeds or trees in the ground | We plant maize in June.
+to protect | to keep safe | We must protect wildlife.
+wildlife | animals living in nature | Wildlife needs a safe place.
+to spread | to grow over a wider area | The fire began to spread.
+charcoal | wood burnt to make fuel | Many families cook with charcoal.`,
+hw:{t:"Our forest",b:"Write 6 sentences about the forest near your home. Use at least one passive sentence, one sentence with unless and one sentence with who or which."}},
 
 {c:"2nde",u:6,lv:"B1",t:"Dumping Grounds",th:"Causes and effects of dumping grounds",g:"Active and passive voice, the use of unless, relative pronouns",
 body:`Les decharges publiques se multiplient dans les villes togolaises. Quelles en sont les causes et les consequences ?
