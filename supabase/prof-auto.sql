@@ -78,11 +78,11 @@ drop trigger if exists prof_notify on public.prof_messages;
 create trigger prof_notify after insert on public.prof_messages
   for each row execute function public.prof_notify();
 
--- Réglages (à modifier dans app_config) — la réponse automatique est coupée par défaut
+-- Réglages — la réponse automatique est coupée par défaut
 insert into public.app_config (key, value) values
-  ('prof_bot', 'off'),                                        -- 'on' pour activer
-  ('prof_bot_url', 'https://VOTRE-PROJET.supabase.co/functions/v1/prof-bot'),
-  ('prof_bot_secret', 'CHANGEZ-CE-SECRET-LONG')               -- même valeur que PROF_BOT_SECRET
+  ('prof_bot', 'off'),
+  ('prof_bot_url', 'https://vcarrnmmdvmssrpbvnit.supabase.co/functions/v1/prof-bot'),
+  ('prof_bot_secret', '6S5G-ULsVzss-YeUNQ4dnRGNK16HJ6P68t_9OvUNrTQ')
 on conflict (key) do nothing;
 
 -- Le professeur répond lui-même depuis l'application
