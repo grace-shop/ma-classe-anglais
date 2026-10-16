@@ -639,7 +639,7 @@ dustbin | a container for rubbish | The dustbin is full.
 health risk | a danger to health | Rubbish can be a health risk.`,
 hw:{t:"My neighbourhood and waste",b:"Write 6 sentences about the waste in your neighbourhood. Use at least one passive sentence, one sentence with unless and one sentence with which or who."}},
 
-{c:"2nde",u:7,lv:"B1",t:"Artificial Intelligence and the Modern Society",th:"AI, technology and daily life",g:"Active and passive voice",
+{c:"tle",u:9,lv:"B2",t:"Artificial Intelligence and the Modern Society",th:"AI, technology and daily life",g:"Active and passive voice",
 body:`Artificial intelligence is entering daily life: schools, hospitals, banks. What are its advantages and disadvantages?
 
 **Vocabulary** (words and expressions):
@@ -743,7 +743,7 @@ to apply for a job | to ask for a job in writing | She applied for a job at the 
 skill | an ability you have learned | Computer skill is important today.`,
 hw:{t:"AI in my life",b:"Write a short text of 6 sentences: give one advantage and one disadvantage of artificial intelligence. Use at least 2 passive sentences."}},
 
-{c:"2nde",u:8,lv:"B1",t:"Phytotherapy and Health",th:"Medicinal plants and health",g:"Active and passive voice",
+{c:"tle",u:10,lv:"B2",t:"Phytotherapy and Health",th:"Medicinal plants and health",g:"Active and passive voice",
 body:`Phytotherapy, meaning treatment with plants, is widely used in Togo. What are its advantages for health?
 
 **Vocabulary** (words and expressions):
@@ -846,7 +846,7 @@ side effect | an unwanted result of a medicine | This medicine has a side effect
 patient | a person receiving medical care | The patient is waiting outside.`,
 hw:{t:"A health advice",b:"Write 6 sentences giving health advice to a friend who has a fever. Use at least one passive sentence and one sentence with fewer ... than."}},
 
-{c:"2nde",u:9,lv:"B1",t:"Respect of State Property",th:"Citizenship and public goods",g:"Wish and if only, question tags, active and passive voice",
+{c:"tle",u:11,lv:"B2",t:"Respect of State Property",th:"Citizenship and public goods",g:"Wish and if only, question tags, active and passive voice",
 body:`State property (schools, roads, public buildings) belongs to everyone. Why must we respect it?
 
 **Vocabulary** (words and expressions):
@@ -955,7 +955,7 @@ to take care of | to look after | We take care of our school.
 community | a group of people living together | The whole community helped build the clinic.`,
 hw:{t:"Respect public goods",b:"Write 5 sentences with wish or if only about public goods in your town. Use at least one question tag."}},
 
-{c:"2nde",u:10,lv:"B1",t:"Patriotic Acts",th:"Patriotism and civic action",g:"Wish and if only, question tags, active and passive voice",
+{c:"tle",u:12,lv:"B2",t:"Patriotic Acts",th:"Patriotism and civic action",g:"Wish and if only, question tags, active and passive voice",
 body:`To be patriotic is to love your country and act for it. What patriotic acts can we do every day?
 
 **Vocabulary** (words and expressions):
@@ -1061,7 +1061,7 @@ pride | a feeling of satisfaction in what you achieve | I feel pride when I see 
 to celebrate | to mark a special day | We celebrate National Day in October.`,
 hw:{t:"My patriotic act",b:"Write 5 sentences about a patriotic act you can do this week. Use I wish or If only, one question tag and one passive sentence."}},
 
-{c:"2nde",u:11,lv:"B1",t:"Land Issues",th:"Land, inheritance and women's rights",g:"Correlative conjunctions, emphasis with if clause type three",
+{c:"tle",u:13,lv:"B2",t:"Land Issues",th:"Land, inheritance and women's rights",g:"Correlative conjunctions, emphasis with if clause type three",
 body:`Land is a source of conflict in Togo, especially when inheritance is involved. Women are often excluded. How can this change?
 
 **Vocabulary** (words and expressions):
@@ -1166,7 +1166,7 @@ injustice | unfair treatment | Denying women land is an injustice.
 to claim | to demand something you believe is yours | She claimed her share of the land.`,
 hw:{t:"Land rights",b:"Write 6 sentences about women's right to land. Use either ... or, neither ... nor, both ... and and one sentence with It was ... that."}},
 
-{c:"2nde",u:12,lv:"B1",t:"The Value of Traditional Arts in Togo",th:"Traditional arts, culture and identity",g:"No matter (what, who, how), direct and indirect speech",
+{c:"tle",u:14,lv:"B2",t:"The Value of Traditional Arts in Togo",th:"Traditional arts, culture and identity",g:"No matter (what, who, how), direct and indirect speech",
 body:`Togolese traditional arts (carving, weaving, masks, dances) are part of our identity. Why are they precious?
 
 **Vocabulary** (words and expressions):
@@ -1273,7 +1273,7 @@ religious extremism | extreme views about religion | Religious extremism is a da
 tolerance | accepting people who are different | Tolerance makes peace possible.`,
 hw:{t:"A traditional art",b:"Write 6 sentences about a traditional art from your region. Use two sentences with No matter ... and two sentences in indirect speech (He said that ...)."}},
 
-{c:"2nde",u:13,lv:"B1",t:"Violent Extremism",th:"Extremism, violence and peace",g:"No matter (what, who, how), direct and indirect speech",
+{c:"tle",u:15,lv:"B2",t:"Violent Extremism",th:"Extremism, violence and peace",g:"No matter (what, who, how), direct and indirect speech",
 body:`Violent extremism threatens peace in several countries. How can it be described, and how can it be fought?
 
 **Vocabulary** (words and expressions):
@@ -2642,4 +2642,373 @@ side effect | effet secondaire | Some medicines have side effects.
 to recommend | recommander | I recommend this course.
 to access | acceder a | Students access the lessons at home.`,
 hw:{t:"Learning online",b:"Ecris 6 phrases sur l'apprentissage en ligne. Utilise un conditionnel de type 2 et le passif."}},
+{c:"2nde",u:7,lv:"B1",t:"Effects of WhatsApp on the Youth",th:"Social media and young people",g:"Would prefer, would rather ... than, prefer ... to; not only ... but also; used to and be used to",
+body:`WhatsApp is the most popular messaging app among young people. It is free, fast and easy to use, so many students use it every day to talk with friends, share photos and learn new things. But it also has effects that we must understand.
+
+**Vocabulary** (words and expressions): **messaging app** (an app to send messages) ; **to share** (to give something to others) ; **addiction** (a strong need to do something all the time) ; **to spread** (to make news known to many people) ; **rumour** (a story that may not be true) ; **to waste time** (to spend time for nothing useful) ; **privacy** (the right to keep personal things secret) ; **group chat** (a conversation with several people) ; **to concentrate** (to give all your attention to something).
+
+**Grammar 1: would prefer, would rather ... than, prefer ... to.** We use them to say what we like better.
+I would prefer to study at home than in a crowded café.
+I would rather read a book than watch a video.
+Many students prefer chatting to calling by phone.
+
+**Grammar 2: not only ... but also.** WhatsApp is not only fast but also cheap.
+
+**Grammar 3: used to and be used to.** We use used to for a past habit: At school, we used to write letters by hand. We use be used to for a habit we have now: I am used to sending voice messages every day.`,
+quiz:`Which sentence is correct?
+* I would rather read a book than watch TV.
+- I would rather read a book to watch TV.
+- I would rather reading a book than watch TV.
+- I would rather read a book than watches TV.
+
+Complete: Many students prefer chatting ___ calling by phone.
+* to
+- than
+- and
+
+Complete: WhatsApp is not only fast ___ also free.
+* but
+- and
+- or
+
+Complete: In the past, people ___ write letters by hand.
+* used to
+- be used to
+- use to
+
+Complete: I am ___ sending voice messages every day.
+* used to
+- use to
+- used
+
+What is a group chat?
+* a conversation with several people in one place
+- a phone with a broken screen
+- a message sent to one person only
+
+What does « addiction » mean?
+* a strong need to do something all the time
+- a free gift
+- a kind of phone
+
+Write the word: a story that may not be true
+= rumour`,
+deck:`messaging app | an app to send messages | Messaging apps are free to use.
+to share | to give something to others | Students share photos in the group.
+addiction | a strong need to do something all the time | Too much phone use can become an addiction.
+to spread | to make news known to many people | Rumours spread quickly on WhatsApp.
+rumour | a story that may not be true | Do not believe every rumour you read.
+privacy | the right to keep personal things secret | Protect your privacy online.
+group chat | a conversation with several people | Our class has a group chat.
+to waste time | to spend time for nothing useful | Scrolling all night wastes time.`,
+hw:{t:"WhatsApp and me",b:"Write 6 sentences about how you use WhatsApp. Use would prefer ... than and not only ... but also."}},
+
+{c:"2nde",u:8,lv:"B1",t:"Solar Energy in Africa",th:"Renewable energy in Africa",g:"Not only ... but also; be used to; types of energy",
+body:`Africa has a lot of sunshine, which makes solar energy a good choice for many people. Solar energy is clean, cheap to run and renewable. In many villages, families still use kerosene lamps, but solar panels now give them light and power for phones.
+
+**Vocabulary** (words and expressions): **solar panel** (a device that turns sunlight into electricity) ; **renewable** (that never runs out) ; **to power** (to supply energy to a machine or a house) ; **battery** (a device that stores electricity) ; **off-grid** (not connected to the national electricity network) ; **pollution** (harmful waste in the air, water or soil) ; **cost** (the price you pay) ; **village** (a small community in the countryside).
+
+**Types of energy:** solar, wind, hydro (water), biomass and geothermal are renewable. Coal, oil and gas are not renewable.
+
+**Grammar 1: not only ... but also.** Solar energy is not only clean but also cheap.
+
+**Grammar 2: be used to and used to.** Many villages used to depend on kerosene. Now the villagers are used to solar lamps.`,
+quiz:`Which energy comes from the sun?
+* solar energy
+- coal
+- gasoline
+
+Which type of energy is renewable?
+* wind energy
+- coal
+- oil
+
+What does « to power » mean?
+* to supply energy to a machine or a house
+- to break something
+- to paint a wall
+
+Write the word: a device that stores electricity
+= battery
+
+Complete: Solar energy is not only clean ___ also cheap.
+* but
+- and
+- or
+
+Complete: Many villages ___ use kerosene lamps.
+* used to
+- be used to
+- use to
+
+Complete: Farmers are ___ working in the sun.
+* used to
+- use to
+- used
+
+What is the main advantage of solar panels in remote villages?
+* they give electricity without fuel pollution
+- they make the sun brighter
+- they replace the water supply`,
+deck:`solar panel | a device that turns sunlight into electricity | A solar panel sits on the roof.
+renewable | that never runs out | Wind is a renewable source of energy.
+to power | to supply energy to a machine | Solar panels power the lamps.
+battery | a device that stores electricity | The battery keeps the light on at night.
+off-grid | not connected to the national electricity network | Off-grid houses use solar energy.
+pollution | harmful waste in the air, water or soil | Coal creates a lot of pollution.
+cost | the price you pay | The cost of solar panels is falling.
+village | a small community in the countryside | The village has no electricity yet.`,
+hw:{t:"Energy at home",b:"Write 6 sentences about the energy you use at home. Use not only ... but also and used to."}},
+
+{c:"2nde",u:9,lv:"B1",t:"The Youth and the Law",th:"Young people and the law",g:"Direct and indirect speech; should, have to, ought to",
+body:`Laws protect young people in Togo and in many other countries. They give every child the right to go to school and the right to be protected from harm. Young people also have duties: they should respect the law, they have to obey their teachers, and they ought to help their families.
+
+**Vocabulary** (words and expressions): **law** (rules made by the government) ; **youth** (young people) ; **right** (something everyone is allowed to have) ; **duty** (something you must do) ; **to protect** (to keep someone safe from harm) ; **offence** (an action that breaks the law) ; **penalty** (the punishment for breaking a rule) ; **to obey** (to do what the law or a person says).
+
+**Grammar 1: should, have to, ought to.** Should gives advice: You should respect the law. Have to shows an obligation: Pupils have to attend school. Ought to gives a strong duty: We ought to protect younger children.
+
+**Grammar 2: direct and indirect speech.** Direct: The teacher said, "You must respect the law." Indirect: The teacher said that we had to respect the law. Present tenses move back to the past.`,
+quiz:`Choose the correct option: Young people ___ respect the law.
+* should
+- shoulds
+- should to
+
+Students ___ wear a uniform at school. It is the rule.
+* have to
+- should to
+- ought for
+
+Change to indirect speech: He said, "I am tired." He said that he ___ tired.
+* was
+- is
+- were
+
+What does « offence » mean?
+* an action that breaks the law
+- a kind of food
+- a school subject
+
+Write the word: to keep someone safe from harm
+= protect
+
+You ___ help your classmates when they need it.
+* ought to
+- oughts to
+- ought for
+
+What does « youth » mean?
+* young people
+- old people
+- parents`,
+deck:`law | rules made by the government | The law protects children.
+youth | young people | The youth of Togo are very active.
+right | something everyone is allowed to have | Every child has the right to school.
+duty | something you must do | It is our duty to respect others.
+to protect | to keep someone safe from harm | Laws protect young people.
+offence | an action that breaks the law | Stealing is an offence.
+penalty | the punishment for breaking a rule | The penalty can be a fine.
+to obey | to do what the law or a person says | Pupils obey the school rules.`,
+hw:{t:"My rights and duties",b:"Write 6 sentences about the rights and duties of young people. Use should, have to and ought to."}},
+
+{c:"2nde",u:10,lv:"B1",t:"Communal Labour",th:"Communal labour and community work",g:"Should, have to, ought to; reported speech with will and would",
+body:`Communal labour is work done together by the people of a community for the good of everyone. In many villages, people gather to clean the market, repair a road or build a school. Each family contributes its time, and nobody is paid for this work.
+
+**Vocabulary** (words and expressions): **communal labour** (work done together for the community) ; **community** (a group of people who live together) ; **to build** (to make something by putting parts together) ; **to clean up** (to make a place clean) ; **volunteer** (a person who works without being paid) ; **to contribute** (to give time, money or help) ; **neighbour** (a person who lives near you) ; **shared** (used by everyone).
+
+**Grammar 1: should, have to, ought to.** Everybody should take part. Each family has to send one member. We ought to help our neighbours.
+
+**Grammar 2: reported speech.** Direct: The chief said, "We will build a school." Indirect: The chief said they would build a school.`,
+quiz:`Choose: Every family ___ send one person to the work.
+* has to
+- have to
+- haves to
+
+What is communal labour?
+* work done together by people for the community
+- work done alone at home
+- a paid job in a city
+
+Write the word: to construct a house or a road
+= build
+
+Complete: We ___ clean the village every month.
+* should
+- shoulds
+- should to
+
+Change to reported speech: The chief said, "We will build a school." The chief said they ___ build a school.
+* would
+- will
+- are
+
+What does « volunteer » mean?
+* someone who works without being paid
+- someone who sells goods
+- someone who gives orders
+
+Each person ___ bring a tool to the meeting.
+* ought to
+- oughts to
+- ought`,
+deck:`communal labour | work done together for the community | Communal labour cleans the market.
+community | a group of people who live together | The community built a well.
+to build | to make something by putting parts together | We build a school with bricks.
+to clean up | to make a place clean | Let us clean up the road.
+volunteer | a person who works without being paid | Many volunteers came to help.
+to contribute | to give money, time or help | Each family contributes ten hours a year.
+neighbour | a person who lives near you | Our neighbours help us in the fields.
+shared | used by everyone | The water point is shared by all.`,
+hw:{t:"Work for the community",b:"Write 6 sentences about a community project in your village. Use should, have to and ought to."}},
+
+{c:"2nde",u:11,lv:"B1",t:"Conflicts in Communities",th:"Conflicts in communities",g:"Although, despite; so ... that; consequently, as a result",
+body:`Conflicts in communities often start over land, water, money or family matters. Although neighbours live close together, they can quickly fall out. Despite the efforts of the elders, some quarrels last for years. The causes are jealousy, poor communication and disputes about land. The consequences can be fear, division and violence. The solutions are dialogue, mediation by a neutral person and respect for the law.
+
+**Vocabulary** (words and expressions): **conflict** (a serious disagreement) ; **dispute** (an argument about land, money or rights) ; **mediation** (solving a problem with the help of a neutral person) ; **to reconcile** (to become friends again after a quarrel) ; **tension** (a feeling of anger or fear between people) ; **jealousy** (envy of what others have) ; **to solve** (to find an answer to a problem) ; **peace** (a state without fighting).
+
+**Grammar 1: although and despite.** Although they are neighbours, they often argue. Despite the rain, the meeting took place. (although + clause ; despite + noun)
+
+**Grammar 2: so ... that.** The river is so polluted that nobody can drink it.
+
+**Grammar 3: consequently and as a result.** The farmers quarrelled; consequently, the field was damaged. The chief spoke to both families. As a result, the quarrel stopped.`,
+quiz:`Choose: ___ they are neighbours, they often argue.
+* Although
+- Despite
+- So
+
+Complete: It rained ___ the bad weather, the match continued.
+* despite
+- although
+- so
+
+Complete: The river is so polluted ___ nobody can swim in it.
+* that
+- which
+- as
+
+Choose: The chief spoke to both families. ___, the quarrel stopped.
+* As a result
+- Although
+- Despite
+
+What does « mediation » mean?
+* help from a neutral person to solve a dispute
+- a fight with weapons
+- a family celebration
+
+Write the word: a feeling of envy
+= jealousy
+
+What is a good solution to a conflict in a community?
+* dialogue and respect
+- ignoring the problem
+- fighting until one side wins`,
+deck:`conflict | a serious disagreement between people or groups | The conflict lasted two years.
+dispute | an argument about land, money or rights | The dispute was about a field.
+mediation | solving a problem with the help of a neutral person | The elders offered mediation.
+to reconcile | to become friends again after a quarrel | They reconciled after the meeting.
+tension | a feeling of anger or fear between people | There is tension in the village.
+jealousy | envy of what others have | Jealousy can cause conflict.
+to solve | to find an answer to a problem | We must solve this problem together.
+peace | a state without fighting | The people want peace.`,
+hw:{t:"Peace in my community",b:"Write 6 sentences about a conflict in a community and how it was solved. Use although, despite and so ... that."}},
+
+{c:"2nde",u:12,lv:"B1",t:"Child Labour",th:"Child labour",g:"So ... that; consequently; as a result; although, despite",
+body:`Child labour is work done by children that harms their health, their education or their development. It often happens because of poverty: families are so poor that they send their children to work. Consequently, many children drop out of school. Some work in fields or markets, and as a result they are often tired and sick.
+
+**Vocabulary** (words and expressions): **child labour** (work that harms children) ; **poverty** (having very little money) ; **to exploit** (to use someone unfairly) ; **to drop out** (to stop going to school) ; **hazardous** (dangerous) ; **to ban** (to forbid by law) ; **awareness** (knowledge of a problem) ; **to enrol** (to register in a school).
+
+**Grammar 1: so ... that.** The work was so dangerous that many children were hurt.
+
+**Grammar 2: consequently and as a result.** Many children left school. Consequently, they lost their chance to learn.
+
+**Grammar 3: although and despite.** Although the law bans child labour, it still exists. Despite the law, some children work in the markets.`,
+quiz:`Complete: The work was so dangerous ___ many children were hurt.
+* that
+- which
+- as
+
+Choose: ___ the law, many children still work in the fields.
+* Despite
+- Although
+- So
+
+Choose: Many children left school. ___, they lost their chance to learn.
+* Consequently
+- Although
+- Despite
+
+What is child labour?
+* work that harms children's health or education
+- light help at home after school
+- a holiday job for adults
+
+Write the word: to forbid something by law
+= ban
+
+What does « to drop out » mean?
+* to stop going to school
+- to jump from a height
+- to finish a course with success
+
+Choose the correct sentence.
+* Although the law forbids it, child labour still exists.
+- Although the law forbids it, but child labour still exists.
+- Despite the law, but child labour still exists.`,
+deck:`child labour | work done by children that harms them | Child labour keeps children out of school.
+poverty | the state of having very little money | Poverty forces some families to send children to work.
+to exploit | to use someone unfairly for work | Employers must not exploit children.
+to drop out | to stop going to school | Some pupils drop out after primary school.
+hazardous | dangerous | Mining is a hazardous job.
+to ban | to forbid something by law | The government banned child labour.
+awareness | knowledge and understanding of a problem | Awareness campaigns help parents.
+to enrol | to register in a school | Parents enrol their children every September.`,
+hw:{t:"Children's rights",b:"Write 6 sentences on why every child must go to school. Use so ... that and consequently."}},
+
+{c:"2nde",u:13,lv:"B1",t:"Traditional Values",th:"Traditional values and culture",g:"Since, for, ago, during",
+body:`Traditional values are the beliefs and customs that a community passes from one generation to the next. In many families, respect for the elders, hospitality and respect for the ancestors are very important. Traditional recipes are also part of this heritage: they are passed down from grandmothers to grandchildren.
+
+**Vocabulary** (words and expressions): **tradition** (a custom passed on over time) ; **values** (beliefs about what is good and important) ; **elders** (older people who deserve respect) ; **hospitality** (a warm welcome for guests) ; **ancestor** (a family member from long ago) ; **recipe** (instructions for cooking a dish) ; **heritage** (customs and objects from the past) ; **to pass down** (to hand on to the next generation).
+
+**Grammar: since, for, ago, during.** Since gives a starting point: I have lived here since 2010. For gives a period: She cooked the dish for three hours. Ago means before now: I visited my village five years ago. During is used with an event or a time: The grandparents told us stories during the evening.`,
+quiz:`Complete: We have known each other ___ 2015.
+* since
+- for
+- ago
+
+Complete: She cooked this dish ___ three hours.
+* for
+- since
+- ago
+
+Complete: The grandparents told us stories ___ the evening.
+* during
+- for
+- ago
+
+Complete: I visited my village five years ___.
+* ago
+- since
+- for
+
+What does « elders » mean?
+* older people who deserve respect
+- young children
+- shop owners
+
+Write the word: a list of ingredients and steps to cook a dish
+= recipe
+
+What does « to pass down » mean?
+* to give traditions to the next generation
+- to fail an exam
+- to run quickly`,
+deck:`tradition | a custom passed from one generation to the next | Greetings are an important tradition.
+values | beliefs about what is good and important | Respect is a core value.
+elders | older people who deserve respect | We greet the elders first.
+hospitality | a warm welcome for guests | Our family is known for hospitality.
+ancestor | a family member from long ago | We honour our ancestors.
+recipe | instructions for cooking a dish | My grandmother's recipe is famous.
+heritage | customs and objects passed down from the past | The festival is part of our heritage.
+to pass down | to hand on to the next generation | Stories are passed down by the elders.`,
+hw:{t:"Traditions in my family",b:"Write 6 sentences about a tradition in your family. Use since, for and ago."}},
 ];
