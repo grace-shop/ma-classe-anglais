@@ -949,49 +949,30 @@ function initMascot(){mascot=(function(){
  let r;try{r=new T.WebGLRenderer({canvas:cv,alpha:true,antialias:true})}catch(e){return api}
  r.setPixelRatio(Math.min(devicePixelRatio||1,2));r.setSize(300,300,false);
  const sc=new T.Scene(),cam=new T.PerspectiveCamera(32,1,.1,50);cam.position.set(0,.3,8.2);
- sc.add(new T.AmbientLight(0xffffff,.62));
- const key=new T.DirectionalLight(0xffffff,1);key.position.set(3,5,5);sc.add(key);
+ sc.add(new T.AmbientLight(0xffffff,.7));
+ const key=new T.DirectionalLight(0xffffff,1.1);key.position.set(3,5,5);sc.add(key);
  const rim=new T.PointLight(0x9fb2ff,.9,20);rim.position.set(-3,2,3);sc.add(rim);
- const warm=new T.PointLight(0xf0d49a,.7,20);warm.position.set(3,-1,3);sc.add(warm);
- const M=(c,o)=>new T.MeshStandardMaterial(Object.assign({color:c,roughness:.45,metalness:.05},o||{}));
- const SKIN=0xF2C7A0,HAIR=0x1B1A24,HOOD=0x4B6BD6,HOOD_D=0x3A55B8,WHITE=0xffffff,INK=0x141833;
+ const warm=new T.PointLight(0xf0d49a,.6,20);warm.position.set(3,-1,3);sc.add(warm);
+ const M=(c,o)=>new T.MeshStandardMaterial(Object.assign({color:c,roughness:.3,metalness:.05},o||{}));
+ const WHITE=0xffffff,NAVY=0x161B3D,GOLD=0xD8B46A,BLUE=0x4B6BD6;
  const bot=new T.Group();sc.add(bot);
- // torse : sweat à capuche bleu
- const torso=new T.Mesh(new T.SphereGeometry(1,48,36),M(HOOD));torso.scale.set(.84,.8,.72);torso.position.set(0,-1.38,0);bot.add(torso);
- const collar=new T.Mesh(new T.TorusGeometry(.42,.085,16,44),M(WHITE));collar.rotation.x=Math.PI/2;collar.position.set(0,-.66,.05);bot.add(collar);
- const pocket=new T.Mesh(new T.BoxGeometry(.5,.2,.07),M(HOOD_D));pocket.position.set(0,-1.78,.66);pocket.rotation.x=-.1;bot.add(pocket);
- const logo=new T.Mesh(new T.CircleGeometry(.12,32),M(0xD8B46A,{metalness:.7,roughness:.25}));logo.position.set(-.34,-1.12,.66);bot.add(logo);
- // tête
- const head=new T.Group();head.position.set(0,.4,0);bot.add(head);
- const face=new T.Mesh(new T.SphereGeometry(1,64,56),M(SKIN,{roughness:.55}));face.scale.set(1,.98,.92);head.add(face);
- // cheveux noirs : calotte + frange
- const hair=new T.Mesh(new T.SphereGeometry(1.06,56,40,0,Math.PI*2,0,Math.PI*.55),M(HAIR,{roughness:.35}));hair.position.set(0,.06,-.02);hair.scale.set(1.03,1.02,.98);head.add(hair);
- [[-.5,.74,.62,.44,-.25],[-.08,.8,.7,.42,.05],[.36,.78,.66,.42,.3]].forEach(([x,y,z,s,rz])=>{const f=new T.Mesh(new T.SphereGeometry(s,32,24),M(HAIR,{roughness:.35}));f.position.set(x,y,z);f.scale.set(1,.72,.8);f.rotation.z=rz;head.add(f)});
- // oreilles
- [-1,1].forEach(s=>{const e=new T.Mesh(new T.SphereGeometry(.17,24,20),M(SKIN));e.position.set(s*.98,-.08,0);e.scale.set(.5,.72,.62);head.add(e)});
- // yeux expressifs (type Duolingo)
- const eyeK=new T.MeshBasicMaterial({color:INK}),eyeW=new T.MeshBasicMaterial({color:WHITE});
- const eyes=[-.36,.36].map(x=>{const g=new T.Group();g.position.set(x,-.06,.9);
-   const w=new T.Mesh(new T.SphereGeometry(.17,32,24),eyeK);w.scale.set(1,1.22,.42);g.add(w);
-   const sh=new T.Mesh(new T.SphereGeometry(.055,16,12),eyeW);sh.position.set(.06,.08,.12);g.add(sh);
-   const sh2=new T.Mesh(new T.SphereGeometry(.024,12,10),eyeW);sh2.position.set(-.05,-.06,.13);g.add(sh2);
-   head.add(g);return g});
- // joues roses
- const blush=new T.MeshBasicMaterial({color:0xF08FA0,transparent:true,opacity:.45});
- [-.6,.6].forEach(x=>{const b=new T.Mesh(new T.CircleGeometry(.16,32),blush);b.position.set(x,-.32,.93);b.scale.set(1.3,.8,1);head.add(b)});
- // sourire
- const mouth=new T.Mesh(new T.TorusGeometry(.15,.032,10,28,Math.PI),new T.MeshBasicMaterial({color:0x7A2E3E}));mouth.rotation.z=Math.PI;mouth.position.set(0,-.42,.97);head.add(mouth);
- // bras : manches bleues + mains
- const arms=[-1,1].map(s=>{const p=new T.Group();p.position.set(s*.92,-1.3,0);bot.add(p);
-   const a=new T.Mesh(new T.SphereGeometry(.26,32,24),M(HOOD));a.scale.set(1,2.05,1);a.position.y=-.45;p.add(a);
-   const hand=new T.Mesh(new T.SphereGeometry(.22,24,20),M(SKIN));hand.position.set(0,-1.12,0);p.add(hand);
-   p.userData.s=s;return p});
- // chaussures
- [-.32,.32].forEach(x=>{const sh=new T.Mesh(new T.SphereGeometry(.26,24,20),M(INK,{roughness:.3}));sh.scale.set(1.1,.6,1.35);sh.position.set(x,-2.5,.12);bot.add(sh)});
- // décor 3D
- const ring=new T.Mesh(new T.TorusGeometry(2.05,.05,12,90),new T.MeshStandardMaterial({color:0xd8b46a,metalness:.85,roughness:.25}));ring.rotation.x=1.25;sc.add(ring);
- const ring2=new T.Mesh(new T.TorusGeometry(2.25,.025,10,90),new T.MeshBasicMaterial({color:0x4b6bd6,transparent:true,opacity:.35}));ring2.rotation.set(1.1,.4,0);sc.add(ring2);
- const orbs=[0,1,2].map(i=>{const o=new T.Mesh(new T.SphereGeometry(.09,16,16),new T.MeshStandardMaterial({color:[0x4b6bd6,0xd8b46a,0xb4546f][i],metalness:.4,roughness:.3}));sc.add(o);return o});
+ // corps : robot blanc brillant
+ const body=new T.Mesh(new T.SphereGeometry(1.25,64,48),M(WHITE,{roughness:.2}));bot.add(body);
+ // antenne et petite bille dorée
+ const stick=new T.Mesh(new T.CylinderGeometry(.03,.03,.5,12),M(0xE5E7EB,{roughness:.4}));stick.position.set(0,1.5,0);bot.add(stick);
+ const tip=new T.Mesh(new T.SphereGeometry(.1,24,20),M(GOLD,{metalness:.7,roughness:.25}));tip.position.set(0,1.8,0);bot.add(tip);
+ // visière bleu nuit sur le devant
+ const visor=new T.Mesh(new T.SphereGeometry(1,64,48),M(NAVY,{roughness:.25,metalness:.2}));
+ visor.scale.set(.92,.62,.5);visor.position.set(0,.12,.85);bot.add(visor);
+ // yeux blancs lumineux (clignotement)
+ const eyeM=new T.MeshBasicMaterial({color:WHITE});
+ const eyes=[-.36,.36].map(x=>{const e=new T.Mesh(new T.SphereGeometry(.16,32,24),eyeM);e.scale.set(.9,1.2,.35);e.position.set(x,.14,1.33);bot.add(e);return e});
+ // sourire doré
+ const smile=new T.Mesh(new T.TorusGeometry(.16,.035,12,30,Math.PI),M(GOLD,{metalness:.6,roughness:.3}));smile.rotation.z=Math.PI;smile.position.set(0,-.18,1.36);bot.add(smile);
+ // décor 3D : anneau doré, anneau bleu, petites planètes
+ const ring=new T.Mesh(new T.TorusGeometry(2.05,.05,12,90),new T.MeshStandardMaterial({color:GOLD,metalness:.85,roughness:.25}));ring.rotation.x=1.25;sc.add(ring);
+ const ring2=new T.Mesh(new T.TorusGeometry(2.25,.025,10,90),new T.MeshBasicMaterial({color:BLUE,transparent:true,opacity:.35}));ring2.rotation.set(1.1,.4,0);sc.add(ring2);
+ const orbs=[0,1,2].map(i=>{const o=new T.Mesh(new T.SphereGeometry(.09,16,16),new T.MeshStandardMaterial({color:[BLUE,GOLD,0xb4546f][i],metalness:.4,roughness:.3}));sc.add(o);return o});
  // interaction
  let mx=0,my=0,jumpT=-10;const clk=new T.Clock();
  addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
@@ -999,15 +980,10 @@ function initMascot(){mascot=(function(){
  function frame(){
    const calm=document.body.dataset.mode==="teacher",t=calm?2.4:clk.getElapsedTime(),j=calm?9:t-jumpT;
    bot.position.y=Math.sin(t*1.6)*.1+(j<1?Math.sin(j*Math.PI)*.9:0);
-   if(calm){bot.rotation.y=0;bot.rotation.x=0;head.rotation.y=0}
-   else{bot.rotation.y+=((mx*.9)+(j<1?j*Math.PI*2:0)-bot.rotation.y)*.12;bot.rotation.x+=(my*.5-bot.rotation.x)*.08;head.rotation.y=mx*.35}
-   head.rotation.z=Math.sin(t*1.2)*.05;
-   // salut de la main (au saut et de temps en temps)
-   const waving=j<1.4||(t%9)<1.4;
-   arms.forEach(p=>{const s=p.userData.s;
-     if(s===1)p.rotation.z=waving?2.35+Math.sin(t*9)*.32:.12;
-     else p.rotation.z=-.12});
-   const blink=(t%4)<.12;eyes.forEach(g=>g.scale.y=blink?.12:1);
+   if(calm){bot.rotation.y=0;bot.rotation.x=0}
+   else{bot.rotation.y+=((mx*.9)+(j<1?j*Math.PI*2:0)-bot.rotation.y)*.12;bot.rotation.x+=(my*.5-bot.rotation.x)*.08}
+   bot.rotation.z=Math.sin(t*1.2)*.05;
+   const blink=(t%4)<.12;eyes.forEach(e=>e.scale.y=blink?.12:1.2);
    ring.rotation.z=t*.5;ring2.rotation.z=-t*.35;
    orbs.forEach((o,i)=>{const a=t*(.8+i*.25)+i*2.1;o.position.set(Math.cos(a)*2.25,Math.sin(a*1.3)*.5,Math.sin(a)*2.25)});
    r.render(sc,cam)}
@@ -10297,7 +10273,14 @@ function btKindOf(){return (BT.st&&BT.st.kind)||(BT.room&&BT.room.kind)||BTNAV.k
 #arena .ar-back svg{width:24px!important;height:24px!important}
 .bt-codechip{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:10px 14px;border-radius:16px;background:rgba(94,234,212,.10);border:1px solid rgba(94,234,212,.35);color:#EEF2FF;font-size:14px}
 .bt-codechip b{font-family:ui-monospace,monospace;font-size:18px;letter-spacing:.2em;color:#5EEAD4}
-.bt-kpage .bt-code{margin:10px 0 16px}
+.bt-kpage{max-width:100%;min-width:0;overflow-x:hidden;box-sizing:border-box}
+.bt-kpage>*,.bt-kpage .ar-card,.bt-kpage .ar-go,.bt-kpage .ar-hint{min-width:0;max-width:100%;box-sizing:border-box}
+.bt-kpage .ar-kicker{letter-spacing:.14em;white-space:normal;overflow-wrap:anywhere;line-height:1.5}
+.bt-kpage .ar-hero{padding:0}
+.bt-kpage .ar-hero h1{font-size:clamp(1.8rem,8vw,2.4rem);line-height:1.1;margin:4px 0 0;overflow-wrap:anywhere}
+.bt-kpage .ar-card{padding:16px;gap:10px}
+.bt-kpage .ar-hint{margin:0}
+.bt-kpage .bt-code{font-size:clamp(1.25rem,7vw,2rem);letter-spacing:.12em;white-space:normal;overflow-wrap:anywhere;padding:8px 0 4px;margin:6px 0 10px;text-align:center}
 .bt-kpage .ar-go+.ar-go{margin-top:10px}
 `;document.head.appendChild(s)})();
 
