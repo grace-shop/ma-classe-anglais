@@ -30,7 +30,7 @@ V5.showArch=false;
 peersView=function(){const me=S.uid,last={},un={};
   for(const m of PR.inbox){const o=m.sender===me?m.receiver:m.sender;if(!last[o])last[o]=m;if(m.receiver===me&&!m.read_at&&!m.deleted_at)un[m.sender]=(un[m.sender]||0)+1}
   const q=(S.drafts.peer_q||"").trim().toLowerCase(),t=m=>m?+new Date(m.created_at):0,pin=u=>((v5Prefs().conv["peer:"+u]||{}).pin)||0;
-  const all=PR.dir.filter(x=>!BL.set.has(x.uid)).filter(x=>!q||x.name.toLowerCase().includes(q)||nickOf(x.uid).toLowerCase().includes(q)).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid],pin:pin(x.uid),arch:convHas("peer:"+x.uid,"arch"),mute:convHas("peer:"+x.uid,"mute")}));
+  const all=PR.dir.filter(x=>!BL.set.has(x.uid)&&frState(x.uid)==="friends").filter(x=>!q||x.name.toLowerCase().includes(q)||nickOf(x.uid).toLowerCase().includes(q)).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid],pin:pin(x.uid),arch:convHas("peer:"+x.uid,"arch"),mute:convHas("peer:"+x.uid,"mute")}));
   const sort=(a,b)=>(!!b.pin-!!a.pin)||(b.pin-a.pin)||(b.un-a.un)||(t(b.last)-t(a.last))||(b.on-a.on)||a.name.localeCompare(b.name);
   const rows=all.filter(x=>q||!x.arch).sort(sort),arch=all.filter(x=>x.arch).sort(sort);
   const row=x=>{const nk=nickOf(x.uid),prev=x.last?((x.last.sender===me?"You: ":"")+String(x.last.deleted_at?"⊘ Message deleted":(v4Plain(x.last.body)||attLabel(x.last.att))).slice(0,60)):((x.classe?CL(x.classe)+(x.same?" · your class":""):"")||"Say hello!");
@@ -43,7 +43,7 @@ peersView=function(){const me=S.uid,last={},un={};
   <input id="peer_q" type="search" placeholder="Search for a classmate…" value="${esc(S.drafts.peer_q||"")}" aria-label="Search for a classmate">
   ${!PR.loaded?`<div class="empty">Loading…</div>`:rows.length||arch.length?`${arch.length&&!q?`<button type="button" class="glass pv-arch" data-v4="pvArch">${ic("file")}<b>Archived</b><span class="chip">${arch.length}</span><span class="muted small" style="margin-left:auto">${V5.showArch?"Hide":"Show"}</span></button>${V5.showArch?`<div class="glass list pv-list">${arch.map(row).join("")}</div>`:""}`:""}
     ${rows.length>60&&!q?`<p class="hint">${rows.length} learners: the 60 most recent are shown. Search for a name to find the others.</p>`:""}<div class="glass list pv-list">${rows.slice(0,q?200:60).map(row).join("")}</div>`
-   :`<div class="empty"><b>No other learners yet.</b><br>Learners will appear here as soon as the teacher approves their registration.</div>`}</div>`};
+   :`<div class="empty"><b>No friends yet.</b><br>Tap + to find classmates and send them a friend request. Once they accept, they appear here.</div>`}</div>`};
 function pvSheetHTML(){const u=V5.pv;if(!u)return"";const nm=peerName(u),id="peer:"+u,nk=nickOf(u);
   if(V5.pvNick)return`<div class="v4sheet-bg fz" data-v4="pvX"></div><form class="v4sheet fz" data-ff="nick"><b>Nickname for ${esc(nm)}</b><p class="small muted" style="margin:0">Only you can see it.</p><input id="pv_nick" maxlength="30" value="${esc(nk)}" placeholder="e.g. My bestie 💛" autocomplete="off"><button class="btn" type="submit">Save</button>${nk?`<button type="button" data-v4="pvNickDel">${ic("trash")}Remove the nickname</button>`:""}<button type="button" class="v4cancel" data-v4="pvX">Cancel</button></form>`;
   return`<div class="v4sheet-bg fz" data-v4="pvX"></div><div class="v4sheet fz"><b>${esc(nk||nm)}</b>
