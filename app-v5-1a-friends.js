@@ -21,7 +21,11 @@ async function frRefresh(){
   try{
     const next=await window.__peer.friendList();
     const same=JSON.stringify(next)===JSON.stringify(FR.list)&&FR.loaded;
+    // un camarade vient d'accepter : l'élève arrive directement sur la messagerie
+    const was=new Set(FR.list.filter(x=>x.status==="accepted").map(x=>x.uid));
+    const gained=FR.loaded&&next.some(x=>x.status==="accepted"&&!was.has(x.uid));
     FR.list=next; FR.loaded=true; FR.err="";
+    if(gained&&S.mode==="student"&&S.view?.type!=="peer"){S.view={type:"peers"};S.animate=true;scrollTo(0,0);toast("New friend! Say hello 👋","check")}
     if(!same) render();
   }catch(e){ FR.err=e.message||""; FR.loaded=true; }
 }
@@ -43,6 +47,7 @@ document.addEventListener("click",async e=>{
     if(a==="add"){
       const r=await window.__peer.friendRequest(id);
       toast(r==="friends"?"You are now friends! You can chat now.":"Friend request sent","check");
+      if(S.mode==="student"){S.view={type:"peers"};S.animate=true;scrollTo(0,0)}
     }else if(a==="accept"||a==="refuse"){
       const r=await window.__peer.friendRespond(id,a==="accept");
       toast(r==="friends"?"You are now friends! You can chat now.":"Request declined","check");

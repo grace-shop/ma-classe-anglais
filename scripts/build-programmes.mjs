@@ -48,7 +48,7 @@ function parseQuiz(text) {
   return out;
 }
 
-// 3 · vocabulaire : « anglais | français | exemple »
+// 3 · vocabulaire : « anglais | définition en anglais | exemple » (aucun français dans l'application)
 function parseDeck(text) {
   return text.trim().split("\n").map(l => l.split("|").map(s => s.trim())).filter(p => p.length >= 2 && p[0])
     .map(([en, fr, ex]) => ({ en, fr, ex: ex || "" }));
@@ -65,7 +65,7 @@ function vocabQuiz(cards) {
     const wrong = pool.slice((i * 3) % Math.max(1, pool.length - 3), (i * 3) % Math.max(1, pool.length - 3) + 3);
     while (wrong.length < 3 && pool.length) wrong.push(pool[wrong.length]);
     if (wrong.length < 3) return;
-    const q = en2fr ? `What does « ${c.en} » mean?` : `How do you say « ${c.fr} » in English?`;
+    const q = en2fr ? `What does « ${c.en} » mean?` : `Which word means « ${c.fr} »?`;
     const pos = i % 4;
     const choices = [...wrong];
     choices.splice(pos, 0, correct);
