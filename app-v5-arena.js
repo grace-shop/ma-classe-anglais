@@ -306,7 +306,7 @@ function arFab(){if(document.getElementById("arFab"))return;const b=document.cre
 function arOpen(){arRoot().hidden=false;document.body.style.overflow="hidden";arHome()}
 function arClose(){arStopT();const r=document.getElementById("arena");if(r)r.hidden=true;document.body.style.overflow="";AR.mode=null}
 function arSet(h){const b=document.getElementById("arBody");if(b){b.innerHTML=h;const r=document.getElementById("arena");if(r)r.scrollTop=0}}
-function arTop(title,right){return`<div class="ar-top"><button class="ar-glass" data-ar="home" aria-label="Back to the Arena">${arIc("back")}</button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
+function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Back to the Arena">${arIc("back")}<span>Back</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
 function arBar(p){return`<div class="ar-bar"><i style="width:${Math.max(0,Math.min(100,Math.round(p*100)))}%"></i></div>`}
 function arRing(){return`<div class="ar-ring"><svg viewBox="0 0 48 48"><circle class="ar-track" cx="24" cy="24" r="22"/><circle id="arRing" class="ar-arc" cx="24" cy="24" r="22" style="stroke-dashoffset:0"/></svg><b id="arNum">0</b></div>`}
 

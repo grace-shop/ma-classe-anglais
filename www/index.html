@@ -4741,7 +4741,7 @@ function arFab(){if(document.getElementById("arFab"))return;const b=document.cre
 function arOpen(){arRoot().hidden=false;document.body.style.overflow="hidden";arHome()}
 function arClose(){arStopT();const r=document.getElementById("arena");if(r)r.hidden=true;document.body.style.overflow="";AR.mode=null}
 function arSet(h){const b=document.getElementById("arBody");if(b){b.innerHTML=h;const r=document.getElementById("arena");if(r)r.scrollTop=0}}
-function arTop(title,right){return`<div class="ar-top"><button class="ar-glass" data-ar="home" aria-label="Back to the Arena">${arIc("back")}</button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
+function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Back to the Arena">${arIc("back")}<span>Back</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
 function arBar(p){return`<div class="ar-bar"><i style="width:${Math.max(0,Math.min(100,Math.round(p*100)))}%"></i></div>`}
 function arRing(){return`<div class="ar-ring"><svg viewBox="0 0 48 48"><circle class="ar-track" cx="24" cy="24" r="22"/><circle id="arRing" class="ar-arc" cx="24" cy="24" r="22" style="stroke-dashoffset:0"/></svg><b id="arNum">0</b></div>`}
 
@@ -5111,7 +5111,7 @@ AR_MODES.push(
 .bt-glow::before{content:"";position:absolute;inset:-45%;background:conic-gradient(from 0deg,transparent 0deg,rgba(94,234,212,.22) 40deg,transparent 90deg);animation:btSpin 7s linear infinite;pointer-events:none}
 .bt-glow>*{position:relative}
 @keyframes btSpin{to{transform:rotate(360deg)}}
-.bt-code{font-size:2.6rem;font-weight:900;letter-spacing:.32em;text-align:center;padding:12px 0 6px;background:linear-gradient(120deg,#8EF6E4,#818CF8 55%,#F472B6);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.bt-code{font-size:2.6rem;font-weight:900;letter-spacing:.32em;text-align:center;padding:12px 0 6px;color:#8EF6E4;text-shadow:0 0 24px rgba(142,246,228,.35);font-variant-numeric:tabular-nums;user-select:all}
 .bt-in{flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:1px solid rgba(160,172,255,.3);background:rgba(8,10,28,.7);color:#fff;font:inherit;font-weight:900;letter-spacing:.25em;text-transform:uppercase;text-align:center;outline:none}
 .bt-in:focus{border-color:#5EEAD4;box-shadow:0 0 0 3px rgba(94,234,212,.2)}
 .bt-sb{display:grid;gap:8px;margin-bottom:6px}
@@ -5166,7 +5166,7 @@ function btFinished(st){return st.status==="done"||(st.kind==="challenge"&&st.an
 
 /* ---------- polling ---------- */
 function btStop(){if(BT.iv){clearInterval(BT.iv);BT.iv=null}if(BT.clk){clearInterval(BT.clk);BT.clk=null}}
-function btPoll(){btStop();BT.on=true;BT.key="";const ar=document.getElementById("arena");if(ar)ar.scrollTop=0;BT.iv=setInterval(btSync,1500);BT.clk=setInterval(btClock,250);btSync()}
+function btPoll(){btStop();BT.on=true;BT.inHub=false;BT.key="";const ar=document.getElementById("arena");if(ar)ar.scrollTop=0;BT.iv=setInterval(btSync,1500);BT.clk=setInterval(btClock,250);btSync()}
 async function btSync(){if(!BT.room||BT.syncing)return;BT.syncing=true;
   try{const st=await btRpc("arena_state",{p_room:BT.room.id});
     BT.off=st.now-Date.now();BT.st=st;BT.room.kind=st.kind;BT.room.code=st.code;
@@ -5199,7 +5199,7 @@ function btDraw(){if(!BT.on||!BT.st)return;const st=BT.st;
   return btLive(st)}
 
 /* ---------- hub ---------- */
-function btHub(){btStop();BT.on=false;BT.key="";
+function btHub(){btStop();BT.on=false;BT.inHub=true;BT.key="";
   const live=BT.room&&BT.st&&!btFinished(BT.st);
   const cards=["duel","battle","royale","challenge"].map((k,i)=>{const K=BT_KINDS[k];
     return `<button class="ar-mode bt-glow" style="--d:${(i*0.07).toFixed(2)}s" data-ar="bt-kind" data-m="${k}">
@@ -5350,7 +5350,10 @@ function btClick(b){const a=b.dataset.ar;
 
 /* leaving the Arena stops the polling; the battle stays resumable */
 {const _c=arClose;arClose=function(){btStop();BT.on=false;return _c()}}
-{const _h=arHome;arHome=function(){btStop();BT.on=false;return _h()}}
+/* back from a battle room returns to the Battles page (not the Arena home); from the Battles page it goes home */
+{const _h=arHome;arHome=function(){
+  if(BT.room&&!BT.inHub){btStop();BT.on=false;btHub();return}
+  btStop();BT.on=false;return _h()}}
 
 /* ---- app-v5-calls.js ---- */
 /* =====================================================================
@@ -9616,6 +9619,13 @@ function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
 @media (prefers-reduced-motion:reduce){.vic-stage,.vic-aura,.vic-ring,.vic-spark,.vic-stars span{animation:none!important}}
 `;document.head.appendChild(st)}
 
+{const st=document.createElement("style");st.id="zzznback";st.textContent=`
+.ar-back{display:inline-flex;align-items:center;gap:2px;background:none!important;border:0!important;box-shadow:none!important;color:var(--fg,#EEF2FF);font-size:15px;font-weight:600;font-family:inherit;padding:8px 8px 8px 0;cursor:pointer;flex:none;backdrop-filter:none}
+.ar-back svg{width:22px;height:22px;flex:none}
+.ar-back:hover{color:#8EF6E4}
+.ar-back:active{transform:translateX(-2px)}
+`;document.head.appendChild(st)}
+
 /* ---- app-v5-zzzo-nav.js ---- */
 /* =====================================================================
    v5 · Retour : le bouton « retour » ramène à la page précédente (et non
@@ -9886,7 +9896,7 @@ function pvOrganize(){
 #arena .ar-ring .ar-arc{stroke:var(--ink)!important}
 #arena .ar-ring .ar-track{stroke:var(--line2)!important}
 #arena .ar-ring b{color:var(--fg)!important}
-#arena .bt-code{background:var(--grad)!important;-webkit-background-clip:text;background-clip:text;color:transparent!important}
+#arena .bt-code{background:none!important;color:#8EF6E4!important;text-shadow:0 0 24px rgba(142,246,228,.35)}
 #arena .bt-in{background:var(--surface2)!important;color:var(--fg)!important;border-color:var(--line2)!important}
 #arena .bt-tag{background:var(--ink-soft)!important;color:var(--ink)!important}
 #arena .bt-tag.host{background:var(--goldS,var(--surface2))!important;color:var(--gold)!important}

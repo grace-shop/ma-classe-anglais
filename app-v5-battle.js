@@ -12,7 +12,7 @@
 .bt-glow::before{content:"";position:absolute;inset:-45%;background:conic-gradient(from 0deg,transparent 0deg,rgba(94,234,212,.22) 40deg,transparent 90deg);animation:btSpin 7s linear infinite;pointer-events:none}
 .bt-glow>*{position:relative}
 @keyframes btSpin{to{transform:rotate(360deg)}}
-.bt-code{font-size:2.6rem;font-weight:900;letter-spacing:.32em;text-align:center;padding:12px 0 6px;background:linear-gradient(120deg,#8EF6E4,#818CF8 55%,#F472B6);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.bt-code{font-size:2.6rem;font-weight:900;letter-spacing:.32em;text-align:center;padding:12px 0 6px;color:#8EF6E4;text-shadow:0 0 24px rgba(142,246,228,.35);font-variant-numeric:tabular-nums;user-select:all}
 .bt-in{flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:1px solid rgba(160,172,255,.3);background:rgba(8,10,28,.7);color:#fff;font:inherit;font-weight:900;letter-spacing:.25em;text-transform:uppercase;text-align:center;outline:none}
 .bt-in:focus{border-color:#5EEAD4;box-shadow:0 0 0 3px rgba(94,234,212,.2)}
 .bt-sb{display:grid;gap:8px;margin-bottom:6px}
@@ -67,7 +67,7 @@ function btFinished(st){return st.status==="done"||(st.kind==="challenge"&&st.an
 
 /* ---------- polling ---------- */
 function btStop(){if(BT.iv){clearInterval(BT.iv);BT.iv=null}if(BT.clk){clearInterval(BT.clk);BT.clk=null}}
-function btPoll(){btStop();BT.on=true;BT.key="";const ar=document.getElementById("arena");if(ar)ar.scrollTop=0;BT.iv=setInterval(btSync,1500);BT.clk=setInterval(btClock,250);btSync()}
+function btPoll(){btStop();BT.on=true;BT.inHub=false;BT.key="";const ar=document.getElementById("arena");if(ar)ar.scrollTop=0;BT.iv=setInterval(btSync,1500);BT.clk=setInterval(btClock,250);btSync()}
 async function btSync(){if(!BT.room||BT.syncing)return;BT.syncing=true;
   try{const st=await btRpc("arena_state",{p_room:BT.room.id});
     BT.off=st.now-Date.now();BT.st=st;BT.room.kind=st.kind;BT.room.code=st.code;
@@ -100,7 +100,7 @@ function btDraw(){if(!BT.on||!BT.st)return;const st=BT.st;
   return btLive(st)}
 
 /* ---------- hub ---------- */
-function btHub(){btStop();BT.on=false;BT.key="";
+function btHub(){btStop();BT.on=false;BT.inHub=true;BT.key="";
   const live=BT.room&&BT.st&&!btFinished(BT.st);
   const cards=["duel","battle","royale","challenge"].map((k,i)=>{const K=BT_KINDS[k];
     return `<button class="ar-mode bt-glow" style="--d:${(i*0.07).toFixed(2)}s" data-ar="bt-kind" data-m="${k}">
@@ -251,4 +251,7 @@ function btClick(b){const a=b.dataset.ar;
 
 /* leaving the Arena stops the polling; the battle stays resumable */
 {const _c=arClose;arClose=function(){btStop();BT.on=false;return _c()}}
-{const _h=arHome;arHome=function(){btStop();BT.on=false;return _h()}}
+/* back from a battle room returns to the Battles page (not the Arena home); from the Battles page it goes home */
+{const _h=arHome;arHome=function(){
+  if(BT.room&&!BT.inHub){btStop();BT.on=false;btHub();return}
+  btStop();BT.on=false;return _h()}}

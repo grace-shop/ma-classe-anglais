@@ -28,7 +28,7 @@
 #arena .ar-ring .ar-arc{stroke:var(--ink)!important}
 #arena .ar-ring .ar-track{stroke:var(--line2)!important}
 #arena .ar-ring b{color:var(--fg)!important}
-#arena .bt-code{background:var(--grad)!important;-webkit-background-clip:text;background-clip:text;color:transparent!important}
+#arena .bt-code{background:none!important;color:#8EF6E4!important;text-shadow:0 0 24px rgba(142,246,228,.35)}
 #arena .bt-in{background:var(--surface2)!important;color:var(--fg)!important;border-color:var(--line2)!important}
 #arena .bt-tag{background:var(--ink-soft)!important;color:var(--ink)!important}
 #arena .bt-tag.host{background:var(--goldS,var(--surface2))!important;color:var(--gold)!important}
