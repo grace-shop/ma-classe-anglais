@@ -21,7 +21,14 @@ function btKindOf(){return (BT.st&&BT.st.kind)||(BT.room&&BT.room.kind)||BTNAV.k
 #arena .ar-back svg{width:24px!important;height:24px!important}
 .bt-codechip{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:10px 14px;border-radius:16px;background:rgba(94,234,212,.10);border:1px solid rgba(94,234,212,.35);color:#EEF2FF;font-size:14px}
 .bt-codechip b{font-family:ui-monospace,monospace;font-size:18px;letter-spacing:.2em;color:#5EEAD4}
-.bt-kpage .bt-code{margin:10px 0 16px}
+.bt-kpage{max-width:100%;min-width:0;overflow-x:hidden;box-sizing:border-box}
+.bt-kpage>*,.bt-kpage .ar-card,.bt-kpage .ar-go,.bt-kpage .ar-hint{min-width:0;max-width:100%;box-sizing:border-box}
+.bt-kpage .ar-kicker{letter-spacing:.14em;white-space:normal;overflow-wrap:anywhere;line-height:1.5}
+.bt-kpage .ar-hero{padding:0}
+.bt-kpage .ar-hero h1{font-size:clamp(1.8rem,8vw,2.4rem);line-height:1.1;margin:4px 0 0;overflow-wrap:anywhere}
+.bt-kpage .ar-card{padding:16px;gap:10px}
+.bt-kpage .ar-hint{margin:0}
+.bt-kpage .bt-code{font-size:clamp(1.25rem,7vw,2rem);letter-spacing:.12em;white-space:normal;overflow-wrap:anywhere;padding:8px 0 4px;margin:6px 0 10px;text-align:center}
 .bt-kpage .ar-go+.ar-go{margin-top:10px}
 `;document.head.appendChild(s)})();
 
