@@ -2775,7 +2775,9 @@ document.head.insertAdjacentHTML("beforeend",`<style id="v4css">
 @media (max-width:480px){.docv-top button span{display:none}}
 .docv-body{overflow:auto;-webkit-overflow-scrolling:touch;display:grid;justify-items:center;align-content:start;padding:12px 8px 40px;gap:10px;touch-action:pan-x pan-y pinch-zoom}
 .docv-page{background:#fff;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.45);max-width:none}
-.docv-img{max-width:100%;height:auto;border-radius:8px;background:#fff}
+.docv-img{display:block;width:100%;height:100%;object-fit:contain;border-radius:8px;background:transparent;transform-origin:50% 50%;user-select:none;-webkit-user-drag:none;touch-action:none}
+.docv-body.docv-pic{display:block;padding:0;overflow:hidden;min-height:0;height:100%;touch-action:none}
+.docv-body.docv-pic .docv-img{transition:transform .18s ease}
 .docv-msg{display:grid;justify-items:center;gap:14px;text-align:center;max-width:420px;margin:12vh auto 0;color:#C9CFEA;line-height:1.5}
 .docv-msg svg{width:48px;height:48px;fill:none;stroke:#93ABFF;stroke-width:1.6}
 .docv-wait{display:flex;align-items:center;gap:10px;margin-top:20vh;color:#C9CFEA}
@@ -2799,6 +2801,7 @@ button.scanimg{border:0;padding:0;background:none;cursor:zoom-in;display:block}
 .v4grid button:hover{background:var(--ink-soft);transform:scale(1.06)}
 .v4grid img,.v4grid .e3d{width:100%;height:auto;max-width:54px}
 .v4grid.emo .e3d{width:30px;height:30px}
+.v4grid.emo .emo-nat{font-size:1.6rem;line-height:1}
 .msg .v4stk{width:110px;height:110px;object-fit:contain;display:block;filter:drop-shadow(0 8px 14px rgba(0,0,0,.25))}
 .msg.stk{background:none!important;box-shadow:none!important;border:0!important;padding:0!important}
 .msg .msg-emo{font-size:2.2rem;line-height:1.15}.msg .msg-emo .e3d{width:44px;height:44px}
@@ -2913,6 +2916,29 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
     const c=document.createElement("canvas");c.className="docv-page";c.width=Math.floor(vp.width);c.height=Math.floor(vp.height);c.style.width=Math.floor(vp.width/dpr)+"px";box.appendChild(c);
     try{await page.render({canvasContext:c.getContext("2d"),viewport:vp}).promise}catch(e){}}
   if(P.doc.numPages>n)box.insertAdjacentHTML("beforeend",`<p class="docv-msg">The last ${P.doc.numPages-n} pages are not shown: save the file to see everything.</p>`)}
+/* ---- photo viewer: the whole photo fits the screen (no automatic zoom); the student zooms with two fingers or a double tap ---- */
+{const PV={s:1,x:0,y:0,p:new Map(),d0:0,s0:1,img:null,tap:0,tx:0,ty:0};
+ const dist=()=>{const[a,b]=[...PV.p.values()];return Math.hypot(a.x-b.x,a.y-b.y)||1};
+ const bounds=img=>{const w=img.clientWidth,h=img.clientHeight;return{mx:(PV.s-1)*w/2,my:(PV.s-1)*h/2}};
+ const paint=img=>{const b=bounds(img);PV.x=Math.max(-b.mx,Math.min(b.mx,PV.x));PV.y=Math.max(-b.my,Math.min(b.my,PV.y));if(PV.s<=1){PV.x=0;PV.y=0}img.style.transform=`translate(${PV.x}px,${PV.y}px) scale(${PV.s})`};
+ const reset=img=>{PV.s=1;PV.x=0;PV.y=0;if(img)img.style.transform=""};
+ const setup=()=>{const body=document.getElementById("docvBody"),img=body&&body.querySelector("img.docv-img");
+   if(!img){if(PV.img){PV.img=null}return}
+   if(PV.img!==img){PV.img=img;reset(img);body.classList.add("docv-pic")}};
+ new MutationObserver(setup).observe(document.body,{childList:true,subtree:true});
+ const inView=e=>e.target&&e.target.closest&&e.target.closest("#docvBody")&&PV.img&&PV.img.isConnected;
+ document.addEventListener("pointerdown",e=>{if(!inView(e))return;PV.p.set(e.pointerId,{x:e.clientX,y:e.clientY});
+   if(PV.p.size===2){PV.d0=dist();PV.s0=PV.s}
+   if(PV.p.size===1){PV.tx=e.clientX;PV.ty=e.clientY}},{passive:true});
+ document.addEventListener("pointermove",e=>{if(!inView(e)||!PV.p.has(e.pointerId))return;const prev=PV.p.get(e.pointerId);
+   const cur={x:e.clientX,y:e.clientY};PV.p.set(e.pointerId,cur);
+   if(PV.p.size===2){PV.s=Math.max(1,Math.min(5,PV.s0*dist()/PV.d0));paint(PV.img)}
+   else if(PV.p.size===1&&PV.s>1){PV.x+=cur.x-prev.x;PV.y+=cur.y-prev.y;paint(PV.img)}},{passive:true});
+ const up=e=>{if(!PV.p.has(e.pointerId))return;const was=PV.p.size;PV.p.delete(e.pointerId);
+   if(was===1&&inView(e)&&Math.hypot(e.clientX-PV.tx,e.clientY-PV.ty)<12){const now=Date.now();
+     if(now-PV.tap<320){PV.tap=0;if(PV.s>1){reset(PV.img)}else{PV.s=2.5;paint(PV.img)}}else PV.tap=now}};
+ document.addEventListener("pointerup",up,{passive:true});document.addEventListener("pointercancel",up,{passive:true});
+}
 async function docSave(){const d=V4.doc;if(!d)return;try{if(S.dl&&S.dl.save){await S.dl.save({filename:d.name,data:d.blob});toast("File saved","download")}else{const a=document.createElement("a");a.href=URL.createObjectURL(d.blob);a.download=d.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}}catch(e){toast("Could not save the file.","x")}}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("docv"))closeDoc()});
 addEventListener("popstate",()=>{if(document.getElementById("docv"))closeDoc()});
@@ -2934,6 +2960,7 @@ setTimeout(v4Prefetch,9000);setInterval(v4Prefetch,60000);addEventListener("onli
 const V4EMO="😀 😁 😂 🤣 😊 😍 😘 😎 🤩 🥳 😇 🙂 😉 😢 😭 😡 😱 🤔 🙄 😴 🤗 🤭 😅 👍 👎 👏 🙏 💪 👋 ✌️ 🤝 👌 ❤️ 💙 💚 💛 💜 🔥 ⭐ ✨ 🎉 🎂 🎁 📚 ✏️ 📝 ✅ ❌ 💯 🏆 ⚽ 🎵 ☀️ 🌧️ 🍕 🍚 🥭 🇹🇬".split(" ");
 const V4STK=["1f600","1f602","1f60d","1f929","1f60c","1f622","1f62d","1f621","1f914","1f633","1f632","1f634","1f971","1f629","1f62c","1f44f","1f44b","1f64f","1f4aa","1f91d","2764","1f525","2b50","1f388","1f381","1f3c6","1f393","1f4da","1f4dd","2705","1f680","1f916","1f47d","1f431","1f436","1f981","1f98b","26bd","1f355","1f366","2600","1f308"].filter(c=>{try{return EMO_SET.has(c)}catch(e){return false}});
 function attLabel(a){if(!a)return"";return a.k==="voice"?"🎤 Voice message":a.k==="img"?"📷 Photo":a.k==="sticker"?"Sticker":"📎 "+(a.n||"File")}
+function natEmo(s){return segG(String(s||"")).map(g=>/\p{Extended_Pictographic}/u.test(g)?`<span class="emo-nat">${esc(g)}</span>`:esc(g)).join("")}
 const onlyEmoji=t=>{const s=String(t||"").trim();if(!s||s.length>16)return false;try{return/^(\p{Extended_Pictographic}|\p{Emoji_Component}|‍|️|\s)+$/u.test(s)}catch(e){return false}};
 function voiceHTML(a){const on=V4.playing===a.p;return`<div class="v4voice${on?" on":""}"><button type="button" data-v4="play" data-p="${esc(a.p)}" data-t="${esc(a.t||"audio/webm")}" aria-label="${on?"Pause":"Listen to the voice message"}">${ic(on?"pause":"play")}</button><span class="v4bars" aria-hidden="true">${[5,9,14,8,18,11,6,15,20,9,13,7,16,10,5,12].map(h=>`<span class="v4b" style="height:${h}px"></span>`).join("")}</span><small>${fmtDur(a.d)}</small></div>`}
 function msgBodyHTML(text,a){let h="";
@@ -2941,7 +2968,7 @@ function msgBodyHTML(text,a){let h="";
     else if(a.k==="voice")h+=voiceHTML(a);
     else if(a.k==="img"){const u=V4.obj[a.p];h+=`<button type="button" class="v4img" data-v4="doc" data-k="m" data-id="${esc(a.p)}" data-t="${esc(a.t||"image/jpeg")}" data-n="${esc(a.n||"photo.jpg")}" aria-label="See the photo"><img ${u?`src="${u}"`:`data-chatp="${esc(a.p)}" data-t="${esc(a.t||"")}"`} alt="Photo"></button>`}
     else if(a.p)h+=`<button type="button" class="v4file" data-v4="doc" data-k="m" data-id="${esc(a.p)}" data-t="${esc(a.t||"")}" data-n="${esc(a.n||"file")}">${ic(/word/.test(a.t||"")?"word":"file")}<span><b>${esc(a.n||"File")}</b><small>${fmtSize(a.s)}${V4.cached.has("m:"+a.p)?" · offline":""}</small></span></button>`}
-  if(text){const fx=v4Split(text);h+=fx?v4FixHTML(fx[0],fx[1],fx[2]):`<div class="${onlyEmoji(text)?"msg-emo":""}" style="white-space:pre-wrap">${E(text)}</div>`}
+  if(text){const fx=v4Split(text);h+=fx?v4FixHTML(fx[0],fx[1],fx[2]):`<div class="${onlyEmoji(text)?"msg-emo":""}" style="white-space:pre-wrap">${natEmo(text)}</div>`}
   return h}
 const msgHTML=(mine,text,a,at)=>`<div class="msg ${mine?"mine":""}${a&&a.k==="sticker"&&!text?" stk":""}">${msgBodyHTML(text,a)}<span>${fmtTime(at)}</span></div>`;
 async function hydrateChat(){for(const img of document.querySelectorAll("img[data-chatp]:not([data-ok])")){img.dataset.ok="1";const p=img.dataset.chatp;
@@ -2956,7 +2983,7 @@ async function v4Play(p,t){const A=V4.audio||(V4.audio=new Audio());if(V4.playin
   try{let u=V4.obj[p];if(!u){V4.playing=p;render();const b=await srcBlob({k:"m",id:p,t});u=V4.obj[p]=URL.createObjectURL(b)}A.src=u;A.onended=()=>{V4.playing=null;render()};V4.playing=p;await A.play();render()}
   catch(e){V4.playing=null;render();toast(navigator.onLine?"Cannot play audio on this device.":"This voice message is not saved on this device yet.","x")}}
 function v4PanelHTML(kind,t){return`<div class="v4panel glass"><div class="v4tabs seg"><button type="button" data-v4="panel" data-k="${kind}" data-t="emo" aria-pressed="${t==="emo"}">Emojis</button><button type="button" data-v4="panel" data-k="${kind}" data-t="stk" aria-pressed="${t==="stk"}">Stickers 3D</button><button type="button" class="iconbtn sm" data-v4="panelClose" aria-label="Close">${ic("x")}</button></div>
-  ${t==="emo"?`<div class="v4grid emo">${V4EMO.map(x=>`<button type="button" data-v4="emo" data-k="${kind}" data-e="${x}" aria-label="${x}">${E(x)}</button>`).join("")}</div>`:`<div class="v4grid stk">${v4Stickers().map(c=>`<button type="button" data-v4="stk" data-k="${kind}" data-e="${c}" aria-label="Send this sticker"><img src="img/${c}.webp" alt="" loading="lazy"></button>`).join("")}${v4LockedPacks().map(pk=>`<button type="button" class="lockpk" data-v4="packInfo" data-id="${pk.id}" aria-label="${esc(pk.t)} pack to unlock" title="Unlock it in the shop"><img src="img/${pk.e[0]}.webp" alt="" loading="lazy"></button>`).join("")}</div>${v4LockedPacks().length&&S.mode==="student"?`<span class="small muted">${v4LockedPacks().length} sticker pack${v4LockedPacks().length>1?"s":""} to unlock in the shop (greyed out).</span>`:""}`}</div>`}
+  ${t==="emo"?`<div class="v4grid emo">${V4EMO.map(x=>`<button type="button" data-v4="emo" data-k="${kind}" data-e="${x}" aria-label="${x}">${natEmo(x)}</button>`).join("")}</div>`:`<div class="v4grid stk">${v4Stickers().map(c=>`<button type="button" data-v4="stk" data-k="${kind}" data-e="${c}" aria-label="Send this sticker"><img src="img/${c}.webp" alt="" loading="lazy"></button>`).join("")}${v4LockedPacks().map(pk=>`<button type="button" class="lockpk" data-v4="packInfo" data-id="${pk.id}" aria-label="${esc(pk.t)} pack to unlock" title="Unlock it in the shop"><img src="img/${pk.e[0]}.webp" alt="" loading="lazy"></button>`).join("")}</div>${v4LockedPacks().length&&S.mode==="student"?`<span class="small muted">${v4LockedPacks().length} sticker pack${v4LockedPacks().length>1?"s":""} to unlock in the shop (greyed out).</span>`:""}`}</div>`}
 const v4Stickers=()=>{const own=(S.me&&S.me.owned)||{},all=[...V4STK];if(typeof SH_PACKS!=="undefined")for(const pk of SH_PACKS)if(own[pk.id]||S.mode==="teacher")for(const c of pk.e)if(!all.includes(c))all.push(c);return all};
 const v4LockedPacks=()=>{if(typeof SH_PACKS==="undefined"||S.mode!=="student")return[];const own=(S.me&&S.me.owned)||{};return SH_PACKS.filter(pk=>!own[pk.id])};
 const V4KINDS={peer:{input:"peerInput",form:"peerchat"},chat:{input:"chatInput",form:"chat"},staff:{input:"staffInput",form:"staffchat"}};   // feature files can register more kinds (e.g. V4KINDS.group={input:"groupInput",form:"groupchat"})
@@ -4329,7 +4356,7 @@ V5.showArch=false;
 peersView=function(){const me=S.uid,last={},un={};
   for(const m of PR.inbox){const o=m.sender===me?m.receiver:m.sender;if(!last[o])last[o]=m;if(m.receiver===me&&!m.read_at&&!m.deleted_at)un[m.sender]=(un[m.sender]||0)+1}
   const q=(S.drafts.peer_q||"").trim().toLowerCase(),t=m=>m?+new Date(m.created_at):0,pin=u=>((v5Prefs().conv["peer:"+u]||{}).pin)||0;
-  const all=PR.dir.filter(x=>!BL.set.has(x.uid)).filter(x=>!q||x.name.toLowerCase().includes(q)||nickOf(x.uid).toLowerCase().includes(q)).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid],pin:pin(x.uid),arch:convHas("peer:"+x.uid,"arch"),mute:convHas("peer:"+x.uid,"mute")}));
+  const all=PR.dir.filter(x=>!BL.set.has(x.uid)&&frState(x.uid)==="friends").filter(x=>!q||x.name.toLowerCase().includes(q)||nickOf(x.uid).toLowerCase().includes(q)).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid],pin:pin(x.uid),arch:convHas("peer:"+x.uid,"arch"),mute:convHas("peer:"+x.uid,"mute")}));
   const sort=(a,b)=>(!!b.pin-!!a.pin)||(b.pin-a.pin)||(b.un-a.un)||(t(b.last)-t(a.last))||(b.on-a.on)||a.name.localeCompare(b.name);
   const rows=all.filter(x=>q||!x.arch).sort(sort),arch=all.filter(x=>x.arch).sort(sort);
   const row=x=>{const nk=nickOf(x.uid),prev=x.last?((x.last.sender===me?"You: ":"")+String(x.last.deleted_at?"⊘ Message deleted":(v4Plain(x.last.body)||attLabel(x.last.att))).slice(0,60)):((x.classe?CL(x.classe)+(x.same?" · your class":""):"")||"Say hello!");
@@ -4342,7 +4369,7 @@ peersView=function(){const me=S.uid,last={},un={};
   <input id="peer_q" type="search" placeholder="Search for a classmate…" value="${esc(S.drafts.peer_q||"")}" aria-label="Search for a classmate">
   ${!PR.loaded?`<div class="empty">Loading…</div>`:rows.length||arch.length?`${arch.length&&!q?`<button type="button" class="glass pv-arch" data-v4="pvArch">${ic("file")}<b>Archived</b><span class="chip">${arch.length}</span><span class="muted small" style="margin-left:auto">${V5.showArch?"Hide":"Show"}</span></button>${V5.showArch?`<div class="glass list pv-list">${arch.map(row).join("")}</div>`:""}`:""}
     ${rows.length>60&&!q?`<p class="hint">${rows.length} learners: the 60 most recent are shown. Search for a name to find the others.</p>`:""}<div class="glass list pv-list">${rows.slice(0,q?200:60).map(row).join("")}</div>`
-   :`<div class="empty"><b>No other learners yet.</b><br>Learners will appear here as soon as the teacher approves their registration.</div>`}</div>`};
+   :`<div class="empty"><b>No friends yet.</b><br>Tap + to find classmates and send them a friend request. Once they accept, they appear here.</div>`}</div>`};
 function pvSheetHTML(){const u=V5.pv;if(!u)return"";const nm=peerName(u),id="peer:"+u,nk=nickOf(u);
   if(V5.pvNick)return`<div class="v4sheet-bg fz" data-v4="pvX"></div><form class="v4sheet fz" data-ff="nick"><b>Nickname for ${esc(nm)}</b><p class="small muted" style="margin:0">Only you can see it.</p><input id="pv_nick" maxlength="30" value="${esc(nk)}" placeholder="e.g. My bestie 💛" autocomplete="off"><button class="btn" type="submit">Save</button>${nk?`<button type="button" data-v4="pvNickDel">${ic("trash")}Remove the nickname</button>`:""}<button type="button" class="v4cancel" data-v4="pvX">Cancel</button></form>`;
   return`<div class="v4sheet-bg fz" data-v4="pvX"></div><div class="v4sheet fz"><b>${esc(nk||nm)}</b>
