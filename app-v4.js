@@ -182,11 +182,13 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
 {const PV={s:1,x:0,y:0,p:new Map(),d0:0,s0:1,img:null,tap:0,tx:0,ty:0};
  const dist=()=>{const[a,b]=[...PV.p.values()];return Math.hypot(a.x-b.x,a.y-b.y)||1};
  const bounds=img=>{const w=img.clientWidth,h=img.clientHeight;return{mx:(PV.s-1)*w/2,my:(PV.s-1)*h/2}};
- const paint=img=>{const b=bounds(img);PV.x=Math.max(-b.mx,Math.min(b.mx,PV.x));PV.y=Math.max(-b.my,Math.min(b.my,PV.y));if(PV.s<=1){PV.x=0;PV.y=0}img.style.transform=`translate(calc(-50% + ${PV.x}px),calc(-50% + ${PV.y}px)) scale(${PV.s})`};
+ const paint=img=>{const b=bounds(img);PV.x=Math.max(-b.mx,Math.min(b.mx,PV.x));PV.y=Math.max(-b.my,Math.min(b.my,PV.y));if(PV.s<=1){PV.x=0;PV.y=0}img.style.transform=`translate(${PV.x}px,${PV.y}px) scale(${PV.s})`};
  const reset=img=>{PV.s=1;PV.x=0;PV.y=0;if(img)img.style.transform=""};
  const setup=()=>{const body=document.getElementById("docvBody"),img=body&&body.querySelector("img.docv-img");
    if(!img){if(PV.img){PV.img=null}return}
-   if(PV.img!==img){PV.img=img;reset(img);body.classList.add("docv-pic")}};
+   if(PV.img!==img){PV.img=img;reset(img);body.classList.add("docv-pic");
+     const top=body.parentElement&&body.parentElement.querySelector(".docv-top"),th=top?Math.round(top.getBoundingClientRect().height):56;
+     img.style.cssText=`position:fixed;left:0;top:${th}px;width:100vw;height:${window.innerHeight-th}px;max-width:none;max-height:none;margin:0;padding:0;object-fit:contain;border-radius:0;background:transparent;transform-origin:50% 50%`}};
  new MutationObserver(setup).observe(document.body,{childList:true,subtree:true});
  const inView=e=>e.target&&e.target.closest&&e.target.closest("#docvBody")&&PV.img&&PV.img.isConnected;
  document.addEventListener("pointerdown",e=>{if(!inView(e))return;PV.p.set(e.pointerId,{x:e.clientX,y:e.clientY});
@@ -200,6 +202,182 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
    if(was===1&&inView(e)&&Math.hypot(e.clientX-PV.tx,e.clientY-PV.ty)<12){const now=Date.now();
      if(now-PV.tap<320){PV.tap=0;if(PV.s>1){reset(PV.img)}else{PV.s=2.5;paint(PV.img)}}else PV.tap=now}};
  document.addEventListener("pointerup",up,{passive:true});document.addEventListener("pointercancel",up,{passive:true});
+}
+/* ---- qui a aimé un post : un tap sur le compteur de likes ouvre la liste des personnes ---- */
+{const st=document.createElement("style");st.textContent=`
+#flkSheet{position:fixed;inset:0;z-index:9500;display:flex;align-items:flex-end;justify-content:center}
+#flkSheet .flk-back{position:absolute;inset:0;background:rgba(5,8,18,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#flkSheet .flk-card{position:relative;width:min(520px,100%);max-height:70dvh;overflow:auto;background:#141A33;color:#EEF1FF;border:1px solid rgba(140,160,255,.2);border-bottom:0;border-radius:22px 22px 0 0;padding:14px 16px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.5);animation:flkUp .22s ease-out}
+@keyframes flkUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+#flkSheet .flk-h{display:flex;align-items:center;justify-content:space-between;margin:2px 0 12px}
+#flkSheet .flk-h b{font-size:1rem}
+#flkSheet .flk-x{border:0;background:rgba(140,160,255,.14);color:#EEF1FF;width:34px;height:34px;border-radius:50%;font-size:1.3rem;line-height:1;cursor:pointer}
+#flkSheet ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+#flkSheet li{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:14px;background:rgba(140,160,255,.08)}
+#flkSheet .flk-av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#6EE7C1,#8B9BFF);color:#0B0E1C;font-weight:800;flex:none}
+#flkSheet .flk-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+#flkSheet .flk-e{font-size:1.4rem;line-height:1}
+.flk{background:none;border:0;color:inherit;font:inherit;padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.flk:active{opacity:.7}`;document.head.appendChild(st);
+ const nameOf=uid=>{if(uid===S.uid)return (S.me&&S.me.name)||"You";const x=(PR.dir||[]).find(d=>d.uid===uid);return (x&&x.name)||"Student"};
+ function flkOpen(id){const L=F.likes[id]||[];if(!L.length)return;
+   document.getElementById("flkSheet")?.remove();
+   const o=document.createElement("div");o.id="flkSheet";
+   o.innerHTML=`<div class="flk-back" data-flk-close></div><div class="flk-card" role="dialog" aria-label="Likes"><div class="flk-h"><b>${L.length} ${L.length>1?"people":"person"} liked this</b><button type="button" class="flk-x" data-flk-close aria-label="Close">×</button></div><ul>${L.map(l=>`<li><span class="flk-av">${esc(nameOf(l.uid).trim().charAt(0).toUpperCase()||"?")}</span><span class="flk-n">${esc(nameOf(l.uid))}</span><span class="flk-e">${natEmo(l.e||"❤️")}</span></li>`).join("")}</ul></div>`;
+   document.body.appendChild(o);}
+ document.addEventListener("click",e=>{
+   if(e.target.closest&&e.target.closest("#flkSheet [data-flk-close]")){document.getElementById("flkSheet")?.remove();return}
+   const b=e.target.closest&&e.target.closest("[data-flk]");
+   if(b){e.preventDefault();e.stopPropagation();flkOpen(b.dataset.flk)}
+ },true);
+}
+/* ---- messagerie du professeur : l'élève écrit au professeur, Nova répond si elle est absente ---- */
+{const st=document.createElement("style");st.textContent=`
+#profSheet{position:fixed;inset:0;z-index:9400;display:flex;flex-direction:column;background:#0B0E1C;color:#EEF1FF}
+#profSheet .pt-head{display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top,0px)) 12px 10px;background:rgba(18,22,44,.96);border-bottom:1px solid rgba(140,160,255,.18)}
+#profSheet .pt-head .pt-t{flex:1;min-width:0}
+#profSheet .pt-head b{display:block;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#profSheet .pt-head small{display:block;color:#A9B3D9;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#profSheet .pt-back{border:1px solid rgba(140,160,255,.3);background:rgba(110,130,255,.12);color:#EEF1FF;border-radius:12px;padding:8px 12px;font:inherit;font-weight:700;cursor:pointer}
+#profSheet .pt-body{flex:1;min-height:0;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px}
+#profSheet .pt-row{display:flex;flex-direction:column;max-width:82%}
+#profSheet .pt-row.me{align-self:flex-end;align-items:flex-end}
+#profSheet .pt-row.them{align-self:flex-start;align-items:flex-start}
+#profSheet .pt-bub{padding:10px 13px;border-radius:16px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:anywhere}
+#profSheet .me .pt-bub{background:linear-gradient(135deg,#6EE7C1,#5BD2FF);color:#06241C;border-bottom-right-radius:6px}
+#profSheet .them .pt-bub{background:#1A2142;border:1px solid rgba(140,160,255,.2);border-bottom-left-radius:6px}
+#profSheet .pt-img{display:block;max-width:240px;width:100%;border-radius:12px;margin-bottom:6px;cursor:zoom-in}
+#profSheet .pt-meta{font-size:.72rem;color:#8E98C4;margin-top:3px}
+#profSheet .pt-auto{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:rgba(110,130,255,.2);color:#B9C4FF;font-size:.68rem;font-weight:700}
+#profSheet .pt-list{display:grid;gap:8px}
+#profSheet .pt-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:#141A33;border:1px solid rgba(140,160,255,.16);color:#EEF1FF;text-align:left;font:inherit;cursor:pointer}
+#profSheet .pt-item .pt-av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#6EE7C1,#8B9BFF);color:#0B0E1C;font-weight:800;flex:none}
+#profSheet .pt-item .pt-x{flex:1;min-width:0}
+#profSheet .pt-item b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#profSheet .pt-item small{display:block;color:#A9B3D9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#profSheet .pt-empty{text-align:center;color:#A9B3D9;margin-top:30px;line-height:1.5}
+#profSheet .pt-foot[hidden]{display:none!important}
+#profSheet .pt-foot{display:flex;gap:8px;align-items:flex-end;padding:10px 12px max(12px,env(safe-area-inset-bottom,0px));background:rgba(18,22,44,.96);border-top:1px solid rgba(140,160,255,.18)}
+#profSheet .pt-foot textarea{flex:1;min-width:0;resize:none;max-height:120px;border-radius:16px;border:1px solid rgba(140,160,255,.3);background:#0E1430;color:#EEF1FF;padding:10px 12px;font:inherit;line-height:1.4}
+#profSheet .pt-foot button{border:0;border-radius:14px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer;background:rgba(110,130,255,.16);color:#EEF1FF;flex:none}
+#profSheet .pt-foot .pt-send{background:linear-gradient(135deg,#6EE7C1,#5BD2FF);color:#06241C}
+#profSheet .pt-foot button:disabled{opacity:.5}
+#ptEntry{width:calc(100% - 0px);display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:12px 14px;border-radius:18px;border:1px solid rgba(110,231,193,.35);background:linear-gradient(135deg,rgba(110,231,193,.16),rgba(139,155,255,.14));color:#EEF1FF;font:inherit;text-align:left;cursor:pointer}
+#ptEntry .pt-ic{font-size:1.5rem}
+#ptEntry b{display:block}
+#ptEntry small{display:block;color:#A9B3D9;font-size:.78rem;margin-top:2px}
+#ptTeacher{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:900;border:1px solid rgba(110,231,193,.45);background:rgba(18,22,44,.94);color:#EEF1FF;border-radius:999px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+`;document.head.appendChild(st);
+
+ const PT={mode:"student",student:null,rows:[],names:{},urls:{},timer:null,busy:false,err:""};
+ const nameOf=u=>PT.names[u]||"Student";
+ const timeOf=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+
+ async function load(){const sb=window.__sb;if(!sb)return;
+   let q=sb.from("prof_messages").select("*").order("created_at",{ascending:true}).limit(500);
+   if(PT.mode==="student")q=q.eq("student",S.uid);
+   const {data,error}=await q;
+   if(error){PT.err=error.message||"Could not load";render();return}
+   PT.rows=data||[];PT.err="";
+   const ids=[...new Set(PT.rows.map(r=>r.student).filter(u=>u&&!PT.names[u]))];
+   if(ids.length&&PT.mode==="teacher"){const {data:d}=await sb.from("docs").select("path,data").in("path",ids.map(u=>"students/"+u));
+     for(const x of d||[])PT.names[x.path.slice(9)]=(x.data&&x.data.name)||"Student"}
+   await hydrate();render();
+ }
+ async function hydrate(){for(const r of PT.rows){const p=r.att&&r.att.k==="img"&&r.att.p;if(!p||PT.urls[p])continue;PT.urls[p]="…";
+   try{PT.urls[p]=await window.__chatFiles.url(p)}catch(e){PT.urls[p]=""}}}
+
+ function thread(){return PT.mode==="student"?PT.rows:PT.rows.filter(r=>r.student===PT.student)}
+ function bubble(r){
+   const mine=PT.mode==="student"?r.from_student:!r.from_student;
+   const p=r.att&&r.att.k==="img"&&r.att.p;
+   const img=p&&PT.urls[p]&&PT.urls[p]!=="…"?`<img class="pt-img" src="${esc(PT.urls[p])}" alt="${esc(r.att.n||"photo")}" onclick="window.open(this.src,'_blank')">`:(p?`<div class="pt-meta">📷 photo</div>`:"");
+   const body=r.body?`<div class="pt-bub">${img}${natEmo(r.body)}</div>`:(img?`<div class="pt-bub">${img}</div>`:"");
+   const auto=r.auto?`<span class="pt-auto">Automatic reply</span>`:"";
+   return `<div class="pt-row ${mine?"me":"them"}">${body}<div class="pt-meta">${timeOf(r.created_at)}${auto}</div></div>`;
+ }
+ function render(){const o=document.getElementById("profSheet");if(!o)return;
+   const head=o.querySelector(".pt-head"),body=o.querySelector(".pt-body"),foot=o.querySelector(".pt-foot");
+   const showThread=PT.mode==="student"||!!PT.student;
+   foot.hidden=!showThread;
+   o.querySelector(".pt-photo").hidden=PT.mode!=="student";
+   if(PT.mode==="student"){
+     head.innerHTML=`<button type="button" class="pt-back" data-pt="back" aria-label="Back">‹</button><div class="pt-t"><b>Your teacher</b><small>Ask in English. Automatic replies when she is away.</small></div>`;
+     const t=thread();body.innerHTML=t.length?t.map(bubble).join(""):`<div class="pt-empty">Write your question here. Your teacher will read it.<br>You can also send a photo or a screenshot.</div>`;
+   }else if(!PT.student){
+     head.innerHTML=`<button type="button" class="pt-back" data-pt="back" aria-label="Close">✕</button><div class="pt-t"><b>Pupils' messages</b><small>Tap a pupil to read and reply</small></div>`;
+     const by={};for(const r of PT.rows){const k=r.student;if(!by[k]||new Date(r.created_at)>new Date(by[k].created_at))by[k]=r;else by[k]=by[k]}
+     const last=Object.values(by).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+     body.innerHTML=last.length?`<div class="pt-list">${last.map(r=>`<button type="button" class="pt-item" data-pt="thread" data-id="${esc(r.student)}"><span class="pt-av">${esc((nameOf(r.student)||"?").trim().charAt(0).toUpperCase())}</span><span class="pt-x"><b>${esc(nameOf(r.student))}</b><small>${r.from_student?"":"You: "}${esc((r.body||"📷 photo").slice(0,80))}</small></span><span class="pt-meta">${timeOf(r.created_at)}</span></button>`).join("")}</div>`:`<div class="pt-empty">No message from pupils yet.</div>`;
+   }else{
+     head.innerHTML=`<button type="button" class="pt-back" data-pt="back" aria-label="Back">‹</button><div class="pt-t"><b>${esc(nameOf(PT.student))}</b><small>Pupil · you reply in English</small></div>`;
+     const t=thread();body.innerHTML=t.length?t.map(bubble).join(""):`<div class="pt-empty">No message yet.</div>`;
+   }
+   if(PT.err)body.insertAdjacentHTML("afterbegin",`<div class="pt-meta" style="color:#FF9AA8">${esc(PT.err)}</div>`);
+   body.scrollTop=body.scrollHeight;
+ }
+
+ async function send(text,file){const sb=window.__sb;if(!sb)return toast("You need internet to send.","x");
+   try{
+     if(PT.mode==="student"){
+       let att=null;
+       if(file){const up=await window.__chatFiles.upload(file,file.name||"photo.jpg");att={k:(file.type||"").startsWith("image/")?"img":"file",p:up.p,t:up.t,n:up.n}}
+       const {error}=await sb.rpc("prof_send",{p_body:text||"",p_att:att});if(error)throw error;
+     }else{
+       if(!PT.student||!text)return;
+       const {error}=await sb.rpc("prof_teacher_reply",{p_student:PT.student,p_body:text});if(error)throw error;
+     }
+     await load();
+   }catch(e){toast(e.message||"Could not send","x")}
+ }
+
+ function openSheet(mode,student){
+   document.getElementById("profSheet")?.remove();
+   PT.mode=mode;PT.student=student||null;PT.rows=[];
+   const o=document.createElement("div");o.id="profSheet";o.setAttribute("role","dialog");
+   o.innerHTML=`<div class="pt-head"></div><div class="pt-body"></div><div class="pt-foot" hidden><input type="file" accept="image/*" class="pt-file" hidden><button type="button" class="pt-photo" data-pt="photo" aria-label="Send a photo">📷</button><textarea rows="1" maxlength="4000" placeholder="Write in English…" aria-label="Message"></textarea><button type="button" class="pt-send" data-pt="send" aria-label="Send">➤</button></div>`;
+   document.body.appendChild(o);
+   clearInterval(PT.timer);PT.timer=setInterval(()=>{if(document.getElementById("profSheet"))load()},7000);
+   load();
+ }
+ function closeSheet(){clearInterval(PT.timer);document.getElementById("profSheet")?.remove()}
+
+ document.addEventListener("click",e=>{
+   const op=e.target.closest&&e.target.closest("[data-pt-open]");
+   if(op){e.preventDefault();e.stopPropagation();openSheet(op.dataset.ptOpen);return}
+   const o=document.getElementById("profSheet");if(!o||!o.contains(e.target))return;
+   const b=e.target.closest("[data-pt]");if(!b)return;
+   const a=b.dataset.pt;
+   if(a==="back"){if(PT.mode==="teacher"&&PT.student){PT.student=null;render()}else closeSheet();return}
+   if(a==="thread"){PT.student=b.dataset.id;render();return}
+   if(a==="photo"){o.querySelector(".pt-file").click();return}
+   if(a==="send"){const ta=o.querySelector("textarea");const txt=ta.value.trim();if(!txt)return;ta.value="";send(txt,null);return}
+ },true);
+ document.addEventListener("change",e=>{
+   if(!e.target.classList||!e.target.classList.contains("pt-file"))return;
+   const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+   const o=document.getElementById("profSheet");const ta=o&&o.querySelector("textarea");const txt=ta?ta.value.trim():"";if(ta)ta.value="";
+   send(txt,f);
+ });
+ document.addEventListener("keydown",e=>{
+   const ta=e.target&&e.target.closest&&e.target.closest("#profSheet textarea");
+   if(ta&&e.key==="Enter"&&!e.shiftKey){e.preventDefault();const txt=ta.value.trim();if(!txt)return;ta.value="";send(txt,null)}
+ });
+
+ function mountEntries(){
+   const q=document.querySelector("#peer_q");
+   if(S.mode==="student"&&S.view&&S.view.type==="peers"&&q&&!document.getElementById("ptEntry")&&q.parentElement){
+     const b=document.createElement("button");b.id="ptEntry";b.type="button";b.dataset.ptOpen="student";
+     b.innerHTML=`<span class="pt-ic">✉️</span><span><b>Message your teacher</b><small>Ask in English. Automatic replies when she is away.</small></span>`;
+     q.parentElement.insertBefore(b,q);
+   }
+   const teacherMode=S.mode==="teacher"&&S.isStaff;
+   if(teacherMode&&!document.getElementById("ptTeacher")){
+     const b=document.createElement("button");b.id="ptTeacher";b.type="button";b.dataset.ptOpen="teacher";b.textContent="✉️ Pupils' messages";document.body.appendChild(b);
+   }
+   if(!teacherMode)document.getElementById("ptTeacher")?.remove();
+ }
+ new MutationObserver(mountEntries).observe(document.body,{childList:true,subtree:true});
 }
 async function docSave(){const d=V4.doc;if(!d)return;try{if(S.dl&&S.dl.save){await S.dl.save({filename:d.name,data:d.blob});toast("File saved","download")}else{const a=document.createElement("a");a.href=URL.createObjectURL(d.blob);a.download=d.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}}catch(e){toast("Could not save the file.","x")}}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("docv"))closeDoc()});
@@ -1001,7 +1179,7 @@ function fPostHTML(p){const lk=F.likes[p.id]||[],cm=(F.comments[p.id]||[]).filte
   ${p.body?fText(p.body):""}
   ${fMediaHTML(media)}
   ${p.shared?fSharedHTML(p.shared):""}
-  <div class="fcount">${lk.length?`<span>${[...new Set(lk.map(l=>l.e||"❤️"))].slice(0,3).map(e=>E(e)).join("")} ${lk.length}</span>`:"<span></span>"}${cm.length?`<button type="button" class="linkbtn" data-v4="fCom" data-id="${esc(p.id)}">${cm.length} comment${cm.length>1?"s":""}</button>`:""}</div>
+  <div class="fcount">${lk.length?`<button type="button" class="flk" data-flk="${esc(p.id)}" aria-label="See who liked">${[...new Set(lk.map(l=>l.e||"❤️"))].slice(0,3).map(e=>natEmo(e)).join("")} ${lk.length}</button>`:"<span></span>"}${cm.length?`<button type="button" class="linkbtn" data-v4="fCom" data-id="${esc(p.id)}">${cm.length} comment${cm.length>1?"s":""}</button>`:""}</div>
   ${p.deleted_at?"":`${F.pick===p.id?`<div class="fpick">${FRE.map(e=>`<button type="button" data-v4="fLikeE" data-id="${esc(p.id)}" data-e="${e}" aria-label="React ${e}">${E(e)}</button>`).join("")}</div>`:""}<div class="factions"><button type="button" class="${liked?"on":""}" data-v4="fLike" data-id="${esc(p.id)}" aria-pressed="${liked}">${E(liked?(lk.find(l=>l.uid===S.uid).e||"❤️"):"🤍")} ${liked?"Liked":"Like"}</button><button type="button" class="fmore" data-v4="fPick" data-id="${esc(p.id)}" aria-label="More reactions" title="More reactions">${E("😊")}</button><button type="button" data-v4="fCom" data-id="${esc(p.id)}">${ic("chat")} Comment${cm.length?` <span class="fcnt">${cm.length}</span>`:""}</button><button type="button" data-v4="fShare" data-k="post" data-id="${esc(p.id)}">${ic("send")} Share</button></div>`}
   ${shown.length||open?`<div class="fcoms">${cm.length>shown.length?`<button type="button" class="linkbtn" data-v4="fCom" data-id="${esc(p.id)}">See all ${cm.length} comments</button>`:""}${shown.map(c=>`<div class="fc">${whoAva(c.who,c.author,30)}<div class="fcb"><b>${esc(c.who?.name||"Student")}</b>${fText(c.body)}<small>${ago(+new Date(c.created_at))}${c.deleted_at?" · deleted":""}${!c.deleted_at&&(c.author===S.uid||mine||fStaff())?` · <button type="button" class="linkbtn" data-v4="fComDel" data-id="${esc(c.id)}">Delete</button>`:""}</small></div></div>`).join("")}
   ${open&&!p.deleted_at?`<form class="fcform" data-ff="com" data-id="${esc(p.id)}"><input id="fc_${esc(p.id)}" placeholder="Write a comment in English…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}</div>`:""}
