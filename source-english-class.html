@@ -2873,7 +2873,11 @@ function msgBodyHTML(text,a){let h="";
 const msgHTML=(mine,text,a,at)=>`<div class="msg ${mine?"mine":""}${a&&a.k==="sticker"&&!text?" stk":""}">${msgBodyHTML(text,a)}<span>${fmtTime(at)}</span></div>`;
 async function hydrateChat(){for(const img of document.querySelectorAll("img[data-chatp]:not([data-ok])")){img.dataset.ok="1";const p=img.dataset.chatp;
   try{let u=V4.obj[p];if(!u){const b=await srcBlob({k:"m",id:p,t:img.dataset.t});u=V4.obj[p]=URL.createObjectURL(b)}img.src=u}catch(e){img.alt="Photo not available offline"}}}
-document.addEventListener("load",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.closest&&t.closest("#chatScroll")){const cs=document.getElementById("chatScroll");if(cs&&cs.scrollHeight-cs.scrollTop-cs.clientHeight<400)cs.scrollTop=cs.scrollHeight}},true);
+/* the chat follows new messages only while the reader is at the bottom: if they scrolled up, it stays put */
+const CHAT_STICK={on:true,lock:false};
+document.addEventListener("scroll",e=>{const t=e.target;if(t&&t.id==="chatScroll"&&!CHAT_STICK.lock)CHAT_STICK.on=B4near(t)},true);
+function chatStick(cs){if(cs&&CHAT_STICK.on)cs.scrollTop=cs.scrollHeight}
+document.addEventListener("load",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.closest&&t.closest("#chatScroll"))chatStick(document.getElementById("chatScroll"))},true);
 new MutationObserver(()=>{clearTimeout(hydrateChat._t);hydrateChat._t=setTimeout(hydrateChat,60);if(typeof v4ChatLayout==="function"&&!v4ChatLayout._q){v4ChatLayout._q=1;requestAnimationFrame(()=>{v4ChatLayout._q=0;v4ChatLayout()})}}).observe(document.body,{childList:true,subtree:true});
 async function v4Play(p,t){const A=V4.audio||(V4.audio=new Audio());if(V4.playing===p){A.pause();V4.playing=null;render();return}
   try{let u=V4.obj[p];if(!u){V4.playing=p;render();const b=await srcBlob({k:"m",id:p,t});u=V4.obj[p]=URL.createObjectURL(b)}A.src=u;A.onended=()=>{V4.playing=null;render()};V4.playing=p;await A.play();render()}
@@ -3414,7 +3418,7 @@ async function v4TextSend(kind,f){const id=V4IN(kind),inp=document.getElementByI
   if(kind==="peer")PR.sending=true;render();
   try{await v4Deliver(kind,tgt,text,null,v4TakeReply(kind))}catch(e){toast((e&&e.message)||"Could not send","x");S.drafts[id]=orig}
   if(kind==="peer")PR.sending=false;render();
-  const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight;
+  CHAT_STICK.on=true;const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight;
   if(hadFocus){const n=document.getElementById(id);if(n)n.focus({preventScroll:true})}}
 /* Nova panel: same correction on the learner's bubble */
 {const _aiSend=aiSend;aiSend=async function(text){const t0=String(text||"").trim();if(!AI.busy&&t0&&v4NeedFix(t0)){const p=_aiSend(text);const u=[...AI.turns].reverse().find(x=>x.role==="user"&&x.content===t0);if(u)v4Check(t0).then(r=>{if(r){u.en=r.en;u.enk=r.k;try{renderAI()}catch(e){}}});return p}return _aiSend(text)}}
@@ -3429,12 +3433,12 @@ function v4ChatLayout(){const c=document.querySelector(".glass.chat"),B=document
     else{V4.maxVH=Math.max(V4.maxVH||0,vh);const kb=B.classList.contains("v4kb")&&vh<V4.maxVH*0.8;const top=kb?hb+4:Math.min(b+8,vh*0.42);document.documentElement.style.setProperty("--v4ct",Math.round(top)+"px");
       const cs=document.getElementById("chatScroll");if(cs&&!was)cs.scrollTop=cs.scrollHeight}}
   B.classList.toggle("v4chat",on)}
-if(window.visualViewport)visualViewport.addEventListener("resize",()=>{v4ChatLayout();const cs=document.getElementById("chatScroll");if(cs&&B4near(cs))cs.scrollTop=cs.scrollHeight});
+if(window.visualViewport)visualViewport.addEventListener("resize",()=>{v4ChatLayout();chatStick(document.getElementById("chatScroll"))});
 addEventListener("resize",()=>v4ChatLayout());
 function B4near(cs){return cs.scrollHeight-cs.scrollTop-cs.clientHeight<260}
 document.addEventListener("focusin",e=>{const t=e.target;if(!t||!t.matches||!t.matches(".v4bar input:not([type=file])"))return;
   document.body.classList.add("v4kb");if(V4.panel){V4.panel=null;const id=t.id;render();const n=document.getElementById(id);if(n&&document.activeElement!==n)n.focus({preventScroll:true})}
-  v4ChatLayout();setTimeout(()=>{v4ChatLayout();const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight},350)});
+  v4ChatLayout();setTimeout(()=>{v4ChatLayout();chatStick(document.getElementById("chatScroll"))},350)});
 document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(!(a&&a.matches&&a.matches(".v4bar input:not([type=file])"))){document.body.classList.remove("v4kb");v4ChatLayout()}},120));
 {const st=document.createElement("style");st.textContent=`
 .v4fr{display:block;width:fit-content;max-width:100%;color:#B91C1C;background:#FFE4E6;border-radius:10px;padding:3px 8px;text-decoration:line-through;text-decoration-thickness:2px;white-space:pre-wrap}
@@ -5120,7 +5124,7 @@ const BT={diff:"hard",room:null,st:null,off:0,iv:null,clk:null,on:false,busy:fal
 const BT_KINDS={
  duel:{t:"Duel",d:"Two students, the same questions. Best score wins.",n:8,ic:"bolt"},
  battle:{t:"Group battle",d:"2 to 8 students. Live ranking on every question.",n:10,ic:"trophy"},
- royale:{t:"Battle Royale",d:"Up to 12 students. One wrong answer and you are out.",n:12,ic:"search"},
+ royale:{t:"Battle Royale",d:"Up to 12 students. Hard questions, 8 seconds each. One wrong answer and you are out.",n:15,ic:"crown"},
  challenge:{t:"Daily challenge",d:"The same questions for everyone today. Play alone, then see the board.",n:8,ic:"pen"}};
 
 /* ---------- server calls ---------- */
@@ -5159,6 +5163,8 @@ function btPoll(){btStop();BT.on=true;BT.key="";const ar=document.getElementById
 async function btSync(){if(!BT.room||BT.syncing)return;BT.syncing=true;
   try{const st=await btRpc("arena_state",{p_room:BT.room.id});
     BT.off=st.now-Date.now();BT.st=st;BT.room.kind=st.kind;BT.room.code=st.code;
+    /* a rematch puts everyone back in the lobby: the old answers go */
+    if(st.status==="lobby"&&(Object.keys(BT.res).length||BT.ci!=null||BT.cur!=null)){BT.res={};BT.ci=null;BT.cur=null;BT.key=""}
     if(st.kind==="challenge"&&BT.ci==null)BT.ci=btFirstOpen(st);
     btDraw()}
   catch(e){if(/not in this battle|Sign in/i.test(String(e&&e.message))){btLeave(true);BT.err=btMsg(e);if(BT.on===false)btHub()}}
@@ -5210,7 +5216,7 @@ async function btKind(k){if(BT.busy)return;const K=BT_KINDS[k];if(!K)return;
   try{
     if(k==="challenge"){const code=btDayCode();const r=await btRpc("arena_challenge",{p_code:code,p_qs:btQs(K.n,btRng(code))});
       BT.room={id:r.id,code:r.code,kind:"challenge"}}
-    else{const r=await btRpc("arena_create",{p_kind:k,p_mode:"quiz",p_qs:btQs(K.n,Math.random,AR_LV[BT.diff||"hard"])});
+    else{const r=await btRpc("arena_create",{p_kind:k,p_mode:"quiz",p_qs:btQs(K.n,Math.random,k==="royale"?AR_LV.hard:AR_LV[BT.diff||"hard"])});
       BT.room={id:r.id,code:r.code,kind:k}}
     BT.st=null;BT.res={};BT.ci=null;BT.cur=null;BT.err="";
     btPoll()}
@@ -5289,12 +5295,16 @@ function btResults(st){const K=BT_KINDS[st.kind]||BT_KINDS.battle,roy=st.kind===
   const mine=st.players.find(p=>p.uid===st.me)||{score:0};
   const rows=ps.map((p,i)=>`<div class="ar-row ${p.uid===st.me?"me":""} ${roy&&!p.alive?"bt-out":""}">
     <span class="ar-rank ${i<3?"r"+(i+1):""}">${i+1}</span><b>${arEsc(p.name)}</b><span class="ar-rs">${p.score}</span></div>`).join("");
-  btPaint("R"+st.status+st.answered.length,
-    arTop(K.t,"Results")+`<div class="ar-card bt-glow"><div class="bt-win">★</div><h2>${arEsc(head)}</h2>
-      <p class="bt-wait">You scored ${mine.score} points · rank ${mi+1} of ${ps.length}</p></div>
-    <p class="ar-kicker">Final ranking</p><div class="bt-sb">${rows}</div>
-    <div class="ar-inrow" style="justify-content:center;flex-wrap:wrap;margin-top:14px">
-      ${st.kind==="challenge"?"":`<button class="ar-go" data-ar="bt-kind" data-m="${st.kind}">Play again</button>`}
+  const host=st.host===st.me;
+  const again=st.kind==="challenge"?"":host
+    ?`<button class="ar-go bt-again" data-ar="bt-rematch">Play again together</button>`
+    :`<p class="bt-wait bt-wait-host">Waiting for the host to start a new round…</p>`;
+  const stars=ps.length&&mi===0?3:mi<=1?2:1;
+  btPaint("R"+st.status+st.answered.length+st.host+ps.map(p=>p.uid+p.score).join(""),
+    arTop(K.t,"Results")+vicHTML({title:head,kicker:K.t,score:mine.score,label:"points",stars:stars,
+      sub:`Rank ${mi+1} of ${ps.length}${roy&&won?" · last one standing":""}`,mood:won?"win":"end"})+
+    `<p class="ar-kicker">Final ranking</p><div class="bt-sb">${rows}</div>
+    <div class="ar-inrow bt-actions">${again}
       <button class="ar-go ghost" data-ar="bt-leave">Battles</button></div>`)}
 
 /* ---------- answers ---------- */
@@ -5310,6 +5320,14 @@ async function btAnswer(k){const st=BT.st;if(!st||!BT.on)return;
   btSync()}
 function btNext(){BT.ci=(BT.ci==null?0:BT.ci)+1;BT.key="";btDraw()}
 
+/* the host plays again with the same players and the same code */
+async function btRematch(){if(!BT.room||BT.busy||!BT.st)return;BT.busy=true;
+  const K=BT_KINDS[BT.st.kind]||BT_KINDS.battle,lvl=BT.st.kind==="royale"?AR_LV.hard:AR_LV[BT.diff||"hard"];
+  try{await btRpc("arena_rematch",{p_room:BT.room.id,p_qs:btQs(K.n,Math.random,lvl)});
+    BT.res={};BT.ci=null;BT.cur=null;BT.err="";BT.key="";await btSync()}
+  catch(e){BT.err=btMsg(e);BT.key="";btDraw()}
+  finally{BT.busy=false}}
+
 /* clicks from the Arena (arClick hands every "bt-" action here) */
 function btClick(b){const a=b.dataset.ar;
   if(a==="bt-hub")return btHub();
@@ -5320,7 +5338,8 @@ function btClick(b){const a=b.dataset.ar;
   if(a==="bt-start")return btStart();
   if(a==="bt-leave")return btLeave();
   if(a==="bt-ans")return btAnswer(+b.dataset.k);
-  if(a==="bt-next")return btNext()}
+  if(a==="bt-next")return btNext();
+  if(a==="bt-rematch")return btRematch()}
 
 /* leaving the Arena stops the polling; the battle stays resumable */
 {const _c=arClose;arClose=function(){btStop();BT.on=false;return _c()}}
@@ -9248,6 +9267,939 @@ function masSVG(){
 };
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",addStars); else addStars();
 }
+
+/* ---- app-v5-zzzm-questions.js ---- */
+/* =====================================================================
+   v5 · Beaucoup plus de questions pour l'Arena et les battles.
+   Les questions sont fabriquées à partir de listes (verbes irréguliers,
+   vocabulaire, pluriels, comparatifs, prépositions, formation des mots,
+   phrasal verbs, conditionnels). Le tirage est déterministe : tous les
+   téléphones ont la même banque, donc le défi du jour reste identique.
+   ===================================================================== */
+{
+  let seed=20261015;
+  const rnd=()=>{seed=(Math.imul(seed,1103515245)+12345)>>>0;return seed/4294967296};
+  const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+  const seen=new Set((typeof AR_Q!=="undefined"?AR_Q:[]).map(x=>x.q));
+  const add=(lv,q,correct,pool,e)=>{
+    if(seen.has(q))return;
+    const d=shuf(pool.filter((x,i,arr)=>x!==correct&&arr.indexOf(x)===i)).slice(0,3);
+    if(d.length<3)return;
+    const o=shuf([correct,...d]);seen.add(q);
+    AR_Q.push({lv:lv,q:q,o:o,a:o.indexOf(correct),e:e});
+  };
+
+  /* 1 · verbes irréguliers : prétérit et participe passé */
+  const V=[
+    ["go","went","gone","aller","Yesterday, we ___ to the beach.","The bus has already ___ away."],
+    ["come","came","come","venir","Last night, my friends ___ to my house.","Ama has just ___ back from Lomé."],
+    ["see","saw","seen","voir","This morning I ___ a big bird.","I have never ___ such a beautiful sunset."],
+    ["take","took","taken","prendre","She ___ a taxi to the station.","Who has ___ my pen?"],
+    ["make","made","made","faire","They ___ a delicious soup for lunch.","This cake was ___ in ten minutes."],
+    ["eat","ate","eaten","manger","We ___ fufu at my grandmother's house.","Have you ever ___ snails?"],
+    ["drink","drank","drunk","boire","The children ___ all the water.","He has ___ too much coffee today."],
+    ["write","wrote","written","écrire","My sister ___ a long letter to Jack.","This poem was ___ by a Togolese poet."],
+    ["read","read","read","lire","I ___ a good book last week.","She has already ___ the whole novel."],
+    ["speak","spoke","spoken","parler","The teacher ___ slowly so that we understand.","Two languages are ___ in my family."],
+    ["buy","bought","bought","acheter","My father ___ a new bicycle.","We have ___ enough bread for the week."],
+    ["bring","brought","brought","apporter","Kofi ___ his lunch to school.","Who has ___ the keys?"],
+    ["catch","caught","caught","attraper","The fisherman ___ a huge fish.","The thief was ___ by the police."],
+    ["teach","taught","taught","enseigner","Mr Mensah ___ us English last year.","She has ___ mathematics for ten years."],
+    ["think","thought","thought","penser","I ___ about your idea all night.","I have ___ about it a lot."],
+    ["find","found","found","trouver","We ___ a wallet on the road.","The police have ___ the missing boy."],
+    ["give","gave","given","donner","Grandmother ___ us some mangoes.","This gift was ___ to me by my teacher."],
+    ["know","knew","known","savoir","I ___ the answer as soon as you asked.","He has ___ her since childhood."],
+    ["begin","began","begun","commencer","The rain ___ at noon.","The lesson has already ___ ."],
+    ["break","broke","broken","casser","The boy ___ the window with a ball.","My phone has been ___ since Monday."],
+    ["choose","chose","chosen","choisir","She ___ the blue dress.","You have been ___ for the final round."],
+    ["drive","drove","driven","conduire","My uncle ___ us to Kpalimé.","Have you ever ___ a truck?"],
+    ["fly","flew","flown","voler","The birds ___ south in winter.","The plane has ___ to Paris today."],
+    ["forget","forgot","forgotten","oublier","I ___ my homework at home.","I have ___ her phone number."],
+    ["grow","grew","grown","grandir","The maize ___ very fast this year.","My little brother has ___ a lot."],
+    ["hear","heard","heard","entendre","We ___ a strange noise at night.","I have ___ that news before."],
+    ["hold","held","held","tenir","She ___ her baby carefully.","The meeting was ___ in the big hall."],
+    ["keep","kept","kept","garder","He ___ the receipt in his wallet.","They have ___ their promise."],
+    ["lose","lost","lost","perdre","I ___ my way in the market.","She has ___ her umbrella again."],
+    ["meet","met","met","rencontrer","We ___ our teacher at the church.","I have never ___ the mayor."],
+    ["pay","paid","paid","payer","Dad ___ the bill yesterday.","The shop has ___ all its workers."],
+    ["run","ran","run","courir","The dog ___ after the car.","He has ___ five kilometres already."],
+    ["say","said","said","dire","The doctor ___ I must rest.","Nobody has ___ anything yet."],
+    ["sell","sold","sold","vendre","The trader ___ all his mangoes.","This house has been ___ twice."],
+    ["send","sent","sent","envoyer","I ___ a message to my cousin.","She has ___ the documents by email."],
+    ["sing","sang","sung","chanter","The choir ___ beautifully at the wedding.","Have you ever ___ in public?"],
+    ["sit","sat","sat","s'asseoir","We ___ under the big tree.","The cat has ___ on my chair all day."],
+    ["sleep","slept","slept","dormir","The baby ___ for three hours.","I have not ___ well this week."],
+    ["win","won","won","gagner","Our team ___ the match.","She has ___ three prizes this year."],
+    ["wear","wore","worn","porter","He ___ a blue shirt to school.","The shoes are badly ___ ."],
+    ["swim","swam","swum","nager","The children ___ in the lake.","Have you ever ___ across the river?"],
+    ["understand","understood","understood","comprendre","I ___ the lesson perfectly.","She has ___ the rule now."],
+    ["tell","told","told","raconter","He ___ us a funny story.","I have ___ you the truth."],
+    ["feel","felt","felt","se sentir","I ___ tired after the match.","She has ___ better since Monday."],
+    ["leave","left","left","partir","The train ___ at six.","We have ___ the keys on the table."],
+    ["spend","spent","spent","dépenser","We ___ two hours at the market.","He has ___ all his money."],
+    ["build","built","built","construire","They ___ a new school in the village.","This bridge was ___ in 1990."],
+    ["fall","fell","fallen","tomber","The mango ___ from the tree.","The leaves have ___ early this year."],
+    ["hide","hid","hidden","cacher","The kittens ___ under the bed.","The treasure has been ___ for years."]
+  ];
+  const forms=v=>{const b=v[0];const ing=b.endsWith("e")?b.slice(0,-1)+"ing":b+"ing";const sg=/(o|s|x|ch|sh)$/.test(b)?b+"es":/[^aeiou]y$/.test(b)?b.slice(0,-1)+"ies":b+"s";return[b,v[1],v[2],sg,ing]};
+  V.forEach(v=>{
+    const f=forms(v);
+    add(1,v[4].replace("___","_____")+` (${v[0]})`,v[1],f,`Past simple of "${v[0]}" is "${v[1]}".`);
+    add(2,v[5].replace("___","_____")+` (${v[0]})`,v[2],f,`Past participle of "${v[0]}" is "${v[2]}" (have/has + ${v[2]}, or passive).`);
+  });
+
+  /* 2 · vocabulaire : français ↔ anglais */
+  const W=[["house","maison"],["school","école"],["book","livre"],["water","eau"],["bread","pain"],["friend","ami"],["teacher","professeur"],["doctor","médecin"],["market","marché"],["hospital","hôpital"],["river","fleuve"],["mountain","montagne"],["road","route"],["money","argent"],["price","prix"],["rain","pluie"],["sun","soleil"],["cloud","nuage"],["wind","vent"],["morning","matin"],["evening","soir"],["night","nuit"],["tomorrow","demain"],["yesterday","hier"],["to borrow","emprunter"],["to listen","écouter"],["to wait","attendre"],["to answer","répondre"],["to ask","demander"],["to help","aider"],["to open","ouvrir"],["to close","fermer"],["to clean","nettoyer"],["to cook","cuisiner"],["brave","courageux"],["lazy","paresseux"],["clever","intelligent"],["tired","fatigué"],["hungry","affamé"],["thirsty","assoiffé"],["quiet","silencieux"],["dangerous","dangereux"],["cheap","bon marché"],["empty","vide"],["full","plein"],["rich","riche"],["poor","pauvre"],["strong","fort"],["weak","faible"],["expensive","cher"],["cousin","cousin"],["grandmother","grand-mère"],["neighbour","voisin"],["farmer","agriculteur"],["trader","commerçant"],["bridge","pont"],["forest","forêt"],["weather","météo"],["village","village"]];
+  W.forEach(([en,fr])=>{
+    add(1,`How do you say "${fr}" in English?`,en,W.map(x=>x[0]),`"${fr}" is "${en}" in English.`);
+    add(1,`What does "${en}" mean in French?`,fr,W.map(x=>x[1]),`"${en}" means "${fr}".`);
+  });
+
+  /* 3 · contraires */
+  const A=[["big","small"],["hot","cold"],["old","new"],["long","short"],["tall","short"],["fast","slow"],["happy","sad"],["easy","difficult"],["early","late"],["open","closed"],["full","empty"],["rich","poor"],["strong","weak"],["clean","dirty"],["cheap","expensive"],["right","wrong"],["up","down"],["inside","outside"],["buy","sell"],["love","hate"],["win","lose"],["arrive","leave"],["begin","end"],["always","never"],["heavy","light"],["wet","dry"],["hard","soft"],["young","old"],["near","far"],["loud","quiet"]];
+  A.forEach(([x,y])=>{
+    add(1,`What is the opposite of "${x}"?`,y,A.map(p=>p[1]),`The opposite of "${x}" is "${y}".`);
+    add(1,`What is the opposite of "${y}"?`,x,A.map(p=>p[0]),`The opposite of "${y}" is "${x}".`);
+  });
+
+  /* 4 · pluriels irréguliers et réguliers */
+  const P=[["child","children"],["man","men"],["woman","women"],["tooth","teeth"],["foot","feet"],["mouse","mice"],["person","people"],["knife","knives"],["leaf","leaves"],["city","cities"],["baby","babies"],["bus","buses"],["dish","dishes"],["watch","watches"],["potato","potatoes"],["box","boxes"],["day","days"],["country","countries"]];
+  P.forEach(([s,p])=>add(1,`The plural of "${s}" is ___.`,p,P.map(x=>x[1]),`The plural of "${s}" is "${p}".`));
+
+  /* 5 · comparatifs et superlatifs */
+  const C=[["big","bigger","biggest"],["small","smaller","smallest"],["tall","taller","tallest"],["fast","faster","fastest"],["hot","hotter","hottest"],["happy","happier","happiest"],["good","better","best"],["bad","worse","worst"],["far","farther","farthest"],["easy","easier","easiest"],["heavy","heavier","heaviest"],["early","earlier","earliest"],["late","later","latest"],["cheap","cheaper","cheapest"],["clever","cleverer","cleverest"],["strong","stronger","strongest"]];
+  const CC=[["expensive","more expensive","most expensive"],["beautiful","more beautiful","most beautiful"],["interesting","more interesting","most interesting"],["difficult","more difficult","most difficult"],["important","more important","most important"]];
+  const all=C.concat(CC);
+  all.forEach(([b,c,s])=>{
+    const pool=[b,c,s,...all.map(x=>x[1])];
+    add(2,`My bag is ___ than yours.`.replace("___","_____")+` (${b})`,c,pool,`Comparative of "${b}": "${c}".`);
+    add(2,`Of all my friends, Kofi is the ___. (${b})`,s,[b,c,s,...all.map(x=>x[2])],`Superlative of "${b}": "${s}" (the + superlative).`);
+  });
+
+  /* 6 · prépositions de temps */
+  const T=[["Monday","on"],["Sunday","on"],["July","in"],["2030","in"],["7 o'clock","at"],["midnight","at"],["the morning","in"],["Christmas Day","on"]];
+  T.forEach(([x,p])=>add(1,`We will meet ___ ${x}.`,p,["in","on","at","under"],`We use "${p}" with ${x}.`));
+
+  /* 7 · formation des noms */
+  const N=[["happy","happiness"],["kind","kindness"],["decide","decision"],["create","creation"],["achieve","achievement"],["differ","difference"],["invent","invention"],["educate","education"],["act","action"],["friend","friendship"],["employ","employment"],["improve","improvement"],["produce","production"],["prefer","preference"],["hope","hope"],["govern","government"]];
+  N.forEach(([b,n])=>add(2,`Form a noun from "${b}": ___`,n,N.map(x=>x[1]),`The noun from "${b}" is "${n}".`));
+
+  /* 8 · phrasal verbs */
+  const PV=[
+    ["Please ___ the radio; I'm trying to study.","turn down",["turn down","turn up","turn on","turn off"]],
+    ["I can't ___ this word. Can you help me?","figure out",["figure out","find out","point out","pick out"]],
+    ["We have to ___ the meeting until next week.","put off",["put off","put on","put out","put up"]],
+    ["She decided to ___ smoking last year.","give up",["give up","give in","give out","give away"]],
+    ["Could you ___ my bag while I buy some water?","look after",["look after","look for","look into","look up"]],
+    ["The plane will ___ at six o'clock.","take off",["take off","take on","take in","take over"]],
+    ["He ___ his coat and sat down.","took off",["took off","took on","took in","took up"]],
+    ["Don't ___ your homework until tomorrow.","put off",["put off","put on","put out","put down"]],
+    ["The teacher ___ the exam papers to the class.","handed out",["handed out","handed in","handed over","handed down"]],
+    ["Please ___ the lights when you leave the room.","turn off",["turn off","turn on","turn up","turn down"]],
+    ["I ___ an old friend at the market yesterday.","ran into",["ran into","ran out","ran over","ran away"]],
+    ["Our school will ___ a new library next year.","set up",["set up","set off","set out","set down"]]
+  ];
+  PV.forEach(([q,a,o])=>add(3,q,a,o,`"${a}" fits the meaning of the sentence.`));
+
+  /* 9 · conditionnels */
+  const CD=[
+    ["If it rains tomorrow, I ___ at home.","will stay",["will stay","stayed","would stay","stay"],2,"First conditional: if + present, will + verb."],
+    ["If you study hard, you ___ the exam.","will pass",["will pass","passed","would pass","pass"],2,"First conditional: if + present, will + verb."],
+    ["If I had more time, I ___ you more often.","would visit",["would visit","will visit","visited","visit"],2,"Second conditional: if + past, would + verb."],
+    ["If she were rich, she ___ a car.","would buy",["would buy","will buy","bought","buys"],2,"Second conditional: if + past, would + verb."],
+    ["If we had left earlier, we ___ the bus.","would have caught",["would have caught","will catch","caught","catch"],3,"Third conditional: if + had + pp, would have + pp."],
+    ["If he had studied, he ___ the test.","would have passed",["would have passed","will pass","passed","pass"],3,"Third conditional: if + had + pp, would have + pp."],
+    ["If I had known about it, I ___ you.","would have helped",["would have helped","will help","helped","help"],3,"Third conditional: if + had + pp, would have + pp."],
+    ["If they had called me, I ___ them back.","would have called",["would have called","will call","called","call"],3,"Third conditional: if + had + pp, would have + pp."]
+  ];
+  CD.forEach(([q,a,o,lv,e])=>add(lv,q,a,o,e));
+
+  /* 10 · modaux et règles */
+  const MD=[
+    ["You ___ smoke in this classroom. It is forbidden.","mustn't",["mustn't","don't have to","needn't","might not"],2,"Mustn't = it is forbidden."],
+    ["You ___ come tomorrow if you are busy. It is optional.","needn't",["needn't","mustn't","can't","shouldn't have"],2,"Needn't = it is not necessary."],
+    ["Ama ___ speak three languages. She is very talented.","can",["can","must","should have","might have to"],1,"Can = ability."],
+    ["It's raining. You ___ take an umbrella.","should",["should","shouldn't","must not","wouldn't"],1,"Should = advice."],
+    ["She ___ be at home now; her light is on.","must",["must","mustn't","wouldn't","couldn't have"],2,"Must = strong deduction."],
+    ["He ___ have left already. His car is still here.","can't",["can't","must","should","might"],3,"Can't = impossibility, a strong deduction."]
+  ];
+  MD.forEach(([q,a,o,lv,e])=>add(lv,q,a,o,e));
+
+  /* 11 · niveau avancé : voix passive, discours indirect, inversions */
+  const AD=[
+    ["The report ___ by the manager yesterday.",  "was written", ["was written","wrote","written","has written"], "Passive past simple: was + past participle."],
+    ["He said that he ___ the film the day before.","had seen",["had seen","has seen","saw","would see"],"Reported speech: present perfect becomes past perfect."],
+    ["Not until she called ___ he realise his mistake.","did",["did","was","had","does"],"Inversion after 'not until': did + subject + verb."],
+    ["Had I ___ about the delay, I would have warned you.","known",["known","know","knowing","knew"],"Inverted third conditional: had + subject + past participle."],
+    ["The students ___ their projects since Monday.","have been working",["have been working","are working","worked","had worked"],"Present perfect continuous with 'since'."],
+    ["I wish I ___ harder when I was at school.","had studied",["had studied","studied","would study","study"],"'I wish' + past perfect expresses a regret about the past."],
+    ["She suggested that he ___ the doctor immediately.","see",["see","sees","saw","will see"],"After 'suggest that', use the base form."],
+    ["It is high time we ___ home.","went",["went","go","going","have gone"],"'It is high time' + past simple."],
+    ["No sooner had we left the house ___ the rain started.","than",["than","when","as","then"],"No sooner ... than."],
+    ["Rarely ___ such a beautiful view.","have I seen",["have I seen","I have seen","did I see","I saw"],"Inversion after 'rarely'."],
+    ["Were it not for the rain, we ___ to the match.","would have gone",["would have gone","will go","went","go"],"Mixed conditional: a present condition with a past result."],
+    ["He is said ___ the richest man in the town.","to be",["to be","being","be","to being"],"Passive reporting structure: is said to be."]
+  ];
+  AD.forEach(([q,a,o,e])=>add(3,q,a,o,e));
+}
+
+/* ---- app-v5-zzzm-sakura3d.js ---- */
+/* =====================================================================
+   v5 · Sakura en 3D : une jeune fille kawaii avec des volumes, des
+   reflets dans les yeux et les cheveux, des ombres douces et une
+   lumière venant de haut à gauche. Mêmes classes que l'ancien dessin,
+   donc les humeurs (joie, tristesse, bonne réponse) continuent de marcher.
+   ===================================================================== */
+masSVG=function(){
+  const g="s3"+Math.floor(Math.random()*1e6);
+  return `<svg viewBox="0 0 120 150" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="${g}halo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FDE68A" stop-opacity=".5"/><stop offset=".6" stop-color="#F9A8D4" stop-opacity=".18"/><stop offset="1" stop-color="#F472B6" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${g}skin" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#FFF8F2"/><stop offset=".55" stop-color="#FBE0CF"/><stop offset="1" stop-color="#E9AE95"/></radialGradient>
+    <linearGradient id="${g}hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A3170"/><stop offset=".5" stop-color="#1C1747"/><stop offset="1" stop-color="#0B0A22"/></linearGradient>
+    <linearGradient id="${g}sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <radialGradient id="${g}iris" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#6D5BD0"/><stop offset=".6" stop-color="#2B2170"/><stop offset="1" stop-color="#0D0A2A"/></radialGradient>
+    <linearGradient id="${g}uni" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A5B4FC"/><stop offset=".5" stop-color="#6366F1"/><stop offset="1" stop-color="#312E81"/></linearGradient>
+    <linearGradient id="${g}ribbon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBCFE8"/><stop offset="1" stop-color="#DB2777"/></linearGradient>
+    <linearGradient id="${g}k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FB7185"/><stop offset="1" stop-color="#9F1239"/></linearGradient>
+    <radialGradient id="${g}blush" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FB7185" stop-opacity=".75"/><stop offset="1" stop-color="#FB7185" stop-opacity="0"/></radialGradient>
+    <filter id="${g}soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6"/></filter>
+    <filter id="${g}blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+  <ellipse cx="60" cy="72" rx="58" ry="68" fill="url(#${g}halo)"/>
+  <ellipse cx="60" cy="144" rx="34" ry="5" fill="#000" opacity=".35" filter="url(#${g}blur)"/>
+  <path d="M25 74c-5-34 10-58 35-58s40 24 35 58c2 30 7 46 11 62H14c4-16 9-32 11-62z" fill="url(#${g}hair)"/>
+  <path d="M34 98c6 14 14 22 26 22s20-8 26-22" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="5" filter="url(#${g}soft)"/>
+  <path d="M51 88h18v14q-9 5-18 0z" fill="url(#${g}skin)"/>
+  <path d="M38 104q22-10 44 0l9 42H29z" fill="url(#${g}uni)" class="uni"/>
+  <path d="M46 104l14 16 14-16v-4q-14-5-28 0z" fill="#fff"/>
+  <path d="M46 104l14 16 14-16" fill="none" stroke="#C7D2FE" stroke-width="1.2" opacity=".8"/>
+  <path d="M60 116l-7-4v8zM60 116l7-4v8z" fill="url(#${g}ribbon)"/>
+  <path d="M60 117q-9 4-13 0 4 7 13 4zM60 117q9 4 13 0-4 7-13 4z" fill="#F472B6"/>
+  <path d="M38 110v32M82 110v32" stroke="#fff" stroke-opacity=".18" stroke-width="2" stroke-linecap="round"/>
+  <g class="arms" fill="none" stroke="url(#${g}skin)" stroke-width="7" stroke-linecap="round"><path d="M42 108q-14-8-16-36"/><path d="M78 108q14-8 16-36"/></g>
+  <ellipse cx="60" cy="68" rx="29" ry="31" fill="url(#${g}skin)"/>
+  <ellipse cx="60" cy="98" rx="20" ry="8" fill="#E9AE95" opacity=".28" filter="url(#${g}soft)"/>
+  <ellipse cx="40" cy="80" rx="7" ry="4.2" fill="url(#${g}blush)"/><ellipse cx="80" cy="80" rx="7" ry="4.2" fill="url(#${g}blush)"/>
+  <path d="M30 64C27 84 27 98 32 110c3-16 4-32 6-46z" fill="url(#${g}hair)"/>
+  <path d="M90 64C93 84 93 98 88 110c-3-16-4-32-6-46z" fill="url(#${g}hair)"/>
+  <path d="M31 60c-2-20 9-34 29-34 14 0 25 8 30 22-7-6-17-9-27-8-10 1-21 5-32 20z" fill="url(#${g}hair)"/>
+  <path d="M60 30c-12 0-20 4-26 12M54 27c14-2 26 4 31 14" fill="none" stroke="url(#${g}sheen)" stroke-width="2.6" stroke-linecap="round" opacity=".9"/>
+  <path d="M40 40c4-4 9-6 13-6" stroke="#fff" stroke-opacity=".35" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <path d="M74 34c6 2 10 6 12 12" stroke="#fff" stroke-opacity=".3" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <g transform="translate(86 38)"><circle r="4.2" cx="0" cy="-4" fill="#FBCFE8"/><circle r="4.2" cx="4" cy="0" fill="#F9A8D4"/><circle r="4.2" cx="2.5" cy="4.5" fill="#FBCFE8"/><circle r="4.2" cx="-2.5" cy="4.5" fill="#F9A8D4"/><circle r="4.2" cx="-4" cy="0" fill="#FBCFE8"/><circle r="1.8" fill="#FDE68A"/></g>
+  <g class="ey-o"><ellipse cx="49" cy="68" rx="5" ry="6.6" fill="url(#${g}iris)"/><ellipse cx="71" cy="68" rx="5" ry="6.6" fill="url(#${g}iris)"/><circle cx="50.8" cy="65.4" r="2.1" fill="#fff"/><circle cx="72.8" cy="65.4" r="2.1" fill="#fff"/><circle cx="47.6" cy="70.6" r="1" fill="#A5F3FC"/><circle cx="69.6" cy="70.6" r="1" fill="#A5F3FC"/><path d="M43.8 64.2q5.2-4.6 10.4 0M65.8 64.2q5.2-4.6 10.4 0" stroke="#14183A" stroke-width="1.4" fill="none" stroke-linecap="round"/></g>
+  <g class="ey-h" stroke="#1B1A3D" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M44 69q5-6 10 0"/><path d="M66 69q5-6 10 0"/></g>
+  <path d="M59 76q1.4 1.8 0 3" stroke="#B7715A" stroke-opacity=".55" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+  <path class="mo-s" d="M54 82q6 4.5 12 0" stroke="${"#9F1239"}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path class="mo-h" d="M52 81h16q-1 9-8 9t-8-9z" fill="url(#${g}k)"/>
+  <path class="mo-f" d="M54 86q6-5 12 0" stroke="#9F1239" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path class="drop" d="M92 46q-5 8-5 12a5 5 0 0 0 10 0q0-4-5-12z" fill="#7DD3FC"/>
+  <g class="spk"><path d="M12 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#FBBF24"/><path d="M106 22l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z" fill="#F472B6"/><path d="M110 72l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z" fill="#A5F3FC"/></g>
+</svg>`};
+
+/* ---- app-v5-zzzn-victory.js ---- */
+/* =====================================================================
+   v5 · Écran de victoire en 3D, boutons Arena et Battles plus beaux,
+   bouton retour transparent. Tout est sobre en économie d'énergie.
+   ===================================================================== */
+AR_I.crown='<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/><path d="M5 19h14"/>';
+
+/* le trophée 3D et l'écran de victoire, partagés par l'Arena et les battles */
+function vicHTML(o){
+  const g="vt"+Math.floor(Math.random()*1e6),stars=Math.max(0,Math.min(3,o.stars||0));
+  const conf=stars>=2?`<div class="ar-confetti vic-conf">${Array.from({length:40},(_,k)=>`<i style="left:${(k*37)%100}%;animation-delay:${((k%7)*0.18).toFixed(2)}s;background:${["#5EEAD4","#818CF8","#F472B6","#FBBF24","#FFFFFF"][k%5]}"></i>`).join("")}</div>`:"";
+  const trophy=`<svg class="vic-trophy" viewBox="0 0 160 160" aria-hidden="true">
+    <defs>
+      <linearGradient id="${g}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF7D1"/><stop offset=".4" stop-color="#FBBF24"/><stop offset=".8" stop-color="#D97706"/><stop offset="1" stop-color="#78350F"/></linearGradient>
+      <linearGradient id="${g}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDE68A"/><stop offset="1" stop-color="#92400E"/></linearGradient>
+      <linearGradient id="${g}c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3B3F8F"/><stop offset="1" stop-color="#0B0E2A"/></linearGradient>
+      <radialGradient id="${g}d" cx=".35" cy=".3" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <filter id="${g}f" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.2"/></filter>
+    </defs>
+    <ellipse cx="80" cy="151" rx="48" ry="6" fill="#000" opacity=".4" filter="url(#${g}f)"/>
+    <path d="M42 22c-24 0-32 14-32 26 0 16 12 26 36 30" fill="none" stroke="url(#${g}b)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M118 22c24 0 32 14 32 26 0 16-12 26-36 30" fill="none" stroke="url(#${g}b)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M40 24h80v36c0 34-18 56-40 56s-40-22-40-56z" fill="url(#${g}a)"/>
+    <path d="M40 24h80v10H40z" fill="url(#${g}b)" opacity=".7"/>
+    <path d="M60 40v30c0 16 6 30 14 36" stroke="#fff" stroke-opacity=".8" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M104 44c0 14-2 26-8 36" stroke="#78350F" stroke-opacity=".35" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <ellipse cx="66" cy="50" rx="10" ry="6" fill="url(#${g}d)"/>
+    <rect x="71" y="118" width="18" height="22" fill="url(#${g}b)"/>
+    <path d="M50 138h60l8 14H42z" fill="url(#${g}c)"/>
+    <rect x="42" y="146" width="76" height="9" rx="3" fill="url(#${g}c)"/>
+    <path d="M80 54l4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3L80 77.6l-9.3 4.9 1.8-10.3-7.5-7.3 10.4-1.5z" fill="#FFF7D1" opacity=".85"/>
+  </svg>`;
+  const sparks=Array.from({length:8},(_,k)=>`<i class="vic-spark" style="--a:${k*45}deg;animation-delay:${(k*0.3).toFixed(1)}s"></i>`).join("");
+  return `<div class="vic ${o.mood||""}">${conf}
+    <div class="vic-stage"><div class="vic-aura"></div><div class="vic-ring r1"></div><div class="vic-ring r2"></div>${sparks}${trophy}</div>
+    <p class="vic-kicker">${arEsc(o.kicker||"Battle over")}</p>
+    <h2 class="vic-title">${arEsc(o.title||"")}</h2>
+    <div class="vic-score"><b>${o.score}</b><small>${arEsc(o.label||"points")}</small></div>
+    <div class="vic-stars" aria-label="${stars} stars">${[1,2,3].map(n=>`<span class="${n<=stars?"on":""}" style="animation-delay:${(n*0.15).toFixed(2)}s">★</span>`).join("")}</div>
+    ${o.sub?`<p class="vic-sub">${arEsc(o.sub)}</p>`:""}
+  </div>`}
+
+/* fin d'une partie de l'Arena : même écran, nouveau décor */
+function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
+  const prev=AR.best[mode];if(prev==null||score>prev){AR.best[mode]=score;try{localStorage.setItem("ar_best",JSON.stringify(AR.best))}catch(e){}}
+  arSubmit(mode,score);AR.boardMode=mode;
+  const f=max?score/max:1;const stars=f>=0.85?3:f>=0.5?2:1;
+  const names={quiz:"Quiz Blitz",guess:"Guess the Word",fill:"Fill the Gap",order:"Word Order",cards:"Flashcards",clock:"Beat the Clock",odd:"Odd One Out",traps:"Grammar Traps"};
+  const label=mode==="cards"?"cards learned":mode==="clock"?"correct answers":"points";
+  arSet(arTop(names[mode]||"Arena","")+vicHTML({title:stars===3?"Brilliant!":stars===2?"Well done!":"Keep going!",
+      kicker:names[mode]||"Arena",score:score,label:label,stars:stars,mood:stars>=2?"win":"end",sub:msg||`Best: ${AR.best[mode]}`})+
+    `<div class="ar-inrow vic-actions">
+        <button class="ar-go vic-go" data-ar="start" data-m="${mode}">Play again</button>
+        <button class="ar-go ghost" data-ar="board">Class board</button>
+        <button class="ar-go ghost" data-ar="home">Arena</button></div>`)}
+
+/* ---------- habillage ---------- */
+{const st=document.createElement("style");st.id="zzznvic";st.textContent=`
+.vic{position:relative;text-align:center;padding:10px 6px 6px;isolation:isolate;overflow:hidden}
+.vic-stage{position:relative;width:184px;height:184px;margin:6px auto 22px;transform-style:preserve-3d;animation:vicFloat 4.2s ease-in-out infinite}
+.vic-trophy{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 16px 22px rgba(251,191,36,.35)) drop-shadow(0 4px 6px rgba(0,0,0,.45));transform:rotateY(-10deg) rotateX(4deg);transition:transform .6s}
+.vic:hover .vic-trophy{transform:rotateY(8deg) rotateX(-3deg)}
+.vic-aura{position:absolute;inset:-26px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.42),rgba(244,114,182,.22) 42%,transparent 70%);filter:blur(8px);animation:vicPulse 3s ease-in-out infinite}
+.vic.end .vic-aura{background:radial-gradient(circle,rgba(94,234,212,.4),rgba(129,140,248,.2) 42%,transparent 70%)}
+.vic.end .vic-trophy{filter:hue-rotate(150deg) saturate(.8) drop-shadow(0 16px 22px rgba(94,234,212,.3))}
+.vic-ring{position:absolute;inset:-6px;border-radius:50%;border:1.5px solid transparent;border-top-color:rgba(142,246,228,.85);border-right-color:rgba(129,140,248,.55);animation:vicSpin 6s linear infinite}
+.vic-ring.r2{inset:-18px;border-top-color:rgba(244,114,182,.7);border-left-color:rgba(251,191,36,.45);animation-duration:9s;animation-direction:reverse}
+.vic-spark{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px;border-radius:50%;background:#FDE68A;box-shadow:0 0 12px #FBBF24;transform:rotate(var(--a)) translateY(-104px);animation:vicTwinkle 2.4s ease-in-out infinite}
+.vic-kicker{margin:6px 0 0;font-size:.72rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#A5B4FC}
+.vic-title{margin:6px 0 0;font-size:clamp(2rem,8vw,2.6rem);line-height:1.05;font-family:"Instrument Serif",Georgia,serif;font-weight:400;background:linear-gradient(120deg,#FFF7D1,#FBBF24 45%,#F472B6);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 14px rgba(251,191,36,.25))}
+.vic.end .vic-title{background:linear-gradient(120deg,#CCFBF1,#5EEAD4 45%,#818CF8);-webkit-background-clip:text;background-clip:text}
+.vic-score{display:flex;flex-direction:column;align-items:center;margin:8px 0 0}
+.vic-score b{font-size:4.4rem;line-height:1;font-weight:900;font-variant-numeric:tabular-nums;background:linear-gradient(180deg,#fff,#A5B4FC 60%,#6366F1);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 12px 30px rgba(99,102,241,.35)}
+.vic-score small{margin-top:4px;font-size:.72rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#94A3D8}
+.vic-stars{display:flex;justify-content:center;gap:10px;margin:14px 0 4px;font-size:2rem;line-height:1}
+.vic-stars span{color:rgba(148,163,216,.35);transition:transform .4s}
+.vic-stars span.on{color:#FBBF24;text-shadow:0 0 16px rgba(251,191,36,.8),0 3px 0 #92400E;animation:vicStar .6s cubic-bezier(.2,1.6,.4,1) both}
+.vic-sub{margin:8px 0 0;color:#B8C2E6;font-size:.95rem}
+.vic-actions{justify-content:center;flex-wrap:wrap;margin-top:18px}
+.vic-go{box-shadow:0 0 0 1px rgba(255,255,255,.4) inset,0 12px 28px -8px rgba(94,234,212,.7)}
+@keyframes vicFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes vicPulse{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+@keyframes vicSpin{to{transform:rotate(360deg)}}
+@keyframes vicTwinkle{0%,100%{opacity:.2;scale:.6}50%{opacity:1;scale:1.2}}
+@keyframes vicStar{from{transform:scale(.2) rotate(-40deg);opacity:0}to{transform:none;opacity:1}}
+
+/* Arena : cartes et bouton flottant plus travaillés */
+.ar-mode,.bt-entry{position:relative;overflow:hidden;border:1px solid rgba(165,180,252,.22)!important;background:linear-gradient(160deg,rgba(40,44,110,.72),rgba(12,14,38,.85))!important;box-shadow:0 18px 40px -18px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.12)!important;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s}
+.ar-mode:hover,.ar-mode:focus-visible{transform:translateY(-4px) rotateX(3deg);border-color:rgba(142,246,228,.6)!important;box-shadow:0 26px 50px -20px rgba(94,234,212,.35),inset 0 1px 0 rgba(255,255,255,.2)!important}
+.ar-mode::after{content:"";position:absolute;inset:auto -20% -60% -20%;height:70%;background:radial-gradient(ellipse,rgba(94,234,212,.22),transparent 70%);pointer-events:none}
+.ar-mode .ar-badge{position:relative;background:radial-gradient(circle at 30% 25%,#FFFFFF 0,#8EF6E4 22%,#5EEAD4 45%,#4F46E5 100%)!important;box-shadow:0 10px 24px -6px rgba(94,234,212,.7),inset 0 -6px 12px rgba(30,27,75,.35),inset 0 2px 4px rgba(255,255,255,.7)!important}
+.ar-mode .ar-badge .ar-ic{stroke:#0B1030;stroke-width:2.2;filter:drop-shadow(0 1px 0 rgba(255,255,255,.6))}
+.ar-mode b{font-size:1.02rem;letter-spacing:.01em}
+.bt-entry{border-radius:22px!important;padding:16px 18px!important;font-weight:900!important;letter-spacing:.02em;background:linear-gradient(120deg,#5EEAD4 0%,#A7F3D0 35%,#818CF8 100%)!important;color:#0B1030!important;box-shadow:0 18px 40px -12px rgba(94,234,212,.65),inset 0 2px 0 rgba(255,255,255,.7),inset 0 -4px 0 rgba(30,27,75,.18)!important;text-shadow:0 1px 0 rgba(255,255,255,.4)}
+.bt-entry:active{transform:scale(.98)}
+.ar-fab{background:linear-gradient(160deg,rgba(30,34,90,.92),rgba(10,12,34,.92))!important;border:1px solid rgba(165,180,252,.35)!important;box-shadow:0 14px 30px -10px rgba(0,0,0,.8),0 0 0 4px rgba(94,234,212,.08),inset 0 1px 0 rgba(255,255,255,.18)!important;backdrop-filter:blur(12px)}
+.ar-fab .ar-badge{background:radial-gradient(circle at 30% 25%,#FFF7D1,#FBBF24 45%,#B45309)!important;box-shadow:0 0 18px rgba(251,191,36,.7),inset 0 2px 3px rgba(255,255,255,.7)!important}
+.ar-fab .ar-badge .ar-ic{stroke:#3B1D05}
+
+/* bouton retour : transparent, en verre, avec un liseré lumineux */
+.back,.ar-glass{background:rgba(255,255,255,.06)!important;backdrop-filter:blur(12px) saturate(1.3);-webkit-backdrop-filter:blur(12px) saturate(1.3);border:1px solid rgba(255,255,255,.22)!important;box-shadow:0 8px 22px -10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.25)!important;color:#EEF2FF!important;transition:transform .2s,background .2s,box-shadow .2s}
+.back:hover,.ar-glass:hover{background:rgba(94,234,212,.12)!important;box-shadow:0 0 0 3px rgba(94,234,212,.15),0 10px 26px -10px rgba(94,234,212,.5)!important}
+.back:active,.ar-glass:active{transform:scale(.92)}
+.back{border-radius:999px;padding:8px 16px 8px 12px;display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.back svg{width:18px;height:18px}
+
+/* économie d'énergie : aucune animation */
+:root[data-lite="1"] .vic-stage,:root[data-lite="1"] .vic-aura,:root[data-lite="1"] .vic-ring,:root[data-lite="1"] .vic-spark,:root[data-lite="1"] .vic-stars span{animation:none!important}
+@media (prefers-reduced-motion:reduce){.vic-stage,.vic-aura,.vic-ring,.vic-spark,.vic-stars span{animation:none!important}}
+`;document.head.appendChild(st)}
+
+/* ---- app-v5-zzzo-nav.js ---- */
+/* =====================================================================
+   v5 · Retour : le bouton « retour » ramène à la page précédente (et non
+   à l'accueil). Un historique garde les pages visitées. Sur Android, le
+   bouton retour du téléphone fait la même chose.
+   ===================================================================== */
+{
+  const HIST=[];let last=null,restoring=false;
+  const snap=()=>({tab:S.tab,view:S.view?JSON.parse(JSON.stringify(S.view)):null,mode:S.mode});
+  const keyOf=s=>JSON.stringify([s.tab,s.view,s.mode]);
+  const _r=render;
+  render=function(){
+    const o=_r.apply(this,arguments);
+    try{
+      if(!restoring){
+        const cur=snap(),k=keyOf(cur);
+        if(last&&k!==last.k){HIST.push(last.s);if(HIST.length>40)HIST.shift()}
+        last={k:k,s:cur};
+      }
+    }catch(e){}
+    return o;
+  };
+  // rétablit la page précédente ; renvoie false s'il n'y en a pas
+  function back(){
+    if(!HIST.length)return false;
+    const s=HIST.pop();
+    restoring=true;
+    try{S.tab=s.tab;S.view=s.view;S.mode=s.mode;S.run=null;S.deck=null;S.confirm=null;S.animate=true;
+      if(typeof closeChat==="function"&&!(S.view&&S.view.type==="chat"))closeChat();
+      render();window.scrollTo(0,0)}
+    finally{restoring=false}
+    last={k:keyOf(s),s:s};
+    return true;
+  }
+  // le bouton « retour » de l'application (même avec un cadre d'Arena ouvert, l'Arena gère le sien)
+  document.addEventListener("click",e=>{
+    const b=e.target&&e.target.closest&&e.target.closest('[data-a="back"]');
+    if(!b)return;
+    if(back()){e.stopImmediatePropagation();e.preventDefault()}
+  },true);
+  // le bouton retour du téléphone (Android)
+  try{
+    const App=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
+    if(App&&App.addListener)App.addListener("backButton",()=>{
+      const r=document.getElementById("arena");
+      if(r&&!r.hidden){if(AR.mode||BT.on)arHome();else arClose();return}
+      if(!back()&&S.view){S.view=null;S.animate=true;render()}
+    });
+  }catch(e){}
+}
+
+/* ---- app-v5-zzzp-chat-scroll.js ---- */
+/* =====================================================================
+   v5 · Le chat garde la position de lecture. Quand l'élève remonte
+   dans une conversation, un nouveau message, une photo qui se charge
+   ou une mise à jour ne le ramène plus en bas. Il redescend seulement
+   s'il était déjà en bas (ou quand il envoie un message).
+   ===================================================================== */
+{const _r=render;render=function(){
+  const cs0=document.getElementById("chatScroll");
+  const saved=cs0?{top:cs0.scrollTop,key:S.view&&S.view.type+":"+(S.view.id||"")}:null;
+  CHAT_STICK.lock=true;
+  const o=_r.apply(this,arguments);
+  try{
+    const cs=document.getElementById("chatScroll");
+    if(cs){
+      if(!saved||saved.key!==(S.view&&S.view.type+":"+(S.view.id||""))){CHAT_STICK.on=true}
+      if(CHAT_STICK.on)cs.scrollTop=cs.scrollHeight;else cs.scrollTop=saved.top;
+    }
+  }finally{setTimeout(()=>{CHAT_STICK.lock=false},80)}
+  return o;
+}}
+
+/* ---- app-v5-zzzq-arena-book.js ---- */
+/* =====================================================================
+   v5 · L'Arène suit le programme. Les questions des Leçons et de la
+   Pratique (Seconde, Première, Terminale) sont lues dans www/content.json,
+   le même modèle que l'application. Quand le modèle change (scripts/
+   build-programmes.mjs), l'Arène s'y met à jour à l'ouverture suivante.
+   Seconde = niveau facile, Première = moyen, Terminale = difficile.
+   ===================================================================== */
+{
+  const LV={"2nde":1,"1re":2,"Tle":3};
+  let done=false,busy=null;
+  async function arBookLoad(){
+    if(done)return 0;
+    if(busy)return busy;
+    busy=(async()=>{
+      try{
+        const j=await(await fetch("content.json",{cache:"no-store"})).json();
+        const seen=new Set(AR_Q.map(x=>x.q));let n=0;
+        for(const [id,q] of Object.entries(j.quizzes||{})){
+          if(!q.prog||!/^bk/.test(id))continue;
+          const lv=LV[q.classe]||2;
+          for(const x of q.questions||[]){
+            if(x.type==="type"||!Array.isArray(x.choices)||x.choices.length<2)continue;
+            if(seen.has(x.q))continue;seen.add(x.q);
+            AR_Q.push({lv:lv,q:x.q,o:x.choices.slice(),a:x.answer,e:`The correct answer is "${x.choices[x.answer]}" (${q.title||"programme"}).`});n++;
+          }
+        }
+        done=true;return n;
+      }catch(e){busy=null;return 0}
+    })();
+    return busy;
+  }
+  window.arBookLoad=arBookLoad;
+  {const _o=arOpen;arOpen=function(){const r=_o.apply(this,arguments);arBookLoad();return r}}
+}
+
+/* ---- app-v5-zzzq-chat-tools.js ---- */
+/* =====================================================================
+   v5 · Messagerie : modifier un message envoyé, glisser un message pour
+   y répondre, et la mention « modifié ». Les conversations entre élèves
+   (messagerie de classe) ont ces outils ; ils ne touchent pas aux autres
+   conversations.
+   Nécessite supabase/messagerie-edit.sql.
+   ===================================================================== */
+
+/* 1 · l'action « Modifier » dans le menu d'un de mes messages */
+{const _s=v4ActSheet;v4ActSheet=function(kind,list,c){let h=_s.apply(this,arguments);
+  if(kind!=="peer"||!V4.act)return h;
+  const raw=list.find(x=>x.id===V4.act.id);
+  if(raw&&raw.sender===S.uid&&!raw.deleted_at&&raw.body)h=h.replace('<button type="button" data-v4="reply">','<button type="button" data-v4="editMsg">'+ic("edit")+'Edit</button><button type="button" data-v4="reply">');
+  return h}}
+document.addEventListener("click",e=>{
+  const b=e.target.closest&&e.target.closest('[data-v4="editMsg"],[data-v4="editX"]');if(!b)return;
+  e.stopImmediatePropagation();e.preventDefault();
+  if(b.dataset.v4==="editX"){V4.edit=null;const i=document.getElementById(V4IN("peer"));if(i)i.value="";render();return}
+  const x=v4ActMsg();V4.act=null;
+  if(!x||x.kind!=="peer"){render();return}
+  V4.reply=null;V4.edit={kind:"peer",id:x.raw.id,orig:x.raw.body||""};
+  render();
+  const n=document.getElementById(V4IN("peer"));if(n){n.value=V4.edit.orig;n.focus()}
+},true);
+
+/* 2 · la barre du haut indique qu'on modifie, avec un bouton pour annuler */
+{const _b=v4Bar;v4Bar=function(kind,target,ph){let h=_b.apply(this,arguments);
+  if(kind==="peer"&&V4.edit&&V4.edit.kind==="peer")h='<div class="v4replybar v4editbar"><div class="v4quote"><div class="v4q-w">Editing your message</div><div class="v4q-t">'+esc(String(V4.edit.orig).slice(0,140))+'</div></div><button type="button" class="iconbtn sm" data-v4="editX" aria-label="Cancel editing">'+ic("x")+'</button></div>'+h;
+  return h}}
+
+/* 3 · envoyer la modification au lieu d'un nouveau message */
+{const _t=v4TextSend;v4TextSend=async function(kind,f){
+  if(!(kind==="peer"&&V4.edit&&V4.edit.kind==="peer"))return _t.apply(this,arguments);
+  const id=V4IN(kind),inp=document.getElementById(id),text=String((inp&&inp.value)||"").trim(),E0=V4.edit;
+  if(!text)return;
+  if(text===String(E0.orig).trim()){V4.edit=null;if(inp)inp.value="";render();return}
+  try{
+    await window.__peer.edit(E0.id,text);
+    const raw=PR.inbox.find(x=>x.id===E0.id);if(raw){raw.body=text;raw.edited_at=new Date().toISOString()}
+    V4.edit=null;if(inp)inp.value="";render();
+  }catch(e){toast((e&&e.message)||"Could not edit the message","x")}
+}}
+
+/* 4 · « modifié » à côté de l'heure */
+{const _m=v4MsgHTML;v4MsgHTML=function(kind,m,c){let h=_m.apply(this,arguments);
+  if(kind==="peer"&&!m.del){const raw=PR.inbox.find(x=>x.id===m.id);if(raw&&raw.edited_at)h=h.replace("<span>","<span class=\"v4ed\">edited · ")}
+  return h}}
+
+/* 5 · glisser un message (vers la droite) pour répondre */
+{
+  let sw=null;
+  const swipeReply=el=>{const kind=el.dataset.k,c=V4.ctx[kind];if(!c)return;
+    const raw=c.list().find(x=>x.id===el.dataset.mid);if(!raw)return;
+    const m=v4Norm(kind,raw,c),t=v4Plain(m.text)||attLabel(m.att)||"Message";
+    V4.edit=null;
+    V4.reply={kind:kind,id:raw.id,t:t.slice(0,140),w:kind==="chat"?raw.from:(kind==="peer"?raw.sender:raw.from),who:m.mine?"yourself":c.other};
+    render();const n=document.getElementById(V4IN(kind));if(n)n.focus();
+    if(navigator.vibrate)navigator.vibrate(12)};
+  document.addEventListener("pointerdown",e=>{
+    const m=e.target.closest&&e.target.closest("#chatScroll .msg[data-mid]");
+    if(!m||e.button>0||e.target.closest("button,a,input,audio,video,.v4once,.v4quote")||String(m.dataset.mid).startsWith("tmp"))return;
+    sw={el:m,x:e.clientX,y:e.clientY,dx:0,mode:null};
+  },true);
+  document.addEventListener("pointermove",e=>{
+    if(!sw)return;
+    const dx=e.clientX-sw.x,dy=e.clientY-sw.y;
+    if(!sw.mode){
+      if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){sw=null;return}
+      if(dx>8&&Math.abs(dx)>Math.abs(dy)*1.5)sw.mode="x";else return;
+    }
+    sw.dx=Math.max(0,Math.min(96,dx));
+    sw.el.style.transition="none";sw.el.style.transform="translateX("+sw.dx+"px)";
+  },{passive:true});
+  const end=()=>{if(!sw)return;const s=sw;sw=null;
+    s.el.style.transition="transform .25s ease";s.el.style.transform="";
+    if(s.mode==="x"&&s.dx>=60)swipeReply(s.el)};
+  document.addEventListener("pointerup",end,true);
+  document.addEventListener("pointercancel",end,true);
+}
+
+{const st=document.createElement("style");st.id="zzzqchattools";st.textContent=`
+#chatScroll .msg{touch-action:pan-y}
+.v4ed{font-style:italic;opacity:.75;margin-right:4px}
+.v4editbar{border-left:3px solid #FBBF24}
+`;document.head.appendChild(st)}
+
+/* ---- app-v5-zzzr-classmates.js ---- */
+/* =====================================================================
+   v5 · Liste des camarades bien rangée : trois sections (Amis, Demandes,
+   Camarades), chacune triée par dernier message (les non lus d'abord).
+   Une seule ligne par camarade : heure et badge à droite, le bouton « ⋯ »
+   toujours au même endroit. Les amis n'ont plus de pastille répétée.
+   ===================================================================== */
+function pvLastAt(u,me){let t=0;for(const m of PR.inbox){if(m.deleted_at)continue;const o=m.sender===me?m.receiver:m.sender;if(o===u){const x=+new Date(m.created_at);if(x>t)t=x}}return t}
+function pvOrganize(){
+  if(!S.view||S.view.type!=="peers"||!PR.loaded)return;
+  const me=S.uid;
+  document.querySelectorAll(".pv-list").forEach(L=>{
+    const rows=[...L.children].filter(n=>n.classList&&n.classList.contains("it")&&n.dataset.a==="openPeer");
+    if(!rows.length)return;
+    const info=rows.map(r=>{const u=r.dataset.id,st=(typeof frState==="function")?frState(u):"none";
+      return{r,st,last:pvLastAt(u,me),un:r.classList.contains("pv-un"),name:(r.querySelector("b")||{}).textContent||""}});
+    const byRecent=(a,b)=>(b.un-a.un)||(b.last-a.last)||a.name.localeCompare(b.name);
+    const friends=info.filter(x=>x.st==="friends").sort(byRecent);
+    const reqs=info.filter(x=>x.st==="in"||x.st==="out").sort(byRecent);
+    const others=info.filter(x=>x.st!=="friends"&&x.st!=="in"&&x.st!=="out").sort(byRecent);
+    // une seule pastille par ligne, à gauche du bouton ⋯
+    info.forEach(x=>{
+      const fa=x.r.querySelector(".fr-act"),meta=x.r.querySelector(".pv-meta"),more=x.r.querySelector(".pv-more");
+      if(fa&&meta){if(x.st==="friends")fa.remove();else meta.insertBefore(fa,more||null)}
+    });
+    const sec=(title,list)=>{if(!list.length)return null;const h=document.createElement("div");h.className="pv-sec";h.innerHTML=`<span>${title}</span><b>${list.length}</b>`;return[h,...list.map(x=>x.r)]};
+    const parts=[sec("Friends",friends),sec("Friend requests",reqs),sec("Classmates",others)].filter(Boolean).flat();
+    L.replaceChildren(...parts);
+  });
+}
+{const _r=render;render=function(){const o=_r.apply(this,arguments);try{pvOrganize()}catch(e){}return o}}
+{const st=document.createElement("style");st.id="zzzrclassmates";st.textContent=`
+.pv-list .pv-sec{display:flex;align-items:center;gap:10px;padding:14px 16px 6px;font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted,#94A3B8)}
+.pv-list .pv-sec:first-child{padding-top:10px}
+.pv-list .pv-sec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(148,163,184,.4),transparent)}
+.pv-list .pv-sec b{font-size:.7rem;padding:2px 8px;border-radius:999px;background:rgba(148,163,184,.14);color:inherit;letter-spacing:0}
+.pv-list .it.pv-row,.pv-list>.it[data-a="openPeer"]{align-items:center}
+.pv-list .pv-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:72px}
+.pv-list .pv-meta .row{justify-content:flex-end;flex-wrap:nowrap}
+.pv-list .fr-act .chip{font-size:.7rem;padding:3px 9px;white-space:nowrap}
+.pv-list .pv-more{flex:0 0 auto;margin-left:6px}
+`;document.head.appendChild(st)}
+
+/* ---- app-v5-zzzs-arena-theme.js ---- */
+/* =====================================================================
+   v5 · L'Arena suit le thème de l'application. Ses couleurs viennent
+   des jetons du thème (fond, surfaces, encre, or, rose…) : quand on
+   change de thème, l'Arena, les battles et l'écran de victoire
+   changent avec lui, clair ou sombre.
+   ===================================================================== */
+{const st=document.createElement("style");st.id="zzzsarenatheme";st.textContent=`
+#arena{background:var(--bg)!important;color:var(--fg)!important}
+#arena .ar-orb{background:radial-gradient(circle,var(--sky-soft,rgba(56,189,248,.25)),transparent 70%)!important;opacity:.7}
+#arena .ar-kicker,#arena .ar-hint,#arena .bt-wait,#arena .ar-score small,#arena .vic-kicker{color:var(--muted)!important}
+#arena h1,#arena h2,#arena .ar-top b{color:var(--fg)!important}
+#arena .ar-card,#arena .ar-row,#arena .ar-sb,#arena .bt-sb .ar-row{background:var(--surface)!important;border-color:var(--line)!important;color:var(--fg)!important}
+#arena .ar-row.me{border-color:var(--ink)!important;background:var(--surface2)!important}
+#arena .ar-opt{background:var(--surface2)!important;border-color:var(--line2)!important;color:var(--fg)!important}
+#arena .ar-opt.ok{background:var(--ink-soft)!important;border-color:var(--ink)!important;color:var(--ink)!important}
+#arena .ar-opt.bad{background:var(--rose-soft)!important;border-color:var(--rose)!important;color:var(--rose)!important}
+#arena .ar-mode,#arena .bt-entry.ar-go{background:linear-gradient(160deg,var(--surface2),var(--surface))!important;border-color:var(--line2)!important;color:var(--fg)!important}
+#arena .ar-mode small{color:var(--muted)!important}
+#arena .ar-mode .ar-badge,#arena .ar-badge{background:var(--grad)!important;color:var(--on-ink)!important}
+#arena .ar-mode .ar-badge .ar-ic,#arena .ar-badge .ar-ic{stroke:var(--on-ink)!important}
+#arena .ar-go:not(.ghost){background:var(--grad)!important;color:var(--on-ink)!important;box-shadow:0 14px 30px -12px var(--ink)!important}
+#arena .ar-go.ghost,#arena .ar-glass{background:var(--surface)!important;color:var(--fg)!important;border-color:var(--line2)!important}
+#arena .ar-seg{background:var(--surface)!important;border-color:var(--line)!important}
+#arena .ar-seg button{color:var(--muted)!important}
+#arena .ar-seg button.on{background:var(--grad)!important;color:var(--on-ink)!important}
+#arena .ar-bar{background:var(--line)!important}
+#arena .ar-bar i{background:var(--grad)!important}
+#arena .ar-ring .ar-arc{stroke:var(--ink)!important}
+#arena .ar-ring .ar-track{stroke:var(--line2)!important}
+#arena .ar-ring b{color:var(--fg)!important}
+#arena .bt-code{background:var(--grad)!important;-webkit-background-clip:text;background-clip:text;color:transparent!important}
+#arena .bt-in{background:var(--surface2)!important;color:var(--fg)!important;border-color:var(--line2)!important}
+#arena .bt-tag{background:var(--ink-soft)!important;color:var(--ink)!important}
+#arena .bt-tag.host{background:var(--goldS,var(--surface2))!important;color:var(--gold)!important}
+#arena .bt-out-card{background:var(--rose-soft)!important;border-color:var(--rose)!important}
+#arena .bt-win,.vic-title{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+#arena .vic-score b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+#arena .vic-stars span.on{color:var(--gold)!important}
+#arena .vic-aura{background:radial-gradient(circle,var(--ink-soft),transparent 70%)!important}
+#arena .vic-ring{border-top-color:var(--ink)!important;border-right-color:var(--sky)!important}
+#arena .vic-sub{color:var(--muted)!important}
+#arena .ar-fab,.ar-fab{background:var(--surface)!important;color:var(--fg)!important;border-color:var(--line2)!important}
+#arena .ar-fab .ar-badge,.ar-fab .ar-badge{background:var(--grad)!important}
+`;document.head.appendChild(st)}
+
+/* ---- app-v5-zzzt-programme-questions.js ---- */
+/* =====================================================================
+   v5 · Questions tirées des programmes imprimés (Seconde, Première,
+   Terminale). Une banque déterministe : mêmes questions et même ordre
+   sur tous les téléphones. Les options sont mélangées avec une graine
+   fixe. Chaque question est écrite à la main.
+   ===================================================================== */
+{
+  let seed=20261016;
+  const rnd=()=>{seed=(Math.imul(seed,1103515245)+12345)>>>0;return seed/4294967296};
+  const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+  const seen=new Set((typeof AR_Q!=="undefined"?AR_Q:[]).map(x=>x.q));
+  const add=(lv,q,correct,wrong,e)=>{
+    if(seen.has(q))return;
+    const d=wrong.filter((x,i,arr)=>x!==correct&&arr.indexOf(x)===i).slice(0,3);
+    if(d.length<3)return;
+    const o=shuf([correct,...d]);seen.add(q);
+    AR_Q.push({lv:lv,q:q,o:o,a:o.indexOf(correct),e:e});
+  };
+
+  /* ---------- SECONDE · S1 Chieftaincy in Togo ---------- */
+  add(2,"If it rains tomorrow, the chief _____ the meeting in the palace.","will hold",["holds","held","would hold"],"First conditional: if + present simple, will + verb.");
+  add(2,"If the elders _____ the case carefully, the people will accept the decision.","study",["studies","studied","will study"],"First conditional: if + present simple, will + verb.");
+  add(2,"If I were the chief, I _____ the trial fairly.","would judge",["will judge","judged","judge"],"Second conditional: if + past simple, would + verb.");
+  add(2,"If the villagers _____ more time, they would visit the royal palace.","had",["have","will have","would have"],"Second conditional: if + past simple (had), would + verb.");
+  add(2,"_____ the chief was old, he still ruled the village with wisdom.","Although",["Because","Unless","So"],"Although introduces a concession: it means 'despite the fact that'.");
+  add(2,"Even though the king was tired, he _____ the ceremony.","attended",["attends","attending","will attend"],"Even though + past simple, then a past simple verb in the main clause.");
+  add(2,"_____ the trial was long, the people listened until the end.","Though",["Unless","Because","So that"],"Though is a concessive conjunction, like although.");
+  add(2,"What does 'chieftaincy' mean in French?","la chefferie traditionnelle",["la justice moderne","le gouvernement central","le mariage coutumier"],"Chieftaincy = la chefferie traditionnelle.");
+  add(2,"What does 'royal court' mean in French?","la cour royale",["le marché royal","l'école royale","le village royal"],"Royal court = la cour royale, where trials are held.");
+  add(2,"If you _____ the rules of the palace, you will be punished.","break",["will break","broke","would break"],"First conditional: if + present simple, will + verb.");
+  add(2,"What does 'elder' mean in French?","un ancien (du village)",["un enfant","un étranger","un chasseur"],"An elder is a respected older member of the community.");
+  add(2,"Choose the correct sentence.","If the chief were wise, the people would be happy.",["If the chief would be wise, the people would be happy.","If the chief is wise, the people is happy.","If the chief was wise, the people would happy."],"Second conditional: if + were, would + base verb.");
+  add(2,"If we _____ together, we will solve the conflict.","unite",["united","will unite","would unite"],"First conditional: if + present simple, will + verb.");
+  add(2,"What does 'to rule' mean in French?","gouverner",["juger","punir","élire"],"To rule = gouverner.");
+
+  /* ---------- SECONDE · S2 Chieftaincy in Africa ---------- */
+  add(2,"If the chiefs _____ together, they can solve many conflicts.","work",["worked","working","would work"],"First conditional: if + present simple, can + verb.");
+  add(2,"If the young people _____ the traditions, the villages will lose their identity.","forget",["forgot","forgetting","would forget"],"First conditional: if + present simple, will + verb.");
+  add(2,"If the king had listened to his advisers, the war _____ avoided.","would have been",["will be","is","was"],"Third conditional: if + had + past participle, would have + past participle.");
+  add(2,"Even though he was powerful, the chief _____ to the elders.","listened",["listen","will listen","listening"],"Even though + past simple in the main clause, past simple for narration.");
+  add(2,"Though the colonial period was hard, the chiefs _____ their authority.","kept",["keep","will keep","keeping"],"Though + past simple, then past simple in the main clause.");
+  add(2,"What does 'weakness' mean in French?","la faiblesse",["la force","la richesse","la sagesse"],"Weakness = la faiblesse.");
+  add(2,"What is the opposite of 'strength'?","weakness",["power","wisdom","pride"],"The opposite of strength is weakness.");
+  add(2,"If the people _____ the king, they would respect him more.","respected",["respect","will respect","respecting"],"Second conditional: if + past simple, would + verb.");
+  add(2,"What does 'although' mean in French?","bien que",["parce que","donc","depuis"],"Although = bien que.");
+  add(2,"What does 'even though' mean in French?","même si",["parce que","alors","depuis"],"Even though = même si.");
+  add(2,"_____ the chief was sick, he attended the ceremony.","Though",["Unless","Because","So"],"Though is a concessive conjunction.");
+  add(2,"Which word means 'sagesse' in English?","wisdom",["weakness","pride","trial"],"Sagesse = wisdom.");
+  add(2,"If the elders _____ their children, the villages would be stronger.","educated",["educate","will educate","educating"],"Second conditional with a past simple verb in the if-clause.");
+  add(2,"Choose the correct sentence.","If we unite, we will be stronger.",["If we will unite, we will be stronger.","If we united, we will be stronger.","If we unite, we would be stronger."],"First conditional: if + present simple, will + base verb.");
+  add(2,"What does 'elder' mean in French?","un ancien (du village)",["un enfant","un étranger","un chasseur"],"An elder is a respected older member of the community.");
+
+  /* ---------- SECONDE · S3 Girls' Education ---------- */
+  add(2,"Girls can be _____ clever _____ boys.","as ... as",["more ... than","so ... as","less ... than"],"Equality: as + adjective + as.");
+  add(2,"Fatou is _____ than her brother at mathematics.","less good",["more good","gooder","as good"],"Inferiority: less + adjective + than.");
+  add(2,"Girls' education is _____ important than ever.","more",["most","much","many"],"Comparative: more + adjective + than.");
+  add(2,"Girls' schooling is expensive. _____, it is necessary.","However",["Because","So","Unless"],"However introduces a contrast: 'nevertheless'.");
+  add(2,"Girls should go to school, _____?","shouldn't they",["should they","don't they","do they"],"Question tag: positive statement with should, negative tag.");
+  add(2,"Mariam is a student, _____?","isn't she",["is she","doesn't she","isn't it"],"Question tag: positive statement with be, negative tag with the pronoun she.");
+  add(2,"Boys and girls have the same rights, _____?","don't they",["do they","haven't they","don't we"],"Question tag: positive statement with have, negative tag with do.");
+  add(2,"Let's go to school, _____?","shall we",["will we","do we","won't we"],"Let's ... tag is shall we.");
+  add(2,"She can't read well, _____?","can she",["can't she","does she","isn't she"],"Negative statement with can, positive tag with can.");
+  add(2,"This road is _____ than the one to school.","longer",["more long","longest","as long"],"Comparative of long: longer than.");
+  add(2,"She is _____ tall _____ her sister.","as ... as",["so ... that","more ... than","less ... than"],"Equality: as + adjective + as.");
+  add(2,"What does 'equality' mean in French?","l'égalité",["l'inégalité","la liberté","la justice"],"Equality = l'égalité.");
+  add(2,"What does 'household' mean in French?","le foyer, le ménage",["le marché","l'école","la rivière"],"Household = le foyer, le ménage.");
+  add(2,"What is the opposite of 'educated'?","uneducated",["educating","educate","education"],"The opposite of educated is uneducated.");
+
+  /* ---------- SECONDE · S4 Women's Place in the Family ---------- */
+  add(2,"In many families, women _____ most of the housework.","do",["does","did","doing"],"Present simple with a plural subject: do.");
+  add(2,"The husband and the wife _____ the children together.","bring up",["brings up","brought up","bringing up"],"Present simple with a plural subject: bring up.");
+  add(2,"What does 'to bring up' mean in French?","élever (des enfants)",["apporter","amener","ramener"],"To bring up (children) = élever (des enfants).");
+  add(2,"Girls should have the same _____ as boys.","rights",["rightful","righting","righteous"],"Rights is the noun meaning 'droits'.");
+  add(2,"Women and men _____ share the housework equally.","should",["shouldn't","wouldn't","mustn't have"],"Should expresses advice or what is right.");
+  add(2,"What does 'housework' mean in French?","les travaux ménagers",["le travail des champs","le travail de bureau","le marché"],"Housework = les travaux ménagers.");
+  add(2,"The father _____ make all the decisions alone; the family decides together.","doesn't have to",["mustn't","couldn't","wouldn't"],"Doesn't have to = it is not necessary.");
+  add(2,"If the mother _____ outside the home, the children help more with the housework.","works",["worked","will work","working"],"First conditional: if + present simple, the main clause uses the present simple.");
+  add(2,"What is the opposite of 'equal'?","unequal",["equally","equality","equalise"],"The opposite of equal is unequal.");
+  add(2,"What does 'stereotype' mean in French?","un préjugé",["une habitude","une règle","un sport"],"Stereotype = un préjugé.");
+  add(2,"Choose the correct sentence.","Women should be respected in the family.",["Women should respected in the family.","Women should be respect in the family.","Women should to be respected in the family."],"Should + be + past participle: passive form.");
+  add(2,"She is a clever girl, _____?","isn't she",["is she","doesn't she","isn't it"],"Question tag after a positive statement with is.");
+  add(2,"What is the noun form of 'respectful'?","respectfulness",["respectable","respectably","respect"],"The noun form of 'respectful' is 'respectfulness' (respect itself is also a noun, but the question asks the derived form).");
+  add(2,"The girls _____ their homework every evening.","do",["does","did","doing"],"Present simple with a plural subject: do.");
+
+  /* ---------- SECONDE · S5 Bushfires and Deforestation ---------- */
+  add(2,"The forest _____ by fire last year.","was destroyed",["destroyed","has destroyed","destroys"],"Passive past simple: was + past participle.");
+  add(2,"Many trees _____ every year for firewood.","are cut down",["cut down","are cutting down","have cut down"],"Passive present simple: are + past participle.");
+  add(2,"What does 'to set fire to' mean in French?","mettre le feu à",["éteindre","nettoyer","planter"],"To set fire to = mettre le feu à.");
+  add(2,"You will not get wood _____ you plant new trees.","unless",["if","when","until"],"Unless = if not.");
+  add(2,"We will stop the fire _____ we act now.","unless",["if","until","when"],"Unless = if not. The sentence means 'if we do not act now'.");
+  add(2,"The man _____ house burned down is my neighbour.","whose",["who","which","whom"],"Whose shows possession: the man whose house.");
+  add(2,"The dumping ground _____ is near the river is dangerous.","which",["who","whose","where"],"Which is used for things; the dumping ground (thing) which is near the river.");
+  add(2,"The student _____ wrote the report won a prize.","who",["which","whose","whom"],"Who is used for people as the subject of a relative clause.");
+  add(2,"What does 'deforestation' mean in French?","la déforestation",["le reboisement","la sécheresse","la pollution"],"Deforestation = la déforestation.");
+  add(2,"What does 'bushfire' mean in French?","un feu de brousse",["une inondation","un orage","une tempête"],"Bushfire = un feu de brousse.");
+  add(2,"What is a 'dumping ground' in French?","une décharge",["une usine","un marché","un parc"],"A dumping ground = une décharge (waste site).");
+  add(2,"What is the opposite of 'to plant' (trees)?","to cut down",["to water","to grow","to dig"],"To plant trees is the opposite of cutting them down.");
+  add(2,"Choose the correct passive sentence.","The rubbish is burned every week.",["The rubbish burns every week.","The rubbish is burning every week by.","The rubbish has burned by every week."],"Passive present simple: is + past participle (burned).");
+  add(2,"Choose the correct sentence.","The forest was destroyed by the fire.",["The forest was destroy by the fire.","The forest destroyed by the fire.","The forest was destroyed the fire."],"Passive: was + past participle, with by + agent.");
+  add(2,"We will not win the fight _____ we protect the forest.","unless",["if","when","because"],"Unless = if not.");
+
+  /* ---------- SECONDE · S6 Dumping Grounds ---------- */
+  add(2,"Dumping grounds _____ the air and the water.","pollute",["polluted","pollutes","will pollute"],"Plural subject with the present simple: pollute.");
+  add(2,"Plastic bags _____ slowly in the soil.","decompose",["decomposes","decomposed","decomposing"],"Plural subject with the present simple: decompose.");
+  add(2,"What does 'waste' mean in French?","les déchets",["les ressources","les plantes","les routes"],"Waste = les déchets.");
+  add(2,"The rubbish _____ every day by the workers.","is collected",["collects","collected","has collected"],"Passive present simple.");
+  add(2,"The city _____ a new dumping ground next year.","will build",["will be built","builds","built"],"Active future: will + base verb.");
+  add(2,"The waste _____ by the wind into the river.","was carried",["carried","has carried","carries"],"Passive past simple: was + past participle.");
+  add(2,"What is the opposite of 'clean'?","dirty",["fresh","wet","bright"],"The opposite of clean is dirty.");
+  add(2,"What does 'to recycle' mean in French?","recycler",["jeter","brûler","enterrer"],"To recycle = recycler.");
+  add(2,"People should throw rubbish in the bin, _____?","shouldn't they",["should they","don't they","do they"],"Question tag after should: negative tag.");
+  add(2,"If we _____ the rubbish, the town will be clean.","collect",["will collect","collected","collecting"],"First conditional: if + present simple, the main clause uses will.");
+  add(2,"What does 'pollution' mean in French?","la pollution",["la population","la solution","la protection"],"Pollution = la pollution.");
+  add(2,"Our streets are _____ than before since the workers started cleaning.","cleaner",["more clean","cleanest","the cleaner"],"Comparative of clean: cleaner than.");
+
+  /* ---------- SECONDE · S7 Artificial Intelligence and the Modern Society ---------- */
+  add(2,"Artificial intelligence _____ more and more in hospitals, which is a big change.","is being used",["has used","was using","being used"],"Present continuous passive: is being + past participle.");
+  add(2,"Computers _____ by engineers in many countries.","are designed",["design","are designing","designed"],"Passive present simple: are + past participle.");
+  add(2,"What does 'artificial intelligence' mean in French?","l'intelligence artificielle",["l'intelligence humaine","l'art de la ville","la technologie ancienne"],"Artificial intelligence = l'intelligence artificielle.");
+  add(2,"What does 'curriculum vitae' mean in French?","un curriculum vitae",["une lettre de motivation","un contrat de travail","un bulletin scolaire"],"CV = curriculum vitae.");
+  add(2,"What does 'e-learning' mean?","learning by internet",["learning in a village","learning by hand","learning in a church"],"E-learning is learning through digital tools and the internet.");
+  add(2,"The new software _____ by a young engineer last year.","was developed",["developed","is developing","has developed"],"Passive past simple: was + past participle.");
+  add(2,"Choose the correct passive sentence.","The phone is made in a factory.",["The phone makes in a factory.","The phone is making in a factory.","The phone has made in a factory by."],"Passive present simple: is + past participle.");
+  add(2,"What does 'advantage' mean in French?","un avantage",["un inconvénient","un danger","une règle"],"Advantage = un avantage.");
+  add(2,"What is the opposite of 'advantage'?","disadvantage",["advantageous","advantageously","adventure"],"The opposite of advantage is disadvantage.");
+  add(2,"Robots _____ many jobs in the future.","will replace",["replace","will replaced","are replaced"],"Future: will + base verb.");
+  add(2,"If the machine _____, the workers will stop the production.","breaks down",["broke down","will break down","breaking down"],"First conditional: if + present simple.");
+  add(2,"What does 'phytotherapy' mean in French?","la phytothérapie",["la chirurgie","la radiothérapie","la psychologie"],"Phytotherapy = la phytothérapie (treatment with plants).");
+  add(2,"What does 'a diagnosis' mean in French?","un diagnostic",["un traitement","un médicament","un hôpital"],"Diagnosis = un diagnostic.");
+  add(2,"The advantages of AI are _____ than its disadvantages.","more numerous",["more numerously","numerous than","most numerous"],"Comparison of quantity: more numerous than.");
+
+  /* ---------- SECONDE · S8 Phytotherapy and Health ---------- */
+  add(2,"Many people _____ plants to treat their illnesses.","use",["uses","are used","used"],"Present simple with a plural subject: use + object.");
+  add(2,"The leaves of this plant _____ to cure fever.","are used",["use","are using","used"],"Passive present simple: are + past participle.");
+  add(2,"What does 'a remedy' mean in French?","un remède",["une maladie","un médecin","une douleur"],"Remedy = un remède.");
+  add(2,"What does 'a symptom' mean in French?","un symptôme",["un sirop","un virus","une vaccination"],"Symptom = un symptôme.");
+  add(2,"What does 'a patient' mean in French?","un patient",["un étudiant","un ami","un voisin"],"Patient = un patient.");
+  add(2,"What does 'a vaccine' mean in French?","un vaccin",["une piqûre","un pansement","une ordonnance"],"Vaccine = un vaccin.");
+  add(2,"If you _____ more fruit and vegetables, you will be healthier.","eat",["will eat","ate","eating"],"First conditional: if + present simple, will + verb.");
+  add(2,"If I had a headache, I _____ a herbal tea.","would drink",["will drink","drink","drank"],"Second conditional: if + past simple, would + verb.");
+  add(2,"Choose the correct sentence.","The doctor was consulted by many people.",["The doctor consulted by many people.","The doctor was consult by many people.","The doctor has been consulted by many people by."],"Passive past simple: was + past participle.");
+  add(2,"What is the opposite of 'healthy'?","unhealthy",["healthily","health","healthier"],"The opposite of healthy is unhealthy.");
+  add(2,"Herbal medicine is _____ than many modern drugs in some villages.","cheaper",["more cheap","cheapest","the cheap"],"Comparative of cheap: cheaper than.");
+  add(2,"People _____ to the hospital when they are seriously ill.","go",["goes","went","going"],"Present simple with a plural subject: go.");
+  add(2,"What does 'to heal' mean in French?","guérir",["tomber malade","mourir","souffrir"],"To heal = guérir.");
+  add(2,"What does 'illness' mean in French?","la maladie",["la santé","la guérison","le médicament"],"Illness = la maladie.");
+
+  /* ---------- SECONDE · S9 Respect of State Property ---------- */
+  add(2,"I wish I _____ the public bus more carefully yesterday.","had treated",["treated","have treated","would treat"],"I wish + past perfect expresses regret about the past.");
+  add(2,"If only the people _____ the school building in good condition!","would keep",["keep","kept","will keep"],"If only + would expresses a wish about the present or future.");
+  add(2,"I wish I _____ in a clean country.","lived",["live","will live","would live"],"I wish + past simple expresses a wish about the present.");
+  add(2,"What does 'state property' mean in French?","les biens de l'État",["les biens privés","les marchés","les églises"],"State property = les biens de l'État.");
+  add(2,"What does 'patriotism' mean in French?","le patriotisme",["le pacifisme","le capitalisme","le populisme"],"Patriotism = le patriotisme.");
+  add(2,"The public buildings _____ by the young men last night.","were damaged",["damaged","have damaged","damage"],"Passive past simple: were + past participle.");
+  add(2,"Everybody should respect the national flag, _____?","shouldn't they",["should they","don't they","does everybody"],"Question tag after should, with everybody as subject: they.");
+  add(2,"Nobody saw the thief, _____?","did they",["didn't they","did he","do they"],"Nobody takes a positive verb, so the tag is positive, with they.");
+  add(2,"Write a formal letter. It should begin with 'Dear Sir', _____ ?","shouldn't it",["should it","doesn't it","will it"],"Question tag after should in the negative.");
+  add(2,"What does 'to damage' mean in French?","endommager",["réparer","construire","protéger"],"To damage = endommager.");
+  add(2,"What does 'citizenship' mean in French?","la citoyenneté",["la nationalité étrangère","l'immigration","le recensement"],"Citizenship = la citoyenneté.");
+  add(2,"Choose the correct passive sentence.","The school was built by the government.",["The school built by the government.","The school was build by the government.","The school has built by the government."],"Passive past simple: was + past participle (built).");
+  add(2,"What is the opposite of 'to respect'?","to despise",["to obey","to admire","to trust"],"To despise = mépriser, the opposite of respect.");
+  add(2,"I wish the people _____ their country more.","loved",["love","will love","loving"],"I wish + past simple: a wish about the present.");
+
+  /* ---------- SECONDE · S10 Patriotic Acts ---------- */
+  add(2,"What does 'a formal letter' mean in French?","une lettre formelle",["une lettre d'amour","une carte postale","un message oral"],"A formal letter = une lettre formelle.");
+  add(2,"Dear Sir, I _____ to inform you about the problem.","am writing",["write","wrote","will write"],"Present continuous for a letter written now.");
+  add(2,"Yours _____, Kofi Mensah.","faithfully",["faithful","faithfully as","faithfulness"],"Yours faithfully is used with Dear Sir.");
+  add(2,"What does 'to donate' mean in French?","faire un don",["voler","vendre","emprunter"],"To donate = faire un don.");
+  add(2,"The volunteers _____ the street last Sunday.","cleaned",["clean","cleaning","have clean"],"Past simple: cleaned.");
+  add(2,"The national anthem _____ every morning at school.","is sung",["sings","is singing","has sung"],"Passive present simple: is + past participle.");
+  add(2,"What is the opposite of 'to obey'?","to disobey",["to respect","to follow","to help"],"The opposite of obey is disobey.");
+  add(2,"What does 'to celebrate' mean in French?","fêter",["oublier","critiquer","interdire"],"To celebrate = fêter.");
+  add(2,"If the people _____ their country, they would protect it.","loved",["love","will love","loving"],"Second conditional: if + past simple, would + verb.");
+  add(2,"Choose the correct sentence.","The letter was sent yesterday.",["The letter sent yesterday.","The letter was send yesterday.","The letter has sent yesterday by."],"Passive past simple: was + past participle.");
+
+  /* ---------- SECONDE · S11 Land Issues ---------- */
+  add(2,"_____ the land and the house, the girl did not receive anything.","Neither ... nor",["Either ... or","Both ... nor","Not only ... but"],"Neither ... nor: correlative conjunction (ni ... ni).");
+  add(2,"Both the sons _____ the house and the field.","inherited",["inherits","inheriting","have inherit"],"Past simple: inherited.");
+  add(2,"_____ the men, the women also have the right to own land.","Not only ... but also",["Either ... or","Neither ... nor","Both ... nor"],"Not only ... but also: correlative conjunction (non seulement ... mais aussi).");
+  add(2,"What does 'inheritance' mean in French?","l'héritage",["le partage","la vente","le prêt"],"Inheritance = l'héritage.");
+  add(2,"What does 'a dispute' mean in French?","un litige",["un jugement","un prix","une récolte"],"A dispute = un litige.");
+  add(2,"If she _____ the land papers, she would have won the case.","had found",["found","has found","would find"],"Third conditional: if + had + past participle, would have + past participle.");
+  add(2,"If the widow had signed the paper, she _____ her land.","would have kept",["will keep","kept","keeps"],"Third conditional: would have + past participle.");
+  add(2,"If they had asked for help, the court _____ them.","would have helped",["will help","helped","help"],"Third conditional: would have + past participle.");
+  add(2,"Neither the mother _____ the daughter could read the document.","nor",["or","and","but"],"Neither ... nor: nor introduces the second part.");
+  add(2,"What does 'to denounce' mean in French?","dénoncer",["défendre","pardonner","vendre"],"To denounce = dénoncer.");
+  add(2,"What does 'land injustice' mean in French?","l'injustice foncière",["la justice foncière","le partage de la terre","la culture du sol"],"Land injustice = l'injustice foncière.");
+  add(2,"Either the chief _____ the elders will decide the case.","or",["and","nor","but"],"Either ... or: correlative conjunction (soit ... soit).");
+  add(2,"If the family had shared the land fairly, the quarrel _____ .","would not have happened",["will not happen","does not happen","had not happened"],"Third conditional: would not have + past participle.");
+
+  /* ---------- SECONDE · S12 The Value of Traditional Arts in Togo ---------- */
+  add(2,"_____ you like the mask or not, it is part of our culture.","No matter whether",["No matter what","No matter where","No matter how"],"No matter whether: it doesn't matter if.");
+  add(2,"_____ where you go in Togo, you will find traditional art.","No matter",["However","Unless","Even"],"No matter where = wherever; the phrase introduces an indifference.");
+  add(2,"She said, 'I am making a drum.' She said that she _____ a drum.","was making",["is making","makes","made"],"Direct to reported speech: present continuous becomes past continuous.");
+  add(2,"He said, 'We will sing tonight.' He said they _____ that night.","would sing",["will sing","sing","sang"],"Direct to reported speech: will becomes would.");
+  add(2,"'Where is the museum?' she asked me. She asked me _____ the museum was.","where",["that","what","which"],"Reported questions: no inversion, where the museum was.");
+  add(2,"What does 'traditional art' mean in French?","l'art traditionnel",["l'art moderne","la mode","la photographie"],"Traditional art = l'art traditionnel.");
+  add(2,"What does 'extremism' mean in French?","l'extrémisme",["l'optimisme","le pacifisme","le tourisme"],"Extremism = l'extrémisme.");
+  add(2,"The weavers _____ beautiful cloth for the festival.","make",["makes","made","making"],"Present simple with a plural subject: make.");
+  add(2,"'Please help me,' she said to him. She asked him _____ her.","to help",["help","helped","helping"],"Reported request: asked + object + to + base verb.");
+  add(2,"He told the drummer, 'Stop playing now.' He told him _____ playing.","to stop",["stop","stopped","stopping"],"Reported order: told + object + to + base verb.");
+  add(2,"What does 'a religious leader' mean in French?","un chef religieux",["un chef militaire","un artisan","un marchand"],"Religious leader = un chef religieux.");
+
+  /* ---------- SECONDE · S13 Violent Extremism ---------- */
+  add(2,"What does 'violent extremism' mean in French?","l'extrémisme violent",["le pacifisme","la violence urbaine","le fanatisme sportif"],"Violent extremism = l'extrémisme violent.");
+  add(2,"'We will fight terrorism,' the minister said. The minister said that they _____ terrorism.","would fight",["will fight","fight","fought"],"Reported speech: will becomes would.");
+  add(2,"'Did you see the attack?' he asked. He asked me _____ the attack.","if I had seen",["did I see","had I seen","that I saw"],"Reported yes/no questions: if + subject + past perfect, no inversion.");
+  add(2,"'I am afraid,' she said. She said that she _____ afraid.","was",["is","were","has been"],"Reported speech: am becomes was.");
+  add(2,"What does 'to attack' mean in French?","attaquer",["défendre","protéger","arrêter"],"To attack = attaquer.");
+  add(2,"What does 'a victim' mean in French?","une victime",["un témoin","un juge","un voleur"],"A victim = une victime.");
+  add(2,"Violence _____ the community for many years.","has divided",["have divided","divides","dividing"],"Singular subject violence: has + past participle.");
+  add(2,"Our schools _____ violence without fear.","must be free from",["must be free of","must free from","must be free to"],"Free from = libre de, exempt de.");
+  add(2,"What does 'to demonstrate' mean in French?","manifester",["démontrer seulement","démolir","démissionner"],"To demonstrate (in the street) = manifester.");
+  add(2,"'Stop the violence now,' the leader said. He told the people _____ the violence.","to stop",["stop","stopped","stopping"],"Reported order: told + object + to + base verb.");
+  add(2,"What does 'an extremist' mean in French?","un extrémiste",["un artiste","un optimiste","un journaliste"],"An extremist = un extrémiste.");
+  add(2,"What is the opposite of 'peace'?","war",["freedom","calm","justice"],"The opposite of peace is war.");
+
+  /* ---------- PREMIÈRE · P1 The Commonwealth ---------- */
+  add(2,"The Commonwealth _____ in 1949 in London.","was founded",["founded","has founded","founds"],"Passive past simple: was + past participle.");
+  add(2,"Many former British colonies _____ members of the Commonwealth since their independence.","have been",["were","is being","have be"],"Present perfect with since: have been.");
+  add(2,"Although the members are different, they _____ the same language.","share",["shares","sharing","shared"],"Plural subject with present simple: share.");
+  add(2,"Despite _____ many differences, the member states cooperate.","their",["they","them","theirs"],"Despite + noun/possessive + -ing, the possessive adjective comes before the noun.");
+  add(2,"Although the country is small, it _____ an important role.","plays",["play","played","playing"],"Although + present simple, then present simple with a singular subject.");
+  add(2,"The woman _____ spoke at the meeting is the Secretary-General.","who",["which","whose","whom"],"Who for people as subject of a relative clause.");
+  add(2,"The Commonwealth _____ countries share the English language.","whose",["who","which","that"],"Whose shows possession (the countries' language).");
+  add(2,"What does 'a member state' mean in French?","un État membre",["un État indépendant","une colonie","un territoire"],"A member state = un État membre.");
+  add(2,"What does 'cooperation' mean in French?","la coopération",["la compétition","la concurrence","la séparation"],"Cooperation = la coopération.");
+  add(2,"What does 'to share' mean in French?","partager",["séparer","vendre","garder"],"To share = partager.");
+  add(2,"Choose the correct tense: 'Since 2010, the organisation _____ several projects.'","has launched",["launched","has launching","launches"],"Since + present perfect.");
+  add(2,"In 2020, many countries _____ together to fight the pandemic.","worked",["have worked","work","are working"],"A specific past time (2020) requires the past simple.");
+  add(2,"What does 'a summit' mean in French?","un sommet",["un sommet de montagne uniquement","un sondage","un traité"],"A summit = un sommet (meeting of leaders).");
+
+  /* ---------- PREMIÈRE · P2 Different Types of Regimes ---------- */
+  add(2,"If the people _____ their voice, the government will listen.","use",["will use","used","using"],"First conditional: if + present simple, will + verb.");
+  add(2,"Unless the leaders _____ the constitution, the country will remain stable.","respect",["will respect","respected","respecting"],"Unless = if not, then present simple.");
+  add(2,"What does 'a dictatorship' mean in French?","une dictature",["une démocratie","une monarchie","une république"],"Dictatorship = une dictature.");
+  add(2,"What does 'a democracy' mean in French?","une démocratie",["une dictature","une oligarchie","une anarchie"],"Democracy = une démocratie.");
+  add(2,"What does 'a monarchy' mean in French?","une monarchie",["une république","une tyrannie","une fédération"],"Monarchy = une monarchie.");
+  add(2,"Unless the people _____ their rights, they will lose them.","defend",["will defend","defended","defending"],"Unless + present simple, then will + verb.");
+  add(2,"What is the opposite of 'a dictatorship'?","a democracy",["a monarchy","a tyranny","an oligarchy"],"A democracy is the opposite of a dictatorship.");
+  add(2,"The election _____ every five years in our country.","is held",["holds","is holding","held"],"Passive present simple: is + past participle.");
+  add(2,"What does 'an election' mean in French?","une élection",["une électricité","une éléction de pompiers","un électeur"],"Election = une élection.");
+  add(2,"What does 'a voter' mean in French?","un électeur",["un élu","un ministre","un juge"],"A voter = un électeur.");
+  add(2,"The president _____ by the people in a free vote.","is elected",["elects","is electing","elected"],"Passive present simple: is elected.");
+  add(2,"The people of this country _____ their own leaders.","choose",["chooses","chosen","choosing"],"Present simple with a plural subject: choose.");
+  add(2,"Choose the correct sentence.","If you vote, you can change the government.",["If you will vote, you can change the government.","If you voted, you will change the government.","If you vote, you could change the government."],"First conditional: if + present simple, can + base verb.");
+
+  /* ---------- PREMIÈRE · P3 Women and Occupations ---------- */
+  add(2,"She is a hard worker. _____, she earns less than her colleagues.","However",["Because","So","Unless"],"However introduces a contrast.");
+  add(2,"She is very skilled _____ she is paid less than men.","yet",["because","unless","so that"],"Yet introduces a contrast: pourtant, cependant.");
+  add(2,"Many women work hard, _____ they do not always get promotions.","yet",["unless","because","until"],"Yet = pourtant, introduces a contrast.");
+  add(2,"_____ she had a degree, she could not find a job.","Although",["Unless","Because","Until"],"Although introduces a concession.");
+  add(2,"What does 'a workplace' mean in French?","un lieu de travail",["un marché","une école","un hôpital"],"Workplace = un lieu de travail.");
+  add(2,"What does 'an employer' mean in French?","un employeur",["un employé","un patron de village","un salarié"],"Employer = un employeur.");
+  add(2,"What does 'a salary' mean in French?","un salaire",["une récolte","un prix","une dette"],"Salary = un salaire.");
+  add(2,"What is the opposite of 'an employee'?","an employer",["a worker","a student","a trader"],"Employee and employer are opposites in the working relationship.");
+  add(2,"She works in a bank, _____?","doesn't she",["does she","isn't she","won't she"],"Question tag after positive present simple: doesn't she.");
+  add(2,"What does 'a promotion' mean in French?","une promotion",["une publicité","une dépense","une décision"],"Promotion (at work) = une promotion.");
+  add(2,"Women _____ run their own businesses in Togo.","can",["must","have to","shall"],"Can expresses ability or possibility.");
+  add(2,"What does 'a business' mean in French?","une entreprise",["un bureau","un marché","une banque"],"A business = une entreprise.");
+  add(2,"She wanted to work in an office, _____ she had no degree.","but",["so","because","therefore"],"But introduces a contrast in this sentence.");
+
+  /* ---------- PREMIÈRE · P4 Pre-established Gender Roles ---------- */
+  add(2,"Girls _____ to stay at home; boys go out to play.","are expected",["expect","are expecting","expected"],"Passive present simple: are expected to.");
+  add(2,"What does 'a stereotype' mean in French?","un stéréotype",["un symbole","une règle","un modèle"],"Stereotype = un stéréotype.");
+  add(2,"What does 'discrimination' mean in French?","la discrimination",["la domination","la décision","la division de la terre"],"Discrimination = la discrimination.");
+  add(2,"Although women are equal, they _____ often treated unfairly.","are",["is","be","were being"],"Although + present simple, then present simple passive: are treated.");
+  add(2,"Gender roles _____ by society for a long time.","have been defined",["have defined","were defined","are defined"],"Present perfect passive: have been + past participle.");
+  add(2,"What is the opposite of 'equal'?","unequal",["equally","equator","equality"],"The opposite of equal is unequal.");
+  add(2,"Boys _____ often encouraged to play football.","are",["is","has","do"],"Plural subject: are.");
+  add(2,"What does 'a bias' mean in French?","un parti pris",["un bénéfice","un droit","une bataille"],"A bias = un parti pris.");
+  add(2,"What does 'to stage' a sketch mean?","to perform it",["to write it","to cancel it","to translate it"],"To stage a sketch = to perform it on a stage.");
+  add(2,"Women must not _____ treated differently at work.","be",["being","to be","been"],"Modal + passive: must not be + past participle.");
+  add(2,"In the past, women _____ to vote in many countries.","were not allowed",["did not allow","have not allowed","are not allowed"],"Past simple passive: were not allowed.");
+  add(2,"What does 'a role' mean in French?","un rôle",["une règle","une route","un rouleau"],"Role = un rôle.");
+  add(2,"What is the opposite of 'to encourage'?","to discourage",["to support","to help","to praise"],"The opposite of encourage is discourage.");
+}
+
+/* ---- app-v5-zzzu-messages.js ---- */
+/* =====================================================================
+   v5 · Messagerie rangée : une seule ligne par camarade (nom et aperçu
+   à gauche, heure, badge et ⋯ à droite), la liste se met à jour quand
+   une demande d'ami change, et les demandes reçues sont lisibles.
+   ===================================================================== */
+{const _fr=frRefresh;frRefresh=async function(){const r=await _fr.apply(this,arguments);
+  try{if(S.view&&S.view.type==="peers")render()}catch(e){}return r}}
+{const st=document.createElement("style");st.id="zzzumsg";st.textContent=`
+.pv-list .it.pv-row,.pv-list>.it[data-a="openPeer"]{display:flex;flex-wrap:nowrap;align-items:center;gap:12px;padding:12px 14px}
+.pv-list .it .txt{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pv-list .it .txt b,.pv-list .it .txt span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:100%}
+.pv-list .sn-bub{display:none!important}
+.pv-list .pv-meta{order:2;flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:64px}
+.pv-list .pv-meta small{font-size:.72rem;opacity:.75;white-space:nowrap}
+.pv-list .pv-more{order:3;flex:0 0 auto;margin-left:0}
+.pv-list .txt .fr-act{display:flex;margin-top:2px}
+.pv-list .fr-act .chip{font-size:.7rem;padding:3px 9px;white-space:nowrap}
+.fr-card .list>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fr-card .list>div>b{display:block;width:100%}
+.fr-card .list>div>div{display:flex;gap:8px;margin-left:auto}
+`;document.head.appendChild(st)}
+
+/* l'état d'amitié (Ami, Demande envoyée, Ajouter) passe sous le nom, pas à droite */
+{const _r=render;render=function(){const o=_r.apply(this,arguments);
+  try{document.querySelectorAll(".pv-list .it[data-a='openPeer']").forEach(row=>{const fa=row.querySelector(":scope > .fr-act"),tx=row.querySelector(":scope > .txt");if(fa&&tx)tx.appendChild(fa)})}catch(e){}
+  return o}}
 
 /* ==== v4 END ==== */
 render();

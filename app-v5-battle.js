@@ -32,7 +32,7 @@ const BT={diff:"hard",room:null,st:null,off:0,iv:null,clk:null,on:false,busy:fal
 const BT_KINDS={
  duel:{t:"Duel",d:"Two students, the same questions. Best score wins.",n:8,ic:"bolt"},
  battle:{t:"Group battle",d:"2 to 8 students. Live ranking on every question.",n:10,ic:"trophy"},
- royale:{t:"Battle Royale",d:"Up to 12 students. One wrong answer and you are out.",n:12,ic:"search"},
+ royale:{t:"Battle Royale",d:"Up to 12 students. Hard questions, 8 seconds each. One wrong answer and you are out.",n:15,ic:"crown"},
  challenge:{t:"Daily challenge",d:"The same questions for everyone today. Play alone, then see the board.",n:8,ic:"pen"}};
 
 /* ---------- server calls ---------- */
@@ -71,6 +71,8 @@ function btPoll(){btStop();BT.on=true;BT.key="";const ar=document.getElementById
 async function btSync(){if(!BT.room||BT.syncing)return;BT.syncing=true;
   try{const st=await btRpc("arena_state",{p_room:BT.room.id});
     BT.off=st.now-Date.now();BT.st=st;BT.room.kind=st.kind;BT.room.code=st.code;
+    /* a rematch puts everyone back in the lobby: the old answers go */
+    if(st.status==="lobby"&&(Object.keys(BT.res).length||BT.ci!=null||BT.cur!=null)){BT.res={};BT.ci=null;BT.cur=null;BT.key=""}
     if(st.kind==="challenge"&&BT.ci==null)BT.ci=btFirstOpen(st);
     btDraw()}
   catch(e){if(/not in this battle|Sign in/i.test(String(e&&e.message))){btLeave(true);BT.err=btMsg(e);if(BT.on===false)btHub()}}
@@ -122,7 +124,7 @@ async function btKind(k){if(BT.busy)return;const K=BT_KINDS[k];if(!K)return;
   try{
     if(k==="challenge"){const code=btDayCode();const r=await btRpc("arena_challenge",{p_code:code,p_qs:btQs(K.n,btRng(code))});
       BT.room={id:r.id,code:r.code,kind:"challenge"}}
-    else{const r=await btRpc("arena_create",{p_kind:k,p_mode:"quiz",p_qs:btQs(K.n,Math.random,AR_LV[BT.diff||"hard"])});
+    else{const r=await btRpc("arena_create",{p_kind:k,p_mode:"quiz",p_qs:btQs(K.n,Math.random,k==="royale"?AR_LV.hard:AR_LV[BT.diff||"hard"])});
       BT.room={id:r.id,code:r.code,kind:k}}
     BT.st=null;BT.res={};BT.ci=null;BT.cur=null;BT.err="";
     btPoll()}
@@ -201,12 +203,16 @@ function btResults(st){const K=BT_KINDS[st.kind]||BT_KINDS.battle,roy=st.kind===
   const mine=st.players.find(p=>p.uid===st.me)||{score:0};
   const rows=ps.map((p,i)=>`<div class="ar-row ${p.uid===st.me?"me":""} ${roy&&!p.alive?"bt-out":""}">
     <span class="ar-rank ${i<3?"r"+(i+1):""}">${i+1}</span><b>${arEsc(p.name)}</b><span class="ar-rs">${p.score}</span></div>`).join("");
-  btPaint("R"+st.status+st.answered.length,
-    arTop(K.t,"Results")+`<div class="ar-card bt-glow"><div class="bt-win">★</div><h2>${arEsc(head)}</h2>
-      <p class="bt-wait">You scored ${mine.score} points · rank ${mi+1} of ${ps.length}</p></div>
-    <p class="ar-kicker">Final ranking</p><div class="bt-sb">${rows}</div>
-    <div class="ar-inrow" style="justify-content:center;flex-wrap:wrap;margin-top:14px">
-      ${st.kind==="challenge"?"":`<button class="ar-go" data-ar="bt-kind" data-m="${st.kind}">Play again</button>`}
+  const host=st.host===st.me;
+  const again=st.kind==="challenge"?"":host
+    ?`<button class="ar-go bt-again" data-ar="bt-rematch">Play again together</button>`
+    :`<p class="bt-wait bt-wait-host">Waiting for the host to start a new round…</p>`;
+  const stars=ps.length&&mi===0?3:mi<=1?2:1;
+  btPaint("R"+st.status+st.answered.length+st.host+ps.map(p=>p.uid+p.score).join(""),
+    arTop(K.t,"Results")+vicHTML({title:head,kicker:K.t,score:mine.score,label:"points",stars:stars,
+      sub:`Rank ${mi+1} of ${ps.length}${roy&&won?" · last one standing":""}`,mood:won?"win":"end"})+
+    `<p class="ar-kicker">Final ranking</p><div class="bt-sb">${rows}</div>
+    <div class="ar-inrow bt-actions">${again}
       <button class="ar-go ghost" data-ar="bt-leave">Battles</button></div>`)}
 
 /* ---------- answers ---------- */
@@ -222,6 +228,14 @@ async function btAnswer(k){const st=BT.st;if(!st||!BT.on)return;
   btSync()}
 function btNext(){BT.ci=(BT.ci==null?0:BT.ci)+1;BT.key="";btDraw()}
 
+/* the host plays again with the same players and the same code */
+async function btRematch(){if(!BT.room||BT.busy||!BT.st)return;BT.busy=true;
+  const K=BT_KINDS[BT.st.kind]||BT_KINDS.battle,lvl=BT.st.kind==="royale"?AR_LV.hard:AR_LV[BT.diff||"hard"];
+  try{await btRpc("arena_rematch",{p_room:BT.room.id,p_qs:btQs(K.n,Math.random,lvl)});
+    BT.res={};BT.ci=null;BT.cur=null;BT.err="";BT.key="";await btSync()}
+  catch(e){BT.err=btMsg(e);BT.key="";btDraw()}
+  finally{BT.busy=false}}
+
 /* clicks from the Arena (arClick hands every "bt-" action here) */
 function btClick(b){const a=b.dataset.ar;
   if(a==="bt-hub")return btHub();
@@ -232,7 +246,8 @@ function btClick(b){const a=b.dataset.ar;
   if(a==="bt-start")return btStart();
   if(a==="bt-leave")return btLeave();
   if(a==="bt-ans")return btAnswer(+b.dataset.k);
-  if(a==="bt-next")return btNext()}
+  if(a==="bt-next")return btNext();
+  if(a==="bt-rematch")return btRematch()}
 
 /* leaving the Arena stops the polling; the battle stays resumable */
 {const _c=arClose;arClose=function(){btStop();BT.on=false;return _c()}}

@@ -208,7 +208,11 @@ function msgBodyHTML(text,a){let h="";
 const msgHTML=(mine,text,a,at)=>`<div class="msg ${mine?"mine":""}${a&&a.k==="sticker"&&!text?" stk":""}">${msgBodyHTML(text,a)}<span>${fmtTime(at)}</span></div>`;
 async function hydrateChat(){for(const img of document.querySelectorAll("img[data-chatp]:not([data-ok])")){img.dataset.ok="1";const p=img.dataset.chatp;
   try{let u=V4.obj[p];if(!u){const b=await srcBlob({k:"m",id:p,t:img.dataset.t});u=V4.obj[p]=URL.createObjectURL(b)}img.src=u}catch(e){img.alt="Photo not available offline"}}}
-document.addEventListener("load",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.closest&&t.closest("#chatScroll")){const cs=document.getElementById("chatScroll");if(cs&&cs.scrollHeight-cs.scrollTop-cs.clientHeight<400)cs.scrollTop=cs.scrollHeight}},true);
+/* the chat follows new messages only while the reader is at the bottom: if they scrolled up, it stays put */
+const CHAT_STICK={on:true,lock:false};
+document.addEventListener("scroll",e=>{const t=e.target;if(t&&t.id==="chatScroll"&&!CHAT_STICK.lock)CHAT_STICK.on=B4near(t)},true);
+function chatStick(cs){if(cs&&CHAT_STICK.on)cs.scrollTop=cs.scrollHeight}
+document.addEventListener("load",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.closest&&t.closest("#chatScroll"))chatStick(document.getElementById("chatScroll"))},true);
 new MutationObserver(()=>{clearTimeout(hydrateChat._t);hydrateChat._t=setTimeout(hydrateChat,60);if(typeof v4ChatLayout==="function"&&!v4ChatLayout._q){v4ChatLayout._q=1;requestAnimationFrame(()=>{v4ChatLayout._q=0;v4ChatLayout()})}}).observe(document.body,{childList:true,subtree:true});
 async function v4Play(p,t){const A=V4.audio||(V4.audio=new Audio());if(V4.playing===p){A.pause();V4.playing=null;render();return}
   try{let u=V4.obj[p];if(!u){V4.playing=p;render();const b=await srcBlob({k:"m",id:p,t});u=V4.obj[p]=URL.createObjectURL(b)}A.src=u;A.onended=()=>{V4.playing=null;render()};V4.playing=p;await A.play();render()}
@@ -749,7 +753,7 @@ async function v4TextSend(kind,f){const id=V4IN(kind),inp=document.getElementByI
   if(kind==="peer")PR.sending=true;render();
   try{await v4Deliver(kind,tgt,text,null,v4TakeReply(kind))}catch(e){toast((e&&e.message)||"Could not send","x");S.drafts[id]=orig}
   if(kind==="peer")PR.sending=false;render();
-  const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight;
+  CHAT_STICK.on=true;const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight;
   if(hadFocus){const n=document.getElementById(id);if(n)n.focus({preventScroll:true})}}
 /* Nova panel: same correction on the learner's bubble */
 {const _aiSend=aiSend;aiSend=async function(text){const t0=String(text||"").trim();if(!AI.busy&&t0&&v4NeedFix(t0)){const p=_aiSend(text);const u=[...AI.turns].reverse().find(x=>x.role==="user"&&x.content===t0);if(u)v4Check(t0).then(r=>{if(r){u.en=r.en;u.enk=r.k;try{renderAI()}catch(e){}}});return p}return _aiSend(text)}}
@@ -764,12 +768,12 @@ function v4ChatLayout(){const c=document.querySelector(".glass.chat"),B=document
     else{V4.maxVH=Math.max(V4.maxVH||0,vh);const kb=B.classList.contains("v4kb")&&vh<V4.maxVH*0.8;const top=kb?hb+4:Math.min(b+8,vh*0.42);document.documentElement.style.setProperty("--v4ct",Math.round(top)+"px");
       const cs=document.getElementById("chatScroll");if(cs&&!was)cs.scrollTop=cs.scrollHeight}}
   B.classList.toggle("v4chat",on)}
-if(window.visualViewport)visualViewport.addEventListener("resize",()=>{v4ChatLayout();const cs=document.getElementById("chatScroll");if(cs&&B4near(cs))cs.scrollTop=cs.scrollHeight});
+if(window.visualViewport)visualViewport.addEventListener("resize",()=>{v4ChatLayout();chatStick(document.getElementById("chatScroll"))});
 addEventListener("resize",()=>v4ChatLayout());
 function B4near(cs){return cs.scrollHeight-cs.scrollTop-cs.clientHeight<260}
 document.addEventListener("focusin",e=>{const t=e.target;if(!t||!t.matches||!t.matches(".v4bar input:not([type=file])"))return;
   document.body.classList.add("v4kb");if(V4.panel){V4.panel=null;const id=t.id;render();const n=document.getElementById(id);if(n&&document.activeElement!==n)n.focus({preventScroll:true})}
-  v4ChatLayout();setTimeout(()=>{v4ChatLayout();const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight},350)});
+  v4ChatLayout();setTimeout(()=>{v4ChatLayout();chatStick(document.getElementById("chatScroll"))},350)});
 document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(!(a&&a.matches&&a.matches(".v4bar input:not([type=file])"))){document.body.classList.remove("v4kb");v4ChatLayout()}},120));
 {const st=document.createElement("style");st.textContent=`
 .v4fr{display:block;width:fit-content;max-width:100%;color:#B91C1C;background:#FFE4E6;border-radius:10px;padding:3px 8px;text-decoration:line-through;text-decoration-thickness:2px;white-space:pre-wrap}
