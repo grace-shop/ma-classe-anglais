@@ -1115,7 +1115,7 @@ function touch(activity,extra={}){if(!S.me||S.mode!=="student")return;const ad=a
     if(!S.settings.leaderboard&&unBoard){unBoard();unBoard=null;S.board=[]}render()},e=>console.warn(e));
   if(S.uid&&!S.isOwner)db.doc("parents/"+S.uid).onSnapshot(d=>{S.plink=d.exists?d.data():null;if(isParent(S.me))render()},()=>{});
   if(S.uid)db.doc("access/"+S.uid).onSnapshot(d=>{S.myAccess=d.exists?d.data():null;if(S.me&&stOf(S.me)==="active")recordDevice();render()},e=>console.warn(e));
-  if(S.uid)meRef().onSnapshot(s=>{S.me=s.exists?{id:s.id,...s.data()}:null;notifRefresh();S.meLoaded=true;liveSub();if(S.me&&stOf(S.me)==="active")recordDevice();render()},()=>{S.meLoaded=true;render()});else S.meLoaded=true;
+  if(S.uid)meRef().onSnapshot(s=>{S.me=s.exists?{id:s.id,...s.data()}:null;S.meErr=false;notifRefresh();S.meLoaded=true;liveSub();if(S.me&&stOf(S.me)==="active")recordDevice();render()},()=>{S.meLoaded=true;S.meErr=true;render()});else S.meLoaded=true;
   claude.use("downloads").then(d=>{S.dl=d;render()});
   aiInit();
   claude.use("room").then(room=>{if(!room)return;S.room=room;
@@ -2987,12 +2987,12 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
    let q=sb.from("prof_messages").select("*").order("created_at",{ascending:true}).limit(500);
    if(PT.mode==="student")q=q.eq("student",S.uid);
    const {data,error}=await q;
-   if(error){PT.err=error.message||"Could not load";render();return}
+   if(error){PT.err=error.message||"Could not load";ptRender();return}
    PT.rows=data||[];PT.err="";
    const ids=[...new Set(PT.rows.map(r=>r.student).filter(u=>u&&!PT.names[u]))];
    if(ids.length&&PT.mode==="teacher"){const {data:d}=await sb.from("docs").select("path,data").in("path",ids.map(u=>"students/"+u));
      for(const x of d||[])PT.names[x.path.slice(9)]=(x.data&&x.data.name)||"Student"}
-   await hydrate();render();
+   await hydrate();ptRender();
  }
  async function hydrate(){for(const r of PT.rows){const p=r.att&&r.att.k==="img"&&r.att.p;if(!p||PT.urls[p])continue;PT.urls[p]="…";
    try{PT.urls[p]=await window.__chatFiles.url(p)}catch(e){PT.urls[p]=""}}}
@@ -3006,7 +3006,7 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
    const auto=r.auto?`<span class="pt-auto">Automatic reply</span>`:"";
    return `<div class="pt-row ${mine?"me":"them"}">${body}<div class="pt-meta">${timeOf(r.created_at)}${auto}</div></div>`;
  }
- function render(){const o=document.getElementById("profSheet");if(!o)return;
+ function ptRender(){const o=document.getElementById("profSheet");if(!o)return;
    const head=o.querySelector(".pt-head"),body=o.querySelector(".pt-body"),foot=o.querySelector(".pt-foot");
    const showThread=PT.mode==="student"||!!PT.student;
    foot.hidden=!showThread;
@@ -3058,8 +3058,8 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
    const o=document.getElementById("profSheet");if(!o||!o.contains(e.target))return;
    const b=e.target.closest("[data-pt]");if(!b)return;
    const a=b.dataset.pt;
-   if(a==="back"){if(PT.mode==="teacher"&&PT.student){PT.student=null;render()}else closeSheet();return}
-   if(a==="thread"){PT.student=b.dataset.id;render();return}
+   if(a==="back"){if(PT.mode==="teacher"&&PT.student){PT.student=null;ptRender()}else closeSheet();return}
+   if(a==="thread"){PT.student=b.dataset.id;ptRender();return}
    if(a==="photo"){o.querySelector(".pt-file").click();return}
    if(a==="send"){const ta=o.querySelector("textarea");const txt=ta.value.trim();if(!txt)return;ta.value="";send(txt,null);return}
  },true);
@@ -10628,6 +10628,16 @@ arClose=function(){BTNAV.view=null;return _btArClose()};
   /* if one page cannot be drawn, say so and keep the tabs working (no blank screen) */
   const _rnd=render;
   render=function(){
+    // the student's record could not be read (no or slow connection): say so, never ask a registered pupil to join again
+    try{
+      if(S.mode==="student"&&S.uid&&S.meErr&&!S.me){
+        const m=document.getElementById("main");
+        if(m){m.innerHTML=`<div class="empty" style="display:grid;gap:12px;justify-items:center;padding:28px 16px;text-align:center">
+          <p style="margin:0">We could not load your class. Check your internet connection, then try again.</p>
+          <button class="btn" type="button" data-a="retryBoot">Try again</button></div>`;}
+        return;
+      }
+    }catch(e){}
     try{return _rnd.apply(this,arguments)}
     catch(e){
       console.error("render failed:",e);

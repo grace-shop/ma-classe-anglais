@@ -277,12 +277,12 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
    let q=sb.from("prof_messages").select("*").order("created_at",{ascending:true}).limit(500);
    if(PT.mode==="student")q=q.eq("student",S.uid);
    const {data,error}=await q;
-   if(error){PT.err=error.message||"Could not load";render();return}
+   if(error){PT.err=error.message||"Could not load";ptRender();return}
    PT.rows=data||[];PT.err="";
    const ids=[...new Set(PT.rows.map(r=>r.student).filter(u=>u&&!PT.names[u]))];
    if(ids.length&&PT.mode==="teacher"){const {data:d}=await sb.from("docs").select("path,data").in("path",ids.map(u=>"students/"+u));
      for(const x of d||[])PT.names[x.path.slice(9)]=(x.data&&x.data.name)||"Student"}
-   await hydrate();render();
+   await hydrate();ptRender();
  }
  async function hydrate(){for(const r of PT.rows){const p=r.att&&r.att.k==="img"&&r.att.p;if(!p||PT.urls[p])continue;PT.urls[p]="…";
    try{PT.urls[p]=await window.__chatFiles.url(p)}catch(e){PT.urls[p]=""}}}
@@ -296,7 +296,7 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
    const auto=r.auto?`<span class="pt-auto">Automatic reply</span>`:"";
    return `<div class="pt-row ${mine?"me":"them"}">${body}<div class="pt-meta">${timeOf(r.created_at)}${auto}</div></div>`;
  }
- function render(){const o=document.getElementById("profSheet");if(!o)return;
+ function ptRender(){const o=document.getElementById("profSheet");if(!o)return;
    const head=o.querySelector(".pt-head"),body=o.querySelector(".pt-body"),foot=o.querySelector(".pt-foot");
    const showThread=PT.mode==="student"||!!PT.student;
    foot.hidden=!showThread;
@@ -348,8 +348,8 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
    const o=document.getElementById("profSheet");if(!o||!o.contains(e.target))return;
    const b=e.target.closest("[data-pt]");if(!b)return;
    const a=b.dataset.pt;
-   if(a==="back"){if(PT.mode==="teacher"&&PT.student){PT.student=null;render()}else closeSheet();return}
-   if(a==="thread"){PT.student=b.dataset.id;render();return}
+   if(a==="back"){if(PT.mode==="teacher"&&PT.student){PT.student=null;ptRender()}else closeSheet();return}
+   if(a==="thread"){PT.student=b.dataset.id;ptRender();return}
    if(a==="photo"){o.querySelector(".pt-file").click();return}
    if(a==="send"){const ta=o.querySelector("textarea");const txt=ta.value.trim();if(!txt)return;ta.value="";send(txt,null);return}
  },true);

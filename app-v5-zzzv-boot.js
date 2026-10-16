@@ -23,6 +23,16 @@
   /* if one page cannot be drawn, say so and keep the tabs working (no blank screen) */
   const _rnd=render;
   render=function(){
+    // the student's record could not be read (no or slow connection): say so, never ask a registered pupil to join again
+    try{
+      if(S.mode==="student"&&S.uid&&S.meErr&&!S.me){
+        const m=document.getElementById("main");
+        if(m){m.innerHTML=`<div class="empty" style="display:grid;gap:12px;justify-items:center;padding:28px 16px;text-align:center">
+          <p style="margin:0">We could not load your class. Check your internet connection, then try again.</p>
+          <button class="btn" type="button" data-a="retryBoot">Try again</button></div>`;}
+        return;
+      }
+    }catch(e){}
     try{return _rnd.apply(this,arguments)}
     catch(e){
       console.error("render failed:",e);
