@@ -102,27 +102,27 @@ throne | the seat of a king | The king sits on the throne.`,
 hw:{t:"A visit to the palace",b:"Write a dialogue of 8 to 10 lines between a visitor and the chief at the palace. The visitor explains a problem. Use at least one sentence with If ... will and one sentence with Although ... ."}},
 
 {c:"2nde",u:2,lv:"B1",t:"Chieftaincy in Africa",th:"Strengths and weaknesses of chiefs in Africa",g:"Conditional type one, conditional type two, although / even though / though",
-body:`Dans beaucoup de pays africains, la chefferie traditionnelle existe a cote de l'Etat moderne. Quelles sont ses forces et ses faiblesses ?
+body:`In many African countries, traditional chieftaincy exists alongside the modern state. What are its strengths and its weaknesses?
 
-**Vocabulary** (mots et expressions) :
-**kingdom** (royaume) ; **empire** (empire) ; **colonial** (colonial) ; **independence** (independance) ; **strength** (force) ; **weakness** (faiblesse) ; **modern state** (Etat moderne) ; **traditional leader** (dirigeant traditionnel) ; **land** (terre) ; **tribe** (tribu) ; **to unite** (unir) ; **to rule** (gouverner) ; **influence** (influence) ; **authority** (autorite) ; **democracy** (democratie).
+**Vocabulary** (words and expressions):
+**kingdom** (a state ruled by a king) ; **empire** (a large state with many peoples under one ruler) ; **colonial** (relating to colonial rule) ; **independence** (freedom from outside rule) ; **strength** (a positive quality) ; **weakness** (a negative quality) ; **modern state** (a country with a national government and courts) ; **traditional leader** (a leader chosen by custom) ; **land** (ground used for farming or building) ; **tribe** (a group of families sharing one culture) ; **to unite** (to bring together) ; **to rule** (to govern) ; **influence** (the power to affect people) ; **authority** (the right to give orders) ; **democracy** (rule by the people through elections).
 
-**Grammar 1 : Conditional type one.** Pour une situation possible dans l'avenir.
-If the chiefs **work** with the government, the villages **will develop** faster. (Si les chefs travaillent avec le gouvernement, les villages se developperont plus vite.)
+**Grammar 1: Conditional type one.** For a possible situation in the future.
+If the chiefs **work** with the government, the villages **will develop** faster.
 
-**Grammar 2 : Conditional type two.** Pour une situation imaginaire ou peu probable.
-If the chieftaincy **had** more money, it **would** build more schools. (Si la chefferie avait plus d'argent, elle construirait plus d'ecoles.)
-If I **were** a minister, I **would support** traditional leaders. (Si j'etais ministre, je soutiendrais les dirigeants traditionnels.)
+**Grammar 2: Conditional type two.** For an imagined or unlikely situation.
+If the chieftaincy **had** more money, it **would** build more schools.
+If I **were** a minister, I **would support** traditional leaders.
 
-**Grammar 3 : Concessive clauses.**
-Though the chieftaincy is respected, it has little power today. (Bien que la chefferie soit respectee, elle a peu de pouvoir aujourd'hui.)
-Even though the kingdom was small, it had a strong identity. (Bien que le royaume soit petit, il avait une forte identite.)
+**Grammar 3: Concessive clauses.**
+Though the chieftaincy is respected, it has little power today.
+Even though the kingdom was small, it had a strong identity.
 
-**Skill : reading.** Model text : Traditional chiefs have a great influence on land and family questions. Their main strength is their closeness to the people. However, their weakness is that they have little official power in modern courts.
+**Skill: reading.** Model text: Traditional chiefs have a great influence on land and family questions. Their main strength is their closeness to the people. However, their weakness is that they have little official power in modern courts.
 
-**Skill : summary.** Ecris un resume en deux phrases : Traditional chiefs keep social peace. Yet they often lack the means to act.
+**Skill: summary.** Write a two-sentence summary: Traditional chiefs keep social peace. Yet they often lack the means to act.
 
-**Final activity.** Ecris un court paragraphe (5 phrases) : What are the strengths and weaknesses of traditional chiefs in Africa today ?`,
+**Final activity.** Write a short paragraph (5 sentences): What are the strengths and weaknesses of traditional chiefs in Africa today?`,
 quiz:`If the chiefs ___ with the government, the villages will develop faster.
 * work
 - worked
@@ -138,13 +138,13 @@ Though the kingdom was small, it ___ a strong identity.
 - has had not
 - having
 
-Ecris en anglais « independance ».
+Write in English: "independence".
 = independence
 
-Le mot « tribe » veut dire :
-* tribu
-- terre
-- royaume
+The word "tribe" means:
+* a group of families sharing one culture
+- land
+- kingdom
 
 The chiefs have great ___ on family questions.
 * influence
@@ -156,32 +156,32 @@ Even ___ the chief was old, he worked every day.
 - because
 - so
 
-« Dirigeant traditionnel » se dit en anglais :
-* traditional leader
-- modern state
-- colonial power
+"Traditional leader" means:
+* a leader chosen by custom
+- a modern state
+- a colonial power
 
 If I ___ a minister, I would support the chiefs.
 * were
 - was not
 - am
 
-« Gouverner » se dit :
-* to rule
+"To rule" means:
+* to govern
 - to unite
 - to obey
 
-Choisis la bonne forme : If the leaders listen, the people ___ happier.
+Choose the correct form: If the leaders listen, the people ___ happier.
 * will be
 - would be
 - are be
 
-Corrige la phrase : If he would have land, he would farm it.
+Correct the sentence: If he would have land, he would farm it.
 * If he had land, he would farm it.
 - If he has land, he would farms it.
 - If he would have land, he farms it.
 
-Ecris en anglais « faiblesse ».
+Write in English: "weakness".
 = weakness
 
 The land belongs to the village, ___ the state claims it.
@@ -189,24 +189,24 @@ The land belongs to the village, ___ the state claims it.
 - but
 - yet to be
 
-Choisis le sens de « modern state » :
-* Etat moderne
-- royaume ancien
-- pouvoir colonial`,
-deck:`kingdom | royaume | The kingdom had many villages.
-empire | empire | The empire grew quickly.
-colonial | colonial | The colonial period changed the land.
-independence | independance | Independence came in 1960.
-strength | force | Her strength is her honesty.
-weakness | faiblesse | Lack of money is a weakness.
-modern state | Etat moderne | A modern state has courts and schools.
-traditional leader | dirigeant traditionnel | The traditional leader greets the guests.
-land | terre | The land is fertile here.
-tribe | tribu | Each tribe has its own customs.
-to unite | unir | The chiefs united the villages.
-influence | influence | Chiefs have a strong influence.
-democracy | democratie | Democracy gives every citizen a voice.`,
-hw:{t:"Strengths and weaknesses",b:"Ecris 5 phrases sur les forces et les faiblesses de la chefferie dans ta region. Utilise au moins une phrase avec If ... would, une phrase avec Although et une phrase avec However."}},
+Choose the meaning of "modern state":
+* a country with a national government and courts
+- an old kingdom
+- a colonial power`,
+deck:`kingdom | a state ruled by a king | The kingdom had many villages.
+empire | a large state with many peoples under one ruler | The empire grew quickly.
+colonial | relating to colonial rule | The colonial period changed the land.
+independence | freedom from outside rule | Independence came in 1960.
+strength | a positive quality | Her strength is her honesty.
+weakness | a negative quality | Lack of money is a weakness.
+modern state | a country with a national government and courts | A modern state has courts and schools.
+traditional leader | a leader chosen by custom | The traditional leader greets the guests.
+land | ground used for farming or building | The land is fertile here.
+tribe | a group of families sharing one culture | Each tribe has its own customs.
+to unite | to bring together | The chiefs united the villages.
+influence | the power to affect people | Chiefs have a strong influence.
+democracy | rule by the people through elections | Democracy gives every citizen a voice.`,
+hw:{t:"Strengths and weaknesses",b:"Write 5 sentences about the strengths and weaknesses of the chieftaincy in your region. Use at least one sentence with If ... would, one sentence with Although and one sentence with However."}},
 
 {c:"2nde",u:3,lv:"B1",t:"Girls' Education",th:"Gender equity in schools",g:"Comparative of inferiority, comparative of superiority, comparative of equality, however / yet, question tags",
 body:`L'education des filles est un sujet important au Togo. Beaucoup de filles quittent l'ecole trop tot. Pourquoi, et que peut-on faire ?
