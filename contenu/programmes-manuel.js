@@ -1692,23 +1692,23 @@ equal pay | the same pay for the same work | Equal pay for equal work is fair.`,
 hw:{t:"Women at work",b:"Write 6 sentences about women at work in your town. Use however or yet in two sentences, and two subordinating conjunctions (because, so that, while, whereas)."}},
 
 {c:"1re",u:4,lv:"B1",t:"Pre-established Gender Roles",th:"Gender stereotypes and discrimination",g:"However and yet, subordinating conjunctions",
-body:`Certaines idees recues attribuent des roles fixes aux hommes et aux femmes. Comment ces stereotypes limitent-ils les personnes ?
+body:`Some fixed ideas assign set roles to men and women. How do these stereotypes limit people?
 
-**Vocabulary** (mots et expressions) :
-**gender role** (role de genre) ; **stereotype** (stereotype) ; **bias** (prejuge) ; **discrimination** (discrimination) ; **prejudice** (prejuge) ; **to assume** (supposer) ; **to challenge** (remettre en question) ; **to break the mould** (sortir des cadres) ; **household chores** (taches menageres) ; **breadwinner** (soutien de famille) ; **to expect** (attendre) ; **to treat** (traiter) ; **equal treatment** (traitement egal) ; **to influence** (influencer) ; **awareness** (sensibilisation).
+**Vocabulary** (words and expressions):
+**gender role** (the role expected of a man or a woman) ; **stereotype** (a fixed, oversimplified idea about a group) ; **bias** (an unfair preference) ; **discrimination** (unfair treatment because of who someone is) ; **prejudice** (an opinion formed without good reason) ; **to assume** (to think something is true without checking) ; **to challenge** (to question something) ; **to break the mould** (to do something different from what is expected) ; **household chores** (tasks done at home) ; **breadwinner** (the person who earns the money for a family) ; **to expect** (to think someone will do something) ; **to treat** (to behave towards someone) ; **equal treatment** (the same treatment for everyone) ; **to influence** (to affect how someone thinks or acts) ; **awareness** (knowledge and understanding of a problem).
 
-**Grammar 1 : However and yet.**
-Boys are often expected to be strong. However, many boys enjoy caring for others. (On attend souvent des garcons qu'ils soient forts. Cependant, beaucoup aiment prendre soin des autres.)
+**Grammar 1: However and yet.**
+Boys are often expected to be strong. However, many boys enjoy caring for others.
 
-**Grammar 2 : Subordinating conjunctions.** **Although**, **even if**, **unless**, **as soon as**, **whereas**.
-**Even if** society expects it, nobody should be forced into a role. (Meme si la societe l'attend, personne ne devrait etre force dans un role.)
-**Whereas** the father was the breadwinner, the mother took care of the house. (Alors que le pere etait le soutien de famille, la mere s'occupait de la maison.)
+**Grammar 2: Subordinating conjunctions.** **Although**, **even if**, **unless**, **as soon as**, **whereas**.
+**Even if** society expects it, nobody should be forced into a role.
+**Whereas** the father was the breadwinner, the mother took care of the house.
 
-**Skill : reading and writing about gender biases.** Model text : Gender stereotypes begin early. Girls are often told that they are not good at science. This prejudice affects their careers later.
+**Skill: reading and writing about gender biases.** Model text: Gender stereotypes begin early. Girls are often told that they are not good at science. This prejudice affects their careers later.
 
-**Skill : staging a sketch.** Model dialogue : Son : Mum, I want to cook tonight. Mother : Of course, son. Even if you are a boy, you can learn.
+**Skill: staging a sketch.** Model dialogue: Son: Mum, I want to cook tonight. Mother: Of course, son. Even if you are a boy, you can learn.
 
-**Final activity.** Ecris une courte scene de theatre (8 repliques) entre deux amis qui discutent d'un stereotype. Utilise however et yet dans la scene.`,
+**Final activity.** Write a short theatre scene (8 lines) between two friends discussing a stereotype. Use however and yet in the scene.`,
 quiz:`Girls are told to stay home. ___, many of them go to school.
 * However
 - Because
@@ -1724,40 +1724,40 @@ ___ the boy likes dancing, his family forbids it.
 - However
 - Yet
 
-« Stereotype » veut dire :
-* stereotype
-- prejuge
+"Stereotype" means:
+* a fixed, oversimplified idea about a group
+- a prejudice
 - discrimination
 
-Ecris en anglais « remettre en question ».
+Write in English: "to challenge".
 = to challenge
 
-« To break the mould » signifie :
-* sortir des cadres
-- rompre un contrat
-- casser un moule
+"To break the mould" means:
+* to do something different from what is expected
+- to break a contract
+- to break a mould
 
-« Breadwinner » se traduit par :
-* soutien de famille
-- chef du village
-- employe
+"Breadwinner" means:
+* the person who earns the money for a family
+- a village chief
+- an employee
 
-Choisis la bonne conjonction : ___ the law forbids it, the bias remains strong.
+Choose the correct conjunction: ___ the law forbids it, the bias remains strong.
 * Even though
 - Unless
 - As soon as
 
-Corrige la phrase : However she is brilliant, yet she was not chosen.
+Correct the sentence: However she is brilliant, yet she was not chosen.
 * She is brilliant, yet she was not chosen.
 - However she is brilliant, however she was not chosen.
 - She is brilliant, yet however she was not chosen.
 
-« Equal treatment » veut dire :
-* traitement egal
-- salaire egal
-- prejuge
+"Equal treatment" means:
+* the same treatment for everyone
+- equal pay
+- a prejudice
 
-Ecris en anglais « sensibilisation ».
+Write in English: "awareness".
 = awareness
 
 Men ___ women should be treated equally.
@@ -1765,50 +1765,49 @@ Men ___ women should be treated equally.
 - however
 - whereas
 
-« To assume » veut dire :
-* supposer
-- traiter
-- influencer
+"To assume" means:
+* to think something is true without checking
+- to treat
+- to influence
 
-Choisis la phrase correcte :
+Choose the correct sentence:
 * As soon as the teacher arrives, the class will start.
 - As soon the teacher will arrive, the class starts.
 - As soon as the teacher arrives, the class start.`,
-deck:`gender role | role de genre | Gender roles change over time.
-stereotype | stereotype | Stereotypes can be harmful.
-bias | prejuge | There is a bias against women in some jobs.
-discrimination | discrimination | Discrimination is against the law.
-prejudice | prejuge | Prejudice affects people's choices.
-to assume | supposer | Do not assume that girls cannot code.
-to challenge | remettre en question | We must challenge old ideas.
-to break the mould | sortir des cadres | She broke the mould by becoming a pilot.
-household chores | taches menageres | Household chores should be shared.
-breadwinner | soutien de famille | The mother is the breadwinner.
-to expect | attendre | Parents expect a lot from their children.
-to treat | traiter | Everyone should be treated fairly.
-equal treatment | traitement egal | We want equal treatment at school.
-to influence | influencer | Media can influence our ideas.
-awareness | sensibilisation | Awareness campaigns help change minds.`,
-hw:{t:"Breaking a stereotype",b:"Ecris un paragraphe de 6 phrases sur un stereotype de genre que tu as observe. Utilise However ou yet dans une phrase, et une phrase avec even if, whereas ou unless."}},
+deck:`gender role | the role expected of a man or a woman | Gender roles change over time.
+stereotype | a fixed, oversimplified idea about a group | Stereotypes can be harmful.
+bias | an unfair preference | There is a bias against women in some jobs.
+discrimination | unfair treatment because of who someone is | Discrimination is against the law.
+prejudice | an opinion formed without good reason | Prejudice affects people's choices.
+to assume | to think something is true without checking | Do not assume that girls cannot code.
+to challenge | to question something | We must challenge old ideas.
+to break the mould | to do something different from what is expected | She broke the mould by becoming a pilot.
+household chores | tasks done at home | Household chores should be shared.
+breadwinner | the person who earns the money for a family | The mother is the breadwinner.
+to expect | to think someone will do something | Parents expect a lot from their children.
+to treat | to behave towards someone | Everyone should be treated fairly.
+equal treatment | the same treatment for everyone | We want equal treatment at school.
+to influence | to affect how someone thinks or acts | Media can influence our ideas.
+awareness | knowledge and understanding of a problem | Awareness campaigns help change minds.`,
+hw:{t:"Breaking a stereotype",b:"Write a paragraph of 6 sentences about a gender stereotype you have observed. Use However or yet in one sentence, and one sentence with even if, whereas or unless."}},
 {c:"1re",u:5,lv:"B1",t:"Water Pollution",th:"Environment and water pollution",g:"Active and passive voice; superlative forms of adjectives",
-body:`L'eau est precieuse. Dans cette lecon, on parle de la **pollution de l'eau** : ses causes, ses effets et les solutions.
+body:`Water is precious. In this lesson, we talk about **water pollution**: its causes, its effects and the solutions.
 
-**Vocabulary** (mots et expressions) :
-**pollution** (pollution) ; **waste** (dechets) ; **sewage** (eaux usees) ; **factory** (usine) ; **to dump** (deverser) ; **drinking water** (eau potable) ; **disease** (maladie) ; **to contaminate** (contaminer) ; **to clean up** (nettoyer) ; **drought** (secheresse) ; **to protect** (proteger) ; **awareness** (sensibilisation).
+**Vocabulary** (words and expressions):
+**pollution** (harmful substances in the environment) ; **waste** (materials that are thrown away) ; **sewage** (dirty water from homes and toilets) ; **factory** (a building where goods are made) ; **to dump** (to throw away in large amounts) ; **drinking water** (water that is safe to drink) ; **disease** (an illness) ; **to contaminate** (to make dirty or harmful) ; **to clean up** (to make clean) ; **drought** (a long period with no rain) ; **to protect** (to keep safe) ; **awareness** (knowledge and understanding of a problem).
 
-**Grammar 1 : Active and passive voice.** A la voix active, le sujet fait l'action. A la voix passive, le sujet subit l'action : **be + past participle**. On met l'agent avec **by**.
-Active : Factories pollute the river. (Les usines polluent la riviere.)
-Passive : The river **is polluted** by factories. (La riviere est polluee par les usines.)
-Active : The city dumped its waste in the lake. Passive : Waste **was dumped** in the lake.
-Active : People will clean up the beach. Passive : The beach **will be cleaned up**.
+**Grammar 1: Active and passive voice.** In the active voice, the subject does the action. In the passive voice, the subject receives the action: **be + past participle**. We put the agent with **by**.
+Active: Factories pollute the river. Passive: The river **is polluted** by factories.
+Active: The city dumped its waste in the lake. Passive: Waste **was dumped** in the lake.
+Active: People will clean up the beach. Passive: The beach **will be cleaned up**.
 
-**Grammar 2 : Superlative forms of adjectives.** Pour les adjectifs courts : **the + adjective + -est** (clean → **the cleanest**). Pour les adjectifs longs : **the most + adjective** (polluted → **the most polluted**). Attention aux irreguliers : good → **the best**, bad → **the worst**.
-This is **the most polluted** river in the region. (C'est la riviere la plus polluee de la region.)
-The lake is **the cleanest** of the three. (Le lac est le plus propre des trois.)
+**Grammar 2: Superlative forms of adjectives.** For short adjectives: **the + adjective + -est** (clean becomes **the cleanest**). For long adjectives: **the most + adjective** (polluted becomes **the most polluted**). Watch the irregular forms: good becomes **the best**, bad becomes **the worst**.
+This is **the most polluted** river in the region.
+The lake is **the cleanest** of the three.
 
-**Skill : reading and speaking.** Un texte explique que dans certains quartiers, les eaux usees sont deversees dans les caniveaux. Les habitants tombent malades. Une association organise des nettoyages chaque samedi.
+**Skill: reading and speaking.** A text explains that in some neighbourhoods, sewage is dumped into the gutters. The residents become ill. An association organises clean-ups every Saturday.
 
-**Final activity.** Ecris 5 phrases sur la pollution de l'eau dans ton quartier. Utilise au moins deux passifs et un superlatif.`,
+**Final activity.** Write 5 sentences about water pollution in your neighbourhood. Use at least two passive sentences and one superlative.`,
 quiz:`The river ___ by the factories every year.
 * is polluted
 - pollutes
@@ -1839,41 +1838,41 @@ Lake Togo is ___ lake in the area.
 - the most large
 - largest than
 
-What does « drought » mean ?
-* secheresse
-- inondation
-- pluie
+What does "drought" mean?
+* a long period with no rain
+- a flood
+- rain
 
 The waste ___ into the sea by the company.
 * was dumped
 - dumped
 - has dump
 
-Write the superlative of « bad » (use the).
+Write the superlative of "bad" (use the).
 = the worst
 
-What does « to contaminate » mean ?
-* contaminer
-- nettoyer
-- proteger
+What does "to contaminate" mean?
+* to make dirty or harmful
+- to clean up
+- to protect
 
-Choose the correct passive : The house ___ in 1990.
+Choose the correct passive: The house ___ in 1990.
 * was built
 - built
 - was build`,
-deck:`pollution | pollution | Pollution harms fish and people.
-waste | dechets | Do not throw waste in the river.
-sewage | eaux usees | Sewage must be treated before it goes into the sea.
-factory | usine | The factory dumps chemicals.
-to dump | deverser | They dump rubbish near the lake.
-drinking water | eau potable | Drinking water must be clean.
-disease | maladie | Dirty water causes disease.
-to contaminate | contaminer | The well was contaminated by oil.
-to clean up | nettoyer | Students clean up the beach.
-drought | secheresse | The drought lasted three months.
-to protect | proteger | We must protect our rivers.
-awareness | sensibilisation | Awareness campaigns help people change.`,
-hw:{t:"A polluted river",b:"Ecris un paragraphe de 6 phrases sur une riviere polluee. Utilise au moins deux phrases au passif et un superlatif."}},
+deck:`pollution | harmful substances in the environment | Pollution harms fish and people.
+waste | materials that are thrown away | Do not throw waste in the river.
+sewage | dirty water from homes and toilets | Sewage must be treated before it goes into the sea.
+factory | a building where goods are made | The factory dumps chemicals.
+to dump | to throw away in large amounts | They dump rubbish near the lake.
+drinking water | water that is safe to drink | Drinking water must be clean.
+disease | an illness | Dirty water causes disease.
+to contaminate | to make dirty or harmful | The well was contaminated by oil.
+to clean up | to make clean | Students clean up the beach.
+drought | a long period with no rain | The drought lasted three months.
+to protect | to keep safe | We must protect our rivers.
+awareness | knowledge and understanding of a problem | Awareness campaigns help people change.`,
+hw:{t:"A polluted river",b:"Write a paragraph of 6 sentences about a polluted river. Use at least two passive sentences and one superlative."}},
 {c:"1re",u:6,lv:"B1",t:"Hunting and National Parks",th:"Wildlife and national parks",g:"Question tags",
 body:`Les parcs nationaux protegent les animaux et les plantes. Dans cette lecon, on parle de la **chasse**, des **parcs** et des especes menacees.
 
