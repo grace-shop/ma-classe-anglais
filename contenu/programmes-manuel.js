@@ -209,29 +209,29 @@ democracy | rule by the people through elections | Democracy gives every citizen
 hw:{t:"Strengths and weaknesses",b:"Write 5 sentences about the strengths and weaknesses of the chieftaincy in your region. Use at least one sentence with If ... would, one sentence with Although and one sentence with However."}},
 
 {c:"2nde",u:3,lv:"B1",t:"Girls' Education",th:"Gender equity in schools",g:"Comparative of inferiority, comparative of superiority, comparative of equality, however / yet, question tags",
-body:`L'education des filles est un sujet important au Togo. Beaucoup de filles quittent l'ecole trop tot. Pourquoi, et que peut-on faire ?
+body:`Girls' education is an important issue in Togo. Many girls leave school too early. Why, and what can be done?
 
-**Vocabulary** (mots et expressions) :
-**education** (education) ; **school fees** (frais de scolarite) ; **enrolment** (inscription) ; **literacy** (alphabetisation) ; **household** (menage) ; **housework** (travaux domestiques) ; **to drop out** (abandonner l'ecole) ; **career** (carriere) ; **equal** (egal) ; **unfair** (injuste) ; **to encourage** (encourager) ; **gap** (ecart) ; **opportunity** (occasion, chance) ; **to support** (soutenir) ; **to succeed** (reussir).
+**Vocabulary** (words and expressions):
+**education** (learning at school) ; **school fees** (money paid to go to school) ; **enrolment** (registration at a school) ; **literacy** (the ability to read and write) ; **household** (the people who live in one home) ; **housework** (domestic tasks such as cooking and cleaning) ; **to drop out** (to leave school before finishing) ; **career** (a person's working life and profession) ; **equal** (the same in value or rights) ; **unfair** (not fair or just) ; **to encourage** (to give confidence or support) ; **gap** (a difference between two things) ; **opportunity** (a good chance) ; **to support** (to help) ; **to succeed** (to achieve a goal).
 
-**Grammar 1 : Comparative of inferiority.** On utilise **less ... than** (moins ... que) ou **less + nom + than**.
-Boys often have **less housework than** girls. (Les garcons ont souvent moins de travaux domestiques que les filles.)
+**Grammar 1: Comparative of inferiority.** We use **less ... than** (less ... than) or **less + noun + than**.
+Boys often have **less housework than** girls.
 
-**Grammar 2 : Comparative of superiority.** On ajoute **-er** ou on utilise **more ... than**.
-Schooling is **more important than** money for a girl's future. (La scolarisation est plus importante que l'argent pour l'avenir d'une fille.)
+**Grammar 2: Comparative of superiority.** We add **-er** or use **more ... than**.
+Schooling is **more important than** money for a girl's future.
 
-**Grammar 3 : Comparative of equality.** On utilise **as ... as** (aussi ... que).
-A girl can be **as clever as** a boy. (Une fille peut etre aussi intelligente qu'un garcon.)
+**Grammar 3: Comparative of equality.** We use **as ... as**.
+A girl can be **as clever as** a boy.
 
-**Grammar 4 : However and yet.** **However** et **yet** expriment un contraste (cependant, pourtant). **However** est souvent en debut de phrase avec une virgule.
-Many girls are bright. However, they often leave school early. (Beaucoup de filles sont brillantes. Cependant, elles quittent souvent l'ecole tot.)
+**Grammar 4: However and yet.** **However** and **yet** express a contrast (nevertheless, still). **However** is often at the start of a sentence, followed by a comma.
+Many girls are bright. However, they often leave school early.
 
-**Grammar 5 : Question tags.** On ajoute une petite question a la fin : **isn't it ?**, **doesn't she ?**
-Girls should go to school, **shouldn't they ?** (Les filles devraient aller a l'ecole, non ?)
+**Grammar 5: Question tags.** We add a short question at the end: **isn't it?**, **doesn't she?**
+Girls should go to school, **shouldn't they?**
 
-**Skill : translation.** FR : Les parents doivent envoyer leurs filles a l'ecole. EN : Parents must send their daughters to school.
+**Skill: translation.** FR: Les parents doivent envoyer leurs filles a l'ecole. EN: Parents must send their daughters to school.
 
-**Final activity.** Ecris un paragraphe de 5 phrases sur l'importance de l'education des filles. Utilise au moins un comparatif et un question tag.`,
+**Final activity.** Write a paragraph of 5 sentences on the importance of girls' education. Use at least one comparative and one question tag.`,
 quiz:`Girls often have ___ time to study than boys.
 * less
 - fewer than
@@ -257,13 +257,13 @@ Parents must support their daughters, ___ ?
 - should they
 - don't they
 
-Ecris en anglais « alphabetisation ».
+Write in English: "literacy".
 = literacy
 
-« To drop out » veut dire :
-* abandonner l'ecole
-- reussir
-- encourager
+"To drop out" means:
+* to leave school before finishing
+- to succeed
+- to encourage
 
 Many girls are bright, ___ they leave school early.
 * yet
@@ -275,48 +275,48 @@ The gap between boys and girls is smaller ___ before.
 - as
 - to
 
-Le contraire de « equal » est :
+The opposite of "equal" is:
 * unfair
 - literacy
 - household
 
-Choisis la bonne forme : Her brother is ___ tall ___ her.
+Choose the correct form: Her brother is ___ tall ___ her.
 * as / as
 - more / than
 - less / as
 
-Corrige la phrase : Girls are more intelligent than boys, isn't they ?
-* Girls are more intelligent than boys, aren't they ?
-- Girls are more intelligent than boys, are they ?
-- Girls are more intelligent that boys, isn't they ?
+Correct the sentence: Girls are more intelligent than boys, isn't they?
+* Girls are more intelligent than boys, aren't they?
+- Girls are more intelligent than boys, are they?
+- Girls are more intelligent that boys, isn't they?
 
-« Frais de scolarite » se dit :
-* school fees
-- school enrolment
-- school career
+"School fees" means:
+* the money paid to go to school
+- school registration
+- a school career
 
-Ecris en anglais « travaux domestiques ».
+Write in English: "housework".
 = housework
 
 The mother cooks, ___ she also works in the field.
 * and
 - however
 - unless`,
-deck:`education | education | Education opens many doors.
-school fees | frais de scolarite | School fees are high for some families.
-enrolment | inscription | Enrolment starts in September.
-literacy | alphabetisation | Literacy helps women run a business.
-household | menage | The household has five members.
-housework | travaux domestiques | Housework takes many hours each day.
-to drop out | abandonner l'ecole | Some girls drop out at twelve.
-career | carriere | She wants a career in medicine.
-equal | egal | Boys and girls have equal rights.
-unfair | injuste | It is unfair to stop a girl's studies.
-to encourage | encourager | Teachers should encourage girls.
-gap | ecart | The gap between boys and girls is closing.
-opportunity | occasion | Every child needs an opportunity.
-to succeed | reussir | She succeeded in her exams.`,
-hw:{t:"Girls and school",b:"Ecris 6 phrases sur l'ecole des filles. Utilise au moins deux comparatifs (more ... than, as ... as) et un question tag."}},
+deck:`education | learning at school | Education opens many doors.
+school fees | money paid to go to school | School fees are high for some families.
+enrolment | registration at a school | Enrolment starts in September.
+literacy | the ability to read and write | Literacy helps women run a business.
+household | the people who live in one home | The household has five members.
+housework | domestic tasks such as cooking and cleaning | Housework takes many hours each day.
+to drop out | to leave school before finishing | Some girls drop out at twelve.
+career | a person's working life and profession | She wants a career in medicine.
+equal | the same in value or rights | Boys and girls have equal rights.
+unfair | not fair or just | It is unfair to stop a girl's studies.
+to encourage | to give confidence or support | Teachers should encourage girls.
+gap | a difference between two things | The gap between boys and girls is closing.
+opportunity | a good chance | Every child needs an opportunity.
+to succeed | to achieve a goal | She succeeded in her exams.`,
+hw:{t:"Girls and school",b:"Write 6 sentences about girls' schooling. Use at least two comparatives (more ... than, as ... as) and one question tag."}},
 
 {c:"2nde",u:4,lv:"B1",t:"Women's Place in the Family",th:"Role and place of women in the family",g:"Comparative of inferiority, comparative of superiority, comparative of equality, however / yet, question tags",
 body:`Dans la famille togolaise, le role des femmes change. Comment les taches sont-elles partagees entre l'homme et la femme ?
