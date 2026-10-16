@@ -640,23 +640,23 @@ health risk | a danger to health | Rubbish can be a health risk.`,
 hw:{t:"My neighbourhood and waste",b:"Write 6 sentences about the waste in your neighbourhood. Use at least one passive sentence, one sentence with unless and one sentence with which or who."}},
 
 {c:"2nde",u:7,lv:"B1",t:"Artificial Intelligence and the Modern Society",th:"AI, technology and daily life",g:"Active and passive voice",
-body:`L'intelligence artificielle entre dans la vie quotidienne : ecoles, hopitaux, banques. Quels sont ses avantages et ses inconvenients ?
+body:`Artificial intelligence is entering daily life: schools, hospitals, banks. What are its advantages and disadvantages?
 
-**Vocabulary** (mots et expressions) :
-**artificial intelligence (AI)** (intelligence artificielle) ; **machine** (machine) ; **algorithm** (algorithme) ; **robot** (robot) ; **data** (donnees) ; **software** (logiciel) ; **to program** (programmer) ; **to automate** (automatiser) ; **e-learning** (apprentissage en ligne) ; **job loss** (perte d'emploi) ; **advantage** (avantage) ; **disadvantage** (inconvenient) ; **curriculum vitae (CV)** (CV) ; **to apply for a job** (postuler) ; **skill** (competence).
+**Vocabulary** (words and expressions):
+**artificial intelligence (AI)** (computer systems that do tasks needing human intelligence) ; **machine** (a device that does a task) ; **algorithm** (a set of steps a computer follows) ; **robot** (a machine that can perform tasks on its own) ; **data** (information stored in a computer) ; **software** (programs that run on a computer) ; **to program** (to give a computer instructions) ; **to automate** (to make a process run by machine) ; **e-learning** (learning through the internet) ; **job loss** (losing your work) ; **advantage** (a benefit) ; **disadvantage** (a drawback) ; **curriculum vitae (CV)** (a document listing your education and experience) ; **to apply for a job** (to ask for a job in writing) ; **skill** (an ability you have learned).
 
-**Grammar : Active and passive voice.** Avec les technologies, on utilise souvent le passif car l'agent est evident ou inutile.
-Many tasks **are done** by machines today. (Beaucoup de taches sont faites par des machines aujourd'hui.)
-The software **has been updated** by engineers. (Le logiciel a ete mis a jour par des ingenieurs.)
-Active : Engineers **design** new robots. (Les ingenieurs concoivent de nouveaux robots.)
+**Grammar: Active and passive voice.** With technology, we often use the passive because the agent is obvious or not important.
+Many tasks **are done** by machines today.
+The software **has been updated** by engineers.
+Active: Engineers **design** new robots.
 
-**Skill : speaking about advantages.** Model sentences : E-learning allows students to study at home. Phytotherapy is a cheap way to treat some illnesses.
+**Skill: speaking about advantages.** Model sentences: E-learning allows students to study at home. Phytotherapy is a cheap way to treat some illnesses.
 
-**Skill : writing a CV.** Model structure : Name, Contact, Education, Skills, Experience, Interests. Example : Skills : computer literacy, good English, teamwork.
+**Skill: writing a CV.** Model structure: Name, Contact, Education, Skills, Experience, Interests. Example: Skills: computer literacy, good English, teamwork.
 
-**Skill : discussion.** Model sentence : AI saves time, but it can cause job loss.
+**Skill: discussion.** Model sentence: AI saves time, but it can cause job loss.
 
-**Final activity.** Ecris 5 phrases : Quels sont les avantages et les inconvenients de l'intelligence artificielle pour les jeunes Togolais ?`,
+**Final activity.** Write 5 sentences: What are the advantages and disadvantages of artificial intelligence for young people in Togo?`,
 quiz:`Many jobs ___ by machines now.
 * are done
 - do
@@ -667,12 +667,12 @@ The robot ___ programmed by a young engineer.
 - were
 - is be
 
-« Algorithm » veut dire :
-* algorithme
-- logiciel
-- donnees
+"Algorithm" means:
+* a set of steps a computer follows
+- software
+- data
 
-Ecris en anglais « perte d'emploi ».
+Write in English: "job loss".
 = job loss
 
 The new software ___ last week.
@@ -680,17 +680,17 @@ The new software ___ last week.
 - installed was
 - was install
 
-Choisis la bonne forme passive : The teacher uses the computer.
+Choose the correct passive form: The teacher uses the computer.
 * The computer is used by the teacher.
 - The computer uses the teacher.
 - The computer is using by the teacher.
 
-« Curriculum vitae » se dit :
+"Curriculum vitae" is abbreviated as:
 * CV
 - CD
 - CS
 
-Ecris en anglais « automatiser ».
+Write in English: "to automate".
 = to automate
 
 Students ___ taught online by good teachers.
@@ -698,50 +698,50 @@ Students ___ taught online by good teachers.
 - can be teach
 - can teaching
 
-« Advantage » est le contraire de :
+"Advantage" is the opposite of:
 * disadvantage
 - skill
 - data
 
-Les donnees ___ collectees sont protegees.
-* qui
-- que
-- dont
+The data ___ collected are protected.
+* which
+- who
+- whose
 
 The engineers ___ the new machine in 2025.
 * built
 - were built
 - has build
 
-« To apply for a job » veut dire :
-* postuler
-- programmer
-- automatiser
+"To apply for a job" means:
+* to ask for a job in writing
+- to program
+- to automate
 
-Corrige la phrase : The letter has wrote by the manager.
+Correct the sentence: The letter has wrote by the manager.
 * The letter has been written by the manager.
 - The letter has been write by the manager.
 - The letter was writing by the manager.
 
-Choisis la phrase correcte :
+Choose the correct sentence:
 * AI saves time, but it can cause job loss.
 - AI saves time, but it can causes job loss.
 - AI save time, but can it cause job loss.`,
-deck:`artificial intelligence | intelligence artificielle | Artificial intelligence is growing fast.
-machine | machine | The machine prints forty pages a minute.
-algorithm | algorithme | The algorithm suggests new lessons.
-robot | robot | The robot cleans the floor.
-data | donnees | The data is stored on a server.
-software | logiciel | This software helps students write essays.
-to automate | automatiser | Banks automate many tasks.
-e-learning | apprentissage en ligne | E-learning is useful in remote villages.
-job loss | perte d'emploi | Automation may cause job loss.
-advantage | avantage | An advantage of AI is speed.
-disadvantage | inconvenient | A disadvantage is the cost.
-curriculum vitae | CV | Send your CV with your application.
-to apply for a job | postuler | She applied for a job at the bank.
-skill | competence | Computer skill is important today.`,
-hw:{t:"AI in my life",b:"Ecris un petit texte de 6 phrases : donne un avantage et un inconvenient de l'intelligence artificielle. Utilise au moins 2 phrases au passif."}},
+deck:`artificial intelligence | computer systems that do tasks needing human intelligence | Artificial intelligence is growing fast.
+machine | a device that does a task | The machine prints forty pages a minute.
+algorithm | a set of steps a computer follows | The algorithm suggests new lessons.
+robot | a machine that can perform tasks on its own | The robot cleans the floor.
+data | information stored in a computer | The data is stored on a server.
+software | programs that run on a computer | This software helps students write essays.
+to automate | to make a process run by machine | Banks automate many tasks.
+e-learning | learning through the internet | E-learning is useful in remote villages.
+job loss | losing your work | Automation may cause job loss.
+advantage | a benefit | An advantage of AI is speed.
+disadvantage | a drawback | A disadvantage is the cost.
+curriculum vitae | a document listing your education and experience | Send your CV with your application.
+to apply for a job | to ask for a job in writing | She applied for a job at the bank.
+skill | an ability you have learned | Computer skill is important today.`,
+hw:{t:"AI in my life",b:"Write a short text of 6 sentences: give one advantage and one disadvantage of artificial intelligence. Use at least 2 passive sentences."}},
 
 {c:"2nde",u:8,lv:"B1",t:"Phytotherapy and Health",th:"Medicinal plants and health",g:"Active and passive voice",
 body:`La phytotherapie, c'est-a-dire le traitement par les plantes, est tres utilisee au Togo. Quels sont ses avantages pour la sante ?
