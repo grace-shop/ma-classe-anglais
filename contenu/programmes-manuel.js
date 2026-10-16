@@ -532,27 +532,27 @@ charcoal | wood burnt to make fuel | Many families cook with charcoal.`,
 hw:{t:"Our forest",b:"Write 6 sentences about the forest near your home. Use at least one passive sentence, one sentence with unless and one sentence with who or which."}},
 
 {c:"2nde",u:6,lv:"B1",t:"Dumping Grounds",th:"Causes and effects of dumping grounds",g:"Active and passive voice, the use of unless, relative pronouns",
-body:`Les decharges publiques se multiplient dans les villes togolaises. Quelles en sont les causes et les consequences ?
+body:`Public dumping grounds are spreading in Togolese towns. What are the causes and the consequences?
 
-**Vocabulary** (mots et expressions) :
-**dumping ground** (decharge) ; **waste** (dechets) ; **plastic** (plastique) ; **to collect** (ramasser) ; **to dump** (deverser, jeter) ; **smell** (odeur) ; **disease** (maladie) ; **pollution** (pollution) ; **recycling** (recyclage) ; **to ban** (interdire) ; **landfill** (site d'enfouissement) ; **rubbish** (ordures) ; **dustbin** (poubelle) ; **health risk** (risque pour la sante) ; **to clean up** (nettoyer).
+**Vocabulary** (words and expressions):
+**dumping ground** (a place where rubbish is left) ; **waste** (materials that are thrown away) ; **plastic** (a light material made from oil) ; **to collect** (to pick up) ; **to dump** (to throw away in a large amount) ; **smell** (what you notice with your nose) ; **disease** (an illness) ; **pollution** (harmful substances in the environment) ; **recycling** (reusing materials) ; **to ban** (to forbid by law) ; **landfill** (a place where waste is buried) ; **rubbish** (things thrown away) ; **dustbin** (a container for rubbish) ; **health risk** (a danger to health) ; **to clean up** (to make clean).
 
-**Grammar 1 : Passive voice.** Le passif est tres frequent quand on parle des decharges, car on ne sait pas toujours qui jette les dechets.
-Rubbish **is dumped** near the river every day. (Les ordures sont jetees pres de la riviere chaque jour.)
-The streets **were cleaned** last week. (Les rues ont ete nettoyees la semaine derniere.)
+**Grammar 1: Passive voice.** The passive is very common when we talk about dumping grounds, because we do not always know who throws the waste away.
+Rubbish **is dumped** near the river every day.
+The streets **were cleaned** last week.
 
-**Grammar 2 : Unless.**
-Diseases will spread **unless** the city collects the waste. (Les maladies vont se repandre a moins que la ville ne ramasse les dechets.)
+**Grammar 2: Unless.**
+Diseases will spread **unless** the city collects the waste.
 
-**Grammar 3 : Relative pronouns.**
-The dumping ground **which** is near the market smells badly. (La decharge qui est pres du marche sent tres mal.)
-Children **who** play there can get sick. (Les enfants qui jouent la peuvent tomber malades.)
+**Grammar 3: Relative pronouns.**
+The dumping ground **which** is near the market smells badly.
+Children **who** play there can get sick.
 
-**Skill : translation.** FR : La decharge pollue l'eau et l'air. EN : The dumping ground pollutes the water and the air.
+**Skill: translation.** FR: La decharge pollue l'eau et l'air. EN: The dumping ground pollutes the water and the air.
 
-**Skill : opinion.** Model sentence : In my opinion, plastic should be banned.
+**Skill: opinion.** Model sentence: In my opinion, plastic should be banned.
 
-**Final activity.** Ecris un paragraphe de 5 phrases : Quelle est ton opinion sur les decharges dans ta ville ? Propose une solution.`,
+**Final activity.** Write a paragraph of 5 sentences: What is your opinion of the dumping grounds in your town? Suggest a solution.`,
 quiz:`Rubbish ___ collected every morning in our street.
 * is
 - are
@@ -568,12 +568,12 @@ The bin ___ is full is at the corner.
 - whose
 - who
 
-« Dustbin » veut dire :
-* poubelle
-- decharge
-- recyclage
+"Dustbin" means:
+* a container for rubbish
+- a dumping ground
+- recycling
 
-Ecris en anglais « interdire ».
+Write in English: "to ban".
 = to ban
 
 The plastic ___ thrown in the river.
@@ -581,7 +581,7 @@ The plastic ___ thrown in the river.
 - were
 - have
 
-Corrige la phrase : Unless you will sort the waste, it will smell.
+Correct the sentence: Unless you will sort the waste, it will smell.
 * Unless you sort the waste, it will smell.
 - Unless you will sorted the waste, it smells.
 - Unless you sort the waste, it smells not.
@@ -591,53 +591,53 @@ People ___ live near the dump are at risk.
 - which
 - whose
 
-Choisis la bonne voix : The council ___ the streets last month.
+Choose the correct voice: The council ___ the streets last month.
 * cleaned
 - was clean
 - has clean
 
-« Health risk » se traduit par :
-* risque pour la sante
-- risque de chute
-- risque de vol
+"Health risk" means:
+* a danger to health
+- a risk of falling
+- a risk of theft
 
-Ecris en anglais « ramasser » (les dechets).
+Write in English: "to collect" (waste).
 = to collect
 
-Les jeunes ___ recyclent le plastique aident la ville.
-* qui
-- que
-- dont
+Young people ___ recycle plastic help the city.
+* who
+- that
+- whose
 
 The water ___ by the dump is dirty.
 * is polluted
 - polluted is
 - pollute
 
-« Smell » veut dire :
+"Smell" means:
 * odeur
 - maladie
 - ordures
 
-Choisis la phrase correcte : In my opinion, plastic should be banned.
-* Correct : in my opinion, plastic should be banned.
-- Correct : in my opinion, plastic should banned.
-- Correct : in my opinion, plastic shall ban.`,
-deck:`dumping ground | decharge | The dumping ground is too close to the school.
-waste | dechets | Waste must be sorted at home.
-plastic | plastique | Plastic bags are everywhere in the city.
-to collect | ramasser | The truck collects the rubbish on Monday.
-to dump | deverser, jeter | People dump waste near the river.
-smell | odeur | The smell is very strong at noon.
-disease | maladie | Dirty water can cause disease.
-pollution | pollution | Air pollution affects our health.
-recycling | recyclage | Recycling saves money and nature.
-to ban | interdire | The town banned plastic bags.
-landfill | site d'enfouissement | The landfill is outside the town.
-rubbish | ordures | Put the rubbish in the bin.
-dustbin | poubelle | The dustbin is full.
-health risk | risque pour la sante | Rubbish can be a health risk.`,
-hw:{t:"My neighbourhood and waste",b:"Ecris 6 phrases sur les dechets dans ton quartier. Utilise au moins une phrase au passif, une phrase avec unless et une phrase avec which ou who."}},
+Choose the correct sentence: In my opinion, plastic should be banned.
+* Correct: in my opinion, plastic should be banned.
+- Correct: in my opinion, plastic should banned.
+- Correct: in my opinion, plastic shall ban.`,
+deck:`dumping ground | a place where rubbish is left | The dumping ground is too close to the school.
+waste | materials that are thrown away | Waste must be sorted at home.
+plastic | a light material made from oil | Plastic bags are everywhere in the city.
+to collect | to pick up | The truck collects the rubbish on Monday.
+to dump | to throw away in a large amount | People dump waste near the river.
+smell | what you notice with your nose | The smell is very strong at noon.
+disease | an illness | Dirty water can cause disease.
+pollution | harmful substances in the environment | Air pollution affects our health.
+recycling | reusing materials | Recycling saves money and nature.
+to ban | to forbid by law | The town banned plastic bags.
+landfill | a place where waste is buried | The landfill is outside the town.
+rubbish | things thrown away | Put the rubbish in the bin.
+dustbin | a container for rubbish | The dustbin is full.
+health risk | a danger to health | Rubbish can be a health risk.`,
+hw:{t:"My neighbourhood and waste",b:"Write 6 sentences about the waste in your neighbourhood. Use at least one passive sentence, one sentence with unless and one sentence with which or who."}},
 
 {c:"2nde",u:7,lv:"B1",t:"Artificial Intelligence and the Modern Society",th:"AI, technology and daily life",g:"Active and passive voice",
 body:`L'intelligence artificielle entre dans la vie quotidienne : ecoles, hopitaux, banques. Quels sont ses avantages et ses inconvenients ?
