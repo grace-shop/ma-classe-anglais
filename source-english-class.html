@@ -941,31 +941,79 @@ setTimeout(hideSplash,4500);
 const TIPS_STUDENT=["Practice makes perfect!","One activity a day keeps your streak going.","Tap the coloured words to hear them.","Mistakes help you learn!","The word of the day is worth +2 XP.","You're doing great!"];
 const TIPS_TEACHER=["Your class is live!","Difficult points help you plan the next lesson.","An announcement motivates the whole class.","Great teachers inspire!"];
 let mascot={jump(){},canvas:null};
-function initMascot(){mascot=(function(){const api={jump(){},canvas:null};if(!window.THREE)return api;const T=THREE;const cv=document.createElement("canvas");cv.setAttribute("aria-hidden","true");api.canvas=cv;
-  let r;try{r=new T.WebGLRenderer({canvas:cv,alpha:true,antialias:true})}catch(e){return api}
-  r.setPixelRatio(Math.min(devicePixelRatio||1,2));r.setSize(300,300,false);
-  const sc=new T.Scene(),cam=new T.PerspectiveCamera(35,1,.1,50);cam.position.set(0,.2,7);
-  sc.add(new T.AmbientLight(0xffffff,.55));const k=new T.DirectionalLight(0xffffff,.9);k.position.set(3,4,5);sc.add(k);
-  const p1=new T.PointLight(0x9fb2ff,.8,20);p1.position.set(-3,1,3);sc.add(p1);const p2=new T.PointLight(0xf0d49a,.7,20);p2.position.set(3,-2,3);sc.add(p2);
-  const bot=new T.Group();sc.add(bot);
-  const body=new T.Mesh(new T.SphereGeometry(1.25,64,64),new T.MeshStandardMaterial({color:0xf7f8fc,metalness:.12,roughness:.2}));bot.add(body);
-  const visor=new T.Mesh(new T.SphereGeometry(1,48,48),new T.MeshStandardMaterial({color:0x1e2558,metalness:.5,roughness:.12}));visor.scale.set(.86,.62,.42);visor.position.set(0,.1,.93);bot.add(visor);
-  const eyeMat=new T.MeshBasicMaterial({color:0xbcd0ff});const eyes=[-.32,.32].map(x=>{const e=new T.Mesh(new T.SphereGeometry(.13,24,24),eyeMat);e.scale.set(1,1.35,.5);e.position.set(x,.2,1.32);bot.add(e);return e});
-  const smile=new T.Mesh(new T.TorusGeometry(.24,.045,10,30,Math.PI),new T.MeshBasicMaterial({color:0xe8c780}));smile.rotation.z=Math.PI;smile.position.set(0,-.05,1.33);bot.add(smile);
-  const ant=new T.Mesh(new T.CylinderGeometry(.035,.035,.45,12),new T.MeshStandardMaterial({color:0xcfd8f5,metalness:.8,roughness:.2}));ant.position.set(0,1.42,0);bot.add(ant);
-  const tip=new T.Mesh(new T.SphereGeometry(.12,20,20),new T.MeshStandardMaterial({color:0xd8b46a,metalness:.8,roughness:.25}));tip.position.set(0,1.7,0);bot.add(tip);
-  const ring=new T.Mesh(new T.TorusGeometry(1.85,.05,12,90),new T.MeshStandardMaterial({color:0xd8b46a,metalness:.85,roughness:.25}));ring.rotation.x=1.25;sc.add(ring);
-  const ring2=new T.Mesh(new T.TorusGeometry(2.05,.025,10,90),new T.MeshBasicMaterial({color:0x4b6bd6,transparent:true,opacity:.35}));ring2.rotation.set(1.1,.4,0);sc.add(ring2);
-  const orbs=[0,1,2].map(i=>{const o=new T.Mesh(new T.SphereGeometry(.09,16,16),new T.MeshStandardMaterial({color:[0x4b6bd6,0xd8b46a,0xb4546f][i],metalness:.4,roughness:.3}));sc.add(o);return o});
-  let mx=0,my=0,jumpT=-10;addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
-  api.jump=()=>{jumpT=clk.getElapsedTime()};const clk=new T.Clock();
-  function frame(){const calm=document.body.dataset.mode==="teacher",t=calm?2.4:clk.getElapsedTime(),j=calm?9:t-jumpT;bot.position.y=Math.sin(t*1.6)*.12+(j<1?Math.sin(j*Math.PI)*.9:0);
-    if(calm){bot.rotation.y=0;bot.rotation.x=0}else{bot.rotation.y+=((mx*1.1)+(j<1?j*Math.PI*2:0)-bot.rotation.y)*.12;bot.rotation.x+=(my*.6-bot.rotation.x)*.08}
-    const blink=(t%4)<.12;eyes.forEach(e=>e.scale.y=blink?.15:1.35);
-    ring.rotation.z=t*.5;ring2.rotation.z=-t*.35;
-    orbs.forEach((o,i)=>{const a=t*(.8+i*.25)+i*2.1;o.position.set(Math.cos(a)*2.05,Math.sin(a*1.3)*.5,Math.sin(a)*2.05)});r.render(sc,cam)}
-  let lastCalm=0;(function loop(){if(cv.isConnected&&!document.hidden){if(document.body.dataset.mode!=="teacher"){frame()}else if(performance.now()-lastCalm>400){frame();lastCalm=performance.now()}}if(!reduceMotion)requestAnimationFrame(loop)})();if(reduceMotion)setInterval(()=>{if(cv.isConnected)frame()},1000);
-  return api})()}
+function initMascot(){mascot=(function(){
+ const api={jump(){},canvas:null};
+ if(!window.THREE)return api;
+ const T=THREE;
+ const cv=document.createElement("canvas");cv.setAttribute("aria-hidden","true");api.canvas=cv;
+ let r;try{r=new T.WebGLRenderer({canvas:cv,alpha:true,antialias:true})}catch(e){return api}
+ r.setPixelRatio(Math.min(devicePixelRatio||1,2));r.setSize(300,300,false);
+ const sc=new T.Scene(),cam=new T.PerspectiveCamera(32,1,.1,50);cam.position.set(0,.3,8.2);
+ sc.add(new T.AmbientLight(0xffffff,.62));
+ const key=new T.DirectionalLight(0xffffff,1);key.position.set(3,5,5);sc.add(key);
+ const rim=new T.PointLight(0x9fb2ff,.9,20);rim.position.set(-3,2,3);sc.add(rim);
+ const warm=new T.PointLight(0xf0d49a,.7,20);warm.position.set(3,-1,3);sc.add(warm);
+ const M=(c,o)=>new T.MeshStandardMaterial(Object.assign({color:c,roughness:.45,metalness:.05},o||{}));
+ const SKIN=0xF2C7A0,HAIR=0x1B1A24,HOOD=0x4B6BD6,HOOD_D=0x3A55B8,WHITE=0xffffff,INK=0x141833;
+ const bot=new T.Group();sc.add(bot);
+ // torse : sweat à capuche bleu
+ const torso=new T.Mesh(new T.SphereGeometry(1,48,36),M(HOOD));torso.scale.set(.84,.8,.72);torso.position.set(0,-1.38,0);bot.add(torso);
+ const collar=new T.Mesh(new T.TorusGeometry(.42,.085,16,44),M(WHITE));collar.rotation.x=Math.PI/2;collar.position.set(0,-.66,.05);bot.add(collar);
+ const pocket=new T.Mesh(new T.BoxGeometry(.5,.2,.07),M(HOOD_D));pocket.position.set(0,-1.78,.66);pocket.rotation.x=-.1;bot.add(pocket);
+ const logo=new T.Mesh(new T.CircleGeometry(.12,32),M(0xD8B46A,{metalness:.7,roughness:.25}));logo.position.set(-.34,-1.12,.66);bot.add(logo);
+ // tête
+ const head=new T.Group();head.position.set(0,.4,0);bot.add(head);
+ const face=new T.Mesh(new T.SphereGeometry(1,64,56),M(SKIN,{roughness:.55}));face.scale.set(1,.98,.92);head.add(face);
+ // cheveux noirs : calotte + frange
+ const hair=new T.Mesh(new T.SphereGeometry(1.06,56,40,0,Math.PI*2,0,Math.PI*.55),M(HAIR,{roughness:.35}));hair.position.set(0,.06,-.02);hair.scale.set(1.03,1.02,.98);head.add(hair);
+ [[-.5,.74,.62,.44,-.25],[-.08,.8,.7,.42,.05],[.36,.78,.66,.42,.3]].forEach(([x,y,z,s,rz])=>{const f=new T.Mesh(new T.SphereGeometry(s,32,24),M(HAIR,{roughness:.35}));f.position.set(x,y,z);f.scale.set(1,.72,.8);f.rotation.z=rz;head.add(f)});
+ // oreilles
+ [-1,1].forEach(s=>{const e=new T.Mesh(new T.SphereGeometry(.17,24,20),M(SKIN));e.position.set(s*.98,-.08,0);e.scale.set(.5,.72,.62);head.add(e)});
+ // yeux expressifs (type Duolingo)
+ const eyeK=new T.MeshBasicMaterial({color:INK}),eyeW=new T.MeshBasicMaterial({color:WHITE});
+ const eyes=[-.36,.36].map(x=>{const g=new T.Group();g.position.set(x,-.06,.9);
+   const w=new T.Mesh(new T.SphereGeometry(.17,32,24),eyeK);w.scale.set(1,1.22,.42);g.add(w);
+   const sh=new T.Mesh(new T.SphereGeometry(.055,16,12),eyeW);sh.position.set(.06,.08,.12);g.add(sh);
+   const sh2=new T.Mesh(new T.SphereGeometry(.024,12,10),eyeW);sh2.position.set(-.05,-.06,.13);g.add(sh2);
+   head.add(g);return g});
+ // joues roses
+ const blush=new T.MeshBasicMaterial({color:0xF08FA0,transparent:true,opacity:.45});
+ [-.6,.6].forEach(x=>{const b=new T.Mesh(new T.CircleGeometry(.16,32),blush);b.position.set(x,-.32,.93);b.scale.set(1.3,.8,1);head.add(b)});
+ // sourire
+ const mouth=new T.Mesh(new T.TorusGeometry(.15,.032,10,28,Math.PI),new T.MeshBasicMaterial({color:0x7A2E3E}));mouth.rotation.z=Math.PI;mouth.position.set(0,-.42,.97);head.add(mouth);
+ // bras : manches bleues + mains
+ const arms=[-1,1].map(s=>{const p=new T.Group();p.position.set(s*.92,-1.3,0);bot.add(p);
+   const a=new T.Mesh(new T.SphereGeometry(.26,32,24),M(HOOD));a.scale.set(1,2.05,1);a.position.y=-.45;p.add(a);
+   const hand=new T.Mesh(new T.SphereGeometry(.22,24,20),M(SKIN));hand.position.set(0,-1.12,0);p.add(hand);
+   p.userData.s=s;return p});
+ // chaussures
+ [-.32,.32].forEach(x=>{const sh=new T.Mesh(new T.SphereGeometry(.26,24,20),M(INK,{roughness:.3}));sh.scale.set(1.1,.6,1.35);sh.position.set(x,-2.5,.12);bot.add(sh)});
+ // décor 3D
+ const ring=new T.Mesh(new T.TorusGeometry(2.05,.05,12,90),new T.MeshStandardMaterial({color:0xd8b46a,metalness:.85,roughness:.25}));ring.rotation.x=1.25;sc.add(ring);
+ const ring2=new T.Mesh(new T.TorusGeometry(2.25,.025,10,90),new T.MeshBasicMaterial({color:0x4b6bd6,transparent:true,opacity:.35}));ring2.rotation.set(1.1,.4,0);sc.add(ring2);
+ const orbs=[0,1,2].map(i=>{const o=new T.Mesh(new T.SphereGeometry(.09,16,16),new T.MeshStandardMaterial({color:[0x4b6bd6,0xd8b46a,0xb4546f][i],metalness:.4,roughness:.3}));sc.add(o);return o});
+ // interaction
+ let mx=0,my=0,jumpT=-10;const clk=new T.Clock();
+ addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
+ api.jump=()=>{jumpT=clk.getElapsedTime()};
+ function frame(){
+   const calm=document.body.dataset.mode==="teacher",t=calm?2.4:clk.getElapsedTime(),j=calm?9:t-jumpT;
+   bot.position.y=Math.sin(t*1.6)*.1+(j<1?Math.sin(j*Math.PI)*.9:0);
+   if(calm){bot.rotation.y=0;bot.rotation.x=0;head.rotation.y=0}
+   else{bot.rotation.y+=((mx*.9)+(j<1?j*Math.PI*2:0)-bot.rotation.y)*.12;bot.rotation.x+=(my*.5-bot.rotation.x)*.08;head.rotation.y=mx*.35}
+   head.rotation.z=Math.sin(t*1.2)*.05;
+   // salut de la main (au saut et de temps en temps)
+   const waving=j<1.4||(t%9)<1.4;
+   arms.forEach(p=>{const s=p.userData.s;
+     if(s===1)p.rotation.z=waving?2.35+Math.sin(t*9)*.32:.12;
+     else p.rotation.z=-.12});
+   const blink=(t%4)<.12;eyes.forEach(g=>g.scale.y=blink?.12:1);
+   ring.rotation.z=t*.5;ring2.rotation.z=-t*.35;
+   orbs.forEach((o,i)=>{const a=t*(.8+i*.25)+i*2.1;o.position.set(Math.cos(a)*2.25,Math.sin(a*1.3)*.5,Math.sin(a)*2.25)});
+   r.render(sc,cam)}
+ let lastCalm=0;(function loop(){if(cv.isConnected&&!document.hidden){if(document.body.dataset.mode!=="teacher"){frame()}else if(performance.now()-lastCalm>400){frame();lastCalm=performance.now()}}if(!reduceMotion)requestAnimationFrame(loop)})();
+ if(reduceMotion)setInterval(()=>{if(cv.isConnected)frame()},1000);
+ return api})()}
 const mascotHTML=tips=>mascot.canvas&&!LITE?`<div class="mascot-wrap"><div id="mascotSlot"></div><div class="bubble">${esc(tips[Math.floor(Date.now()/600000)%tips.length])}</div></div>`:"";
 
 /* ============ word of the day ============ */
@@ -1204,7 +1252,7 @@ const knownOf=d=>((S.me?.deckProgress||{})[d.id]?.known||[]);
 function studentView(){
   if(isParent(S.me)){if(S.view?.type==="chat"||S.tab==="pmsg"){if(S.chatFor!==S.uid)subChat(S.uid);return`<div class="section" style="max-width:720px;margin-inline:auto"><div class="row">${ic("chat")}<div><span class="eyebrow">Private messages</span><h2>The teacher</h2></div></div><p class="sub">Only you and the teacher can see this conversation.</p>${chatHTML(S.uid,"student")}</div>`}return S.tab==="me"?parentProfileView():parentHomeView()}
   if(S.liveOn&&liveOpen(S.live))return liveStudentView();if(S.srs)return srsRunView();if(S.run)return quizRunView();if(S.deck)return deckRunView();
-  if(S.view?.type==="peers"&&peerOn())return peersView();if(S.view?.type==="peer"&&peerOn())return peerChatView();
+  if(S.view?.type==="friends"&&peerOn())return friendsView();if(S.view?.type==="peers"&&peerOn())return peersView();if(S.view?.type==="peer"&&peerOn())return peerChatView();
   if(S.view?.type==="chat")return`<div class="section" style="max-width:720px;margin-inline:auto">${backBtn()}<div class="row">${ic("chat")}<div><span class="eyebrow">Private messages</span><h2>My teacher</h2></div></div><p class="sub">Only you and your teacher can see this conversation.</p>${chatHTML(S.uid,"student")}</div>`;
   if(S.view?.type==="lesson")return lessonView();if(S.view?.type==="hw")return hwView();
   if(S.view?.type==="ep")return epView();if(S.view?.type==="shop")return shopView();if(S.view?.type==="talk")return talkView();
@@ -2078,7 +2126,7 @@ const PR={dir:[],inbox:[],loaded:false,err:"",with:null,sending:false,un:null,ti
 const peerOn=()=>S.mode==="student"&&!!S.me&&!isParent(S.me)&&stOf(S.me)==="active"&&S.me.profile!=="primaire"&&S.settings.peerChat!==false&&!(S.myAccess&&S.myAccess.noChat)&&!devBlocked()&&!!window.__peer;
 const peerName=id=>(PR.dir.find(x=>x.uid===id)||{}).name||"Classmate";
 const peerUnread=()=>PR.inbox.filter(m=>m.receiver===S.uid&&!m.read_at).length;
-const peerBtn=()=>peerOn()?`<button class="iconbtn" data-a="openPeers" aria-label="Messages between students" title="Classmates" style="position:relative">${ic("users")}${peerUnread()?`<span class="chip warn" style="position:absolute;top:-6px;right:-6px;min-width:18px;padding:0 5px;font-size:.68rem">${peerUnread()}</span>`:""}</button>`:"";
+const peerBtn=()=>peerOn()?`${frBtn()}<button class="iconbtn" data-a="openPeers" aria-label="Messages between students" title="Classmates" style="position:relative">${ic("users")}${peerUnread()?`<span class="chip warn" style="position:absolute;top:-6px;right:-6px;min-width:18px;padding:0 5px;font-size:.68rem">${peerUnread()}</span>`:""}</button>`:"";
 async function peerRefresh(){if(!peerOn())return;
   try{const[d,i]=await Promise.all([window.__peer.dir(),window.__peer.inbox()]);PR.dir=d;PR.inbox=i;PR.loaded=true;PR.err=""}
   catch(e){PR.loaded=true;PR.err=navigator.onLine?"Cannot load messages right now.":"No network: your messages will arrive as soon as you are connected."}
@@ -2090,15 +2138,36 @@ function peerStart(){if(PR.un||!peerOn())return;peerRefresh();
   PR.timer=setInterval(()=>{if(document.visibilityState==="visible"&&peerOn())peerRefresh()},45000)}
 setInterval(()=>{if(peerOn()&&!PR.un)peerStart()},3000);
 function peerMarkRead(id){window.__peer.read(id).then(()=>{for(const m of PR.inbox)if(m.sender===id&&m.receiver===S.uid&&!m.read_at)m.read_at=new Date().toISOString();render()}).catch(()=>{})}
+/* Page Amis : demandes, amis, recherche de camarades (séparée de la messagerie) */
+function frBtn(){const n=FR.list.filter(x=>x.status==="pending"&&x.incoming).length;return `<button class="iconbtn" data-a="openFriends" aria-label="Friends" title="Friends" style="position:relative">${ic("plus")}${n?`<span class="chip warn" style="position:absolute;top:-6px;right:-6px;min-width:18px;padding:0 5px;font-size:.68rem">${n}</span>`:""}</button>`}
+function friendsView(){
+  const me=S.uid,name=id=>(PR.dir.find(x=>x.uid===id)||{}).name||"Classmate";
+  const inc=FR.list.filter(x=>x.status==="pending"&&x.incoming).map(x=>x.uid);
+  const out=FR.list.filter(x=>x.status==="pending"&&!x.incoming).map(x=>x.uid);
+  const fri=FR.list.filter(x=>x.status==="accepted").map(x=>x.uid);
+  const q=(S.drafts.fr_q||"").trim().toLowerCase();
+  const found=PR.dir.filter(x=>x.uid!==me&&frState(x.uid)==="none"&&(!q||x.name.toLowerCase().includes(q))).slice(0,q?100:30);
+  const row=(uid,sub,act,open)=>`<div class="it"${open?` data-a="openPeer" data-id="${uid}" style="cursor:pointer"`:""}>${avatar(uid,name(uid))}<div class="txt"><b>${esc(name(uid))}</b><span>${sub}</span></div><div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">${act}</div></div>`;
+  const block=(title,rows,none)=>`<h3 style="margin:26px 0 10px">${title}</h3>${rows.length?`<div class="glass list">${rows.join("")}</div>`:`<div class="empty">${none}</div>`}`;
+  return`<div class="section" style="max-width:720px;margin-inline:auto"><div><button class="back" data-a="peerBack">${ic("left")}Messages</button></div><div class="row">${ic("plus")}<div><span class="eyebrow">Friends</span><h2>Your friends</h2></div></div>
+  <p class="sub">Only friends can chat together. Find classmates below and send them a friend request. Once they accept, they appear in your friends list.</p>
+  ${inc.length?block("Friend requests",inc.map(u=>row(u,"Wants to be your friend",`<button class="btn sm" data-fr="accept" data-id="${u}">${ic("check")}Accept</button><button class="btn ghost sm" data-fr="refuse" data-id="${u}">Decline</button>`)),""):""}
+  ${out.length?block("Requests sent",out.map(u=>row(u,"Waiting for an answer",`<button class="btn ghost sm" data-fr="cancel" data-id="${u}">Cancel</button>`)),""):""}
+  ${block("Your friends",fri.map(u=>row(u,"Tap to chat",`<button class="btn ghost sm" data-fr="cancel" data-id="${u}">Remove</button>`,true)),"No friends yet. Send a request below.")}
+  <h3 style="margin:26px 0 10px">Find classmates</h3>
+  <input id="fr_q" type="search" placeholder="Search for a classmate" value="${esc(S.drafts.fr_q||"")}" aria-label="Search for a classmate">
+  ${!PR.loaded?`<div class="empty" style="margin-top:10px">Loading</div>`:found.length?`<div class="glass list" style="margin-top:10px">${found.map(x=>row(x.uid,esc(x.classe||"Classmate"),`<button class="btn sm" data-fr="add" data-id="${x.uid}">${ic("plus")}Add friend</button>`)).join("")}</div>`:`<div class="empty" style="margin-top:10px">${q?"No classmate found with that name.":"Everyone is already your friend or waiting."}</div>`}
+  ${PR.err?`<div class="glass card small">${esc(PR.err)}</div>`:""}</div>`;
+}
 function peersView(){const me=S.uid,last={},un={};
   for(const m of PR.inbox){const o=m.sender===me?m.receiver:m.sender;if(!last[o])last[o]=m;if(m.receiver===me&&!m.read_at)un[m.sender]=(un[m.sender]||0)+1}
   const q=(S.drafts.peer_q||"").trim().toLowerCase(),t=m=>m?+new Date(m.created_at):0;
-  const rows=PR.dir.filter(x=>!q||x.name.toLowerCase().includes(q)).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid]})).sort((a,b)=>(b.un-a.un)||(t(b.last)-t(a.last))||(b.on-a.on)||a.name.localeCompare(b.name));
+  const rows=PR.dir.filter(x=>frIsFriend(x.uid)&&(!q||x.name.toLowerCase().includes(q))).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid]})).sort((a,b)=>(b.un-a.un)||(t(b.last)-t(a.last))||(b.on-a.on)||a.name.localeCompare(b.name));
   return`<div class="section" style="max-width:720px;margin-inline:auto">${backBtn()}<div class="row">${ic("users")}<div><span class="eyebrow">Classmates</span><h2>Messages between students</h2></div></div>
-  <p class="sub">Write to other learners at school: messages, voice notes, photos, files and stickers. Be kind and respectful.</p>
+  <p class="sub">Chat with your friends: messages, voice notes, photos, files and stickers. Be kind and respectful.</p>
   ${PR.err?`<div class="glass card small">${esc(PR.err)}</div>`:""}
-  <input id="peer_q" type="search" placeholder="Search for a classmate…" value="${esc(S.drafts.peer_q||"")}" aria-label="Search for a classmate">
-  ${!PR.loaded?`<div class="empty">Loading…</div>`:rows.length?`${rows.length>60&&!q?`<p class="hint">${rows.length} learners: the 60 most recent are shown. Search for a name to find the others.</p>`:""}<div class="glass list">${rows.slice(0,q?200:60).map(x=>`<div class="it click" data-a="openPeer" data-id="${x.uid}" style="cursor:pointer">${avatar(x.uid,x.name)}<div class="txt"><b>${esc(x.name)}${x.on?` <span class="chip ok">Online</span>`:""}</b><span>${x.last?esc((x.last.sender===me?"You: ":"")+String(v4Plain(x.last.body)||attLabel(x.last.att)).slice(0,60)):esc((x.classe?x.classe+(x.same?" · your class":""):"")||"Say hello!")}</span></div>${x.un?`<span class="chip warn">${x.un}</span>`:""}</div>`).join("")}</div>`:`<div class="empty"><b>No other learners yet.</b><br>Learners will appear here as soon as the teacher approves their registration.</div>`}</div>`}
+  <input id="peer_q" type="search" placeholder="Search your friends…" value="${esc(S.drafts.peer_q||"")}" aria-label="Search your friends">
+  ${!PR.loaded?`<div class="empty">Loading…</div>`:rows.length?`${rows.length>60&&!q?`<p class="hint">${rows.length} learners: the 60 most recent are shown. Search for a name to find the others.</p>`:""}<div class="glass list">${rows.slice(0,q?200:60).map(x=>`<div class="it click" data-a="openPeer" data-id="${x.uid}" style="cursor:pointer">${avatar(x.uid,x.name)}<div class="txt"><b>${esc(x.name)}${x.on?` <span class="chip ok">Online</span>`:""}</b><span>${x.last?esc((x.last.sender===me?"You: ":"")+String(v4Plain(x.last.body)||attLabel(x.last.att)).slice(0,60)):esc((x.classe?x.classe+(x.same?" · your class":""):"")||"Say hello!")}</span></div>${x.un?`<span class="chip warn">${x.un}</span>`:""}</div>`).join("")}</div>`:`<div class="empty"><b>No friends yet.</b><br>Send a friend request to a classmate. Once they accept, you can chat here.<br><button class="btn sm" style="margin-top:12px" data-a="openFriends">Find friends</button></div>`}</div>`}
 function peerChatView(){const id=S.view.id,me=S.uid,nm=peerName(id),msgs=PR.inbox.filter(m=>(m.sender===me&&m.receiver===id)||(m.sender===id&&m.receiver===me)).slice().reverse();
   return`<div class="section" style="max-width:720px;margin-inline:auto"><div><button class="back" data-a="peerBack">${ic("left")}Classmates</button></div><div class="row">${avatar(id,nm,48)}<div><span class="eyebrow">Classmate</span><h2>${esc(nm)}${S.peers[id]?` <span class="chip ok">Online</span>`:""}</h2></div></div>
   <div class="glass chat"><div class="msgs" id="chatScroll">${msgs.length?msgs.map(m=>`<div class="msg ${m.sender===me?"mine":""}"><div>${esc(m.body)}</div><span>${fmtTime(+new Date(m.created_at))}</span></div>`).join(""):`<div class="muted" style="margin:auto;text-align:center">No messages yet.<br>Say hello to ${esc(nm.split(" ")[0])}!</div>`}</div>
@@ -2511,7 +2580,7 @@ document.addEventListener("click",e=>{const say_=e.target.closest("[data-say]");
   case"toggleClosed":{const v=!S.settings.closed;write(()=>S.db.doc("settings/main").set({...S.settings,closed:v})).then(()=>toast(v?"Sign-ups closed":"Sign-ups open","shield"));break}
   case"pickRole":S.drafts.j_role=el.dataset.k||"";S.animate=true;break;
   case"showAll":S.showAll=!S.showAll;S.animate=true;break;
-  case"profFilter":S.profFilter=el.dataset.k||"";S.stLim=ST_STEP;break;case"pronMic":pronListen();return;case"pronHear":speak(S.pron?.target||"","en");return;case"pronWord":speak(el.dataset.w||"","en");return;case"pronNext":pronNext();break;case"pronAI":pronAI();return;case"notifOn":notifEnable();return;case"notifOff":notifOff().then(render);return;case"devBlock":devSet(el.dataset.id,el.dataset.dev,true);return;case"devUnblock":devSet(el.dataset.id,el.dataset.dev,false);return;case"installProg":installProg();return;case"openPeers":S.view={type:"peers"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeer":{const id=el.dataset.id;S.view={type:"peer",id};PR.with=id;S.animate=true;peerMarkRead(id);scrollTo(0,0);break}case"peerBack":PR.with=null;S.view={type:"peers"};S.animate=true;break;
+  case"profFilter":S.profFilter=el.dataset.k||"";S.stLim=ST_STEP;break;case"pronMic":pronListen();return;case"pronHear":speak(S.pron?.target||"","en");return;case"pronWord":speak(el.dataset.w||"","en");return;case"pronNext":pronNext();break;case"pronAI":pronAI();return;case"notifOn":notifEnable();return;case"notifOff":notifOff().then(render);return;case"devBlock":devSet(el.dataset.id,el.dataset.dev,true);return;case"devUnblock":devSet(el.dataset.id,el.dataset.dev,false);return;case"installProg":installProg();return;case"openFriends":S.view={type:"friends"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeers":S.view={type:"peers"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeer":{const id=el.dataset.id;S.view={type:"peer",id};PR.with=id;S.animate=true;peerMarkRead(id);scrollTo(0,0);break}case"peerBack":PR.with=null;S.view={type:"peers"};S.animate=true;break;
   case"msgsTab":S.msgsTab=el.dataset.k;if(el.dataset.k==="peers")peerModLoad();break;case"peerHide":{const id=el.dataset.id,on=el.dataset.on==="1";window.__peer.hide(id,on).then(()=>{const m=(PR.mod||[]).find(x=>x.id===id);if(m)m.hidden=on;render()}).catch(e=>toast(e.message||"Could not hide","x"));return}
   case"togglePeer":{const on=S.settings.peerChat===false;write(()=>S.db.doc("settings/main").set({...S.settings,peerChat:on})).then(()=>toast(on?"Student-to-student messages on":"Student-to-student messages off","check"));break}
   case"toggleNoChat":{const id=el.dataset.id,cur=S.access[id]||{};write(()=>S.db.doc("access/"+id).set({...cur,status:cur.status||"active",at:cur.at||Date.now(),by:cur.by||S.uid,noChat:!cur.noChat})).then(()=>toast(!cur.noChat?"Chat turned off for this student":"Chat turned back on for this student","check"));return}
@@ -10233,7 +10302,7 @@ function btKindOf(){return (BT.st&&BT.st.kind)||(BT.room&&BT.room.kind)||BTNAV.k
 `;document.head.appendChild(s)})();
 
 /* 1 · the back button: "‹ Retour" */
-function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Retour">${arIc("back")}<span>Retour</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
+function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Back">${arIc("back")}<span>Back</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
 
 /* 2 · the join box (used on the hub and on each kind page) */
 function btJoinBox(){return `<div class="ar-card"><p class="ar-kicker">Join a battle with a code</p>
