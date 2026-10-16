@@ -107,3 +107,10 @@ function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
 :root[data-lite="1"] .vic-stage,:root[data-lite="1"] .vic-aura,:root[data-lite="1"] .vic-ring,:root[data-lite="1"] .vic-spark,:root[data-lite="1"] .vic-stars span{animation:none!important}
 @media (prefers-reduced-motion:reduce){.vic-stage,.vic-aura,.vic-ring,.vic-spark,.vic-stars span{animation:none!important}}
 `;document.head.appendChild(st)}
+
+{const st=document.createElement("style");st.id="zzznback";st.textContent=`
+.ar-back{display:inline-flex;align-items:center;gap:2px;background:none!important;border:0!important;box-shadow:none!important;color:var(--fg,#EEF2FF);font-size:15px;font-weight:600;font-family:inherit;padding:8px 8px 8px 0;cursor:pointer;flex:none;backdrop-filter:none}
+.ar-back svg{width:22px;height:22px;flex:none}
+.ar-back:hover{color:#8EF6E4}
+.ar-back:active{transform:translateX(-2px)}
+`;document.head.appendChild(st)}

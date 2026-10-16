@@ -2,26 +2,26 @@
    Formats = ceux de curriculum-togo.js (quiz : * bonne reponse, - fausse, "= reponse ecrite ; vocabulaire : anglais | francais | exemple). */
 const PROGRAMMES_MANUEL=[
 {c:"2nde",u:1,lv:"B1",t:"Chieftaincy in Togo",th:"Traditional chieftaincy",g:"Conditional type one, conditional type two, although / even though / though",
-body:`Le chef traditionnel joue un role important dans la vie des villages au Togo. Dans cette lecon, on parle de la **chefferie** et de ses regles.
+body:`The traditional chief plays an important role in village life in Togo. In this lesson, we talk about the **chieftaincy** and its rules.
 
-**Vocabulary** (mots et expressions) :
-**chief** (chef traditionnel) ; **chieftaincy** (chefferie) ; **palace** (palais) ; **royal court** (cour royale) ; **elder** (ancien) ; **council** (conseil) ; **ancestor** (ancetre) ; **custom** (coutume) ; **ruler** (souverain) ; **to settle a dispute** (regler un conflit) ; **to judge** (juger) ; **verdict** (verdict) ; **to obey** (obeir) ; **to appoint** (nommer) ; **loyalty** (loyaute) ; **throne** (trone).
+**Vocabulary** (words and expressions):
+**chief** (traditional leader) ; **chieftaincy** (the system of chiefs) ; **palace** (the chief's residence) ; **royal court** (where the king holds his council and trials) ; **elder** (respected older member of the community) ; **council** (group that advises or decides) ; **ancestor** (a family member from long ago) ; **custom** (a traditional practice) ; **ruler** (the person who governs) ; **to settle a dispute** (to solve a disagreement) ; **to judge** (to decide a case) ; **verdict** (the final decision of a court) ; **to obey** (to do what you are told) ; **to appoint** (to choose someone for a job) ; **loyalty** (faithfulness to a person or group) ; **throne** (the seat of a king).
 
-**Grammar 1 : Conditional type one** (condition reelle, present + futur). On utilise **if + present simple, will + verbe**.
-If the chief listens to us, the problem **will be** solved. (Si le chef nous ecoute, le probleme sera regle.)
-If you respect the elders, they **will help** you. (Si tu respectes les anciens, ils t'aideront.)
+**Grammar 1: Conditional type one** (a real condition, present + future). We use **if + present simple, will + verb**.
+If the chief listens to us, the problem **will be** solved.
+If you respect the elders, they **will help** you.
 
-**Grammar 2 : Conditional type two** (condition irreelle, present). On utilise **if + past simple, would + verbe**. Avec **I / he / she**, on ecrit souvent **were**.
-If I **were** the chief, I **would help** the young people. (Si j'etais le chef, j'aiderais les jeunes.)
-If the council **met** every week, the village **would be** calmer. (Si le conseil se reunissait chaque semaine, le village serait plus calme.)
+**Grammar 2: Conditional type two** (an unreal or imagined condition, present). We use **if + past simple, would + verb**. With **I / he / she**, we often write **were**.
+If I **were** the chief, I **would help** the young people.
+If the council **met** every week, the village **would be** calmer.
 
-**Grammar 3 : Although, even though, though** (bien que). On utilise une proposition avec un sujet et un verbe ; on ne met pas **but** apres.
-Although the chief was old, he **was** very active. (Bien que le chef soit age, il est tres actif.)
-Even though the trial was long, everyone **accepted** the verdict. (Bien que le proces ait ete long, tout le monde a accepte le verdict.)
+**Grammar 3: Although, even though, though** (despite the fact that). We use a clause with a subject and a verb; we do not put **but** after it.
+Although the chief was old, he **was** very active.
+Even though the trial was long, everyone **accepted** the verdict.
 
-**Skill : model text.** At the royal palace, a visitor says : Good morning, Your Majesty. We come to ask for your help. The chief answers : Welcome. Tell me your problem.
+**Skill: model text.** At the royal palace, a visitor says: "Good morning, Your Majesty. We have come to ask for your help." The chief answers: "Welcome. Tell me your problem."
 
-**Final activity.** Lis le texte, puis reponds par ecrit : What is the main role of a traditional chief in your village ?`,
+**Final activity.** Read the text, then answer in writing: What is the main role of a traditional chief in your village?`,
 quiz:`If the chief listens to us, the problem ___ solved.
 * will be
 - would be
@@ -47,10 +47,10 @@ The chief lives in the ___.
 - verdict
 - ancestor
 
-What does « ancestor » mean ?
-* ancetre
-- descendant
-- conseiller
+What does "ancestor" mean?
+* a family member from long ago
+- a descendant
+- a counsellor
 
 If you break the rules, you ___ be punished.
 * will
@@ -67,62 +67,62 @@ The chief refused to judge the case, ___ he knew the family.
 - so
 - therefore
 
-To settle a dispute means :
-* regler un conflit
-- obeir
-- nommer
+To settle a dispute means:
+* to solve a disagreement
+- to obey
+- to appoint
 
 The people ___ the chief's verdict every year.
 * respect
 - respects not
 - respecting
 
-Choisis la phrase correcte :
+Choose the correct sentence:
 * If I were chief, I would help people.
 - If I would be chief, I helped people.
 - If I am chief, I would helped people.
 
-Ecris en anglais « chefferie ».
+Write in English: "chieftaincy".
 = chieftaincy
 
-Ecris en anglais « verdict ».
+Write in English: "verdict".
 = verdict`,
-deck:`chief | chef traditionnel | The chief settles the dispute at the palace.
-chieftaincy | chefferie | The chieftaincy is important in our region.
-royal court | cour royale | The case was heard at the royal court.
-elder | ancien | The elders give advice to the young.
-council | conseil | The council meets on Monday.
-ancestor | ancetre | Our ancestors respected the land.
-custom | coutume | It is an old custom in this village.
-verdict | verdict | The verdict was fair.
-to obey | obeir | Children must obey their parents.
-to appoint | nommer | The people appointed a new chief.
-loyalty | loyaute | Loyalty is a great value.
-throne | trone | The king sits on the throne.`,
-hw:{t:"A visit to the palace",b:"Ecris un dialogue de 8 a 10 lignes entre un visiteur et le chef au palais. Le visiteur explique un probleme. Utilise au moins une phrase en If ... will et une phrase en Although ... ."}},
+deck:`chief | the traditional leader of a village or community | The chief settles the dispute at the palace.
+chieftaincy | the system of traditional chiefs | The chieftaincy is important in our region.
+royal court | the place where a king holds his council and trials | The case was heard at the royal court.
+elder | a respected older member of the community | The elders give advice to the young.
+council | a group of people who advise or decide together | The council meets on Monday.
+ancestor | a family member from long ago | Our ancestors respected the land.
+custom | a traditional practice of a community | It is an old custom in this village.
+verdict | the final decision of a court | The verdict was fair.
+to obey | to do what you are told | Children must obey their parents.
+to appoint | to choose someone for a job | The people appointed a new chief.
+loyalty | faithfulness to a person or group | Loyalty is a great value.
+throne | the seat of a king | The king sits on the throne.`,
+hw:{t:"A visit to the palace",b:"Write a dialogue of 8 to 10 lines between a visitor and the chief at the palace. The visitor explains a problem. Use at least one sentence with If ... will and one sentence with Although ... ."}},
 
 {c:"2nde",u:2,lv:"B1",t:"Chieftaincy in Africa",th:"Strengths and weaknesses of chiefs in Africa",g:"Conditional type one, conditional type two, although / even though / though",
-body:`Dans beaucoup de pays africains, la chefferie traditionnelle existe a cote de l'Etat moderne. Quelles sont ses forces et ses faiblesses ?
+body:`In many African countries, traditional chieftaincy exists alongside the modern state. What are its strengths and its weaknesses?
 
-**Vocabulary** (mots et expressions) :
-**kingdom** (royaume) ; **empire** (empire) ; **colonial** (colonial) ; **independence** (independance) ; **strength** (force) ; **weakness** (faiblesse) ; **modern state** (Etat moderne) ; **traditional leader** (dirigeant traditionnel) ; **land** (terre) ; **tribe** (tribu) ; **to unite** (unir) ; **to rule** (gouverner) ; **influence** (influence) ; **authority** (autorite) ; **democracy** (democratie).
+**Vocabulary** (words and expressions):
+**kingdom** (a state ruled by a king) ; **empire** (a large state with many peoples under one ruler) ; **colonial** (relating to colonial rule) ; **independence** (freedom from outside rule) ; **strength** (a positive quality) ; **weakness** (a negative quality) ; **modern state** (a country with a national government and courts) ; **traditional leader** (a leader chosen by custom) ; **land** (ground used for farming or building) ; **tribe** (a group of families sharing one culture) ; **to unite** (to bring together) ; **to rule** (to govern) ; **influence** (the power to affect people) ; **authority** (the right to give orders) ; **democracy** (rule by the people through elections).
 
-**Grammar 1 : Conditional type one.** Pour une situation possible dans l'avenir.
-If the chiefs **work** with the government, the villages **will develop** faster. (Si les chefs travaillent avec le gouvernement, les villages se developperont plus vite.)
+**Grammar 1: Conditional type one.** For a possible situation in the future.
+If the chiefs **work** with the government, the villages **will develop** faster.
 
-**Grammar 2 : Conditional type two.** Pour une situation imaginaire ou peu probable.
-If the chieftaincy **had** more money, it **would** build more schools. (Si la chefferie avait plus d'argent, elle construirait plus d'ecoles.)
-If I **were** a minister, I **would support** traditional leaders. (Si j'etais ministre, je soutiendrais les dirigeants traditionnels.)
+**Grammar 2: Conditional type two.** For an imagined or unlikely situation.
+If the chieftaincy **had** more money, it **would** build more schools.
+If I **were** a minister, I **would support** traditional leaders.
 
-**Grammar 3 : Concessive clauses.**
-Though the chieftaincy is respected, it has little power today. (Bien que la chefferie soit respectee, elle a peu de pouvoir aujourd'hui.)
-Even though the kingdom was small, it had a strong identity. (Bien que le royaume soit petit, il avait une forte identite.)
+**Grammar 3: Concessive clauses.**
+Though the chieftaincy is respected, it has little power today.
+Even though the kingdom was small, it had a strong identity.
 
-**Skill : reading.** Model text : Traditional chiefs have a great influence on land and family questions. Their main strength is their closeness to the people. However, their weakness is that they have little official power in modern courts.
+**Skill: reading.** Model text: Traditional chiefs have a great influence on land and family questions. Their main strength is their closeness to the people. However, their weakness is that they have little official power in modern courts.
 
-**Skill : summary.** Ecris un resume en deux phrases : Traditional chiefs keep social peace. Yet they often lack the means to act.
+**Skill: summary.** Write a two-sentence summary: Traditional chiefs keep social peace. Yet they often lack the means to act.
 
-**Final activity.** Ecris un court paragraphe (5 phrases) : What are the strengths and weaknesses of traditional chiefs in Africa today ?`,
+**Final activity.** Write a short paragraph (5 sentences): What are the strengths and weaknesses of traditional chiefs in Africa today?`,
 quiz:`If the chiefs ___ with the government, the villages will develop faster.
 * work
 - worked
@@ -138,13 +138,13 @@ Though the kingdom was small, it ___ a strong identity.
 - has had not
 - having
 
-Ecris en anglais « independance ».
+Write in English: "independence".
 = independence
 
-Le mot « tribe » veut dire :
-* tribu
-- terre
-- royaume
+The word "tribe" means:
+* a group of families sharing one culture
+- land
+- kingdom
 
 The chiefs have great ___ on family questions.
 * influence
@@ -156,32 +156,32 @@ Even ___ the chief was old, he worked every day.
 - because
 - so
 
-« Dirigeant traditionnel » se dit en anglais :
-* traditional leader
-- modern state
-- colonial power
+"Traditional leader" means:
+* a leader chosen by custom
+- a modern state
+- a colonial power
 
 If I ___ a minister, I would support the chiefs.
 * were
 - was not
 - am
 
-« Gouverner » se dit :
-* to rule
+"To rule" means:
+* to govern
 - to unite
 - to obey
 
-Choisis la bonne forme : If the leaders listen, the people ___ happier.
+Choose the correct form: If the leaders listen, the people ___ happier.
 * will be
 - would be
 - are be
 
-Corrige la phrase : If he would have land, he would farm it.
+Correct the sentence: If he would have land, he would farm it.
 * If he had land, he would farm it.
 - If he has land, he would farms it.
 - If he would have land, he farms it.
 
-Ecris en anglais « faiblesse ».
+Write in English: "weakness".
 = weakness
 
 The land belongs to the village, ___ the state claims it.
@@ -189,49 +189,49 @@ The land belongs to the village, ___ the state claims it.
 - but
 - yet to be
 
-Choisis le sens de « modern state » :
-* Etat moderne
-- royaume ancien
-- pouvoir colonial`,
-deck:`kingdom | royaume | The kingdom had many villages.
-empire | empire | The empire grew quickly.
-colonial | colonial | The colonial period changed the land.
-independence | independance | Independence came in 1960.
-strength | force | Her strength is her honesty.
-weakness | faiblesse | Lack of money is a weakness.
-modern state | Etat moderne | A modern state has courts and schools.
-traditional leader | dirigeant traditionnel | The traditional leader greets the guests.
-land | terre | The land is fertile here.
-tribe | tribu | Each tribe has its own customs.
-to unite | unir | The chiefs united the villages.
-influence | influence | Chiefs have a strong influence.
-democracy | democratie | Democracy gives every citizen a voice.`,
-hw:{t:"Strengths and weaknesses",b:"Ecris 5 phrases sur les forces et les faiblesses de la chefferie dans ta region. Utilise au moins une phrase avec If ... would, une phrase avec Although et une phrase avec However."}},
+Choose the meaning of "modern state":
+* a country with a national government and courts
+- an old kingdom
+- a colonial power`,
+deck:`kingdom | a state ruled by a king | The kingdom had many villages.
+empire | a large state with many peoples under one ruler | The empire grew quickly.
+colonial | relating to colonial rule | The colonial period changed the land.
+independence | freedom from outside rule | Independence came in 1960.
+strength | a positive quality | Her strength is her honesty.
+weakness | a negative quality | Lack of money is a weakness.
+modern state | a country with a national government and courts | A modern state has courts and schools.
+traditional leader | a leader chosen by custom | The traditional leader greets the guests.
+land | ground used for farming or building | The land is fertile here.
+tribe | a group of families sharing one culture | Each tribe has its own customs.
+to unite | to bring together | The chiefs united the villages.
+influence | the power to affect people | Chiefs have a strong influence.
+democracy | rule by the people through elections | Democracy gives every citizen a voice.`,
+hw:{t:"Strengths and weaknesses",b:"Write 5 sentences about the strengths and weaknesses of the chieftaincy in your region. Use at least one sentence with If ... would, one sentence with Although and one sentence with However."}},
 
 {c:"2nde",u:3,lv:"B1",t:"Girls' Education",th:"Gender equity in schools",g:"Comparative of inferiority, comparative of superiority, comparative of equality, however / yet, question tags",
-body:`L'education des filles est un sujet important au Togo. Beaucoup de filles quittent l'ecole trop tot. Pourquoi, et que peut-on faire ?
+body:`Girls' education is an important issue in Togo. Many girls leave school too early. Why, and what can be done?
 
-**Vocabulary** (mots et expressions) :
-**education** (education) ; **school fees** (frais de scolarite) ; **enrolment** (inscription) ; **literacy** (alphabetisation) ; **household** (menage) ; **housework** (travaux domestiques) ; **to drop out** (abandonner l'ecole) ; **career** (carriere) ; **equal** (egal) ; **unfair** (injuste) ; **to encourage** (encourager) ; **gap** (ecart) ; **opportunity** (occasion, chance) ; **to support** (soutenir) ; **to succeed** (reussir).
+**Vocabulary** (words and expressions):
+**education** (learning at school) ; **school fees** (money paid to go to school) ; **enrolment** (registration at a school) ; **literacy** (the ability to read and write) ; **household** (the people who live in one home) ; **housework** (domestic tasks such as cooking and cleaning) ; **to drop out** (to leave school before finishing) ; **career** (a person's working life and profession) ; **equal** (the same in value or rights) ; **unfair** (not fair or just) ; **to encourage** (to give confidence or support) ; **gap** (a difference between two things) ; **opportunity** (a good chance) ; **to support** (to help) ; **to succeed** (to achieve a goal).
 
-**Grammar 1 : Comparative of inferiority.** On utilise **less ... than** (moins ... que) ou **less + nom + than**.
-Boys often have **less housework than** girls. (Les garcons ont souvent moins de travaux domestiques que les filles.)
+**Grammar 1: Comparative of inferiority.** We use **less ... than** (less ... than) or **less + noun + than**.
+Boys often have **less housework than** girls.
 
-**Grammar 2 : Comparative of superiority.** On ajoute **-er** ou on utilise **more ... than**.
-Schooling is **more important than** money for a girl's future. (La scolarisation est plus importante que l'argent pour l'avenir d'une fille.)
+**Grammar 2: Comparative of superiority.** We add **-er** or use **more ... than**.
+Schooling is **more important than** money for a girl's future.
 
-**Grammar 3 : Comparative of equality.** On utilise **as ... as** (aussi ... que).
-A girl can be **as clever as** a boy. (Une fille peut etre aussi intelligente qu'un garcon.)
+**Grammar 3: Comparative of equality.** We use **as ... as**.
+A girl can be **as clever as** a boy.
 
-**Grammar 4 : However and yet.** **However** et **yet** expriment un contraste (cependant, pourtant). **However** est souvent en debut de phrase avec une virgule.
-Many girls are bright. However, they often leave school early. (Beaucoup de filles sont brillantes. Cependant, elles quittent souvent l'ecole tot.)
+**Grammar 4: However and yet.** **However** and **yet** express a contrast (nevertheless, still). **However** is often at the start of a sentence, followed by a comma.
+Many girls are bright. However, they often leave school early.
 
-**Grammar 5 : Question tags.** On ajoute une petite question a la fin : **isn't it ?**, **doesn't she ?**
-Girls should go to school, **shouldn't they ?** (Les filles devraient aller a l'ecole, non ?)
+**Grammar 5: Question tags.** We add a short question at the end: **isn't it?**, **doesn't she?**
+Girls should go to school, **shouldn't they?**
 
-**Skill : translation.** FR : Les parents doivent envoyer leurs filles a l'ecole. EN : Parents must send their daughters to school.
+**Skill: translation.** FR: Les parents doivent envoyer leurs filles a l'ecole. EN: Parents must send their daughters to school.
 
-**Final activity.** Ecris un paragraphe de 5 phrases sur l'importance de l'education des filles. Utilise au moins un comparatif et un question tag.`,
+**Final activity.** Write a paragraph of 5 sentences on the importance of girls' education. Use at least one comparative and one question tag.`,
 quiz:`Girls often have ___ time to study than boys.
 * less
 - fewer than
@@ -257,13 +257,13 @@ Parents must support their daughters, ___ ?
 - should they
 - don't they
 
-Ecris en anglais « alphabetisation ».
+Write in English: "literacy".
 = literacy
 
-« To drop out » veut dire :
-* abandonner l'ecole
-- reussir
-- encourager
+"To drop out" means:
+* to leave school before finishing
+- to succeed
+- to encourage
 
 Many girls are bright, ___ they leave school early.
 * yet
@@ -275,73 +275,73 @@ The gap between boys and girls is smaller ___ before.
 - as
 - to
 
-Le contraire de « equal » est :
+The opposite of "equal" is:
 * unfair
 - literacy
 - household
 
-Choisis la bonne forme : Her brother is ___ tall ___ her.
+Choose the correct form: Her brother is ___ tall ___ her.
 * as / as
 - more / than
 - less / as
 
-Corrige la phrase : Girls are more intelligent than boys, isn't they ?
-* Girls are more intelligent than boys, aren't they ?
-- Girls are more intelligent than boys, are they ?
-- Girls are more intelligent that boys, isn't they ?
+Correct the sentence: Girls are more intelligent than boys, isn't they?
+* Girls are more intelligent than boys, aren't they?
+- Girls are more intelligent than boys, are they?
+- Girls are more intelligent that boys, isn't they?
 
-« Frais de scolarite » se dit :
-* school fees
-- school enrolment
-- school career
+"School fees" means:
+* the money paid to go to school
+- school registration
+- a school career
 
-Ecris en anglais « travaux domestiques ».
+Write in English: "housework".
 = housework
 
 The mother cooks, ___ she also works in the field.
 * and
 - however
 - unless`,
-deck:`education | education | Education opens many doors.
-school fees | frais de scolarite | School fees are high for some families.
-enrolment | inscription | Enrolment starts in September.
-literacy | alphabetisation | Literacy helps women run a business.
-household | menage | The household has five members.
-housework | travaux domestiques | Housework takes many hours each day.
-to drop out | abandonner l'ecole | Some girls drop out at twelve.
-career | carriere | She wants a career in medicine.
-equal | egal | Boys and girls have equal rights.
-unfair | injuste | It is unfair to stop a girl's studies.
-to encourage | encourager | Teachers should encourage girls.
-gap | ecart | The gap between boys and girls is closing.
-opportunity | occasion | Every child needs an opportunity.
-to succeed | reussir | She succeeded in her exams.`,
-hw:{t:"Girls and school",b:"Ecris 6 phrases sur l'ecole des filles. Utilise au moins deux comparatifs (more ... than, as ... as) et un question tag."}},
+deck:`education | learning at school | Education opens many doors.
+school fees | money paid to go to school | School fees are high for some families.
+enrolment | registration at a school | Enrolment starts in September.
+literacy | the ability to read and write | Literacy helps women run a business.
+household | the people who live in one home | The household has five members.
+housework | domestic tasks such as cooking and cleaning | Housework takes many hours each day.
+to drop out | to leave school before finishing | Some girls drop out at twelve.
+career | a person's working life and profession | She wants a career in medicine.
+equal | the same in value or rights | Boys and girls have equal rights.
+unfair | not fair or just | It is unfair to stop a girl's studies.
+to encourage | to give confidence or support | Teachers should encourage girls.
+gap | a difference between two things | The gap between boys and girls is closing.
+opportunity | a good chance | Every child needs an opportunity.
+to succeed | to achieve a goal | She succeeded in her exams.`,
+hw:{t:"Girls and school",b:"Write 6 sentences about girls' schooling. Use at least two comparatives (more ... than, as ... as) and one question tag."}},
 
 {c:"2nde",u:4,lv:"B1",t:"Women's Place in the Family",th:"Role and place of women in the family",g:"Comparative of inferiority, comparative of superiority, comparative of equality, however / yet, question tags",
-body:`Dans la famille togolaise, le role des femmes change. Comment les taches sont-elles partagees entre l'homme et la femme ?
+body:`In the Togolese family, the role of women is changing. How are tasks shared between the husband and the wife?
 
-**Vocabulary** (mots et expressions) :
-**husband** (mari) ; **wife** (epouse) ; **to share** (partager) ; **responsibility** (responsabilite) ; **decision** (decision) ; **to raise children** (elever des enfants) ; **to cook** (cuisiner) ; **family meeting** (reunion familiale) ; **duty** (devoir) ; **to contribute** (contribuer) ; **role** (role) ; **income** (revenu) ; **respect** (respect) ; **equality** (egalite) ; **tradition** (tradition).
+**Vocabulary** (words and expressions):
+**husband** (a man married to a woman) ; **wife** (a woman married to a man) ; **to share** (to divide and use together) ; **responsibility** (a duty you must carry out) ; **decision** (a choice made after thinking) ; **to raise children** (to bring up children) ; **to cook** (to prepare food) ; **family meeting** (a gathering of the family to decide things) ; **duty** (something you must do) ; **to contribute** (to give or add something) ; **role** (the part someone plays) ; **income** (money earned) ; **respect** (a feeling of honour for someone) ; **equality** (the same rights for everyone) ; **tradition** (customs passed down over time).
 
-**Grammar 1 : Comparative of superiority.** Avec un adjectif court : **adjectif + -er + than**. Avec un adjectif long : **more + adjectif + than**.
-Women's contribution is **more visible than** before. (La contribution des femmes est plus visible qu'avant.)
+**Grammar 1: Comparative of superiority.** With a short adjective: **adjective + -er + than**. With a long adjective: **more + adjective + than**.
+Women's contribution is **more visible than** before.
 
-**Grammar 2 : Comparative of inferiority.** **less ... than**.
-In some families, women have **less say than** men in decisions. (Dans certaines familles, les femmes ont moins de voix que les hommes dans les decisions.)
+**Grammar 2: Comparative of inferiority.** **less ... than**.
+In some families, women have **less say than** men in decisions.
 
-**Grammar 3 : Comparative of equality.**
-A mother can be **as responsible as** a father. (Une mere peut etre aussi responsable qu'un pere.)
+**Grammar 3: Comparative of equality.**
+A mother can be **as responsible as** a father.
 
-**Grammar 4 : However and yet.**
-Tradition gives men the final word. Yet, many women now take part in family decisions. (La tradition donne le dernier mot aux hommes. Pourtant, beaucoup de femmes participent maintenant aux decisions familiales.)
+**Grammar 4: However and yet.**
+Tradition gives men the final word. Yet, many women now take part in family decisions.
 
-**Grammar 5 : Question tags.** Apres un verbe positif, la question tag est negative.
-Women work hard at home, **don't they ?** (Les femmes travaillent dur a la maison, n'est-ce pas ?)
+**Grammar 5: Question tags.** After a positive verb, the question tag is negative.
+Women work hard at home, **don't they?**
 
-**Skill : model sentences for a sketch.** Mother : We must share the housework, my dear. Father : You are right. I will cook on Sunday, won't I ?
+**Skill: model sentences for a sketch.** Mother: We must share the housework, my dear. Father: You are right. I will cook on Sunday, won't I?
 
-**Final activity.** Ecris un court sketch (8 repliques) entre un pere, une mere et un enfant sur le partage des taches a la maison.`,
+**Final activity.** Write a short sketch (8 lines) between a father, a mother and a child about sharing the housework at home.`,
 quiz:`Women's voice is ___ heard today ___ in the past.
 * more / than
 - less / than
@@ -367,13 +367,13 @@ Tradition is strong here, ___ ?
 - is it
 - doesn't it
 
-Ecris en anglais « elever des enfants ».
+Write in English: "to raise children".
 = to raise children
 
-« Income » veut dire :
-* revenu
-- devoir
-- decision
+"Income" means:
+* money earned
+- a duty
+- a decision
 
 Men and women have ___ rights in the family.
 * equal
@@ -385,66 +385,66 @@ She cooks every day, ___ she never complains.
 - however
 - unless
 
-Choisis la bonne forme : Our father ___ the eldest, ___ the youngest.
+Choose the correct form: Our father ___ the eldest, ___ the youngest.
 * is older than
 - is older as
 - is more old than
 
-Corrige la phrase : Men work as hard than women, don't they ?
-* Men work as hard as women, don't they ?
-- Men work as hard than women, do they ?
-- Men work as hard as women, do they ?
+Correct the sentence: Men work as hard than women, don't they?
+* Men work as hard as women, don't they?
+- Men work as hard than women, do they?
+- Men work as hard as women, do they?
 
-« Responsibility » se traduit par :
-* responsabilite
+"Responsibility" means:
+* a duty you must carry out
 - respect
-- reunion
+- a family meeting
 
-Le mot « husband » designe :
-* le mari
-- l'epouse
-- l'enfant
+The word "husband" means:
+* a man married to a woman
+- a wife
+- a child
 
-Ecris en anglais « partager ».
+Write in English: "to share".
 = to share`,
-deck:`husband | mari | My husband works in Lome.
-wife | epouse | His wife teaches at a primary school.
-to share | partager | We share the housework.
-responsibility | responsabilite | Caring for children is a big responsibility.
-decision | decision | The decision was taken together.
-to raise children | elever des enfants | They raise their children with love.
-to cook | cuisiner | Who will cook tonight?
-family meeting | reunion familiale | We hold a family meeting every Sunday.
-duty | devoir | It is a duty to help elders.
-to contribute | contribuer | Each member can contribute ideas.
-role | role | The mother has an important role.
-income | revenu | The family income is small this year.
-equality | egalite | Equality begins at home.
-tradition | tradition | This tradition is very old.`,
-hw:{t:"Family roles",b:"Ecris un petit texte de 6 phrases sur le role de la femme et de l'homme dans ta famille. Utilise au moins un comparatif de superiorite, une phrase avec However et une question tag."}},
+deck:`husband | a man married to a woman | My husband works in Lome.
+wife | a woman married to a man | His wife teaches at a primary school.
+to share | to divide and use together | We share the housework.
+responsibility | a duty you must carry out | Caring for children is a big responsibility.
+decision | a choice made after thinking | The decision was taken together.
+to raise children | to bring up children | They raise their children with love.
+to cook | to prepare food | Who will cook tonight?
+family meeting | a gathering of the family to decide things | We hold a family meeting every Sunday.
+duty | something you must do | It is a duty to help elders.
+to contribute | to give or add something | Each member can contribute ideas.
+role | the part someone plays | The mother has an important role.
+income | money earned | The family income is small this year.
+equality | the same rights for everyone | Equality begins at home.
+tradition | customs passed down over time | This tradition is very old.`,
+hw:{t:"Family roles",b:"Write a short text of 6 sentences about the role of women and men in your family. Use at least one comparative of superiority, one sentence with However and one question tag."}},
 
 {c:"2nde",u:5,lv:"B1",t:"Bushfires and Deforestation",th:"The environment: fires and forests",g:"Active and passive voice, the use of unless, relative pronouns",
-body:`Les feux de brousse et la deforestation menacent les forets du Togo. Que se passe-t-il et comment proteger la nature ?
+body:`Bushfires and deforestation threaten the forests of Togo. What is happening, and how can nature be protected?
 
-**Vocabulary** (mots et expressions) :
-**bushfire** (feu de brousse) ; **deforestation** (deforestation) ; **forest** (foret) ; **to cut down trees** (abattre des arbres) ; **drought** (secheresse) ; **soil** (sol) ; **erosion** (erosion) ; **to burn** (bruler) ; **smoke** (fumee) ; **to plant** (planter) ; **to protect** (proteger) ; **wildlife** (faune sauvage) ; **to spread** (se propager) ; **charcoal** (charbon de bois) ; **rainfall** (pluviometrie).
+**Vocabulary** (words and expressions):
+**bushfire** (a fire that spreads across grassland or bush) ; **deforestation** (the clearing of forests) ; **forest** (a large area covered with trees) ; **to cut down trees** (to fell trees) ; **drought** (a long period with no rain) ; **soil** (the earth in which plants grow) ; **erosion** (the wearing away of soil by wind or water) ; **to burn** (to set on fire) ; **smoke** (the grey cloud from a fire) ; **to plant** (to put seeds or trees in the ground) ; **to protect** (to keep safe) ; **wildlife** (animals living in nature) ; **to spread** (to grow over a wider area) ; **charcoal** (wood burnt to make fuel) ; **rainfall** (the amount of rain).
 
-**Grammar 1 : Active and passive voice.** Voix active : **subject + verb + object**. Voix passive : **subject + be + past participle (by + agent)**.
-Farmers burn the grass. (active) / The grass **is burnt by** farmers. (passive) (Les paysans brulent l'herbe.)
-Many trees **were cut down** last year. (Beaucoup d'arbres ont ete abattus l'an dernier.)
+**Grammar 1: Active and passive voice.** Active voice: **subject + verb + object**. Passive voice: **subject + be + past participle (by + agent)**.
+Farmers burn the grass. (active) / The grass **is burnt by** farmers. (passive)
+Many trees **were cut down** last year.
 
-**Grammar 2 : The use of unless.** **Unless** = **if not** (sauf si, a moins que). Le verbe reste au present.
-The forest will disappear **unless** we plant new trees. (La foret disparaitra a moins que nous ne plantions de nouveaux arbres.)
+**Grammar 2: The use of unless.** **Unless** = **if not**. The verb stays in the present.
+The forest will disappear **unless** we plant new trees.
 
-**Grammar 3 : Relative pronouns.** **who** (personnes), **which** (choses), **that** (personnes ou choses), **whose** (dont).
-The farmer **who** lost his land is angry. (Le paysan qui a perdu sa terre est en colere.)
-The fire, **which** started at night, spread fast. (Le feu, qui a commence la nuit, s'est vite propage.)
+**Grammar 3: Relative pronouns.** **who** (for people), **which** (for things), **that** (for people or things), **whose** (showing possession).
+The farmer **who** lost his land is angry.
+The fire, **which** started at night, spread fast.
 
-**Skill : reading.** Model text : Bushfires destroy the soil and kill small animals. Trees that are cut down cannot protect the land from erosion.
+**Skill: reading.** Model text: Bushfires destroy the soil and kill small animals. Trees that are cut down cannot protect the land from erosion.
 
-**Skill : writing about protection.** Model sentences : We should protect our forests. Young people can plant trees every year.
+**Skill: writing about protection.** Model sentences: We should protect our forests. Young people can plant trees every year.
 
-**Final activity.** Ecris 5 phrases sur les causes et les effets des feux de brousse. Utilise au moins une phrase au passif et une phrase avec unless.`,
+**Final activity.** Write 5 sentences about the causes and effects of bushfires. Use at least one passive sentence and one sentence with unless.`,
 quiz:`The forest ___ by farmers last year.
 * was burnt
 - burnt
@@ -460,12 +460,12 @@ The man ___ planted trees is my uncle.
 - which
 - whose
 
-« Bushfire » veut dire :
-* feu de brousse
-- secheresse
-- fumee
+"Bushfire" means:
+* a fire that spreads across grassland or bush
+- drought
+- smoke
 
-Choisis la voix passive : Farmers cut down the trees.
+Choose the passive voice: Farmers cut down the trees.
 * The trees were cut down by farmers.
 - The trees cut down farmers.
 - The trees have been cut farmers.
@@ -475,30 +475,30 @@ The river ___ dirty since the factory opened.
 - was become
 - become
 
-Ecris en anglais « proteger ».
+Write in English: "to protect".
 = to protect
 
 The soil, ___ is dry, cannot grow food.
 * which
 - who
-- whose man
+- whose
 
-Les arbres ___ sont abattus ne repoussent pas.
+Trees ___ are cut down do not grow back.
 * that
 - what
 - where
 
-« Erosion » designe :
-* l'erosion du sol
-- la pluie
-- le charbon
+"Erosion" means:
+* the wearing away of soil
+- rain
+- charcoal
 
 The fire ___ by a careless child.
 * was started
 - started was
 - was start
 
-Corrige la phrase : Unless we will stop, the forest will disappear.
+Correct the sentence: Unless we will stop, the forest will disappear.
 * Unless we stop, the forest will disappear.
 - Unless we will stop, the forest disappears not.
 - Unless we stopped, the forest will disappear.
@@ -508,51 +508,51 @@ The woman ___ house burned is very sad.
 - who
 - which
 
-Ecris en anglais « charbon de bois ».
+Write in English: "charcoal".
 = charcoal
 
 The drought ___ every year in our region.
 * happens
 - is happened
 - is happen`,
-deck:`bushfire | feu de brousse | A bushfire destroyed the grass.
-deforestation | deforestation | Deforestation is a serious problem.
-forest | foret | The forest is full of birds.
-to cut down trees | abattre des arbres | They cut down trees for wood.
-drought | secheresse | The drought lasted six months.
-soil | sol | The soil needs water and care.
-erosion | erosion | Erosion takes away the top soil.
-to burn | bruler | Do not burn the dry leaves.
-smoke | fumee | Smoke came from the fire.
-to plant | planter | We plant maize in June.
-to protect | proteger | We must protect wildlife.
-wildlife | faune sauvage | Wildlife needs a safe place.
-to spread | se propager | The fire began to spread.
-charcoal | charbon de bois | Many families cook with charcoal.`,
-hw:{t:"Our forest",b:"Ecris 6 phrases sur la foret pres de chez toi. Utilise au moins une phrase au passif, une phrase avec unless et une phrase avec who ou which."}},
+deck:`bushfire | a fire that spreads across grassland or bush | A bushfire destroyed the grass.
+deforestation | the clearing of forests | Deforestation is a serious problem.
+forest | a large area covered with trees | The forest is full of birds.
+to cut down trees | to fell trees | They cut down trees for wood.
+drought | a long period with no rain | The drought lasted six months.
+soil | the earth in which plants grow | The soil needs water and care.
+erosion | the wearing away of soil by wind or water | Erosion takes away the top soil.
+to burn | to set on fire | Do not burn the dry leaves.
+smoke | the grey cloud from a fire | Smoke came from the fire.
+to plant | to put seeds or trees in the ground | We plant maize in June.
+to protect | to keep safe | We must protect wildlife.
+wildlife | animals living in nature | Wildlife needs a safe place.
+to spread | to grow over a wider area | The fire began to spread.
+charcoal | wood burnt to make fuel | Many families cook with charcoal.`,
+hw:{t:"Our forest",b:"Write 6 sentences about the forest near your home. Use at least one passive sentence, one sentence with unless and one sentence with who or which."}},
 
 {c:"2nde",u:6,lv:"B1",t:"Dumping Grounds",th:"Causes and effects of dumping grounds",g:"Active and passive voice, the use of unless, relative pronouns",
-body:`Les decharges publiques se multiplient dans les villes togolaises. Quelles en sont les causes et les consequences ?
+body:`Public dumping grounds are spreading in Togolese towns. What are the causes and the consequences?
 
-**Vocabulary** (mots et expressions) :
-**dumping ground** (decharge) ; **waste** (dechets) ; **plastic** (plastique) ; **to collect** (ramasser) ; **to dump** (deverser, jeter) ; **smell** (odeur) ; **disease** (maladie) ; **pollution** (pollution) ; **recycling** (recyclage) ; **to ban** (interdire) ; **landfill** (site d'enfouissement) ; **rubbish** (ordures) ; **dustbin** (poubelle) ; **health risk** (risque pour la sante) ; **to clean up** (nettoyer).
+**Vocabulary** (words and expressions):
+**dumping ground** (a place where rubbish is left) ; **waste** (materials that are thrown away) ; **plastic** (a light material made from oil) ; **to collect** (to pick up) ; **to dump** (to throw away in a large amount) ; **smell** (what you notice with your nose) ; **disease** (an illness) ; **pollution** (harmful substances in the environment) ; **recycling** (reusing materials) ; **to ban** (to forbid by law) ; **landfill** (a place where waste is buried) ; **rubbish** (things thrown away) ; **dustbin** (a container for rubbish) ; **health risk** (a danger to health) ; **to clean up** (to make clean).
 
-**Grammar 1 : Passive voice.** Le passif est tres frequent quand on parle des decharges, car on ne sait pas toujours qui jette les dechets.
-Rubbish **is dumped** near the river every day. (Les ordures sont jetees pres de la riviere chaque jour.)
-The streets **were cleaned** last week. (Les rues ont ete nettoyees la semaine derniere.)
+**Grammar 1: Passive voice.** The passive is very common when we talk about dumping grounds, because we do not always know who throws the waste away.
+Rubbish **is dumped** near the river every day.
+The streets **were cleaned** last week.
 
-**Grammar 2 : Unless.**
-Diseases will spread **unless** the city collects the waste. (Les maladies vont se repandre a moins que la ville ne ramasse les dechets.)
+**Grammar 2: Unless.**
+Diseases will spread **unless** the city collects the waste.
 
-**Grammar 3 : Relative pronouns.**
-The dumping ground **which** is near the market smells badly. (La decharge qui est pres du marche sent tres mal.)
-Children **who** play there can get sick. (Les enfants qui jouent la peuvent tomber malades.)
+**Grammar 3: Relative pronouns.**
+The dumping ground **which** is near the market smells badly.
+Children **who** play there can get sick.
 
-**Skill : translation.** FR : La decharge pollue l'eau et l'air. EN : The dumping ground pollutes the water and the air.
+**Skill: translation.** FR: La decharge pollue l'eau et l'air. EN: The dumping ground pollutes the water and the air.
 
-**Skill : opinion.** Model sentence : In my opinion, plastic should be banned.
+**Skill: opinion.** Model sentence: In my opinion, plastic should be banned.
 
-**Final activity.** Ecris un paragraphe de 5 phrases : Quelle est ton opinion sur les decharges dans ta ville ? Propose une solution.`,
+**Final activity.** Write a paragraph of 5 sentences: What is your opinion of the dumping grounds in your town? Suggest a solution.`,
 quiz:`Rubbish ___ collected every morning in our street.
 * is
 - are
@@ -568,12 +568,12 @@ The bin ___ is full is at the corner.
 - whose
 - who
 
-« Dustbin » veut dire :
-* poubelle
-- decharge
-- recyclage
+"Dustbin" means:
+* a container for rubbish
+- a dumping ground
+- recycling
 
-Ecris en anglais « interdire ».
+Write in English: "to ban".
 = to ban
 
 The plastic ___ thrown in the river.
@@ -581,7 +581,7 @@ The plastic ___ thrown in the river.
 - were
 - have
 
-Corrige la phrase : Unless you will sort the waste, it will smell.
+Correct the sentence: Unless you will sort the waste, it will smell.
 * Unless you sort the waste, it will smell.
 - Unless you will sorted the waste, it smells.
 - Unless you sort the waste, it smells not.
@@ -591,72 +591,72 @@ People ___ live near the dump are at risk.
 - which
 - whose
 
-Choisis la bonne voix : The council ___ the streets last month.
+Choose the correct voice: The council ___ the streets last month.
 * cleaned
 - was clean
 - has clean
 
-« Health risk » se traduit par :
-* risque pour la sante
-- risque de chute
-- risque de vol
+"Health risk" means:
+* a danger to health
+- a risk of falling
+- a risk of theft
 
-Ecris en anglais « ramasser » (les dechets).
+Write in English: "to collect" (waste).
 = to collect
 
-Les jeunes ___ recyclent le plastique aident la ville.
-* qui
-- que
-- dont
+Young people ___ recycle plastic help the city.
+* who
+- that
+- whose
 
 The water ___ by the dump is dirty.
 * is polluted
 - polluted is
 - pollute
 
-« Smell » veut dire :
+"Smell" means:
 * odeur
 - maladie
 - ordures
 
-Choisis la phrase correcte : In my opinion, plastic should be banned.
-* Correct : in my opinion, plastic should be banned.
-- Correct : in my opinion, plastic should banned.
-- Correct : in my opinion, plastic shall ban.`,
-deck:`dumping ground | decharge | The dumping ground is too close to the school.
-waste | dechets | Waste must be sorted at home.
-plastic | plastique | Plastic bags are everywhere in the city.
-to collect | ramasser | The truck collects the rubbish on Monday.
-to dump | deverser, jeter | People dump waste near the river.
-smell | odeur | The smell is very strong at noon.
-disease | maladie | Dirty water can cause disease.
-pollution | pollution | Air pollution affects our health.
-recycling | recyclage | Recycling saves money and nature.
-to ban | interdire | The town banned plastic bags.
-landfill | site d'enfouissement | The landfill is outside the town.
-rubbish | ordures | Put the rubbish in the bin.
-dustbin | poubelle | The dustbin is full.
-health risk | risque pour la sante | Rubbish can be a health risk.`,
-hw:{t:"My neighbourhood and waste",b:"Ecris 6 phrases sur les dechets dans ton quartier. Utilise au moins une phrase au passif, une phrase avec unless et une phrase avec which ou who."}},
+Choose the correct sentence: In my opinion, plastic should be banned.
+* Correct: in my opinion, plastic should be banned.
+- Correct: in my opinion, plastic should banned.
+- Correct: in my opinion, plastic shall ban.`,
+deck:`dumping ground | a place where rubbish is left | The dumping ground is too close to the school.
+waste | materials that are thrown away | Waste must be sorted at home.
+plastic | a light material made from oil | Plastic bags are everywhere in the city.
+to collect | to pick up | The truck collects the rubbish on Monday.
+to dump | to throw away in a large amount | People dump waste near the river.
+smell | what you notice with your nose | The smell is very strong at noon.
+disease | an illness | Dirty water can cause disease.
+pollution | harmful substances in the environment | Air pollution affects our health.
+recycling | reusing materials | Recycling saves money and nature.
+to ban | to forbid by law | The town banned plastic bags.
+landfill | a place where waste is buried | The landfill is outside the town.
+rubbish | things thrown away | Put the rubbish in the bin.
+dustbin | a container for rubbish | The dustbin is full.
+health risk | a danger to health | Rubbish can be a health risk.`,
+hw:{t:"My neighbourhood and waste",b:"Write 6 sentences about the waste in your neighbourhood. Use at least one passive sentence, one sentence with unless and one sentence with which or who."}},
 
 {c:"2nde",u:7,lv:"B1",t:"Artificial Intelligence and the Modern Society",th:"AI, technology and daily life",g:"Active and passive voice",
-body:`L'intelligence artificielle entre dans la vie quotidienne : ecoles, hopitaux, banques. Quels sont ses avantages et ses inconvenients ?
+body:`Artificial intelligence is entering daily life: schools, hospitals, banks. What are its advantages and disadvantages?
 
-**Vocabulary** (mots et expressions) :
-**artificial intelligence (AI)** (intelligence artificielle) ; **machine** (machine) ; **algorithm** (algorithme) ; **robot** (robot) ; **data** (donnees) ; **software** (logiciel) ; **to program** (programmer) ; **to automate** (automatiser) ; **e-learning** (apprentissage en ligne) ; **job loss** (perte d'emploi) ; **advantage** (avantage) ; **disadvantage** (inconvenient) ; **curriculum vitae (CV)** (CV) ; **to apply for a job** (postuler) ; **skill** (competence).
+**Vocabulary** (words and expressions):
+**artificial intelligence (AI)** (computer systems that do tasks needing human intelligence) ; **machine** (a device that does a task) ; **algorithm** (a set of steps a computer follows) ; **robot** (a machine that can perform tasks on its own) ; **data** (information stored in a computer) ; **software** (programs that run on a computer) ; **to program** (to give a computer instructions) ; **to automate** (to make a process run by machine) ; **e-learning** (learning through the internet) ; **job loss** (losing your work) ; **advantage** (a benefit) ; **disadvantage** (a drawback) ; **curriculum vitae (CV)** (a document listing your education and experience) ; **to apply for a job** (to ask for a job in writing) ; **skill** (an ability you have learned).
 
-**Grammar : Active and passive voice.** Avec les technologies, on utilise souvent le passif car l'agent est evident ou inutile.
-Many tasks **are done** by machines today. (Beaucoup de taches sont faites par des machines aujourd'hui.)
-The software **has been updated** by engineers. (Le logiciel a ete mis a jour par des ingenieurs.)
-Active : Engineers **design** new robots. (Les ingenieurs concoivent de nouveaux robots.)
+**Grammar: Active and passive voice.** With technology, we often use the passive because the agent is obvious or not important.
+Many tasks **are done** by machines today.
+The software **has been updated** by engineers.
+Active: Engineers **design** new robots.
 
-**Skill : speaking about advantages.** Model sentences : E-learning allows students to study at home. Phytotherapy is a cheap way to treat some illnesses.
+**Skill: speaking about advantages.** Model sentences: E-learning allows students to study at home. Phytotherapy is a cheap way to treat some illnesses.
 
-**Skill : writing a CV.** Model structure : Name, Contact, Education, Skills, Experience, Interests. Example : Skills : computer literacy, good English, teamwork.
+**Skill: writing a CV.** Model structure: Name, Contact, Education, Skills, Experience, Interests. Example: Skills: computer literacy, good English, teamwork.
 
-**Skill : discussion.** Model sentence : AI saves time, but it can cause job loss.
+**Skill: discussion.** Model sentence: AI saves time, but it can cause job loss.
 
-**Final activity.** Ecris 5 phrases : Quels sont les avantages et les inconvenients de l'intelligence artificielle pour les jeunes Togolais ?`,
+**Final activity.** Write 5 sentences: What are the advantages and disadvantages of artificial intelligence for young people in Togo?`,
 quiz:`Many jobs ___ by machines now.
 * are done
 - do
@@ -667,12 +667,12 @@ The robot ___ programmed by a young engineer.
 - were
 - is be
 
-« Algorithm » veut dire :
-* algorithme
-- logiciel
-- donnees
+"Algorithm" means:
+* a set of steps a computer follows
+- software
+- data
 
-Ecris en anglais « perte d'emploi ».
+Write in English: "job loss".
 = job loss
 
 The new software ___ last week.
@@ -680,17 +680,17 @@ The new software ___ last week.
 - installed was
 - was install
 
-Choisis la bonne forme passive : The teacher uses the computer.
+Choose the correct passive form: The teacher uses the computer.
 * The computer is used by the teacher.
 - The computer uses the teacher.
 - The computer is using by the teacher.
 
-« Curriculum vitae » se dit :
+"Curriculum vitae" is abbreviated as:
 * CV
 - CD
 - CS
 
-Ecris en anglais « automatiser ».
+Write in English: "to automate".
 = to automate
 
 Students ___ taught online by good teachers.
@@ -698,177 +698,177 @@ Students ___ taught online by good teachers.
 - can be teach
 - can teaching
 
-« Advantage » est le contraire de :
+"Advantage" is the opposite of:
 * disadvantage
 - skill
 - data
 
-Les donnees ___ collectees sont protegees.
-* qui
-- que
-- dont
+The data ___ collected are protected.
+* which
+- who
+- whose
 
 The engineers ___ the new machine in 2025.
 * built
 - were built
 - has build
 
-« To apply for a job » veut dire :
-* postuler
-- programmer
-- automatiser
+"To apply for a job" means:
+* to ask for a job in writing
+- to program
+- to automate
 
-Corrige la phrase : The letter has wrote by the manager.
+Correct the sentence: The letter has wrote by the manager.
 * The letter has been written by the manager.
 - The letter has been write by the manager.
 - The letter was writing by the manager.
 
-Choisis la phrase correcte :
+Choose the correct sentence:
 * AI saves time, but it can cause job loss.
 - AI saves time, but it can causes job loss.
 - AI save time, but can it cause job loss.`,
-deck:`artificial intelligence | intelligence artificielle | Artificial intelligence is growing fast.
-machine | machine | The machine prints forty pages a minute.
-algorithm | algorithme | The algorithm suggests new lessons.
-robot | robot | The robot cleans the floor.
-data | donnees | The data is stored on a server.
-software | logiciel | This software helps students write essays.
-to automate | automatiser | Banks automate many tasks.
-e-learning | apprentissage en ligne | E-learning is useful in remote villages.
-job loss | perte d'emploi | Automation may cause job loss.
-advantage | avantage | An advantage of AI is speed.
-disadvantage | inconvenient | A disadvantage is the cost.
-curriculum vitae | CV | Send your CV with your application.
-to apply for a job | postuler | She applied for a job at the bank.
-skill | competence | Computer skill is important today.`,
-hw:{t:"AI in my life",b:"Ecris un petit texte de 6 phrases : donne un avantage et un inconvenient de l'intelligence artificielle. Utilise au moins 2 phrases au passif."}},
+deck:`artificial intelligence | computer systems that do tasks needing human intelligence | Artificial intelligence is growing fast.
+machine | a device that does a task | The machine prints forty pages a minute.
+algorithm | a set of steps a computer follows | The algorithm suggests new lessons.
+robot | a machine that can perform tasks on its own | The robot cleans the floor.
+data | information stored in a computer | The data is stored on a server.
+software | programs that run on a computer | This software helps students write essays.
+to automate | to make a process run by machine | Banks automate many tasks.
+e-learning | learning through the internet | E-learning is useful in remote villages.
+job loss | losing your work | Automation may cause job loss.
+advantage | a benefit | An advantage of AI is speed.
+disadvantage | a drawback | A disadvantage is the cost.
+curriculum vitae | a document listing your education and experience | Send your CV with your application.
+to apply for a job | to ask for a job in writing | She applied for a job at the bank.
+skill | an ability you have learned | Computer skill is important today.`,
+hw:{t:"AI in my life",b:"Write a short text of 6 sentences: give one advantage and one disadvantage of artificial intelligence. Use at least 2 passive sentences."}},
 
 {c:"2nde",u:8,lv:"B1",t:"Phytotherapy and Health",th:"Medicinal plants and health",g:"Active and passive voice",
-body:`La phytotherapie, c'est-a-dire le traitement par les plantes, est tres utilisee au Togo. Quels sont ses avantages pour la sante ?
+body:`Phytotherapy, meaning treatment with plants, is widely used in Togo. What are its advantages for health?
 
-**Vocabulary** (mots et expressions) :
-**phytotherapy** (phytotherapie) ; **medicinal plant** (plante medicinale) ; **herbal medicine** (medecine a base de plantes) ; **symptom** (symptome) ; **fever** (fievre) ; **cough** (toux) ; **headache** (mal de tete) ; **wound** (blessure) ; **prescription** (ordonnance) ; **doctor** (medecin) ; **nurse** (infirmiere) ; **hospital** (hopital) ; **to cure** (guerir) ; **side effect** (effet secondaire) ; **patient** (patient).
+**Vocabulary** (words and expressions):
+**phytotherapy** (treatment with plants) ; **medicinal plant** (a plant used to treat illness) ; **herbal medicine** (medicine made from plants) ; **symptom** (a sign of illness) ; **fever** (a high body temperature) ; **cough** (a sudden noise made by the throat) ; **headache** (pain in the head) ; **wound** (an injury to the skin) ; **prescription** (a written order for medicine) ; **doctor** (a person who treats patients) ; **nurse** (a person who cares for patients) ; **hospital** (a place where sick people are treated) ; **to cure** (to make someone well) ; **side effect** (an unwanted result of a medicine) ; **patient** (a person receiving medical care).
 
-**Grammar : Active and passive voice.** Dans les textes de sante, on utilise souvent le passif.
-Many illnesses **are treated** with plants. (Beaucoup de maladies sont soignees avec des plantes.)
-The patient **was given** a prescription. (Le patient a recu une ordonnance.)
-Active : The nurse **gives** the medicine. (L'infirmiere donne le medicament.)
+**Grammar: Active and passive voice.** In health texts, we often use the passive.
+Many illnesses **are treated** with plants.
+The patient **was given** a prescription.
+Active: The nurse **gives** the medicine.
 
-**Skill : speaking about advantages.** Model sentences : Herbal medicine is cheap and easy to find. It has fewer side effects than some chemical drugs.
+**Skill: speaking about advantages.** Model sentences: Herbal medicine is cheap and easy to find. It has fewer side effects than some chemical drugs.
 
-**Skill : discussion on AI in medicine.** Model sentence : AI can help doctors to diagnose diseases, but it cannot replace them.
+**Skill: discussion on AI in medicine.** Model sentence: AI can help doctors to diagnose diseases, but it cannot replace them.
 
-**Skill : medical vocabulary in context.** The patient has a fever and a headache. The doctor will write a prescription.
+**Skill: medical vocabulary in context.** The patient has a fever and a headache. The doctor will write a prescription.
 
-**Final activity.** Imagine que tu parles a un patient. Ecris 5 phrases pour lui expliquer les avantages et les limites des plantes medicinales.`,
+**Final activity.** Imagine you are speaking to a patient. Write 5 sentences to explain the advantages and limits of medicinal plants.`,
 quiz:`The fever ___ cured by this plant last year.
 * was
 - were
 - is be
 
-« Herbal medicine » veut dire :
-* medecine a base de plantes
-- hopital
-- ordonnance
+"Herbal medicine" means:
+* medicine made from plants
+- a hospital
+- a prescription
 
 The patient ___ a prescription by the doctor.
 * was given
 - gave
 - was give
 
-Ecris en anglais « guerir ».
+Write in English: "to cure".
 = to cure
 
-Choisis le passif : The doctor treats the wound.
+Choose the passive: The doctor treats the wound.
 * The wound is treated by the doctor.
 - The wound treats the doctor.
 - The wound is treating by the doctor.
 
-« Side effect » se traduit par :
-* effet secondaire
-- symptome
-- blessure
+"Side effect" means:
+* an unwanted result of a medicine
+- a symptom
+- a wound
 
 Many plants ___ used in traditional medicine.
 * are
 - is
 - be
 
-« Cough » est :
-* une toux
-- une fievre
-- un mal de tete
+"Cough" means:
+* a sudden noise made by the throat
+- a fever
+- a headache
 
 The nurse ___ the patient at night.
 * watches
 - is watched by the patient
 - watch
 
-Ecris en anglais « infirmiere ».
+Write in English: "nurse".
 = nurse
 
 Plants ___ are cheap are often used by poor families.
 * that
 - who
-- whose man
+- whose
 
-« Patient » veut dire :
-* patient
-- medecin
-- ordonnance
+"Patient" means:
+* a person receiving medical care
+- a doctor
+- a prescription
 
-Corrige la phrase : The medicine has be given to the child.
+Correct the sentence: The medicine has be given to the child.
 * The medicine has been given to the child.
 - The medicine has be give to the child.
 - The medicine was giving to the child.
 
-Choisis la phrase correcte :
+Choose the correct sentence:
 * Herbal medicine has fewer side effects than some drugs.
 - Herbal medicine has less side effects than some drugs.
 - Herbal medicine have fewer side effect than some drugs.
 
-Ecris en anglais « mal de tete ».
+Write in English: "headache".
 = headache`,
-deck:`phytotherapy | phytotherapie | Phytotherapy uses plants to heal.
-medicinal plant | plante medicinale | This medicinal plant treats fever.
-herbal medicine | medecine a base de plantes | Herbal medicine is popular in our villages.
-symptom | symptome | A cough is a common symptom.
-fever | fievre | The child has a high fever.
-cough | toux | Her cough lasted two weeks.
-headache | mal de tete | I have a headache after the exam.
-wound | blessure | The wound must be cleaned.
-prescription | ordonnance | The doctor wrote a prescription.
-doctor | medecin | The doctor works at the health centre.
-nurse | infirmiere | The nurse gave me the medicine.
-hospital | hopital | The hospital is near the market.
-to cure | guerir | This plant can cure many illnesses.
-side effect | effet secondaire | This medicine has a side effect.
-patient | patient | The patient is waiting outside.`,
-hw:{t:"A health advice",b:"Ecris 6 phrases pour donner un conseil de sante a un ami qui a de la fievre. Utilise au moins une phrase au passif et une phrase avec fewer ... than."}},
+deck:`phytotherapy | treatment with plants | Phytotherapy uses plants to heal.
+medicinal plant | a plant used to treat illness | This medicinal plant treats fever.
+herbal medicine | medicine made from plants | Herbal medicine is popular in our villages.
+symptom | a sign of illness | A cough is a common symptom.
+fever | a high body temperature | The child has a high fever.
+cough | a sudden noise made by the throat | Her cough lasted two weeks.
+headache | pain in the head | I have a headache after the exam.
+wound | an injury to the skin | The wound must be cleaned.
+prescription | a written order for medicine | The doctor wrote a prescription.
+doctor | a person who treats patients | The doctor works at the health centre.
+nurse | a person who cares for patients | The nurse gave me the medicine.
+hospital | a place where sick people are treated | The hospital is near the market.
+to cure | to make someone well | This plant can cure many illnesses.
+side effect | an unwanted result of a medicine | This medicine has a side effect.
+patient | a person receiving medical care | The patient is waiting outside.`,
+hw:{t:"A health advice",b:"Write 6 sentences giving health advice to a friend who has a fever. Use at least one passive sentence and one sentence with fewer ... than."}},
 
 {c:"2nde",u:9,lv:"B1",t:"Respect of State Property",th:"Citizenship and public goods",g:"Wish and if only, question tags, active and passive voice",
-body:`Les biens de l'Etat (ecoles, routes, batiments publics) appartiennent a tous. Pourquoi faut-il les respecter ?
+body:`State property (schools, roads, public buildings) belongs to everyone. Why must we respect it?
 
-**Vocabulary** (mots et expressions) :
-**state property** (biens de l'Etat) ; **citizen** (citoyen) ; **citizenship** (citoyennete) ; **public building** (batiment public) ; **road** (route) ; **to damage** (endommager) ; **to steal** (voler) ; **to repair** (reparer) ; **responsibility** (responsabilite) ; **to report** (signaler) ; **penalty** (sanction) ; **law** (loi) ; **to protect** (proteger) ; **to take care of** (prendre soin de) ; **community** (communaute).
+**Vocabulary** (words and expressions):
+**state property** (property owned by the government) ; **citizen** (a member of a country) ; **citizenship** (the status of being a citizen) ; **public building** (a building open to the public) ; **road** (a way for vehicles and people) ; **to damage** (to harm or spoil) ; **to steal** (to take something that belongs to someone else) ; **to repair** (to fix) ; **responsibility** (a duty you must carry out) ; **to report** (to inform an authority) ; **penalty** (a punishment) ; **law** (a rule made by the state) ; **to protect** (to keep safe) ; **to take care of** (to look after) ; **community** (a group of people living together).
 
-**Grammar 1 : Wish and if only.** On utilise **wish** ou **if only** pour exprimer un regret ou un souhait irreel. Apres **wish** et **if only**, on utilise le passe simple (ou **were**).
-I **wish** people **took** better care of the schools. (J'aimerais que les gens prennent mieux soin des ecoles.)
-If only the road **were** repaired. (Si seulement la route etait reparee !)
+**Grammar 1: Wish and if only.** We use **wish** or **if only** to express a regret or an unreal wish. After **wish** and **if only**, we use the past simple (or **were**).
+I **wish** people **took** better care of the schools.
+If only the road **were** repaired!
 
-**Grammar 2 : Question tags.**
-Public property belongs to us all, **doesn't it ?** (Les biens publics nous appartiennent a tous, n'est-ce pas ?)
-Nobody should damage the bridge, **should they ?** (Personne ne devrait endommager le pont, n'est-ce pas ?)
+**Grammar 2: Question tags.**
+Public property belongs to us all, **doesn't it?**
+Nobody should damage the bridge, **should they?**
 
-**Grammar 3 : Active and passive voice.**
-The bridge **was damaged** by a storm. (Le pont a ete endommage par une tempete.)
-Active : The council **repairs** the road every year. (Le conseil repare la route chaque annee.)
+**Grammar 3: Active and passive voice.**
+The bridge **was damaged** by a storm.
+Active: The council **repairs** the road every year.
 
-**Skill : reporting.** Model sentence : He reported that the school gate had been stolen.
+**Skill: reporting.** Model sentence: He reported that the school gate had been stolen.
 
-**Skill : formal letter.** Model structure : Your address / Date / Dear Sir or Madam, / Body / Yours faithfully,
+**Skill: formal letter.** Model structure: Your address / Date / Dear Sir or Madam, / Body / Yours faithfully,
 
-**Final activity.** Ecris une phrase avec wish pour chaque situation : une route abimee, une ecole sale, un parc sans arbres.`,
+**Final activity.** Write one sentence with wish for each situation: a damaged road, a dirty school, a park without trees.`,
 quiz:`I wish the government ___ more schools in our town.
 * would build
 - builds
@@ -889,12 +889,12 @@ The school gate ___ by a storm last night.
 - damaged was
 - was damage
 
-« Public property » se traduit par :
-* biens publics
-- ecole publique
-- loi publique
+"Public property" means:
+* property belonging to the public
+- a public school
+- a public law
 
-Ecris en anglais « signaler ».
+Write in English: "to report".
 = to report
 
 Our community must ___ the water pump.
@@ -902,32 +902,32 @@ Our community must ___ the water pump.
 - repairs
 - repaired
 
-« Penalty » veut dire :
-* sanction
-- citoyen
-- route
+"Penalty" means:
+* a punishment
+- a citizen
+- a road
 
-Choisis la forme correcte : I wish I ___ more time to help the school.
+Choose the correct form: I wish I ___ more time to help the school.
 * had
 - have
 - will have
 
-« Citizenship » veut dire :
-* citoyennete
-- responsabilite
-- communaute
+"Citizenship" means:
+* the status of being a citizen
+- responsibility
+- community
 
-Choisis la phrase au passif : The council painted the building.
+Choose the passive: The council painted the building.
 * The building was painted by the council.
 - The building painted by the council.
 - The building was painting by the council.
 
-Corrige la phrase : If only I can help the village.
+Correct the sentence: If only I can help the village.
 * If only I could help the village.
 - If only I can helped the village.
 - If only I could helping the village.
 
-Ecris en anglais « endommager ».
+Write in English: "to damage".
 = to damage
 
 He should respect the rules, ___ ?
@@ -935,51 +935,51 @@ He should respect the rules, ___ ?
 - should he
 - doesn't he
 
-« To take care of » signifie :
-* prendre soin de
-- voler
-- reparer`,
-deck:`state property | biens de l'Etat | State property belongs to every citizen.
-citizen | citoyen | Every citizen must pay taxes.
-citizenship | citoyennete | Citizenship means respecting others.
-public building | batiment public | The public building needs paint.
-road | route | The road to the market is muddy.
-to damage | endommager | The rain damaged the roof.
-to steal | voler | Do not steal school books.
-to repair | reparer | The workers repair the well.
-responsibility | responsabilite | It is our responsibility to keep it clean.
-to report | signaler | Report any damage to the chief.
-penalty | sanction | The penalty for theft is high.
-law | loi | The law protects public goods.
-to take care of | prendre soin de | We take care of our school.
-community | communaute | The whole community helped build the clinic.`,
-hw:{t:"A wish for my town",b:"Ecris 5 phrases avec I wish ou If only sur ce que tu voudrais changer dans ta ville. Ajoute deux question tags et une phrase au passif."}},
+"To take care of" means:
+* to look after
+- to steal
+- to repair`,
+deck:`state property | property owned by the government | State property belongs to every citizen.
+citizen | a member of a country | Every citizen must pay taxes.
+citizenship | the status of being a citizen | Citizenship means respecting others.
+public building | a building open to the public | The public building needs paint.
+road | a way for vehicles and people | The road to the market is muddy.
+to damage | to harm or spoil | The rain damaged the roof.
+to steal | to take something that belongs to someone else | Do not steal school books.
+to repair | to fix | The workers repair the well.
+responsibility | a duty you must carry out | It is our responsibility to keep it clean.
+to report | to inform an authority | Report any damage to the chief.
+penalty | a punishment | The penalty for theft is high.
+law | a rule made by the state | The law protects public goods.
+to take care of | to look after | We take care of our school.
+community | a group of people living together | The whole community helped build the clinic.`,
+hw:{t:"Respect public goods",b:"Write 5 sentences with wish or if only about public goods in your town. Use at least one question tag."}},
 
 {c:"2nde",u:10,lv:"B1",t:"Patriotic Acts",th:"Patriotism and civic action",g:"Wish and if only, question tags, active and passive voice",
-body:`Etre patriote, c'est aimer son pays et agir pour lui. Quels gestes patriotiques peut-on faire chaque jour ?
+body:`To be patriotic is to love your country and act for it. What patriotic acts can we do every day?
 
-**Vocabulary** (mots et expressions) :
-**patriotism** (patriotisme) ; **patriot** (patriote) ; **national flag** (drapeau national) ; **national anthem** (hymne national) ; **to honour** (honorer) ; **to serve** (servir) ; **national service** (service national) ; **sacrifice** (sacrifice) ; **nation** (nation) ; **hero** (heros) ; **duty** (devoir) ; **to vote** (voter) ; **to pay taxes** (payer les impots) ; **pride** (fierte) ; **to celebrate** (celebrer).
+**Vocabulary** (words and expressions):
+**patriotism** (love and loyalty for one's country) ; **patriot** (a person who loves and serves their country) ; **national flag** (the flag of a country) ; **national anthem** (the official song of a country) ; **to honour** (to show respect) ; **to serve** (to work for others or for the state) ; **national service** (a period of service to the nation) ; **sacrifice** (giving up something for others) ; **nation** (a large community of people with a shared history) ; **hero** (a person admired for courage) ; **duty** (something you must do) ; **to vote** (to choose by voting) ; **to pay taxes** (to give money to the state) ; **pride** (a feeling of satisfaction in what you achieve) ; **to celebrate** (to mark a special day).
 
-**Grammar 1 : Wish and if only.** Pour exprimer un regret sur le present.
-I **wish** I **could** serve my country. (J'aimerais pouvoir servir mon pays.)
-If only the young **knew** the history of the nation. (Si seulement les jeunes connaissaient l'histoire de la nation !)
+**Grammar 1: Wish and if only.** To express a regret about the present.
+I **wish** I **could** serve my country.
+If only the young **knew** the history of the nation!
 
-**Grammar 2 : Question tags.**
-Our flag is a symbol of unity, **isn't it ?** (Notre drapeau est un symbole d'unite, n'est-ce pas ?)
-Children should sing the anthem with pride, **shouldn't they ?**
+**Grammar 2: Question tags.**
+Our flag is a symbol of unity, **isn't it?**
+Children should sing the anthem with pride, **shouldn't they?**
 
-**Grammar 3 : Passive voice.**
-The national anthem **is sung** on public holidays. (L'hymne national est chante les jours feries.)
-Heroes **are remembered** by the nation. (Les heros sont honores par la nation.)
+**Grammar 3: Passive voice.**
+The national anthem **is sung** on public holidays.
+Heroes **are remembered** by the nation.
 
-**Skill : discussion.** Model sentences : Patriotism means working for the nation. In my opinion, paying taxes is a patriotic act.
+**Skill: discussion.** Model sentences: Patriotism means working for the nation. In my opinion, paying taxes is a patriotic act.
 
-**Skill : translation.** FR : Le drapeau est hisse chaque matin devant l'ecole. EN : The flag is raised every morning in front of the school.
+**Skill: translation.** FR: Le drapeau est hisse chaque matin devant l'ecole. EN: The flag is raised every morning in front of the school.
 
-**Skill : formal letter.** Dear Sir, I am writing to suggest that the school celebrate National Day with a parade. Yours faithfully,
+**Skill: formal letter.** Dear Sir, I am writing to suggest that the school celebrate National Day with a parade. Yours faithfully,
 
-**Final activity.** Ecris une lettre formelle de 6 lignes a ton directeur pour proposer un acte patriotique pour ton ecole.`,
+**Final activity.** Write a formal letter of 6 lines to your headteacher proposing a patriotic act for your school.`,
 quiz:`I wish I ___ more about our national history.
 * knew
 - know
@@ -995,12 +995,12 @@ The national flag ___ every morning at school.
 - raises
 - is raise
 
-« Patriotism » veut dire :
-* patriotisme
+"Patriotism" means:
+* love and loyalty for one's country
 - sacrifice
-- fierte
+- pride
 
-Ecris en anglais « honorer ».
+Write in English: "to honour".
 = to honour
 
 If only we ___ vote in every election.
@@ -1013,27 +1013,27 @@ The students ___ the anthem on Monday.
 - were sang
 - are sing
 
-« National service » se traduit par :
-* service national
-- service public
-- service militaire
+"National service" means:
+* a period of service to the nation
+- public service
+- military service
 
-Ecris la phrase au passif : The people celebrate Independence Day.
+Choose the passive: The people celebrate Independence Day.
 * Independence Day is celebrated by the people.
 - Independence Day celebrates by the people.
 - Independence Day is celebrate by the people.
 
-« Sacrifice » veut dire :
-* sacrifice
-- devoir
-- nation
+"Sacrifice" means:
+* giving up something for others
+- a duty
+- a nation
 
-Corrige la phrase : I wish I was a doctor for my people.
+Correct the sentence: I wish I was a doctor for my people.
 * I wish I were a doctor for my people.
-- I wish I was a doctor for my people, am I ?
+- I wish I was a doctor for my people, am I?
 - I wish I be a doctor for my people.
 
-Ecris en anglais « payer les impots ».
+Write in English: "to pay taxes".
 = to pay taxes
 
 Our parents served the nation, ___ ?
@@ -1041,45 +1041,45 @@ Our parents served the nation, ___ ?
 - did they
 - don't they
 
-« Pride » veut dire :
-* fierte
-- hymne
-- drapeau`,
-deck:`patriotism | patriotisme | Patriotism means love of one's country.
-patriot | patriote | She is a patriot who works for the town.
-national flag | drapeau national | The national flag is green, yellow and red.
-national anthem | hymne national | We sing the national anthem at school.
-to honour | honorer | We honour our heroes each year.
-to serve | servir | Soldiers serve the nation.
-national service | service national | Some young people do national service.
-sacrifice | sacrifice | Their sacrifice saved many lives.
-nation | nation | The nation celebrates its independence.
-hero | heros | He is a hero for the village.
-duty | devoir | It is our duty to vote.
-to pay taxes | payer les impots | Citizens must pay taxes.
-pride | fierte | I feel pride when I see the flag.
-to celebrate | celebrer | We celebrate National Day in October.`,
-hw:{t:"My patriotic act",b:"Ecris 5 phrases sur un geste patriotique que tu peux faire cette semaine. Utilise I wish ou If only, une question tag et une phrase au passif."}},
+"Pride" means:
+* a feeling of satisfaction in what you achieve
+- an anthem
+- a flag`,
+deck:`patriotism | love and loyalty for one's country | Patriotism means love of one's country.
+patriot | a person who loves and serves their country | She is a patriot who works for the town.
+national flag | the flag of a country | The national flag is green, yellow and red.
+national anthem | the official song of a country | We sing the national anthem at school.
+to honour | to show respect | We honour our heroes each year.
+to serve | to work for others or for the state | Soldiers serve the nation.
+national service | a period of service to the nation | Some young people do national service.
+sacrifice | giving up something for others | Their sacrifice saved many lives.
+nation | a large community with a shared history | The nation celebrates its independence.
+hero | a person admired for courage | He is a hero for the village.
+duty | something you must do | It is our duty to vote.
+to pay taxes | to give money to the state | Citizens must pay taxes.
+pride | a feeling of satisfaction in what you achieve | I feel pride when I see the flag.
+to celebrate | to mark a special day | We celebrate National Day in October.`,
+hw:{t:"My patriotic act",b:"Write 5 sentences about a patriotic act you can do this week. Use I wish or If only, one question tag and one passive sentence."}},
 
 {c:"2nde",u:11,lv:"B1",t:"Land Issues",th:"Land, inheritance and women's rights",g:"Correlative conjunctions, emphasis with if clause type three",
-body:`La terre est une source de conflits au Togo, surtout lorsqu'il s'agit d'heritage. Les femmes sont souvent exclues. Comment changer cela ?
+body:`Land is a source of conflict in Togo, especially when inheritance is involved. Women are often excluded. How can this change?
 
-**Vocabulary** (mots et expressions) :
-**land** (terre) ; **land issue** (question fonciere) ; **inheritance** (heritage) ; **to inherit** (heriter) ; **heir** (heritier) ; **will** (testament) ; **widow** (veuve) ; **property** (propriete) ; **dispute** (litige) ; **to deny** (refuser, nier) ; **title deed** (titre foncier) ; **court case** (proces) ; **injustice** (injustice) ; **to claim** (revendiquer) ; **family member** (membre de la famille).
+**Vocabulary** (words and expressions):
+**land** (ground used for farming or building) ; **land issue** (a problem about land ownership) ; **inheritance** (property received from a family member who has died) ; **to inherit** (to receive property after a death) ; **heir** (a person who inherits) ; **will** (a document saying who gets your property) ; **widow** (a woman whose husband has died) ; **property** (things or land that someone owns) ; **dispute** (a disagreement) ; **to deny** (to refuse to give, or to say something is not true) ; **title deed** (an official document proving land ownership) ; **court case** (a legal process in court) ; **injustice** (unfair treatment) ; **to claim** (to demand something you believe is yours) ; **family member** (a person related to you).
 
-**Grammar 1 : Correlative conjunctions.** Ce sont des paires de mots de liaison : **either ... or** (soit ... soit), **neither ... nor** (ni ... ni), **both ... and** (a la fois ... et), **not only ... but also** (non seulement ... mais aussi).
-Either the family or the court **will decide**. (Soit la famille, soit le tribunal decidera.)
-Neither the widow **nor** her children **received** the land. (Ni la veuve ni ses enfants n'ont recu la terre.)
-Both men **and** women **should inherit** property. (Les hommes comme les femmes devraient heriter.)
+**Grammar 1: Correlative conjunctions.** These are pairs of linking words: **either ... or** (one or the other), **neither ... nor** (not one, not the other), **both ... and** (the two together), **not only ... but also** (more than one thing).
+Either the family or the court **will decide**.
+Neither the widow **nor** her children **received** the land.
+Both men **and** women **should inherit** property.
 
-**Grammar 2 : Emphasis with if clause type three.** Pour insister, on utilise **It is ... that** avec un passe perfect dans la condition.
-It was because she **had not registered** the land that she lost it. (C'est parce qu'elle n'avait pas enregistre la terre qu'elle l'a perdue.)
+**Grammar 2: Emphasis with if clause type three.** To emphasise, we use **It is ... that** with a past perfect in the condition.
+It was because she **had not registered** the land that she lost it.
 
-**Skill : acting a dispute.** Model lines : Widow : My husband wanted me to keep the house. Brother-in-law : Not only is the land ours, but the will says so.
+**Skill: acting a dispute.** Model lines: Widow: My husband wanted me to keep the house. Brother-in-law: Not only is the land ours, but the will says so.
 
-**Skill : formal letter to denounce injustice.** Model sentence : I am writing to denounce the injustice suffered by women who are denied land after the death of their husbands.
+**Skill: formal letter to denounce injustice.** Model sentence: I am writing to denounce the injustice suffered by women who are denied land after the death of their husbands.
 
-**Final activity.** Ecris 5 phrases sur les difficultes des femmes pour heriter de la terre. Utilise either ... or, neither ... nor et une phrase emphasis avec It was ... that.`,
+**Final activity.** Write 5 sentences about the difficulties women face in inheriting land. Use either ... or, neither ... nor, and one emphasis sentence with It was ... that.`,
 quiz:`Either the court ___ the family will decide.
 * or
 - nor
@@ -1095,12 +1095,12 @@ Not only ___ she a widow, but she is also poor.
 - was
 - be
 
-« Inheritance » veut dire :
+"Inheritance" means:
 * heritage
-- testament
-- propriete
+- a will
+- property
 
-Ecris en anglais « veuve ».
+Write in English: "widow".
 = widow
 
 Both men ___ women should own land.
@@ -1113,79 +1113,79 @@ It was because he ___ the will that he lost the house.
 - did not find
 - has not find
 
-« Dispute » signifie :
-* litige
-- heritier
-- injustice
+"Dispute" means:
+* a disagreement
+- an heir
+- an injustice
 
-Choisis la paire correcte : ___ the father ___ the mother can sign the papers.
+Choose the correct pair: ___ the father ___ the mother can sign the papers.
 * Both / and
 - Either / and
 - Neither / or
 
-« Title deed » se dit :
-* titre foncier
-- testament
-- acte de naissance
+"Title deed" means:
+* an official document proving land ownership
+- a will
+- a birth certificate
 
-Ecris en anglais « heriter ».
+Write in English: "to inherit".
 = to inherit
 
-Corrige la phrase : Neither the chief nor the elders was present.
+Correct the sentence: Neither the chief nor the elders was present.
 * Neither the chief nor the elders were present.
 - Neither the chief or the elders was present.
 - Neither the chief nor the elders is presents.
 
-« To deny » veut dire :
-* refuser ou nier
-- revendiquer
-- heriter
+"To deny" means:
+* to refuse to give, or to say something is not true
+- to claim
+- to inherit
 
 It was the court case ___ changed the family's decision.
 * that
 - which
 - who
 
-« Family member » veut dire :
-* membre de la famille
-- chef de village
-- proprietaire`,
-deck:`land | terre | The land belongs to our village.
-land issue | question fonciere | Land issues cause many quarrels.
-inheritance | heritage | The inheritance was shared between the children.
-to inherit | heriter | He inherited his father's farm.
-heir | heritier | The eldest son is the heir.
-will | testament | The will was read at the funeral.
-widow | veuve | The widow kept the family house.
-property | propriete | The property has three rooms.
-dispute | litige | The dispute went to court.
-to deny | refuser, nier | They denied her the right to land.
-title deed | titre foncier | Keep your title deed in a safe place.
-court case | proces | The court case lasted two years.
-injustice | injustice | Denying women land is an injustice.
-to claim | revendiquer | She claimed her share of the land.`,
-hw:{t:"Land rights",b:"Ecris 6 phrases sur le droit des femmes a la terre. Utilise either ... or, neither ... nor, both ... and et une phrase avec It was ... that."}},
+"Family member" means:
+* a person related to you
+- a village chief
+- an owner`,
+deck:`land | ground used for farming or building | The land belongs to our village.
+land issue | a problem about land ownership | Land issues cause many quarrels.
+inheritance | property received from a family member who has died | The inheritance was shared between the children.
+to inherit | to receive property after a death | He inherited his father's farm.
+heir | a person who inherits | The eldest son is the heir.
+will | a document saying who gets your property | The will was read at the funeral.
+widow | a woman whose husband has died | The widow kept the family house.
+property | things or land that someone owns | The property has three rooms.
+dispute | a disagreement | The dispute went to court.
+to deny | to refuse to give | They denied her the right to land.
+title deed | an official document proving land ownership | Keep your title deed in a safe place.
+court case | a legal process in court | The court case lasted two years.
+injustice | unfair treatment | Denying women land is an injustice.
+to claim | to demand something you believe is yours | She claimed her share of the land.`,
+hw:{t:"Land rights",b:"Write 6 sentences about women's right to land. Use either ... or, neither ... nor, both ... and and one sentence with It was ... that."}},
 
 {c:"2nde",u:12,lv:"B1",t:"The Value of Traditional Arts in Togo",th:"Traditional arts, culture and identity",g:"No matter (what, who, how), direct and indirect speech",
-body:`Les arts traditionnels togolais (sculpture, tissage, masques, danses) font partie de notre identite. Pourquoi sont-ils precieux ?
+body:`Togolese traditional arts (carving, weaving, masks, dances) are part of our identity. Why are they precious?
 
-**Vocabulary** (mots et expressions) :
-**traditional art** (art traditionnel) ; **carving** (sculpture sur bois) ; **mask** (masque) ; **weaving** (tissage) ; **pottery** (poterie) ; **drum** (tambour) ; **dance** (danse) ; **craftsman** (artisan) ; **heritage** (patrimoine) ; **to preserve** (preserver) ; **value** (valeur) ; **tourist** (touriste) ; **extremism** (extremisme) ; **religious extremism** (extremisme religieux) ; **tolerance** (tolerance).
+**Vocabulary** (words and expressions):
+**traditional art** (art made with long-established local methods) ; **carving** (shaping wood into a figure) ; **mask** (an object worn on the face in ceremonies) ; **weaving** (making cloth on a loom) ; **pottery** (clay objects made by hand) ; **drum** (an instrument you hit to make sound) ; **dance** (moving to music in a set way) ; **craftsman** (a skilled worker who makes things by hand) ; **heritage** (things passed down from the past) ; **to preserve** (to keep safe for the future) ; **value** (how important something is) ; **tourist** (a person who visits a place for fun) ; **extremism** (holding very extreme views) ; **religious extremism** (extreme views about religion) ; **tolerance** (accepting people who are different).
 
-**Grammar 1 : No matter (what, who, how, where).** Cela veut dire peu importe (quoi, qui, comment, ou). Il est suivi d'un sujet et d'un verbe.
-No matter how old a craftsman is, he can still teach. (Peu importe son age, un artisan peut toujours enseigner.)
-No matter what the tourists say, the masks remain beautiful. (Peu importe ce que disent les touristes, les masques restent beaux.)
+**Grammar 1: No matter (what, who, how, where).** It means it does not matter (what, who, how, where). It is followed by a subject and a verb.
+No matter how old a craftsman is, he can still teach.
+No matter what the tourists say, the masks remain beautiful.
 
-**Grammar 2 : Direct and indirect speech.** Au discours indirect, le temps recule souvent (present -> past, will -> would) et on change les pronoms.
-Direct : "The weaver is working today," she said.
-Indirect : She said that the weaver **was working** that day.
-Direct : "I will teach you the dance," he said. Indirect : He said that he **would teach** me the dance.
+**Grammar 2: Direct and indirect speech.** In indirect speech, the tense often moves back (present to past, will to would), and pronouns change.
+Direct: "The weaver is working today," she said.
+Indirect: She said that the weaver **was working** that day.
+Direct: "I will teach you the dance," he said. Indirect: He said that he **would teach** me the dance.
 
-**Skill : talking about value.** Model text : Traditional arts show who we are. They create jobs for craftsmen and attract tourists.
+**Skill: talking about value.** Model text: Traditional arts show who we are. They create jobs for craftsmen and attract tourists.
 
-**Skill : translation.** FR : Les artisans preservent nos traditions. EN : Craftsmen preserve our traditions.
+**Skill: translation.** FR: Les artisans preservent nos traditions. EN: Craftsmen preserve our traditions.
 
-**Final activity.** Ecris un court texte (5 phrases) sur la valeur d'un art traditionnel de ta region, puis rapporte les paroles d'un artisan en discours indirect.`,
+**Final activity.** Write a short text (5 sentences) about the value of a traditional art from your region, then report the words of a craftsman in indirect speech.`,
 quiz:`No matter ___ tired the dancer is, she performs every night.
 * how
 - what
@@ -1206,18 +1206,18 @@ She said, "I will sell the pottery." She said she ___ the pottery.
 - will sell
 - sells
 
-« Weaving » veut dire :
-* tissage
-- poterie
-- sculpture
+"Weaving" means:
+* making cloth on a loom
+- pottery
+- carving
 
-Ecris en anglais « preserver ».
+Write in English: "to preserve".
 = to preserve
 
-« Heritage » se traduit par :
-* patrimoine
-- valeur
-- artisanat
+"Heritage" means:
+* things passed down from the past
+- value
+- craft
 
 He said, "We are happy." He said that they ___ happy.
 * were
@@ -1229,17 +1229,17 @@ No matter ___ you are, you can learn a traditional dance.
 - what
 - which
 
-« Religious extremism » veut dire :
-* extremisme religieux
-- tolerance religieuse
-- art religieux
+"Religious extremism" means:
+* extreme views about religion
+- religious tolerance
+- religious art
 
-Le mot « tolerance » veut dire :
-* tolerance
-- extremisme
-- valeur
+"Tolerance" means:
+* accepting people who are different
+- extremism
+- value
 
-Ecris en anglais « tambour ».
+Write in English: "drum".
 = drum
 
 She asked, "Where is the market?" She asked me where the market ___.
@@ -1247,50 +1247,50 @@ She asked, "Where is the market?" She asked me where the market ___.
 - is
 - will be
 
-Corrige la phrase : No matter how much it costs, we will buy the mask.
+Correct the sentence: No matter how much it costs, we will buy the mask.
 * No matter how much it costs, we will buy the mask.
 - No matter how much it cost, we will buying the mask.
 - No matter how much costs it, we will buy the mask.
 
-« Craftsman » veut dire :
-* artisan
-- touriste
-- danseur`,
-deck:`traditional art | art traditionnel | Traditional art attracts many visitors.
-carving | sculpture sur bois | The carving shows an ancestor.
-mask | masque | The mask is used in a dance.
-weaving | tissage | Weaving is done on a narrow loom.
-pottery | poterie | Pottery is made by women in this village.
-drum | tambour | The drum announces the festival.
-dance | danse | The dance tells a story.
-craftsman | artisan | The craftsman sells his work at the market.
-heritage | patrimoine | Our heritage must be protected.
-to preserve | preserver | We must preserve our customs.
-value | valeur | Culture has a great value.
-tourist | touriste | The tourist bought a wooden statue.
-extremism | extremisme | Extremism divides communities.
-religious extremism | extremisme religieux | Religious extremism is a danger.
-tolerance | tolerance | Tolerance makes peace possible.`,
-hw:{t:"A traditional art",b:"Ecris 6 phrases sur un art traditionnel de ta region. Utilise deux phrases avec No matter ... et deux phrases au discours indirect (He said that ...)."}},
+"Craftsman" means:
+* a skilled worker who makes things by hand
+- a tourist
+- a dancer`,
+deck:`traditional art | art made with long-established local methods | Traditional art attracts many visitors.
+carving | shaping wood into a figure | The carving shows an ancestor.
+mask | an object worn on the face in ceremonies | The mask is used in a dance.
+weaving | making cloth on a loom | Weaving is done on a narrow loom.
+pottery | clay objects made by hand | Pottery is made by women in this village.
+drum | an instrument you hit to make sound | The drum announces the festival.
+dance | moving to music in a set way | The dance tells a story.
+craftsman | a skilled worker who makes things by hand | The craftsman sells his work at the market.
+heritage | things passed down from the past | Our heritage must be protected.
+to preserve | to keep safe for the future | We must preserve our customs.
+value | how important something is | Culture has a great value.
+tourist | a person who visits a place for fun | The tourist bought a wooden statue.
+extremism | holding very extreme views | Extremism divides communities.
+religious extremism | extreme views about religion | Religious extremism is a danger.
+tolerance | accepting people who are different | Tolerance makes peace possible.`,
+hw:{t:"A traditional art",b:"Write 6 sentences about a traditional art from your region. Use two sentences with No matter ... and two sentences in indirect speech (He said that ...)."}},
 
 {c:"2nde",u:13,lv:"B1",t:"Violent Extremism",th:"Extremism, violence and peace",g:"No matter (what, who, how), direct and indirect speech",
-body:`L'extremisme violent menace la paix dans plusieurs pays. Comment le decrire, et comment le combattre ?
+body:`Violent extremism threatens peace in several countries. How can it be described, and how can it be fought?
 
-**Vocabulary** (mots et expressions) :
-**violent extremism** (extremisme violent) ; **terrorism** (terrorisme) ; **radicalisation** (radicalisation) ; **violence** (violence) ; **peace** (paix) ; **security** (securite) ; **to condemn** (condamner) ; **victim** (victime) ; **attack** (attaque) ; **to threaten** (menacer) ; **community** (communaute) ; **religion** (religion) ; **to fight against** (lutter contre) ; **hatred** (haine) ; **to unite** (unir).
+**Vocabulary** (words and expressions):
+**violent extremism** (extreme views supported by violence) ; **terrorism** (the use of violence to create fear for political aims) ; **radicalisation** (the process of becoming extreme) ; **violence** (the use of force to hurt people) ; **peace** (a time without war or conflict) ; **security** (safety from danger) ; **to condemn** (to say publicly that something is wrong) ; **victim** (a person who suffers harm) ; **attack** (a violent action against people or places) ; **to threaten** (to say you will harm someone) ; **community** (a group of people living together) ; **religion** (a belief system with rules and worship) ; **to fight against** (to struggle against) ; **hatred** (very strong dislike) ; **to unite** (to bring together).
 
-**Grammar 1 : No matter.**
-No matter why people join extremist groups, violence is never the answer. (Peu importe les raisons pour lesquelles on rejoint ces groupes, la violence n'est jamais la solution.)
+**Grammar 1: No matter.**
+No matter why people join extremist groups, violence is never the answer.
 
-**Grammar 2 : Direct and indirect speech.** Au discours indirect, on utilise **said that**, **told me to**, **asked whether / if**.
-Direct : "Stop the violence now," the leader said. Indirect : The leader said that we **had to** stop the violence.
-Direct : "Are you safe?" she asked. Indirect : She asked whether we **were** safe.
+**Grammar 2: Direct and indirect speech.** In indirect speech, we use **said that**, **told me to**, **asked whether / if**.
+Direct: "Stop the violence now," the leader said. Indirect: The leader said that we **had to** stop the violence.
+Direct: "Are you safe?" she asked. Indirect: She asked whether we **were** safe.
 
-**Skill : describing an extremist act.** Model text : On Monday night, a group attacked a village market. Several people were injured. The police condemned the attack and asked the population to stay calm.
+**Skill: describing an extremist act.** Model text: On Monday night, a group attacked a village market. Several people were injured. The police condemned the attack and asked the population to stay calm.
 
-**Skill : argumentative essay.** Model structure : Introduction (question) / Arguments for / Arguments against / Conclusion. Example : To sum up, education and dialogue are stronger than hatred.
+**Skill: argumentative essay.** Model structure: Introduction (question) / Arguments for / Arguments against / Conclusion. Example: To sum up, education and dialogue are stronger than hatred.
 
-**Final activity.** Ecris un court paragraphe argumentatif (6 phrases) : Comment peut-on lutter contre l'extremisme dans une communaute ? Termine par une conclusion.`,
+**Final activity.** Write a short argumentative paragraph (6 sentences): How can extremism be fought in a community? End with a conclusion.`,
 quiz:`No matter ___ the leaders say, we must stay united.
 * what
 - how
@@ -1306,12 +1306,12 @@ She asked, "Are the roads safe?" She asked whether the roads ___ safe.
 - are
 - be
 
-« Terrorism » veut dire :
-* terrorisme
+"Terrorism" means:
+* the use of violence to create fear for political aims
 - violence
-- securite
+- security
 
-Ecris en anglais « condamner ».
+Write in English: "to condemn".
 = to condemn
 
 The leader told us ___ calm.
@@ -1324,12 +1324,12 @@ No matter ___ young people are, they can fight extremism.
 - what
 - when
 
-« Victim » veut dire :
-* victime
-- attaque
-- haine
+"Victim" means:
+* a person who suffers harm
+- an attack
+- hatred
 
-Ecris en anglais « lutter contre ».
+Write in English: "to fight against".
 = to fight against
 
 He said, "We will meet tomorrow." He said that they ___ the next day.
@@ -1337,9 +1337,9 @@ He said, "We will meet tomorrow." He said that they ___ the next day.
 - will meet
 - meet
 
-« Radicalisation » se traduit par :
-* radicalisation
-- securite
+"Radicalisation" means:
+* the process of becoming extreme
+- security
 - religion
 
 The soldiers asked ___ the village was safe.
@@ -1347,59 +1347,59 @@ The soldiers asked ___ the village was safe.
 - that
 - what
 
-Corrige la phrase : No matter why does he join the group, violence is wrong.
+Correct the sentence: No matter why does he join the group, violence is wrong.
 * No matter why he joins the group, violence is wrong.
 - No matter why does he joins the group, violence is wrong.
 - No matter why he joined the group, violence is wrong.
 
-« Peace » veut dire :
-* paix
-- haine
-- unite
+"Peace" means:
+* a time without war or conflict
+- hatred
+- unity
 
-« Hatred » est :
-* la haine
-- la paix
-- la securite`,
-deck:`violent extremism | extremisme violent | Violent extremism destroys families.
-terrorism | terrorisme | Terrorism threatens the whole region.
-radicalisation | radicalisation | Radicalisation often starts online.
-violence | violence | Violence never solves a problem.
-peace | paix | Peace is precious for every family.
-security | securite | The police protect the security of the town.
-to condemn | condamner | The chief condemned the attack.
-victim | victime | The victims received help.
-attack | attaque | The attack happened at dawn.
-to threaten | menacer | The group threatened the village.
-community | communaute | The community met to discuss safety.
-religion | religion | Every religion teaches respect.
-to fight against | lutter contre | We must fight against hatred.
-hatred | haine | Hatred divides people.`,
-hw:{t:"Peace in my town",b:"Ecris un court paragraphe (6 phrases) sur la paix dans ta ville. Utilise une phrase avec No matter ..., une phrase au discours indirect (He said that ...) et une conclusion commencant par To sum up."}},
+"Hatred" means:
+* very strong dislike
+- peace
+- security`,
+deck:`violent extremism | extreme views supported by violence | Violent extremism destroys families.
+terrorism | the use of violence to create fear for political aims | Terrorism threatens the whole region.
+radicalisation | the process of becoming extreme | Radicalisation often starts online.
+violence | the use of force to hurt people | Violence never solves a problem.
+peace | a time without war or conflict | Peace is precious for every family.
+security | safety from danger | The police protect the security of the town.
+to condemn | to say publicly that something is wrong | The chief condemned the attack.
+victim | a person who suffers harm | The victims received help.
+attack | a violent action against people or places | The attack happened at dawn.
+to threaten | to say you will harm someone | The group threatened the village.
+community | a group of people living together | The community met to discuss safety.
+religion | a belief system with rules and worship | Every religion teaches respect.
+to fight against | to struggle against | We must fight against hatred.
+hatred | very strong dislike | Hatred divides people.`,
+hw:{t:"Peace in my town",b:"Write a short paragraph (6 sentences) about peace in your town. Use one sentence with No matter ..., one sentence in indirect speech (He said that ...) and a conclusion starting with To sum up."}},
 
 {c:"1re",u:1,lv:"B1",t:"The Commonwealth",th:"The Commonwealth of Nations",g:"Tenses in English, although and despite, relative pronouns",
-body:`Le Commonwealth est une association de pays, dont beaucoup ont ete colonies par le Royaume-Uni. Quelles sont ses caracteristiques ?
+body:`The Commonwealth is an association of countries, many of which were colonies of the United Kingdom. What are its main features?
 
-**Vocabulary** (mots et expressions) :
-**Commonwealth** (Commonwealth) ; **member country** (pays membre) ; **former colony** (ancienne colonie) ; **head of state** (chef d'Etat) ; **summit** (sommet) ; **charter** (charte) ; **democracy** (democratie) ; **human rights** (droits de l'homme) ; **cooperation** (cooperation) ; **trade** (commerce) ; **to join** (adherer, rejoindre) ; **to share** (partager) ; **language** (langue) ; **official** (officiel) ; **history** (histoire).
+**Vocabulary** (words and expressions):
+**Commonwealth** (an association of countries that were once under British rule) ; **member country** (a country that belongs to the group) ; **former colony** (a country that was once ruled by another) ; **head of state** (the leader of a country, such as a king or president) ; **summit** (a meeting of leaders) ; **charter** (a document setting out shared principles) ; **democracy** (rule by the people through elections) ; **human rights** (the basic rights every person has) ; **cooperation** (working together) ; **trade** (buying and selling goods) ; **to join** (to become a member) ; **to share** (to have or use something together) ; **language** (a system of words used to communicate) ; **official** (recognised by the government) ; **history** (the events of the past).
 
-**Grammar 1 : Tenses in English.** Le present simple decrit les faits generaux. Le present perfect relie le passe au present. Le past simple raconte un fait termine.
-The Commonwealth **has grown** since 1949. (Le Commonwealth s'est developpe depuis 1949.)
-Togo **joined** the Commonwealth in 1995. (Le Togo a rejoint le Commonwealth en 1995.)
-Member countries **share** a common history. (Les pays membres partagent une histoire commune.)
+**Grammar 1: Tenses in English.** The present simple describes general facts. The present perfect connects the past to the present. The past simple tells of a finished event.
+The Commonwealth **has grown** since 1949.
+Togo **joined** the Commonwealth in 1995.
+Member countries **share** a common history.
 
-**Grammar 2 : Although and despite.** **Although** + proposition (bien que). **Despite** + nom ou -ing (malgre).
-Although the countries are different, they share the English language. (Bien que les pays soient differents, ils partagent la langue anglaise.)
-Despite its many members, the Commonwealth is not a political union. (Malgre ses nombreux membres, le Commonwealth n'est pas une union politique.)
+**Grammar 2: Although and despite.** **Although** + clause. **Despite** + noun or -ing.
+Although the countries are different, they share the English language.
+Despite its many members, the Commonwealth is not a political union.
 
-**Grammar 3 : Relative pronouns.** **Who**, **which**, **that**, **whose**, **where**.
-The city **where** the summit was held is in Africa. (La ville ou le sommet a eu lieu est en Afrique.)
+**Grammar 3: Relative pronouns.** **Who**, **which**, **that**, **whose**, **where**.
+The city **where** the summit was held is in Africa.
 
-**Skill : recognising key features.** Model text : The Commonwealth is a group of independent countries. Its members cooperate in trade, education and human rights.
+**Skill: recognising key features.** Model text: The Commonwealth is a group of independent countries. Its members cooperate in trade, education and human rights.
 
-**Skill : describing and writing.** Model sentences : Members meet every two years. Many of them use English in government.
+**Skill: describing and writing.** Model sentences: Members meet every two years. Many of them use English in government.
 
-**Final activity.** Ecris un court paragraphe (6 phrases) qui presente le Commonwealth, avec au moins un temps du present perfect, une phrase avec although et une phrase avec which.`,
+**Final activity.** Write a short paragraph (6 sentences) presenting the Commonwealth, with at least one present perfect, one sentence with although and one sentence with which.`,
 quiz:`The Commonwealth ___ many changes since its creation.
 * has seen
 - saw
@@ -1420,12 +1420,12 @@ The country ___ hosted the summit last year is in Africa.
 - who
 - whose
 
-« Former colony » veut dire :
-* ancienne colonie
-- membre du sommet
-- pays independant
+"Former colony" means:
+* a country that was once ruled by another
+- a member of the summit
+- an independent country
 
-Ecris en anglais « rejoindre ».
+Write in English: "to join".
 = to join
 
 Togo ___ the Commonwealth in 1995.
@@ -1433,12 +1433,12 @@ Togo ___ the Commonwealth in 1995.
 - has join
 - joining
 
-« Human rights » se traduit par :
-* droits de l'homme
-- droits du pays
-- droit commercial
+"Human rights" means:
+* the basic rights every person has
+- the rights of the country
+- commercial law
 
-Choisis la bonne forme : She ___ a student of the Commonwealth since 2020.
+Choose the correct form: She ___ a student of the Commonwealth since 2020.
 * has been
 - was
 - is being
@@ -1448,17 +1448,17 @@ The leader ___ the charter was from Ghana.
 - whose signed
 - where signed
 
-« Summit » veut dire :
-* sommet
-- charte
-- commerce
+"Summit" means:
+* a meeting of leaders
+- a charter
+- trade
 
-Corrige la phrase : Despite the countries is different, they cooperate.
+Correct the sentence: Despite the countries is different, they cooperate.
 * Despite the countries being different, they cooperate.
 - Despite the countries is different, they cooperate.
 - Although the countries being different, they cooperates.
 
-Ecris en anglais « cooperation ».
+Write in English: "cooperation".
 = cooperation
 
 The island ___ my father was born is small.
@@ -1466,44 +1466,44 @@ The island ___ my father was born is small.
 - which
 - who
 
-« Head of state » signifie :
-* chef d'Etat
-- chef de village
-- ministre`,
-deck:`Commonwealth | Commonwealth | The Commonwealth meets every two years.
-member country | pays membre | Togo is a member country.
-former colony | ancienne colonie | Many members are former colonies.
-head of state | chef d'Etat | The head of state greets the guests.
-summit | sommet | The summit was held in London.
-charter | charte | The charter promotes democracy.
-democracy | democratie | Democracy is a shared value.
-human rights | droits de l'homme | Human rights must be respected.
-cooperation | cooperation | Cooperation helps trade grow.
-trade | commerce | Trade between members has increased.
-to join | adherer, rejoindre | The country decided to join the group.
-to share | partager | The members share a common language.
-official | officiel | English is an official language.
-history | histoire | Their history is linked to Britain.`,
-hw:{t:"My country in a group",b:"Ecris 6 phrases sur un groupe de pays dont ton pays fait partie (ou un groupe que tu connais). Utilise le present perfect, although ou despite, et une phrase avec who, which ou where."}},
+"Head of state" means:
+* the leader of a country
+- a village chief
+- a minister`,
+deck:`Commonwealth | an association of countries once under British rule | The Commonwealth meets every two years.
+member country | a country that belongs to the group | Togo is a member country.
+former colony | a country that was once ruled by another | Many members are former colonies.
+head of state | the leader of a country | The head of state greets the guests.
+summit | a meeting of leaders | The summit was held in London.
+charter | a document setting out shared principles | The charter promotes democracy.
+democracy | rule by the people through elections | Democracy is a shared value.
+human rights | the basic rights every person has | Human rights must be respected.
+cooperation | working together | Cooperation helps trade grow.
+trade | buying and selling goods | Trade between members has increased.
+to join | to become a member | The country decided to join the group.
+to share | to have or use something together | The members share a common language.
+official | recognised by the government | English is an official language.
+history | the events of the past | Their history is linked to Britain.`,
+hw:{t:"My country in a group",b:"Write 6 sentences about a group of countries that your country belongs to (or a group you know). Use the present perfect, although or despite, and one sentence with who, which or where."}},
 
 {c:"1re",u:2,lv:"B1",t:"Different Types of Regimes",th:"Political regimes",g:"Conditional type one, the use of unless",
-body:`Il existe plusieurs types de regimes politiques dans le monde. Quelles en sont les caracteristiques, et quels sont leurs risques ?
+body:`There are several types of political regime in the world. What are their features, and what are their risks?
 
-**Vocabulary** (mots et expressions) :
-**regime** (regime) ; **democracy** (democratie) ; **dictatorship** (dictature) ; **monarchy** (monarchie) ; **republic** (republique) ; **election** (election) ; **opposition** (opposition) ; **constitution** (constitution) ; **freedom of speech** (liberte d'expression) ; **to elect** (elire) ; **to overthrow** (renverser) ; **power** (pouvoir) ; **corruption** (corruption) ; **citizen** (citoyen) ; **parliament** (parlement).
+**Vocabulary** (words and expressions):
+**regime** (a system of government) ; **democracy** (rule by the people through elections) ; **dictatorship** (rule by one person with total power) ; **monarchy** (a state ruled by a king or queen) ; **republic** (a state with an elected head of state) ; **election** (a vote to choose leaders) ; **opposition** (the parties that are against the government) ; **constitution** (the basic law of a country) ; **freedom of speech** (the right to say what you think) ; **to elect** (to choose by vote) ; **to overthrow** (to remove a government by force) ; **power** (the ability to control or decide) ; **corruption** (dishonest use of power for money) ; **citizen** (a member of a country with rights and duties) ; **parliament** (the body that makes the laws).
 
-**Grammar 1 : Conditional type one.** Pour une situation reelle ou probable.
-If citizens **vote** freely, the government **will be** more responsive. (Si les citoyens votent librement, le gouvernement sera plus a l'ecoute.)
-If the opposition **wins**, the president **will have** to accept the result. (Si l'opposition gagne, le president devra accepter le resultat.)
+**Grammar 1: Conditional type one.** For a real or likely situation.
+If citizens **vote** freely, the government **will be** more responsive.
+If the opposition **wins**, the president **will have** to accept the result.
 
-**Grammar 2 : Unless.** **Unless** = **if not**.
-A regime **will become** unstable **unless** it respects the constitution. (Un regime deviendra instable a moins qu'il ne respecte la constitution.)
+**Grammar 2: Unless.** **Unless** = **if not**.
+A regime **will become** unstable **unless** it respects the constitution.
 
-**Skill : understanding a message.** Model text : A democracy allows citizens to elect their leaders. In a dictatorship, power is held by one person or a small group.
+**Skill: understanding a message.** Model text: A democracy allows citizens to elect their leaders. In a dictatorship, power is held by one person or a small group.
 
-**Skill : interpreting a passage.** Model sentence : The article suggests that freedom of speech is the best protection against corruption.
+**Skill: interpreting a passage.** Model sentence: The article suggests that freedom of speech is the best protection against corruption.
 
-**Final activity.** Ecris 5 phrases sur les avantages et les dangers d'un regime democratique. Utilise au moins une phrase en If ... will et une phrase avec unless.`,
+**Final activity.** Write 5 sentences about the advantages and dangers of a democratic regime. Use at least one sentence with If ... will and one sentence with unless.`,
 quiz:`If citizens ___ freely, the government will listen to them.
 * vote
 - voted
@@ -1514,12 +1514,12 @@ The president will leave office ___ the people vote him out.
 - if
 - while
 
-« Dictatorship » veut dire :
-* dictature
-- monarchie
-- republique
+"Dictatorship" means:
+* rule by one person with total power
+- a monarchy
+- a republic
 
-Ecris en anglais « elire ».
+Write in English: "to elect".
 = to elect
 
 If the parliament ___ the law, the country will be stable.
@@ -1527,32 +1527,32 @@ If the parliament ___ the law, the country will be stable.
 - approved
 - would approve
 
-« Freedom of speech » se traduit par :
-* liberte d'expression
-- liberte de vote
-- liberte de marche
+"Freedom of speech" means:
+* the right to say what you think
+- the freedom to vote
+- the freedom to march
 
 The regime ___ fall unless it changes.
 * will
 - would
 - is
 
-« Overthrow » veut dire :
-* renverser
-- elire
-- contrôler
+"Overthrow" means:
+* to remove a government by force
+- to elect
+- to control
 
-« Corruption » se traduit par :
-* corruption
-- constitution
-- opposition
+"Corruption" means:
+* dishonest use of power for money
+- a constitution
+- an opposition
 
-Corrige la phrase : If the people will protest, the leader will resign.
+Correct the sentence: If the people will protest, the leader will resign.
 * If the people protest, the leader will resign.
 - If the people will protested, the leader resigns.
 - If the people protest, the leader would resign.
 
-Ecris en anglais « constitution ».
+Write in English: "constitution".
 = constitution
 
 The citizens ___ their rights unless they are informed.
@@ -1560,55 +1560,55 @@ The citizens ___ their rights unless they are informed.
 - would not know
 - do not knows
 
-« Monarchy » signifie :
-* monarchie
-- republique
-- parlement
+"Monarchy" means:
+* a state ruled by a king or queen
+- a republic
+- a parliament
 
 If the opposition ___ strong, the election will be fair.
 * is
 - was
 - would be
 
-« Parliament » veut dire :
-* parlement
-- election
-- pouvoir`,
-deck:`regime | regime | The regime changed after the election.
-democracy | democratie | Democracy depends on free elections.
-dictatorship | dictature | The dictatorship limited free speech.
-monarchy | monarchie | The monarchy has a symbolic role.
-republic | republique | Togo is a republic.
-election | election | The election takes place in April.
-opposition | opposition | The opposition criticised the budget.
-constitution | constitution | The constitution protects citizens.
-freedom of speech | liberte d'expression | Freedom of speech is a basic right.
-to elect | elire | The people elect their deputies.
-to overthrow | renverser | The army tried to overthrow the government.
-corruption | corruption | Corruption slows down development.
-parliament | parlement | The parliament passed a new law.
-citizen | citoyen | Every citizen can vote at eighteen.`,
-hw:{t:"A good government",b:"Ecris 6 phrases sur ce qu'un bon gouvernement doit faire. Utilise au moins deux phrases en If ... will et une phrase avec unless."}},
+"Parliament" means:
+* the body that makes the laws
+- an election
+- power`,
+deck:`regime | a system of government | The regime changed after the election.
+democracy | rule by the people through elections | Democracy depends on free elections.
+dictatorship | rule by one person with total power | The dictatorship limited free speech.
+monarchy | a state ruled by a king or queen | The monarchy has a symbolic role.
+republic | a state with an elected head of state | Togo is a republic.
+election | a vote to choose leaders | The election takes place in April.
+opposition | the parties that are against the government | The opposition criticised the budget.
+constitution | the basic law of a country | The constitution protects citizens.
+freedom of speech | the right to say what you think | Freedom of speech is a basic right.
+to elect | to choose by vote | The people elect their deputies.
+to overthrow | to remove a government by force | The army tried to overthrow the government.
+corruption | dishonest use of power for money | Corruption slows down development.
+parliament | the body that makes the laws | The parliament passed a new law.
+citizen | a member of a country with rights and duties | Every citizen can vote at eighteen.`,
+hw:{t:"A good government",b:"Write 6 sentences about what a good government must do. Use at least two sentences with If ... will and one sentence with unless."}},
 
 {c:"1re",u:3,lv:"B1",t:"Women and Occupations",th:"Women at work",g:"However and yet, subordinating conjunctions",
-body:`Les femmes occupent de plus en plus de postes varies : enseignantes, entrepreneuses, ingenieures. Quels obstacles restent a surmonter ?
+body:`Women hold more and more varied jobs: teachers, entrepreneurs, engineers. What obstacles still need to be overcome?
 
-**Vocabulary** (mots et expressions) :
-**workplace** (lieu de travail) ; **occupation** (profession) ; **salary** (salaire) ; **employer** (employeur) ; **employee** (employe) ; **promotion** (promotion) ; **business** (entreprise) ; **to hire** (embaucher) ; **experience** (experience) ; **skill** (competence) ; **to apply** (postuler) ; **career** (carriere) ; **flexible hours** (horaires flexibles) ; **childcare** (garde d'enfants) ; **equal pay** (salaire egal).
+**Vocabulary** (words and expressions):
+**workplace** (the place where you work) ; **occupation** (a job or profession) ; **salary** (regular pay for work) ; **employer** (a person or company that pays workers) ; **employee** (a person who works for an employer) ; **promotion** (a move to a higher job) ; **business** (a company that sells goods or services) ; **to hire** (to employ someone) ; **experience** (knowledge gained by doing a job) ; **skill** (an ability you have learned) ; **to apply** (to ask for a job in writing) ; **career** (a person's working life) ; **flexible hours** (working times that can change) ; **childcare** (looking after children while parents work) ; **equal pay** (the same pay for the same work).
 
-**Grammar 1 : However and yet.** **However** (cependant, toutefois) relie deux idees. **Yet** (pourtant) indique une surprise.
-Many women are qualified. However, they earn less than men. (Beaucoup de femmes sont qualifiees. Cependant, elles gagnent moins que les hommes.)
-She has a degree, yet she was not hired. (Elle a un diplome, pourtant elle n'a pas ete embauchee.)
+**Grammar 1: However and yet.** **However** (nevertheless) links two ideas. **Yet** (still) shows a surprise.
+Many women are qualified. However, they earn less than men.
+She has a degree, yet she was not hired.
 
-**Grammar 2 : Subordinating conjunctions.** **Because**, **since**, **while**, **whereas**, **as long as**, **so that**.
-She works at night **so that** she can care for her children. (Elle travaille la nuit afin de pouvoir s'occuper de ses enfants.)
-**While** men dominate some sectors, women are growing in others. (Alors que les hommes dominent certains secteurs, les femmes progressent dans d'autres.)
+**Grammar 2: Subordinating conjunctions.** **Because**, **since**, **while**, **whereas**, **as long as**, **so that**.
+She works at night **so that** she can care for her children.
+**While** men dominate some sectors, women are growing in others.
 
-**Skill : translating a passage.** FR : Les femmes entrepreneures creent des emplois dans leur quartier. EN : Women entrepreneurs create jobs in their neighbourhood.
+**Skill: translating a passage.** FR: Les femmes entrepreneures creent des emplois dans leur quartier. EN: Women entrepreneurs create jobs in their neighbourhood.
 
-**Skill : debating.** Model sentence : Women should have the same opportunities as men, because talent has no gender.
+**Skill: debating.** Model sentence: Women should have the same opportunities as men, because talent has no gender.
 
-**Final activity.** Ecris un court texte (6 phrases) sur les femmes au travail. Utilise however, yet et au moins deux conjonctions de subordination.`,
+**Final activity.** Write a short text (6 sentences) about women at work. Use however, yet and at least two subordinating conjunctions.`,
 quiz:`Women are skilled. ___, they are often paid less.
 * However
 - Because
@@ -1629,40 +1629,40 @@ She saved money ___ she could open a shop.
 - however
 - whereas
 
-« Salary » veut dire :
-* salaire
-- promotion
-- employeur
+"Salary" means:
+* regular pay for work
+- a promotion
+- an employer
 
-Ecris en anglais « embaucher ».
+Write in English: "to hire".
 = to hire
 
-« Equal pay » se traduit par :
-* salaire egal
-- salaire minimum
-- prime egale
+"Equal pay" means:
+* the same pay for the same work
+- a minimum wage
+- an equal bonus
 
-Choisis la bonne conjonction : ___ she has children, she works part-time.
+Choose the correct conjunction: ___ she has children, she works part-time.
 * Since
 - However
 - Yet
 
-« Childcare » veut dire :
-* garde d'enfants
-- lieu de travail
-- heures flexibles
+"Childcare" means:
+* looking after children while parents work
+- a workplace
+- flexible hours
 
-Corrige la phrase : However she is qualified, yet she is not promoted.
+Correct the sentence: However she is qualified, yet she is not promoted.
 * She is qualified, yet she is not promoted.
 - However she is qualified, however she is not promoted.
 - She is qualified, however yet she is not promoted.
 
-« Business » veut dire :
-* entreprise
-- carriere
+"Business" means:
+* a company that sells goods or services
+- a career
 - experience
 
-Ecris en anglais « carriere ».
+Write in English: "career".
 = career
 
 They work hard ___ they want a good future.
@@ -1670,45 +1670,45 @@ They work hard ___ they want a good future.
 - however
 - yet
 
-« Employer » se traduit par :
-* employeur
-- employe
-- entrepreneur`,
-deck:`workplace | lieu de travail | The workplace must be safe for everyone.
-occupation | profession | Her occupation is nursing.
-salary | salaire | The salary is paid every month.
-employer | employeur | The employer hired three new staff.
-employee | employe | The employee works from eight to four.
-promotion | promotion | She got a promotion this year.
-business | entreprise | She runs a small business in Kara.
-to hire | embaucher | The company will hire two engineers.
-experience | experience | Experience is important for this job.
-skill | competence | Good communication is a useful skill.
-to apply | postuler | I will apply for the post.
-career | carriere | She built a career in finance.
-flexible hours | horaires flexibles | Flexible hours help working mothers.
-childcare | garde d'enfants | Affordable childcare is needed.
-equal pay | salaire egal | Equal pay for equal work is fair.`,
-hw:{t:"Women at work",b:"Ecris 6 phrases sur les femmes au travail dans ta ville. Utilise however ou yet dans deux phrases, et deux conjonctions de subordination (because, so that, while, whereas)."}},
+"Employer" means:
+* a person or company that pays workers
+- an employee
+- an entrepreneur`,
+deck:`workplace | the place where you work | The workplace must be safe for everyone.
+occupation | a job or profession | Her occupation is nursing.
+salary | regular pay for work | The salary is paid every month.
+employer | a person or company that pays workers | The employer hired three new staff.
+employee | a person who works for an employer | The employee works from eight to four.
+promotion | a move to a higher job | She got a promotion this year.
+business | a company that sells goods or services | She runs a small business in Kara.
+to hire | to employ someone | The company will hire two engineers.
+experience | knowledge gained by doing a job | Experience is important for this job.
+skill | an ability you have learned | Good communication is a useful skill.
+to apply | to ask for a job in writing | I will apply for the post.
+career | a person's working life | She built a career in finance.
+flexible hours | working times that can change | Flexible hours help working mothers.
+childcare | looking after children while parents work | Affordable childcare is needed.
+equal pay | the same pay for the same work | Equal pay for equal work is fair.`,
+hw:{t:"Women at work",b:"Write 6 sentences about women at work in your town. Use however or yet in two sentences, and two subordinating conjunctions (because, so that, while, whereas)."}},
 
 {c:"1re",u:4,lv:"B1",t:"Pre-established Gender Roles",th:"Gender stereotypes and discrimination",g:"However and yet, subordinating conjunctions",
-body:`Certaines idees recues attribuent des roles fixes aux hommes et aux femmes. Comment ces stereotypes limitent-ils les personnes ?
+body:`Some fixed ideas assign set roles to men and women. How do these stereotypes limit people?
 
-**Vocabulary** (mots et expressions) :
-**gender role** (role de genre) ; **stereotype** (stereotype) ; **bias** (prejuge) ; **discrimination** (discrimination) ; **prejudice** (prejuge) ; **to assume** (supposer) ; **to challenge** (remettre en question) ; **to break the mould** (sortir des cadres) ; **household chores** (taches menageres) ; **breadwinner** (soutien de famille) ; **to expect** (attendre) ; **to treat** (traiter) ; **equal treatment** (traitement egal) ; **to influence** (influencer) ; **awareness** (sensibilisation).
+**Vocabulary** (words and expressions):
+**gender role** (the role expected of a man or a woman) ; **stereotype** (a fixed, oversimplified idea about a group) ; **bias** (an unfair preference) ; **discrimination** (unfair treatment because of who someone is) ; **prejudice** (an opinion formed without good reason) ; **to assume** (to think something is true without checking) ; **to challenge** (to question something) ; **to break the mould** (to do something different from what is expected) ; **household chores** (tasks done at home) ; **breadwinner** (the person who earns the money for a family) ; **to expect** (to think someone will do something) ; **to treat** (to behave towards someone) ; **equal treatment** (the same treatment for everyone) ; **to influence** (to affect how someone thinks or acts) ; **awareness** (knowledge and understanding of a problem).
 
-**Grammar 1 : However and yet.**
-Boys are often expected to be strong. However, many boys enjoy caring for others. (On attend souvent des garcons qu'ils soient forts. Cependant, beaucoup aiment prendre soin des autres.)
+**Grammar 1: However and yet.**
+Boys are often expected to be strong. However, many boys enjoy caring for others.
 
-**Grammar 2 : Subordinating conjunctions.** **Although**, **even if**, **unless**, **as soon as**, **whereas**.
-**Even if** society expects it, nobody should be forced into a role. (Meme si la societe l'attend, personne ne devrait etre force dans un role.)
-**Whereas** the father was the breadwinner, the mother took care of the house. (Alors que le pere etait le soutien de famille, la mere s'occupait de la maison.)
+**Grammar 2: Subordinating conjunctions.** **Although**, **even if**, **unless**, **as soon as**, **whereas**.
+**Even if** society expects it, nobody should be forced into a role.
+**Whereas** the father was the breadwinner, the mother took care of the house.
 
-**Skill : reading and writing about gender biases.** Model text : Gender stereotypes begin early. Girls are often told that they are not good at science. This prejudice affects their careers later.
+**Skill: reading and writing about gender biases.** Model text: Gender stereotypes begin early. Girls are often told that they are not good at science. This prejudice affects their careers later.
 
-**Skill : staging a sketch.** Model dialogue : Son : Mum, I want to cook tonight. Mother : Of course, son. Even if you are a boy, you can learn.
+**Skill: staging a sketch.** Model dialogue: Son: Mum, I want to cook tonight. Mother: Of course, son. Even if you are a boy, you can learn.
 
-**Final activity.** Ecris une courte scene de theatre (8 repliques) entre deux amis qui discutent d'un stereotype. Utilise however et yet dans la scene.`,
+**Final activity.** Write a short theatre scene (8 lines) between two friends discussing a stereotype. Use however and yet in the scene.`,
 quiz:`Girls are told to stay home. ___, many of them go to school.
 * However
 - Because
@@ -1724,40 +1724,40 @@ ___ the boy likes dancing, his family forbids it.
 - However
 - Yet
 
-« Stereotype » veut dire :
-* stereotype
-- prejuge
+"Stereotype" means:
+* a fixed, oversimplified idea about a group
+- a prejudice
 - discrimination
 
-Ecris en anglais « remettre en question ».
+Write in English: "to challenge".
 = to challenge
 
-« To break the mould » signifie :
-* sortir des cadres
-- rompre un contrat
-- casser un moule
+"To break the mould" means:
+* to do something different from what is expected
+- to break a contract
+- to break a mould
 
-« Breadwinner » se traduit par :
-* soutien de famille
-- chef du village
-- employe
+"Breadwinner" means:
+* the person who earns the money for a family
+- a village chief
+- an employee
 
-Choisis la bonne conjonction : ___ the law forbids it, the bias remains strong.
+Choose the correct conjunction: ___ the law forbids it, the bias remains strong.
 * Even though
 - Unless
 - As soon as
 
-Corrige la phrase : However she is brilliant, yet she was not chosen.
+Correct the sentence: However she is brilliant, yet she was not chosen.
 * She is brilliant, yet she was not chosen.
 - However she is brilliant, however she was not chosen.
 - She is brilliant, yet however she was not chosen.
 
-« Equal treatment » veut dire :
-* traitement egal
-- salaire egal
-- prejuge
+"Equal treatment" means:
+* the same treatment for everyone
+- equal pay
+- a prejudice
 
-Ecris en anglais « sensibilisation ».
+Write in English: "awareness".
 = awareness
 
 Men ___ women should be treated equally.
@@ -1765,50 +1765,49 @@ Men ___ women should be treated equally.
 - however
 - whereas
 
-« To assume » veut dire :
-* supposer
-- traiter
-- influencer
+"To assume" means:
+* to think something is true without checking
+- to treat
+- to influence
 
-Choisis la phrase correcte :
+Choose the correct sentence:
 * As soon as the teacher arrives, the class will start.
 - As soon the teacher will arrive, the class starts.
 - As soon as the teacher arrives, the class start.`,
-deck:`gender role | role de genre | Gender roles change over time.
-stereotype | stereotype | Stereotypes can be harmful.
-bias | prejuge | There is a bias against women in some jobs.
-discrimination | discrimination | Discrimination is against the law.
-prejudice | prejuge | Prejudice affects people's choices.
-to assume | supposer | Do not assume that girls cannot code.
-to challenge | remettre en question | We must challenge old ideas.
-to break the mould | sortir des cadres | She broke the mould by becoming a pilot.
-household chores | taches menageres | Household chores should be shared.
-breadwinner | soutien de famille | The mother is the breadwinner.
-to expect | attendre | Parents expect a lot from their children.
-to treat | traiter | Everyone should be treated fairly.
-equal treatment | traitement egal | We want equal treatment at school.
-to influence | influencer | Media can influence our ideas.
-awareness | sensibilisation | Awareness campaigns help change minds.`,
-hw:{t:"Breaking a stereotype",b:"Ecris un paragraphe de 6 phrases sur un stereotype de genre que tu as observe. Utilise However ou yet dans une phrase, et une phrase avec even if, whereas ou unless."}},
+deck:`gender role | the role expected of a man or a woman | Gender roles change over time.
+stereotype | a fixed, oversimplified idea about a group | Stereotypes can be harmful.
+bias | an unfair preference | There is a bias against women in some jobs.
+discrimination | unfair treatment because of who someone is | Discrimination is against the law.
+prejudice | an opinion formed without good reason | Prejudice affects people's choices.
+to assume | to think something is true without checking | Do not assume that girls cannot code.
+to challenge | to question something | We must challenge old ideas.
+to break the mould | to do something different from what is expected | She broke the mould by becoming a pilot.
+household chores | tasks done at home | Household chores should be shared.
+breadwinner | the person who earns the money for a family | The mother is the breadwinner.
+to expect | to think someone will do something | Parents expect a lot from their children.
+to treat | to behave towards someone | Everyone should be treated fairly.
+equal treatment | the same treatment for everyone | We want equal treatment at school.
+to influence | to affect how someone thinks or acts | Media can influence our ideas.
+awareness | knowledge and understanding of a problem | Awareness campaigns help change minds.`,
+hw:{t:"Breaking a stereotype",b:"Write a paragraph of 6 sentences about a gender stereotype you have observed. Use However or yet in one sentence, and one sentence with even if, whereas or unless."}},
 {c:"1re",u:5,lv:"B1",t:"Water Pollution",th:"Environment and water pollution",g:"Active and passive voice; superlative forms of adjectives",
-body:`L'eau est precieuse. Dans cette lecon, on parle de la **pollution de l'eau** : ses causes, ses effets et les solutions.
+body:`Water is precious. In this lesson, we talk about **water pollution**: its causes, its effects and the solutions.
 
-**Vocabulary** (mots et expressions) :
-**pollution** (pollution) ; **waste** (dechets) ; **sewage** (eaux usees) ; **factory** (usine) ; **to dump** (deverser) ; **drinking water** (eau potable) ; **disease** (maladie) ; **to contaminate** (contaminer) ; **to clean up** (nettoyer) ; **drought** (secheresse) ; **to protect** (proteger) ; **awareness** (sensibilisation).
+**Vocabulary** (words and expressions):
+**pollution** (harmful substances in the environment) ; **waste** (materials that are thrown away) ; **sewage** (dirty water from homes and toilets) ; **factory** (a building where goods are made) ; **to dump** (to throw away in large amounts) ; **drinking water** (water that is safe to drink) ; **disease** (an illness) ; **to contaminate** (to make dirty or harmful) ; **to clean up** (to make clean) ; **drought** (a long period with no rain) ; **to protect** (to keep safe) ; **awareness** (knowledge and understanding of a problem).
 
-**Grammar 1 : Active and passive voice.** A la voix active, le sujet fait l'action. A la voix passive, le sujet subit l'action : **be + past participle**. On met l'agent avec **by**.
-Active : Factories pollute the river. (Les usines polluent la riviere.)
-Passive : The river **is polluted** by factories. (La riviere est polluee par les usines.)
-Active : The city dumped its waste in the lake. Passive : Waste **was dumped** in the lake.
-Active : People will clean up the beach. Passive : The beach **will be cleaned up**.
+**Grammar 1: Active and passive voice.** In the active voice, the subject does the action. In the passive voice, the subject receives the action: **be + past participle**. We put the agent with **by**.
+Active: Factories pollute the river. Passive: The river **is polluted** by factories.
+Active: The city dumped its waste in the lake. Passive: Waste **was dumped** in the lake.
+Active: People will clean up the beach. Passive: The beach **will be cleaned up**.
 
-**Grammar 2 : Superlative forms of adjectives.** Pour les adjectifs courts : **the + adjective + -est** (clean → **the cleanest**). Pour les adjectifs longs : **the most + adjective** (polluted → **the most polluted**). Attention aux irreguliers : good → **the best**, bad → **the worst**.
-This is **the most polluted** river in the region. (C'est la riviere la plus polluee de la region.)
-The lake is **the cleanest** of the three. (Le lac est le plus propre des trois.)
+**Grammar 2: Superlative forms of adjectives.** For short adjectives: **the + adjective + -est** (clean becomes **the cleanest**). For long adjectives: **the most + adjective** (polluted becomes **the most polluted**). Watch the irregular forms: good becomes **the best**, bad becomes **the worst**.
+This is **the most polluted** river in the region.
+The lake is **the cleanest** of the three.
 
-**Skill : reading and speaking.** Un texte explique que dans certains quartiers, les eaux usees sont deversees dans les caniveaux. Les habitants tombent malades. Une association organise des nettoyages chaque samedi.
+**Skill: reading and speaking.** A text explains that in some neighbourhoods, sewage is dumped into the gutters. The residents become ill. An association organises clean-ups every Saturday.
 
-**Final activity.** Ecris 5 phrases sur la pollution de l'eau dans ton quartier. Utilise au moins deux passifs et un superlatif.`,
+**Final activity.** Write 5 sentences about water pollution in your neighbourhood. Use at least two passive sentences and one superlative.`,
 quiz:`The river ___ by the factories every year.
 * is polluted
 - pollutes
@@ -1839,41 +1838,41 @@ Lake Togo is ___ lake in the area.
 - the most large
 - largest than
 
-What does « drought » mean ?
-* secheresse
-- inondation
-- pluie
+What does "drought" mean?
+* a long period with no rain
+- a flood
+- rain
 
 The waste ___ into the sea by the company.
 * was dumped
 - dumped
 - has dump
 
-Write the superlative of « bad » (use the).
+Write the superlative of "bad" (use the).
 = the worst
 
-What does « to contaminate » mean ?
-* contaminer
-- nettoyer
-- proteger
+What does "to contaminate" mean?
+* to make dirty or harmful
+- to clean up
+- to protect
 
-Choose the correct passive : The house ___ in 1990.
+Choose the correct passive: The house ___ in 1990.
 * was built
 - built
 - was build`,
-deck:`pollution | pollution | Pollution harms fish and people.
-waste | dechets | Do not throw waste in the river.
-sewage | eaux usees | Sewage must be treated before it goes into the sea.
-factory | usine | The factory dumps chemicals.
-to dump | deverser | They dump rubbish near the lake.
-drinking water | eau potable | Drinking water must be clean.
-disease | maladie | Dirty water causes disease.
-to contaminate | contaminer | The well was contaminated by oil.
-to clean up | nettoyer | Students clean up the beach.
-drought | secheresse | The drought lasted three months.
-to protect | proteger | We must protect our rivers.
-awareness | sensibilisation | Awareness campaigns help people change.`,
-hw:{t:"A polluted river",b:"Ecris un paragraphe de 6 phrases sur une riviere polluee. Utilise au moins deux phrases au passif et un superlatif."}},
+deck:`pollution | harmful substances in the environment | Pollution harms fish and people.
+waste | materials that are thrown away | Do not throw waste in the river.
+sewage | dirty water from homes and toilets | Sewage must be treated before it goes into the sea.
+factory | a building where goods are made | The factory dumps chemicals.
+to dump | to throw away in large amounts | They dump rubbish near the lake.
+drinking water | water that is safe to drink | Drinking water must be clean.
+disease | an illness | Dirty water causes disease.
+to contaminate | to make dirty or harmful | The well was contaminated by oil.
+to clean up | to make clean | Students clean up the beach.
+drought | a long period with no rain | The drought lasted three months.
+to protect | to keep safe | We must protect our rivers.
+awareness | knowledge and understanding of a problem | Awareness campaigns help people change.`,
+hw:{t:"A polluted river",b:"Write a paragraph of 6 sentences about a polluted river. Use at least two passive sentences and one superlative."}},
 {c:"1re",u:6,lv:"B1",t:"Hunting and National Parks",th:"Wildlife and national parks",g:"Question tags",
 body:`Les parcs nationaux protegent les animaux et les plantes. Dans cette lecon, on parle de la **chasse**, des **parcs** et des especes menacees.
 
