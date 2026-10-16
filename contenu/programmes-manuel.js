@@ -1378,28 +1378,28 @@ hatred | very strong dislike | Hatred divides people.`,
 hw:{t:"Peace in my town",b:"Write a short paragraph (6 sentences) about peace in your town. Use one sentence with No matter ..., one sentence in indirect speech (He said that ...) and a conclusion starting with To sum up."}},
 
 {c:"1re",u:1,lv:"B1",t:"The Commonwealth",th:"The Commonwealth of Nations",g:"Tenses in English, although and despite, relative pronouns",
-body:`Le Commonwealth est une association de pays, dont beaucoup ont ete colonies par le Royaume-Uni. Quelles sont ses caracteristiques ?
+body:`The Commonwealth is an association of countries, many of which were colonies of the United Kingdom. What are its main features?
 
-**Vocabulary** (mots et expressions) :
-**Commonwealth** (Commonwealth) ; **member country** (pays membre) ; **former colony** (ancienne colonie) ; **head of state** (chef d'Etat) ; **summit** (sommet) ; **charter** (charte) ; **democracy** (democratie) ; **human rights** (droits de l'homme) ; **cooperation** (cooperation) ; **trade** (commerce) ; **to join** (adherer, rejoindre) ; **to share** (partager) ; **language** (langue) ; **official** (officiel) ; **history** (histoire).
+**Vocabulary** (words and expressions):
+**Commonwealth** (an association of countries that were once under British rule) ; **member country** (a country that belongs to the group) ; **former colony** (a country that was once ruled by another) ; **head of state** (the leader of a country, such as a king or president) ; **summit** (a meeting of leaders) ; **charter** (a document setting out shared principles) ; **democracy** (rule by the people through elections) ; **human rights** (the basic rights every person has) ; **cooperation** (working together) ; **trade** (buying and selling goods) ; **to join** (to become a member) ; **to share** (to have or use something together) ; **language** (a system of words used to communicate) ; **official** (recognised by the government) ; **history** (the events of the past).
 
-**Grammar 1 : Tenses in English.** Le present simple decrit les faits generaux. Le present perfect relie le passe au present. Le past simple raconte un fait termine.
-The Commonwealth **has grown** since 1949. (Le Commonwealth s'est developpe depuis 1949.)
-Togo **joined** the Commonwealth in 1995. (Le Togo a rejoint le Commonwealth en 1995.)
-Member countries **share** a common history. (Les pays membres partagent une histoire commune.)
+**Grammar 1: Tenses in English.** The present simple describes general facts. The present perfect connects the past to the present. The past simple tells of a finished event.
+The Commonwealth **has grown** since 1949.
+Togo **joined** the Commonwealth in 1995.
+Member countries **share** a common history.
 
-**Grammar 2 : Although and despite.** **Although** + proposition (bien que). **Despite** + nom ou -ing (malgre).
-Although the countries are different, they share the English language. (Bien que les pays soient differents, ils partagent la langue anglaise.)
-Despite its many members, the Commonwealth is not a political union. (Malgre ses nombreux membres, le Commonwealth n'est pas une union politique.)
+**Grammar 2: Although and despite.** **Although** + clause. **Despite** + noun or -ing.
+Although the countries are different, they share the English language.
+Despite its many members, the Commonwealth is not a political union.
 
-**Grammar 3 : Relative pronouns.** **Who**, **which**, **that**, **whose**, **where**.
-The city **where** the summit was held is in Africa. (La ville ou le sommet a eu lieu est en Afrique.)
+**Grammar 3: Relative pronouns.** **Who**, **which**, **that**, **whose**, **where**.
+The city **where** the summit was held is in Africa.
 
-**Skill : recognising key features.** Model text : The Commonwealth is a group of independent countries. Its members cooperate in trade, education and human rights.
+**Skill: recognising key features.** Model text: The Commonwealth is a group of independent countries. Its members cooperate in trade, education and human rights.
 
-**Skill : describing and writing.** Model sentences : Members meet every two years. Many of them use English in government.
+**Skill: describing and writing.** Model sentences: Members meet every two years. Many of them use English in government.
 
-**Final activity.** Ecris un court paragraphe (6 phrases) qui presente le Commonwealth, avec au moins un temps du present perfect, une phrase avec although et une phrase avec which.`,
+**Final activity.** Write a short paragraph (6 sentences) presenting the Commonwealth, with at least one present perfect, one sentence with although and one sentence with which.`,
 quiz:`The Commonwealth ___ many changes since its creation.
 * has seen
 - saw
@@ -1420,12 +1420,12 @@ The country ___ hosted the summit last year is in Africa.
 - who
 - whose
 
-« Former colony » veut dire :
-* ancienne colonie
-- membre du sommet
-- pays independant
+"Former colony" means:
+* a country that was once ruled by another
+- a member of the summit
+- an independent country
 
-Ecris en anglais « rejoindre ».
+Write in English: "to join".
 = to join
 
 Togo ___ the Commonwealth in 1995.
@@ -1433,12 +1433,12 @@ Togo ___ the Commonwealth in 1995.
 - has join
 - joining
 
-« Human rights » se traduit par :
-* droits de l'homme
-- droits du pays
-- droit commercial
+"Human rights" means:
+* the basic rights every person has
+- the rights of the country
+- commercial law
 
-Choisis la bonne forme : She ___ a student of the Commonwealth since 2020.
+Choose the correct form: She ___ a student of the Commonwealth since 2020.
 * has been
 - was
 - is being
@@ -1448,17 +1448,17 @@ The leader ___ the charter was from Ghana.
 - whose signed
 - where signed
 
-« Summit » veut dire :
-* sommet
-- charte
-- commerce
+"Summit" means:
+* a meeting of leaders
+- a charter
+- trade
 
-Corrige la phrase : Despite the countries is different, they cooperate.
+Correct the sentence: Despite the countries is different, they cooperate.
 * Despite the countries being different, they cooperate.
 - Despite the countries is different, they cooperate.
 - Although the countries being different, they cooperates.
 
-Ecris en anglais « cooperation ».
+Write in English: "cooperation".
 = cooperation
 
 The island ___ my father was born is small.
@@ -1466,44 +1466,44 @@ The island ___ my father was born is small.
 - which
 - who
 
-« Head of state » signifie :
-* chef d'Etat
-- chef de village
-- ministre`,
-deck:`Commonwealth | Commonwealth | The Commonwealth meets every two years.
-member country | pays membre | Togo is a member country.
-former colony | ancienne colonie | Many members are former colonies.
-head of state | chef d'Etat | The head of state greets the guests.
-summit | sommet | The summit was held in London.
-charter | charte | The charter promotes democracy.
-democracy | democratie | Democracy is a shared value.
-human rights | droits de l'homme | Human rights must be respected.
-cooperation | cooperation | Cooperation helps trade grow.
-trade | commerce | Trade between members has increased.
-to join | adherer, rejoindre | The country decided to join the group.
-to share | partager | The members share a common language.
-official | officiel | English is an official language.
-history | histoire | Their history is linked to Britain.`,
-hw:{t:"My country in a group",b:"Ecris 6 phrases sur un groupe de pays dont ton pays fait partie (ou un groupe que tu connais). Utilise le present perfect, although ou despite, et une phrase avec who, which ou where."}},
+"Head of state" means:
+* the leader of a country
+- a village chief
+- a minister`,
+deck:`Commonwealth | an association of countries once under British rule | The Commonwealth meets every two years.
+member country | a country that belongs to the group | Togo is a member country.
+former colony | a country that was once ruled by another | Many members are former colonies.
+head of state | the leader of a country | The head of state greets the guests.
+summit | a meeting of leaders | The summit was held in London.
+charter | a document setting out shared principles | The charter promotes democracy.
+democracy | rule by the people through elections | Democracy is a shared value.
+human rights | the basic rights every person has | Human rights must be respected.
+cooperation | working together | Cooperation helps trade grow.
+trade | buying and selling goods | Trade between members has increased.
+to join | to become a member | The country decided to join the group.
+to share | to have or use something together | The members share a common language.
+official | recognised by the government | English is an official language.
+history | the events of the past | Their history is linked to Britain.`,
+hw:{t:"My country in a group",b:"Write 6 sentences about a group of countries that your country belongs to (or a group you know). Use the present perfect, although or despite, and one sentence with who, which or where."}},
 
 {c:"1re",u:2,lv:"B1",t:"Different Types of Regimes",th:"Political regimes",g:"Conditional type one, the use of unless",
-body:`Il existe plusieurs types de regimes politiques dans le monde. Quelles en sont les caracteristiques, et quels sont leurs risques ?
+body:`There are several types of political regime in the world. What are their features, and what are their risks?
 
-**Vocabulary** (mots et expressions) :
-**regime** (regime) ; **democracy** (democratie) ; **dictatorship** (dictature) ; **monarchy** (monarchie) ; **republic** (republique) ; **election** (election) ; **opposition** (opposition) ; **constitution** (constitution) ; **freedom of speech** (liberte d'expression) ; **to elect** (elire) ; **to overthrow** (renverser) ; **power** (pouvoir) ; **corruption** (corruption) ; **citizen** (citoyen) ; **parliament** (parlement).
+**Vocabulary** (words and expressions):
+**regime** (a system of government) ; **democracy** (rule by the people through elections) ; **dictatorship** (rule by one person with total power) ; **monarchy** (a state ruled by a king or queen) ; **republic** (a state with an elected head of state) ; **election** (a vote to choose leaders) ; **opposition** (the parties that are against the government) ; **constitution** (the basic law of a country) ; **freedom of speech** (the right to say what you think) ; **to elect** (to choose by vote) ; **to overthrow** (to remove a government by force) ; **power** (the ability to control or decide) ; **corruption** (dishonest use of power for money) ; **citizen** (a member of a country with rights and duties) ; **parliament** (the body that makes the laws).
 
-**Grammar 1 : Conditional type one.** Pour une situation reelle ou probable.
-If citizens **vote** freely, the government **will be** more responsive. (Si les citoyens votent librement, le gouvernement sera plus a l'ecoute.)
-If the opposition **wins**, the president **will have** to accept the result. (Si l'opposition gagne, le president devra accepter le resultat.)
+**Grammar 1: Conditional type one.** For a real or likely situation.
+If citizens **vote** freely, the government **will be** more responsive.
+If the opposition **wins**, the president **will have** to accept the result.
 
-**Grammar 2 : Unless.** **Unless** = **if not**.
-A regime **will become** unstable **unless** it respects the constitution. (Un regime deviendra instable a moins qu'il ne respecte la constitution.)
+**Grammar 2: Unless.** **Unless** = **if not**.
+A regime **will become** unstable **unless** it respects the constitution.
 
-**Skill : understanding a message.** Model text : A democracy allows citizens to elect their leaders. In a dictatorship, power is held by one person or a small group.
+**Skill: understanding a message.** Model text: A democracy allows citizens to elect their leaders. In a dictatorship, power is held by one person or a small group.
 
-**Skill : interpreting a passage.** Model sentence : The article suggests that freedom of speech is the best protection against corruption.
+**Skill: interpreting a passage.** Model sentence: The article suggests that freedom of speech is the best protection against corruption.
 
-**Final activity.** Ecris 5 phrases sur les avantages et les dangers d'un regime democratique. Utilise au moins une phrase en If ... will et une phrase avec unless.`,
+**Final activity.** Write 5 sentences about the advantages and dangers of a democratic regime. Use at least one sentence with If ... will and one sentence with unless.`,
 quiz:`If citizens ___ freely, the government will listen to them.
 * vote
 - voted
@@ -1514,12 +1514,12 @@ The president will leave office ___ the people vote him out.
 - if
 - while
 
-« Dictatorship » veut dire :
-* dictature
-- monarchie
-- republique
+"Dictatorship" means:
+* rule by one person with total power
+- a monarchy
+- a republic
 
-Ecris en anglais « elire ».
+Write in English: "to elect".
 = to elect
 
 If the parliament ___ the law, the country will be stable.
@@ -1527,32 +1527,32 @@ If the parliament ___ the law, the country will be stable.
 - approved
 - would approve
 
-« Freedom of speech » se traduit par :
-* liberte d'expression
-- liberte de vote
-- liberte de marche
+"Freedom of speech" means:
+* the right to say what you think
+- the freedom to vote
+- the freedom to march
 
 The regime ___ fall unless it changes.
 * will
 - would
 - is
 
-« Overthrow » veut dire :
-* renverser
-- elire
-- contrôler
+"Overthrow" means:
+* to remove a government by force
+- to elect
+- to control
 
-« Corruption » se traduit par :
-* corruption
-- constitution
-- opposition
+"Corruption" means:
+* dishonest use of power for money
+- a constitution
+- an opposition
 
-Corrige la phrase : If the people will protest, the leader will resign.
+Correct the sentence: If the people will protest, the leader will resign.
 * If the people protest, the leader will resign.
 - If the people will protested, the leader resigns.
 - If the people protest, the leader would resign.
 
-Ecris en anglais « constitution ».
+Write in English: "constitution".
 = constitution
 
 The citizens ___ their rights unless they are informed.
@@ -1560,55 +1560,55 @@ The citizens ___ their rights unless they are informed.
 - would not know
 - do not knows
 
-« Monarchy » signifie :
-* monarchie
-- republique
-- parlement
+"Monarchy" means:
+* a state ruled by a king or queen
+- a republic
+- a parliament
 
 If the opposition ___ strong, the election will be fair.
 * is
 - was
 - would be
 
-« Parliament » veut dire :
-* parlement
-- election
-- pouvoir`,
-deck:`regime | regime | The regime changed after the election.
-democracy | democratie | Democracy depends on free elections.
-dictatorship | dictature | The dictatorship limited free speech.
-monarchy | monarchie | The monarchy has a symbolic role.
-republic | republique | Togo is a republic.
-election | election | The election takes place in April.
-opposition | opposition | The opposition criticised the budget.
-constitution | constitution | The constitution protects citizens.
-freedom of speech | liberte d'expression | Freedom of speech is a basic right.
-to elect | elire | The people elect their deputies.
-to overthrow | renverser | The army tried to overthrow the government.
-corruption | corruption | Corruption slows down development.
-parliament | parlement | The parliament passed a new law.
-citizen | citoyen | Every citizen can vote at eighteen.`,
-hw:{t:"A good government",b:"Ecris 6 phrases sur ce qu'un bon gouvernement doit faire. Utilise au moins deux phrases en If ... will et une phrase avec unless."}},
+"Parliament" means:
+* the body that makes the laws
+- an election
+- power`,
+deck:`regime | a system of government | The regime changed after the election.
+democracy | rule by the people through elections | Democracy depends on free elections.
+dictatorship | rule by one person with total power | The dictatorship limited free speech.
+monarchy | a state ruled by a king or queen | The monarchy has a symbolic role.
+republic | a state with an elected head of state | Togo is a republic.
+election | a vote to choose leaders | The election takes place in April.
+opposition | the parties that are against the government | The opposition criticised the budget.
+constitution | the basic law of a country | The constitution protects citizens.
+freedom of speech | the right to say what you think | Freedom of speech is a basic right.
+to elect | to choose by vote | The people elect their deputies.
+to overthrow | to remove a government by force | The army tried to overthrow the government.
+corruption | dishonest use of power for money | Corruption slows down development.
+parliament | the body that makes the laws | The parliament passed a new law.
+citizen | a member of a country with rights and duties | Every citizen can vote at eighteen.`,
+hw:{t:"A good government",b:"Write 6 sentences about what a good government must do. Use at least two sentences with If ... will and one sentence with unless."}},
 
 {c:"1re",u:3,lv:"B1",t:"Women and Occupations",th:"Women at work",g:"However and yet, subordinating conjunctions",
-body:`Les femmes occupent de plus en plus de postes varies : enseignantes, entrepreneuses, ingenieures. Quels obstacles restent a surmonter ?
+body:`Women hold more and more varied jobs: teachers, entrepreneurs, engineers. What obstacles still need to be overcome?
 
-**Vocabulary** (mots et expressions) :
-**workplace** (lieu de travail) ; **occupation** (profession) ; **salary** (salaire) ; **employer** (employeur) ; **employee** (employe) ; **promotion** (promotion) ; **business** (entreprise) ; **to hire** (embaucher) ; **experience** (experience) ; **skill** (competence) ; **to apply** (postuler) ; **career** (carriere) ; **flexible hours** (horaires flexibles) ; **childcare** (garde d'enfants) ; **equal pay** (salaire egal).
+**Vocabulary** (words and expressions):
+**workplace** (the place where you work) ; **occupation** (a job or profession) ; **salary** (regular pay for work) ; **employer** (a person or company that pays workers) ; **employee** (a person who works for an employer) ; **promotion** (a move to a higher job) ; **business** (a company that sells goods or services) ; **to hire** (to employ someone) ; **experience** (knowledge gained by doing a job) ; **skill** (an ability you have learned) ; **to apply** (to ask for a job in writing) ; **career** (a person's working life) ; **flexible hours** (working times that can change) ; **childcare** (looking after children while parents work) ; **equal pay** (the same pay for the same work).
 
-**Grammar 1 : However and yet.** **However** (cependant, toutefois) relie deux idees. **Yet** (pourtant) indique une surprise.
-Many women are qualified. However, they earn less than men. (Beaucoup de femmes sont qualifiees. Cependant, elles gagnent moins que les hommes.)
-She has a degree, yet she was not hired. (Elle a un diplome, pourtant elle n'a pas ete embauchee.)
+**Grammar 1: However and yet.** **However** (nevertheless) links two ideas. **Yet** (still) shows a surprise.
+Many women are qualified. However, they earn less than men.
+She has a degree, yet she was not hired.
 
-**Grammar 2 : Subordinating conjunctions.** **Because**, **since**, **while**, **whereas**, **as long as**, **so that**.
-She works at night **so that** she can care for her children. (Elle travaille la nuit afin de pouvoir s'occuper de ses enfants.)
-**While** men dominate some sectors, women are growing in others. (Alors que les hommes dominent certains secteurs, les femmes progressent dans d'autres.)
+**Grammar 2: Subordinating conjunctions.** **Because**, **since**, **while**, **whereas**, **as long as**, **so that**.
+She works at night **so that** she can care for her children.
+**While** men dominate some sectors, women are growing in others.
 
-**Skill : translating a passage.** FR : Les femmes entrepreneures creent des emplois dans leur quartier. EN : Women entrepreneurs create jobs in their neighbourhood.
+**Skill: translating a passage.** FR: Les femmes entrepreneures creent des emplois dans leur quartier. EN: Women entrepreneurs create jobs in their neighbourhood.
 
-**Skill : debating.** Model sentence : Women should have the same opportunities as men, because talent has no gender.
+**Skill: debating.** Model sentence: Women should have the same opportunities as men, because talent has no gender.
 
-**Final activity.** Ecris un court texte (6 phrases) sur les femmes au travail. Utilise however, yet et au moins deux conjonctions de subordination.`,
+**Final activity.** Write a short text (6 sentences) about women at work. Use however, yet and at least two subordinating conjunctions.`,
 quiz:`Women are skilled. ___, they are often paid less.
 * However
 - Because
@@ -1629,40 +1629,40 @@ She saved money ___ she could open a shop.
 - however
 - whereas
 
-« Salary » veut dire :
-* salaire
-- promotion
-- employeur
+"Salary" means:
+* regular pay for work
+- a promotion
+- an employer
 
-Ecris en anglais « embaucher ».
+Write in English: "to hire".
 = to hire
 
-« Equal pay » se traduit par :
-* salaire egal
-- salaire minimum
-- prime egale
+"Equal pay" means:
+* the same pay for the same work
+- a minimum wage
+- an equal bonus
 
-Choisis la bonne conjonction : ___ she has children, she works part-time.
+Choose the correct conjunction: ___ she has children, she works part-time.
 * Since
 - However
 - Yet
 
-« Childcare » veut dire :
-* garde d'enfants
-- lieu de travail
-- heures flexibles
+"Childcare" means:
+* looking after children while parents work
+- a workplace
+- flexible hours
 
-Corrige la phrase : However she is qualified, yet she is not promoted.
+Correct the sentence: However she is qualified, yet she is not promoted.
 * She is qualified, yet she is not promoted.
 - However she is qualified, however she is not promoted.
 - She is qualified, however yet she is not promoted.
 
-« Business » veut dire :
-* entreprise
-- carriere
+"Business" means:
+* a company that sells goods or services
+- a career
 - experience
 
-Ecris en anglais « carriere ».
+Write in English: "career".
 = career
 
 They work hard ___ they want a good future.
@@ -1670,26 +1670,26 @@ They work hard ___ they want a good future.
 - however
 - yet
 
-« Employer » se traduit par :
-* employeur
-- employe
-- entrepreneur`,
-deck:`workplace | lieu de travail | The workplace must be safe for everyone.
-occupation | profession | Her occupation is nursing.
-salary | salaire | The salary is paid every month.
-employer | employeur | The employer hired three new staff.
-employee | employe | The employee works from eight to four.
-promotion | promotion | She got a promotion this year.
-business | entreprise | She runs a small business in Kara.
-to hire | embaucher | The company will hire two engineers.
-experience | experience | Experience is important for this job.
-skill | competence | Good communication is a useful skill.
-to apply | postuler | I will apply for the post.
-career | carriere | She built a career in finance.
-flexible hours | horaires flexibles | Flexible hours help working mothers.
-childcare | garde d'enfants | Affordable childcare is needed.
-equal pay | salaire egal | Equal pay for equal work is fair.`,
-hw:{t:"Women at work",b:"Ecris 6 phrases sur les femmes au travail dans ta ville. Utilise however ou yet dans deux phrases, et deux conjonctions de subordination (because, so that, while, whereas)."}},
+"Employer" means:
+* a person or company that pays workers
+- an employee
+- an entrepreneur`,
+deck:`workplace | the place where you work | The workplace must be safe for everyone.
+occupation | a job or profession | Her occupation is nursing.
+salary | regular pay for work | The salary is paid every month.
+employer | a person or company that pays workers | The employer hired three new staff.
+employee | a person who works for an employer | The employee works from eight to four.
+promotion | a move to a higher job | She got a promotion this year.
+business | a company that sells goods or services | She runs a small business in Kara.
+to hire | to employ someone | The company will hire two engineers.
+experience | knowledge gained by doing a job | Experience is important for this job.
+skill | an ability you have learned | Good communication is a useful skill.
+to apply | to ask for a job in writing | I will apply for the post.
+career | a person's working life | She built a career in finance.
+flexible hours | working times that can change | Flexible hours help working mothers.
+childcare | looking after children while parents work | Affordable childcare is needed.
+equal pay | the same pay for the same work | Equal pay for equal work is fair.`,
+hw:{t:"Women at work",b:"Write 6 sentences about women at work in your town. Use however or yet in two sentences, and two subordinating conjunctions (because, so that, while, whereas)."}},
 
 {c:"1re",u:4,lv:"B1",t:"Pre-established Gender Roles",th:"Gender stereotypes and discrimination",g:"However and yet, subordinating conjunctions",
 body:`Certaines idees recues attribuent des roles fixes aux hommes et aux femmes. Comment ces stereotypes limitent-ils les personnes ?
