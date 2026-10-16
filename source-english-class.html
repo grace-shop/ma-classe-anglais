@@ -10624,6 +10624,20 @@ arClose=function(){BTNAV.view=null;return _btArClose()};
     const b=e.target&&e.target.closest&&e.target.closest('[data-a="retryBoot"]');
     if(b){e.preventDefault();location.reload()}
   },true);
+
+  /* if one page cannot be drawn, say so and keep the tabs working (no blank screen) */
+  const _rnd=render;
+  render=function(){
+    try{return _rnd.apply(this,arguments)}
+    catch(e){
+      console.error("render failed:",e);
+      try{const m=document.getElementById("main");
+        if(m)m.innerHTML=`<div class="empty" style="display:grid;gap:12px;justify-items:center;padding:28px 16px;text-align:center">
+          <p style="margin:0">This page could not be shown. Pick another tab above, or try again.</p>
+          <button class="btn" type="button" data-a="retryBoot">Try again</button></div>`;
+      }catch(x){}
+    }
+  };
   const st=document.createElement("style");st.id="zzzvsteady";st.textContent=`
 #arena .ar-mode,#arena .ar-card,#arena .ar-row,#arena .ar-fab,#arena .ar-trophy,#arena .ar-confetti i{animation:none!important}
 #arena{overflow-x:hidden}
