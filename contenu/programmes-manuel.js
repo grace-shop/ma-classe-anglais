@@ -1274,23 +1274,23 @@ tolerance | accepting people who are different | Tolerance makes peace possible.
 hw:{t:"A traditional art",b:"Write 6 sentences about a traditional art from your region. Use two sentences with No matter ... and two sentences in indirect speech (He said that ...)."}},
 
 {c:"2nde",u:13,lv:"B1",t:"Violent Extremism",th:"Extremism, violence and peace",g:"No matter (what, who, how), direct and indirect speech",
-body:`L'extremisme violent menace la paix dans plusieurs pays. Comment le decrire, et comment le combattre ?
+body:`Violent extremism threatens peace in several countries. How can it be described, and how can it be fought?
 
-**Vocabulary** (mots et expressions) :
-**violent extremism** (extremisme violent) ; **terrorism** (terrorisme) ; **radicalisation** (radicalisation) ; **violence** (violence) ; **peace** (paix) ; **security** (securite) ; **to condemn** (condamner) ; **victim** (victime) ; **attack** (attaque) ; **to threaten** (menacer) ; **community** (communaute) ; **religion** (religion) ; **to fight against** (lutter contre) ; **hatred** (haine) ; **to unite** (unir).
+**Vocabulary** (words and expressions):
+**violent extremism** (extreme views supported by violence) ; **terrorism** (the use of violence to create fear for political aims) ; **radicalisation** (the process of becoming extreme) ; **violence** (the use of force to hurt people) ; **peace** (a time without war or conflict) ; **security** (safety from danger) ; **to condemn** (to say publicly that something is wrong) ; **victim** (a person who suffers harm) ; **attack** (a violent action against people or places) ; **to threaten** (to say you will harm someone) ; **community** (a group of people living together) ; **religion** (a belief system with rules and worship) ; **to fight against** (to struggle against) ; **hatred** (very strong dislike) ; **to unite** (to bring together).
 
-**Grammar 1 : No matter.**
-No matter why people join extremist groups, violence is never the answer. (Peu importe les raisons pour lesquelles on rejoint ces groupes, la violence n'est jamais la solution.)
+**Grammar 1: No matter.**
+No matter why people join extremist groups, violence is never the answer.
 
-**Grammar 2 : Direct and indirect speech.** Au discours indirect, on utilise **said that**, **told me to**, **asked whether / if**.
-Direct : "Stop the violence now," the leader said. Indirect : The leader said that we **had to** stop the violence.
-Direct : "Are you safe?" she asked. Indirect : She asked whether we **were** safe.
+**Grammar 2: Direct and indirect speech.** In indirect speech, we use **said that**, **told me to**, **asked whether / if**.
+Direct: "Stop the violence now," the leader said. Indirect: The leader said that we **had to** stop the violence.
+Direct: "Are you safe?" she asked. Indirect: She asked whether we **were** safe.
 
-**Skill : describing an extremist act.** Model text : On Monday night, a group attacked a village market. Several people were injured. The police condemned the attack and asked the population to stay calm.
+**Skill: describing an extremist act.** Model text: On Monday night, a group attacked a village market. Several people were injured. The police condemned the attack and asked the population to stay calm.
 
-**Skill : argumentative essay.** Model structure : Introduction (question) / Arguments for / Arguments against / Conclusion. Example : To sum up, education and dialogue are stronger than hatred.
+**Skill: argumentative essay.** Model structure: Introduction (question) / Arguments for / Arguments against / Conclusion. Example: To sum up, education and dialogue are stronger than hatred.
 
-**Final activity.** Ecris un court paragraphe argumentatif (6 phrases) : Comment peut-on lutter contre l'extremisme dans une communaute ? Termine par une conclusion.`,
+**Final activity.** Write a short argumentative paragraph (6 sentences): How can extremism be fought in a community? End with a conclusion.`,
 quiz:`No matter ___ the leaders say, we must stay united.
 * what
 - how
@@ -1306,12 +1306,12 @@ She asked, "Are the roads safe?" She asked whether the roads ___ safe.
 - are
 - be
 
-« Terrorism » veut dire :
-* terrorisme
+"Terrorism" means:
+* the use of violence to create fear for political aims
 - violence
-- securite
+- security
 
-Ecris en anglais « condamner ».
+Write in English: "to condemn".
 = to condemn
 
 The leader told us ___ calm.
@@ -1324,12 +1324,12 @@ No matter ___ young people are, they can fight extremism.
 - what
 - when
 
-« Victim » veut dire :
-* victime
-- attaque
-- haine
+"Victim" means:
+* a person who suffers harm
+- an attack
+- hatred
 
-Ecris en anglais « lutter contre ».
+Write in English: "to fight against".
 = to fight against
 
 He said, "We will meet tomorrow." He said that they ___ the next day.
@@ -1337,9 +1337,9 @@ He said, "We will meet tomorrow." He said that they ___ the next day.
 - will meet
 - meet
 
-« Radicalisation » se traduit par :
-* radicalisation
-- securite
+"Radicalisation" means:
+* the process of becoming extreme
+- security
 - religion
 
 The soldiers asked ___ the village was safe.
@@ -1347,35 +1347,35 @@ The soldiers asked ___ the village was safe.
 - that
 - what
 
-Corrige la phrase : No matter why does he join the group, violence is wrong.
+Correct the sentence: No matter why does he join the group, violence is wrong.
 * No matter why he joins the group, violence is wrong.
 - No matter why does he joins the group, violence is wrong.
 - No matter why he joined the group, violence is wrong.
 
-« Peace » veut dire :
-* paix
-- haine
-- unite
+"Peace" means:
+* a time without war or conflict
+- hatred
+- unity
 
-« Hatred » est :
-* la haine
-- la paix
-- la securite`,
-deck:`violent extremism | extremisme violent | Violent extremism destroys families.
-terrorism | terrorisme | Terrorism threatens the whole region.
-radicalisation | radicalisation | Radicalisation often starts online.
-violence | violence | Violence never solves a problem.
-peace | paix | Peace is precious for every family.
-security | securite | The police protect the security of the town.
-to condemn | condamner | The chief condemned the attack.
-victim | victime | The victims received help.
-attack | attaque | The attack happened at dawn.
-to threaten | menacer | The group threatened the village.
-community | communaute | The community met to discuss safety.
-religion | religion | Every religion teaches respect.
-to fight against | lutter contre | We must fight against hatred.
-hatred | haine | Hatred divides people.`,
-hw:{t:"Peace in my town",b:"Ecris un court paragraphe (6 phrases) sur la paix dans ta ville. Utilise une phrase avec No matter ..., une phrase au discours indirect (He said that ...) et une conclusion commencant par To sum up."}},
+"Hatred" means:
+* very strong dislike
+- peace
+- security`,
+deck:`violent extremism | extreme views supported by violence | Violent extremism destroys families.
+terrorism | the use of violence to create fear for political aims | Terrorism threatens the whole region.
+radicalisation | the process of becoming extreme | Radicalisation often starts online.
+violence | the use of force to hurt people | Violence never solves a problem.
+peace | a time without war or conflict | Peace is precious for every family.
+security | safety from danger | The police protect the security of the town.
+to condemn | to say publicly that something is wrong | The chief condemned the attack.
+victim | a person who suffers harm | The victims received help.
+attack | a violent action against people or places | The attack happened at dawn.
+to threaten | to say you will harm someone | The group threatened the village.
+community | a group of people living together | The community met to discuss safety.
+religion | a belief system with rules and worship | Every religion teaches respect.
+to fight against | to struggle against | We must fight against hatred.
+hatred | very strong dislike | Hatred divides people.`,
+hw:{t:"Peace in my town",b:"Write a short paragraph (6 sentences) about peace in your town. Use one sentence with No matter ..., one sentence in indirect speech (He said that ...) and a conclusion starting with To sum up."}},
 
 {c:"1re",u:1,lv:"B1",t:"The Commonwealth",th:"The Commonwealth of Nations",g:"Tenses in English, although and despite, relative pronouns",
 body:`Le Commonwealth est une association de pays, dont beaucoup ont ete colonies par le Royaume-Uni. Quelles sont ses caracteristiques ?
