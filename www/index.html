@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>English Classes</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://i.ytimg.com https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src https://www.youtube-nocookie.com; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="theme-color" content="#0E1120"><meta name="description" content="Learn English in Togo with your teacher: lessons, quizzes, Nova, and class follow-up.">
+<title>English Classes</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://i.ytimg.com https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src https://www.youtube-nocookie.com; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="theme-color" content="#0E1120"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="English Classes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;background:#0E1120}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <script>window.__pageBuild=0;</script><script src="config.js"></script><script src="claude-shim.js"></script>
@@ -1235,7 +1235,7 @@ const knownOf=d=>((S.me?.deckProgress||{})[d.id]?.known||[]);
 function studentView(){
   if(isParent(S.me)){if(S.view?.type==="chat"||S.tab==="pmsg"){if(S.chatFor!==S.uid)subChat(S.uid);return`<div class="section" style="max-width:720px;margin-inline:auto"><div class="row">${ic("chat")}<div><span class="eyebrow">Private messages</span><h2>The teacher</h2></div></div><p class="sub">Only you and the teacher can see this conversation.</p>${chatHTML(S.uid,"student")}</div>`}return S.tab==="me"?parentProfileView():parentHomeView()}
   if(S.liveOn&&liveOpen(S.live))return liveStudentView();if(S.srs)return srsRunView();if(S.run)return quizRunView();if(S.deck)return deckRunView();
-  if(S.view?.type==="friends"&&peerOn())return friendsView();if(S.view?.type==="addfriends"&&peerOn())return addFriendsView();if(S.view?.type==="peers"&&peerOn())return peersView();if(S.view?.type==="peer"&&peerOn())return peerChatView();
+  if(S.view?.type==="friends"&&peerOn())return friendsView();if(S.view?.type==="peers"&&peerOn())return peersView();if(S.view?.type==="peer"&&peerOn())return peerChatView();
   if(S.view?.type==="chat")return`<div class="section" style="max-width:720px;margin-inline:auto">${backBtn()}<div class="row">${ic("chat")}<div><span class="eyebrow">Private messages</span><h2>My teacher</h2></div></div><p class="sub">Only you and your teacher can see this conversation.</p>${chatHTML(S.uid,"student")}</div>`;
   if(S.view?.type==="lesson")return lessonView();if(S.view?.type==="hw")return hwView();
   if(S.view?.type==="ep")return epView();if(S.view?.type==="shop")return shopView();if(S.view?.type==="talk")return talkView();
@@ -2124,44 +2124,23 @@ function peerMarkRead(id){window.__peer.read(id).then(()=>{for(const m of PR.inb
 /* Page Amis : demandes, amis, recherche de camarades (séparée de la messagerie) */
 function frBtn(){const n=FR.list.filter(x=>x.status==="pending"&&x.incoming).length;return `<button class="iconbtn" data-a="openFriends" aria-label="Friends" title="Friends" style="position:relative">${ic("plus")}${n?`<span class="chip warn" style="position:absolute;top:-6px;right:-6px;min-width:18px;padding:0 5px;font-size:.68rem">${n}</span>`:""}</button>`}
 function friendsView(){
-  const nm=id=>(PR.dir.find(x=>x.uid===id)||{}).name||"Classmate";
-  const cls=id=>(PR.dir.find(x=>x.uid===id)||{}).classe||"";
+  const me=S.uid,name=id=>(PR.dir.find(x=>x.uid===id)||{}).name||"Classmate";
   const inc=FR.list.filter(x=>x.status==="pending"&&x.incoming).map(x=>x.uid);
   const out=FR.list.filter(x=>x.status==="pending"&&!x.incoming).map(x=>x.uid);
-  const fri=FR.list.filter(x=>x.status==="accepted").map(x=>x.uid).sort((a,b)=>nm(a).localeCompare(nm(b)));
-  const row=(uid,sub,act)=>`<div class="it">${avatar(uid,nm(uid))}<div class="txt"><b>${esc(nm(uid))}</b><span>${sub}</span></div><div class="fr-acts">${act}</div></div>`;
-  const block=(title,n,rows,none)=>`<section class="fr-sec"><div class="fr-head"><h3>${title}</h3>${n?`<span class="chip">${n}</span>`:""}</div>${rows.length?`<div class="glass list">${rows.join("")}</div>`:(none?`<div class="empty">${none}</div>`:"")}</section>`;
-  return`<div class="section fr-page" style="max-width:720px;margin-inline:auto">
-  <div><button class="back" data-a="peerBack">${ic("left")}Messages</button></div>
-  <div class="fr-top"><div class="row">${ic("users")}<div><span class="eyebrow">Friends</span><h2>Your friends</h2></div></div><button class="btn sm" data-a="openAddFriends">${ic("plus")}Find friends</button></div>
-  <p class="sub">Your friends appear here. Open Messages to chat with them.</p>
-  ${block("Friend requests",inc.length,inc.map(u=>row(u,"Wants to be your friend",`<button class="btn sm" data-fr="accept" data-id="${u}">${ic("check")}Accept</button><button class="btn ghost sm" data-fr="refuse" data-id="${u}">Decline</button>`)),"")}
-  ${block("Your friends",fri.length,fri.map(u=>row(u,esc(cls(u)||"Classmate"),`<button class="btn ghost sm" data-a="openPeer" data-id="${u}">${ic("chat")}Message</button><button class="btn ghost sm" data-fr="cancel" data-id="${u}">Remove</button>`)),"No friends yet. Tap “Find friends” to add classmates.")}
-  ${block("Requests sent",out.length,out.map(u=>row(u,"Waiting for an answer",`<button class="btn ghost sm" data-fr="cancel" data-id="${u}">Cancel</button>`)),"")}
-  ${PR.err?`<div class="glass card small">${esc(PR.err)}</div>`:""}
-  </div>`;
-}
-/* page « Find friends » : recherche et ajout, à part de la liste d'amis */
-function addFriendsView(){
-  const me=S.uid,q=(S.drafts.fr_q||"").trim().toLowerCase();
-  const pool=PR.dir.filter(x=>x.uid!==me&&frState(x.uid)==="none"&&(!q||x.name.toLowerCase().includes(q)));
-  const item=x=>`<div class="it">${avatar(x.uid,x.name)}<div class="txt"><b>${esc(x.name)}</b><span>${esc(x.classe||"Classmate")}${x.same?" · your class":""}</span></div><div class="fr-acts"><button class="btn sm" data-fr="add" data-id="${x.uid}">${ic("plus")}Add friend</button></div></div>`;
-  const list=(title,arr)=>arr.length?`<section class="fr-sec"><div class="fr-head"><h3>${title}</h3></div><div class="glass list">${arr.map(item).join("")}</div></section>`:"";
-  let body;
-  if(!PR.loaded) body=`<div class="empty">Loading…</div>`;
-  else if(q) body=pool.length?list("Results",pool.slice(0,100)):`<div class="empty">No classmate found with that name.</div>`;
-  else{
-    const cls=pool.filter(x=>x.same),others=pool.filter(x=>!x.same).slice(0,30);
-    body=(cls.length||others.length)?list("In your class",cls)+list("Other classmates",others):`<div class="empty">Everyone is already your friend or waiting.</div>`;
-  }
-  return`<div class="section fr-page" style="max-width:720px;margin-inline:auto">
-  <div><button class="back" data-a="openFriends">${ic("left")}Friends</button></div>
-  <div class="row">${ic("plus")}<div><span class="eyebrow">Find friends</span><h2>Add a classmate</h2></div></div>
-  <p class="sub">Search for a classmate and send them a friend request. Once they accept, they appear in your Friends page.</p>
+  const fri=FR.list.filter(x=>x.status==="accepted").map(x=>x.uid);
+  const q=(S.drafts.fr_q||"").trim().toLowerCase();
+  const found=PR.dir.filter(x=>x.uid!==me&&frState(x.uid)==="none"&&(!q||x.name.toLowerCase().includes(q))).slice(0,q?100:30);
+  const row=(uid,sub,act,open)=>`<div class="it"${open?` data-a="openPeer" data-id="${uid}" style="cursor:pointer"`:""}>${avatar(uid,name(uid))}<div class="txt"><b>${esc(name(uid))}</b><span>${sub}</span></div><div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">${act}</div></div>`;
+  const block=(title,rows,none)=>`<h3 style="margin:26px 0 10px">${title}</h3>${rows.length?`<div class="glass list">${rows.join("")}</div>`:`<div class="empty">${none}</div>`}`;
+  return`<div class="section" style="max-width:720px;margin-inline:auto"><div><button class="back" data-a="peerBack">${ic("left")}Messages</button></div><div class="row">${ic("plus")}<div><span class="eyebrow">Friends</span><h2>Your friends</h2></div></div>
+  <p class="sub">Only friends can chat together. Find classmates below and send them a friend request. Once they accept, they appear in your friends list.</p>
+  ${inc.length?block("Friend requests",inc.map(u=>row(u,"Wants to be your friend",`<button class="btn sm" data-fr="accept" data-id="${u}">${ic("check")}Accept</button><button class="btn ghost sm" data-fr="refuse" data-id="${u}">Decline</button>`)),""):""}
+  ${out.length?block("Requests sent",out.map(u=>row(u,"Waiting for an answer",`<button class="btn ghost sm" data-fr="cancel" data-id="${u}">Cancel</button>`)),""):""}
+  ${block("Your friends",fri.map(u=>row(u,"Tap to chat",`<button class="btn ghost sm" data-fr="cancel" data-id="${u}">Remove</button>`,true)),"No friends yet. Send a request below.")}
+  <h3 style="margin:26px 0 10px">Find classmates</h3>
   <input id="fr_q" type="search" placeholder="Search for a classmate" value="${esc(S.drafts.fr_q||"")}" aria-label="Search for a classmate">
-  <div style="margin-top:14px">${body}</div>
-  ${PR.err?`<div class="glass card small">${esc(PR.err)}</div>`:""}
-  </div>`;
+  ${!PR.loaded?`<div class="empty" style="margin-top:10px">Loading</div>`:found.length?`<div class="glass list" style="margin-top:10px">${found.map(x=>row(x.uid,esc(x.classe||"Classmate"),`<button class="btn sm" data-fr="add" data-id="${x.uid}">${ic("plus")}Add friend</button>`)).join("")}</div>`:`<div class="empty" style="margin-top:10px">${q?"No classmate found with that name.":"Everyone is already your friend or waiting."}</div>`}
+  ${PR.err?`<div class="glass card small">${esc(PR.err)}</div>`:""}</div>`;
 }
 function peersView(){const me=S.uid,last={},un={};
   for(const m of PR.inbox){const o=m.sender===me?m.receiver:m.sender;if(!last[o])last[o]=m;if(m.receiver===me&&!m.read_at)un[m.sender]=(un[m.sender]||0)+1}
@@ -2499,7 +2478,7 @@ function classViewInner(){const c=S.confirm;
 
 /* ============ events ============ */
 document.addEventListener("input",e=>{const el=e.target;if(!el.id||el.type==="file")return;S.drafts[el.id]=el.type==="checkbox"?(el.checked?"1":""):el.value;
-  if(el.id==="peer_q"||el.id==="fr_q"||el.id==="st_q"||el.id==="st_cls"||el.id==="st_on"||el.id==="gv_q"||el.id==="gv_all"){S.stLim=ST_STEP;S.gvLim=GV_STEP;render();return}
+  if(el.id==="peer_q"||el.id==="st_q"||el.id==="st_cls"||el.id==="st_on"||el.id==="gv_q"||el.id==="gv_all"){S.stLim=ST_STEP;S.gvLim=GV_STEP;render();return}
   if(el.id==="q_exam"){render();return}
   if(/_prof$/.test(el.id)){delete S.drafts[el.id.replace(/_prof$/,"_cls")];render();return}
   if(el.id==="q_body"){const n=parseQuiz(el.value).length,p=$("#q_preview");if(p)p.textContent=n?`${n} question(s) found.`:"No questions found yet."}
@@ -2584,7 +2563,7 @@ document.addEventListener("click",e=>{const say_=e.target.closest("[data-say]");
   case"toggleClosed":{const v=!S.settings.closed;write(()=>S.db.doc("settings/main").set({...S.settings,closed:v})).then(()=>toast(v?"Sign-ups closed":"Sign-ups open","shield"));break}
   case"pickRole":S.drafts.j_role=el.dataset.k||"";S.animate=true;break;
   case"showAll":S.showAll=!S.showAll;S.animate=true;break;
-  case"profFilter":S.profFilter=el.dataset.k||"";S.stLim=ST_STEP;break;case"pronMic":pronListen();return;case"pronHear":speak(S.pron?.target||"","en");return;case"pronWord":speak(el.dataset.w||"","en");return;case"pronNext":pronNext();break;case"pronAI":pronAI();return;case"notifOn":notifEnable();return;case"notifOff":notifOff().then(render);return;case"devBlock":devSet(el.dataset.id,el.dataset.dev,true);return;case"devUnblock":devSet(el.dataset.id,el.dataset.dev,false);return;case"installProg":installProg();return;case"openAddFriends":S.view={type:"addfriends"};S.drafts.fr_q="";S.animate=true;scrollTo(0,0);break;case"openFriends":S.view={type:"friends"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeers":S.view={type:"peers"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeer":{const id=el.dataset.id;S.view={type:"peer",id};PR.with=id;S.animate=true;peerMarkRead(id);scrollTo(0,0);break}case"peerBack":PR.with=null;S.view={type:"peers"};S.animate=true;break;
+  case"profFilter":S.profFilter=el.dataset.k||"";S.stLim=ST_STEP;break;case"pronMic":pronListen();return;case"pronHear":speak(S.pron?.target||"","en");return;case"pronWord":speak(el.dataset.w||"","en");return;case"pronNext":pronNext();break;case"pronAI":pronAI();return;case"notifOn":notifEnable();return;case"notifOff":notifOff().then(render);return;case"devBlock":devSet(el.dataset.id,el.dataset.dev,true);return;case"devUnblock":devSet(el.dataset.id,el.dataset.dev,false);return;case"installProg":installProg();return;case"openFriends":S.view={type:"friends"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeers":S.view={type:"peers"};PR.with=null;S.animate=true;peerStart();peerRefresh();scrollTo(0,0);break;case"openPeer":{const id=el.dataset.id;S.view={type:"peer",id};PR.with=id;S.animate=true;peerMarkRead(id);scrollTo(0,0);break}case"peerBack":PR.with=null;S.view={type:"peers"};S.animate=true;break;
   case"msgsTab":S.msgsTab=el.dataset.k;if(el.dataset.k==="peers")peerModLoad();break;case"peerHide":{const id=el.dataset.id,on=el.dataset.on==="1";window.__peer.hide(id,on).then(()=>{const m=(PR.mod||[]).find(x=>x.id===id);if(m)m.hidden=on;render()}).catch(e=>toast(e.message||"Could not hide","x"));return}
   case"togglePeer":{const on=S.settings.peerChat===false;write(()=>S.db.doc("settings/main").set({...S.settings,peerChat:on})).then(()=>toast(on?"Student-to-student messages on":"Student-to-student messages off","check"));break}
   case"toggleNoChat":{const id=el.dataset.id,cur=S.access[id]||{};write(()=>S.db.doc("access/"+id).set({...cur,status:cur.status||"active",at:cur.at||Date.now(),by:cur.by||S.uid,noChat:!cur.noChat})).then(()=>toast(!cur.noChat?"Chat turned off for this student":"Chat turned back on for this student","check"));return}
@@ -5125,7 +5104,7 @@ function arCards(){if(!AR.deck.length)return arEnd("cards",AR.known,AR.total);
   arSet(arTop("Flashcards",`${AR.known} / ${AR.total} learned`)+arBar(AR.known/AR.total)+
     `<div class="ar-scene"><div class="ar-card3d" id="arCard" data-ar="flip">
        <div class="ar-face front"><span class="ar-kicker">English</span><h2>${arEsc(c[0])}</h2><small>Tap to flip</small></div>
-       <div class="ar-face back"><span class="ar-kicker">Meaning</span><h2>${arEsc(c[1])}</h2><p>${arEsc(c[2])}</p></div>
+       <div class="ar-face back"><span class="ar-kicker">Français</span><h2>${arEsc(c[1])}</h2><p>${arEsc(c[2])}</p></div>
      </div></div>
      <div class="ar-inrow" style="justify-content:center"><button class="ar-go ghost" data-ar="again">Again</button><button class="ar-go" data-ar="know">I know it</button></div>`)}
 
@@ -9106,7 +9085,7 @@ setTimeout(function hello(){try{
    She hops and shows happy eyes; with "less motion" on, she only shows.
    ===================================================================== */
 const MAS={last:0,off:false,t:null,sig:""};
-const MAS_LINES=["Yes! You got it! 🎉","Perfect, keep going!","Awesome! You are on fire!","Nice work, superstar! ⭐","That is right! Well done! 🌟","You did it! Keep it up!"];
+const MAS_LINES=["Yes! You got it! 🎉","Perfect, keep going!","Sugoi! You're on fire!","Nice work, superstar! ⭐","That's right! Well done! 🌸","You did it! Keep it up!"];
 const masPick=()=>MAS_LINES[Math.floor(Math.random()*MAS_LINES.length)];
 function masSVG(){return `<svg viewBox="0 0 120 150" aria-hidden="true" focusable="false">
   <path d="M30 66c-4-26 12-44 30-44s34 18 30 44c0 14 3 26 8 36-10-2-16-8-18-16H40c-2 8-8 14-18 16 5-10 8-22 8-36z" fill="#1B1F3B"/>
@@ -9137,7 +9116,7 @@ function masShow(text,mood){if(masHidden()){const b=document.getElementById("mas
   if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
   let box=document.getElementById("mas");
   if(!box){box=document.createElement("div");box.id="mas";box.className="mas";
-    box.innerHTML=`<div class="mas-bub" role="status" aria-live="polite"></div><div class="mas-girl">${masSVG()}</div><button type="button" class="mas-x" aria-label="Hide Jiho">×</button>`;
+    box.innerHTML=`<div class="mas-bub" role="status" aria-live="polite"></div><div class="mas-girl">${masSVG()}</div><button type="button" class="mas-x" aria-label="Hide Sakura">×</button>`;
     document.body.appendChild(box);
     box.querySelector(".mas-x").onclick=()=>{MAS.off=true;box.remove()};
     box.querySelector(".mas-girl").onclick=()=>{try{localStorage.setItem("ec_mas_look",String(masLook()+1))}catch(e){}masApplyLook(box);masShow("New look! Do you like it? 💖","happy")};
@@ -10523,7 +10502,7 @@ function btKindOf(){return (BT.st&&BT.st.kind)||(BT.room&&BT.room.kind)||BTNAV.k
 `;document.head.appendChild(s)})();
 
 /* 1 · the back button: "‹ Retour" */
-function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Back">${arIc("back")}<span>Back</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
+function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Retour">${arIc("back")}<span>Retour</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
 
 /* 2 · the join box (used on the hub and on each kind page) */
 function btJoinBox(){return `<div class="ar-card"><p class="ar-kicker">Join a battle with a code</p>
@@ -10629,6 +10608,36 @@ arHome=function(){
 /* 10 · closing the Arena forgets the battle screens (the room stays resumable) */
 const _btArClose=arClose;
 arClose=function(){BTNAV.view=null;return _btArClose()};
+
+/* ---- app-v5-zzzv-boot.js ---- */
+/* =====================================================================
+   v5 · Démarrage : si l'écran reste bloqué sur « Connecting to the class… »
+   (réseau lent, données qui ne arrivent pas), on affiche un message clair
+   avec un bouton pour réessayer, au lieu d'une attente sans fin.
+   Arena : rien ne flotte ni ne se redessine sous le doigt, la liste défile
+   calmement et Battle Royale ne déborde plus sur le côté.
+   ===================================================================== */
+{
+  setTimeout(()=>{
+    try{
+      const m=document.getElementById("main");
+      if(!m||!/Connecting to the class/.test(m.textContent||""))return;
+      m.innerHTML=`<div class="empty" style="display:grid;gap:12px;justify-items:center;padding:28px 16px;text-align:center">
+        <p style="margin:0">We could not load your class. Check your internet connection, then try again.</p>
+        <button class="btn" type="button" data-a="retryBoot">Try again</button></div>`;
+    }catch(e){}
+  },12000);
+  document.addEventListener("click",e=>{
+    const b=e.target&&e.target.closest&&e.target.closest('[data-a="retryBoot"]');
+    if(b){e.preventDefault();location.reload()}
+  },true);
+  const st=document.createElement("style");st.id="zzzvsteady";st.textContent=`
+#arena .ar-mode,#arena .ar-card,#arena .ar-row,#arena .ar-fab,#arena .ar-trophy,#arena .ar-confetti i{animation:none!important}
+#arena{overflow-x:hidden}
+#arena .ar-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#arena .ar-mode,#arena .ar-card{min-width:0}`;
+  document.head.appendChild(st);
+}
 
 /* ---- app-v5-zzzw-royale-challenges.js ---- */
 /* =====================================================================
@@ -10929,104 +10938,9 @@ mdUseSelfie=function(c,blob){
 };
 
 /* ==== v4 END ==== */
-/* Battle Royale : page rangée par familles, une liste lisible (même logique de jeu) */
-const _btKindPageRoy=btKindPage;
-const ROY_ORDER=["Mixed","Grammar","Vocabulary","Word games","Themes"];
-function royGroupOf(ch){const k=String(ch.kind||"");if(k.indexOf("theme:")===0)return"Themes";if(k==="grammar")return"Grammar";if(k==="vocab")return"Vocabulary";if(k==="all")return"Mixed";return"Word games"}
-btKindPage=function(k){
-  if(k!=="royale")return _btKindPageRoy(k);
-  btStop();BT.on=false;BT.inHub=true;BT.key="";BTNAV.view="kind";BTNAV.kind="royale";
-  const K=BT_KINDS.royale;
-  const live=BT.room&&(!BT.st||!btFinished(BT.st))&&btKindOf()==="royale";
-  const groups={};ROYALE_CH.forEach((ch,i)=>{const g=royGroupOf(ch);(groups[g]=groups[g]||[]).push({ch,i})});
-  const cap=s=>s[0].toUpperCase()+s.slice(1);
-  const sections=ROY_ORDER.filter(g=>groups[g]).map(g=>`<section class="roy-sec"><p class="ar-kicker">${g} · ${groups[g].length}</p><div class="roy-list">${groups[g].map(({ch,i})=>`<button class="roy-row roy-${ch.lv}" data-ar="bt-rch" data-i="${i}"><span class="roy-ic">${arIc(K.ic)}</span><span class="roy-txt"><b>${arEsc(ch.t)}</b><small>${arEsc(ch.d)}</small></span><span class="roy-meta"><em>${arEsc(cap(ch.lv))}</em><i>${ch.n} Q</i></span></button>`).join("")}</div></section>`).join("");
-  arSet(arTop(K.t,"")+`<div class="roy-page"><div class="ar-hero"><p class="ar-kicker">${arEsc(K.d)}</p><h1>${arEsc(K.t)}</h1><p>Pick a challenge. Each one has its own questions. Then share the code with your classmates.</p></div>${live?`<button class="ar-go bt-entry" data-ar="bt-back" style="width:100%">Back to my battle</button>`:""}<section class="roy-sec"><p class="ar-kicker">Random mix</p><button class="ar-go" data-ar="bt-kind" data-m="royale" style="width:100%">Start a random Battle Royale</button></section>${sections}${btJoinBox()}${btErr()}</div>`);
-  BT.err="";
-};
-/* ===== Jiho : l'avatar (garçon coréen, style Duolingo) ===== */
-masSVG=function(){
-  const g="j"+Math.floor(Math.random()*1e6);
-  return `<svg viewBox="0 0 120 150" aria-hidden="true" focusable="false">
-  <defs>
-    <radialGradient id="${g}halo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#BAE6FD" stop-opacity=".55"/><stop offset="1" stop-color="#818CF8" stop-opacity="0"/></radialGradient>
-    <radialGradient id="${g}skin" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#FFF6EE"/><stop offset=".6" stop-color="#F8D5BC"/><stop offset="1" stop-color="#E7B596"/></radialGradient>
-    <linearGradient id="${g}hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2D2A55"/><stop offset="1" stop-color="#0E0C26"/></linearGradient>
-    <linearGradient id="${g}uni" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7DD3FC"/><stop offset=".5" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E3A8A"/></linearGradient>
-    <radialGradient id="${g}blush" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FB7185" stop-opacity=".7"/><stop offset="1" stop-color="#FB7185" stop-opacity="0"/></radialGradient>
-    <filter id="${g}blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
-  </defs>
-  <ellipse cx="60" cy="72" rx="58" ry="68" fill="url(#${g}halo)"/>
-  <ellipse cx="60" cy="144" rx="34" ry="5" fill="#000" opacity=".3" filter="url(#${g}blur)"/>
-  <path d="M30 62c-2-28 12-42 30-42s32 14 30 42c0 6-2 10-4 12H34c-2-2-4-6-4-12z" fill="url(#${g}hair)"/>
-  <path d="M38 102q22-10 44 0l8 40H30z" fill="url(#${g}uni)" class="uni"/>
-  <path d="M48 101q12 11 24 0" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M60 110v30" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/>
-  <ellipse cx="60" cy="66" rx="30" ry="31" fill="url(#${g}skin)"/>
-  <ellipse cx="30" cy="70" rx="5" ry="7" fill="#F2C2A2"/><ellipse cx="90" cy="70" rx="5" ry="7" fill="#F2C2A2"/>
-  <path d="M31 60c4-18 16-26 30-24 10 1 19 8 22 20-10-6-22-8-34-2-6 3-12 4-18 6z" fill="url(#${g}hair)"/>
-  <g class="ey-o"><ellipse cx="49" cy="70" rx="5.2" ry="7" fill="#1B1F3B"/><ellipse cx="71" cy="70" rx="5.2" ry="7" fill="#1B1F3B"/><circle cx="51" cy="67.6" r="2.3" fill="#fff"/><circle cx="73" cy="67.6" r="2.3" fill="#fff"/><circle cx="47.6" cy="72.4" r="1" fill="#fff"/><circle cx="69.6" cy="72.4" r="1" fill="#fff"/></g>
-  <g class="ey-h" stroke="#1B1F3B" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M43 71q6-7 12 0"/><path d="M65 71q6-7 12 0"/></g>
-  <ellipse cx="41" cy="82" rx="6" ry="3.4" fill="url(#${g}blush)"/><ellipse cx="79" cy="82" rx="6" ry="3.4" fill="url(#${g}blush)"/>
-  <path class="mo-s" d="M52 82q8 7 16 0" stroke="#8A2A3A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-  <path class="mo-h" d="M50 81h20q-1 11-10 11t-10-11z" fill="#7F1D2D"/>
-  <path class="mo-f" d="M54 88q6-5 12 0" stroke="#8A2A3A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-  <g class="arms" fill="none" stroke="#3B82F6" stroke-width="9" stroke-linecap="round"><path d="M38 110q-14-6-16-34"/><path d="M82 110q14-6 16-34"/></g>
-  <circle cx="22" cy="74" r="6" fill="#F8D5BC"/><circle cx="98" cy="74" r="6" fill="#F8D5BC"/>
-  <g class="spk" fill="#FBBF24"><path d="M12 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M104 24l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z" fill="#60A5FA"/></g>
-</svg>`};
-
-/* Jiho parle : la bulle s'affiche et il lit la phrase à voix haute (sans les emojis) */
-{const _mj=masShow;
- masShow=function(text,mood){
-   const before=MAS.last;
-   _mj(text,mood);
-   if(MAS.last!==before&&!LITE&&text){
-     try{speak(String(text).replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu,"").trim(),"en")}catch(e){}
-   }
- };
-}
-
-/* Jiho dit bonjour une fois par session à l'élève */
-if(!window.__jihoHi){window.__jihoHi=true;
-  setTimeout(()=>{try{if(S&&S.mode==="student"&&S.me)masShow("Hi! I'm Jiho. Ready for today's English? 👋","happy")}catch(e){}},5000);
-}
-
 render();
 loadThree();
 </script>
-<style id="friends-page">
-.fr-page{display:grid;gap:12px}
-.fr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.fr-head{display:flex;align-items:center;gap:8px;margin:22px 0 10px}
-.fr-head h3{margin:0}
-.fr-sec{display:grid;gap:4px}
-.fr-acts{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
-</style>
-<style id="arena-calm">
-/* Arena stable : rien ne bouge pendant le défilement ni après un redessin */
-#arena{perspective:none;overscroll-behavior:contain}
-#arena::before{animation:none!important;transform:none!important;opacity:.35!important}
-#arena .ar-orb{animation:none!important}
-#arena .ar-hero,#arena .ar-row,#arena .ar-end{animation:none!important}
-.roy-page{display:grid;gap:18px}
-.roy-sec{display:grid;gap:10px}
-.roy-list{display:grid;gap:8px}
-.roy-row{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;box-sizing:border-box;border-radius:18px;border:1px solid rgba(160,172,255,.2);background:linear-gradient(170deg,rgba(40,48,110,.6),rgba(14,17,40,.8));color:#EAF0FF;font:inherit;text-align:left;cursor:pointer}
-.roy-row:active{transform:scale(.985)}
-.roy-ic{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:radial-gradient(circle at 30% 25%,#fff,#8EF6E4 30%,#5EEAD4 60%,#818CF8);color:#06201C}
-.roy-ic svg{width:20px;height:20px}
-.roy-txt{flex:1;min-width:0;display:grid;gap:2px}
-.roy-txt b{font-size:1rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.roy-txt small{color:#B9C3E6;font-size:.82rem;line-height:1.3}
-.roy-meta{flex:none;display:grid;justify-items:end;gap:2px}
-.roy-meta em{font-style:normal;font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8EF6E4}
-.roy-medium .roy-meta em{color:#FBBF24}
-.roy-hard .roy-meta em{color:#F472B6}
-.roy-meta i{font-style:normal;font-size:.8rem;color:#9FB4FF}
-@media (hover:none){#arena .ar-mode:hover,#arena .ar-mode:focus-visible{transform:none!important}}
-</style>
-
 
 <script>if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
 </body></html>

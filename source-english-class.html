@@ -10495,7 +10495,7 @@ function btKindOf(){return (BT.st&&BT.st.kind)||(BT.room&&BT.room.kind)||BTNAV.k
 `;document.head.appendChild(s)})();
 
 /* 1 · the back button: "‹ Retour" */
-function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Back">${arIc("back")}<span>Back</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
+function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Retour">${arIc("back")}<span>Retour</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
 
 /* 2 · the join box (used on the hub and on each kind page) */
 function btJoinBox(){return `<div class="ar-card"><p class="ar-kicker">Join a battle with a code</p>
@@ -10601,6 +10601,36 @@ arHome=function(){
 /* 10 · closing the Arena forgets the battle screens (the room stays resumable) */
 const _btArClose=arClose;
 arClose=function(){BTNAV.view=null;return _btArClose()};
+
+/* ---- app-v5-zzzv-boot.js ---- */
+/* =====================================================================
+   v5 · Démarrage : si l'écran reste bloqué sur « Connecting to the class… »
+   (réseau lent, données qui ne arrivent pas), on affiche un message clair
+   avec un bouton pour réessayer, au lieu d'une attente sans fin.
+   Arena : rien ne flotte ni ne se redessine sous le doigt, la liste défile
+   calmement et Battle Royale ne déborde plus sur le côté.
+   ===================================================================== */
+{
+  setTimeout(()=>{
+    try{
+      const m=document.getElementById("main");
+      if(!m||!/Connecting to the class/.test(m.textContent||""))return;
+      m.innerHTML=`<div class="empty" style="display:grid;gap:12px;justify-items:center;padding:28px 16px;text-align:center">
+        <p style="margin:0">We could not load your class. Check your internet connection, then try again.</p>
+        <button class="btn" type="button" data-a="retryBoot">Try again</button></div>`;
+    }catch(e){}
+  },12000);
+  document.addEventListener("click",e=>{
+    const b=e.target&&e.target.closest&&e.target.closest('[data-a="retryBoot"]');
+    if(b){e.preventDefault();location.reload()}
+  },true);
+  const st=document.createElement("style");st.id="zzzvsteady";st.textContent=`
+#arena .ar-mode,#arena .ar-card,#arena .ar-row,#arena .ar-fab,#arena .ar-trophy,#arena .ar-confetti i{animation:none!important}
+#arena{overflow-x:hidden}
+#arena .ar-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#arena .ar-mode,#arena .ar-card{min-width:0}`;
+  document.head.appendChild(st);
+}
 
 /* ---- app-v5-zzzw-royale-challenges.js ---- */
 /* =====================================================================
