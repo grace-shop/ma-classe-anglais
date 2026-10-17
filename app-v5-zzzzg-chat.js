@@ -1,0 +1,81 @@
+/* =====================================================================
+   v5 · Chat and photo polish
+   - Photos in the teacher chat open in a full-screen viewer inside the app
+     (no new browser tab). Tap to zoom, tap outside or × to close.
+   - Teacher chat (#profSheet): refined bubbles, auto-reply tag, composer.
+   - Classmate photo preview: full-screen, image centred and fully visible.
+   - Phone top bar: spans the screen width.
+   ===================================================================== */
+(function () {
+  if (document.getElementById("zzzzgchat")) return;
+  var st = document.createElement("style");
+  st.id = "zzzzgchat";
+  st.textContent = `
+/* ---- Full-screen photo viewer ---- */
+#zzPhoto{position:fixed;inset:0;z-index:400;background:rgba(3,4,12,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:grid;place-items:center;padding:max(64px,env(safe-area-inset-top,0px)+54px) 12px max(24px,env(safe-area-inset-bottom,0px));box-sizing:border-box;animation:zzFade .25s ease both!important}
+#zzPhoto img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.6);transition:transform .25s ease;cursor:zoom-in;user-select:none;-webkit-user-drag:none}
+#zzPhoto.z img{transform:scale(2);cursor:zoom-out}
+#zzPhoto .zzx{position:absolute;top:max(14px,env(safe-area-inset-top,0px));right:14px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(20,24,48,.75);color:#fff;font-size:1.4rem;line-height:1;cursor:pointer;display:grid;place-items:center}
+#zzPhoto .zzcap{position:absolute;left:16px;top:max(24px,env(safe-area-inset-top,0px));color:#C9CEE8;font:600 .9rem Manrope,system-ui,sans-serif;max-width:70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---- Classmate photo preview: whole picture visible ---- */
+#docv .docv-img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+#docv #docvBody{display:grid;place-items:center;min-height:0;flex:1;padding:14px;box-sizing:border-box;overflow:hidden}
+
+/* ---- Teacher chat ---- */
+#profSheet{background:radial-gradient(120% 60% at 50% -10%,#1F2A66 0%,#0E1330 55%,#080B1C 100%)!important}
+#profSheet .pt-head{background:rgba(14,18,44,.72)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid rgba(140,160,255,.14)!important;padding-top:max(12px,env(safe-area-inset-top,0px))!important;padding-bottom:12px!important}
+#profSheet .pt-back{width:44px;height:44px;padding:0!important;border-radius:16px!important;display:grid;place-items:center;background:rgba(110,130,255,.14)!important;border:1px solid rgba(140,160,255,.28)!important}
+#profSheet .pt-head b{font-size:1.05rem!important;letter-spacing:.005em}
+#profSheet .pt-head small{color:#AEB8E2!important;font-size:.8rem!important;white-space:normal!important}
+#profSheet .pt-body{padding:18px 14px 12px!important;gap:12px!important;scroll-behavior:smooth}
+#profSheet .pt-row{max-width:84%!important}
+#profSheet .pt-bub{font-size:.97rem;letter-spacing:.005em;box-shadow:0 10px 26px -14px rgba(0,0,0,.7);transition:transform .2s}
+#profSheet .them .pt-bub{background:linear-gradient(165deg,#222C5E 0%,#171E45 100%)!important;border:1px solid rgba(150,170,255,.22)!important;border-radius:22px 22px 22px 8px!important;padding:12px 15px!important;color:#EEF1FF}
+#profSheet .me .pt-bub{background:linear-gradient(135deg,#7BF0D0 0%,#5FD4FF 55%,#8FA6FF 100%)!important;color:#05211B!important;border-radius:22px 22px 8px 22px!important;padding:12px 15px!important;box-shadow:0 14px 34px -12px rgba(91,210,255,.55)!important;font-weight:500}
+#profSheet .pt-meta{display:flex;align-items:center;gap:8px;font-size:.72rem!important;color:#8E98C4!important;margin-top:6px!important;padding:0 4px}
+#profSheet .pt-auto{margin-left:0!important;padding:3px 10px!important;border-radius:999px!important;background:linear-gradient(135deg,rgba(127,140,255,.35),rgba(143,166,255,.18))!important;color:#E4E9FF!important;font-size:.7rem!important;font-weight:700!important;letter-spacing:.02em;border:1px solid rgba(160,176,255,.3)}
+#profSheet .pt-img{width:100%!important;max-width:280px!important;border-radius:18px!important;border:1px solid rgba(150,170,255,.22);box-shadow:0 14px 30px -14px rgba(0,0,0,.7)}
+#profSheet .pt-foot{background:rgba(14,18,44,.78)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid rgba(140,160,255,.14)!important;padding:12px 12px max(14px,env(safe-area-inset-bottom,0px))!important;gap:10px!important;align-items:flex-end!important}
+#profSheet .pt-foot textarea{border-radius:22px!important;padding:12px 16px!important;background:#0B1028!important;border:1px solid rgba(140,160,255,.26)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);font-size:.97rem;line-height:1.4}
+#profSheet .pt-foot textarea:focus{outline:none;border-color:rgba(127,190,255,.7)!important;box-shadow:0 0 0 4px rgba(91,210,255,.14)}
+#profSheet .pt-foot .pt-send{width:50px!important;height:50px!important;min-width:50px;padding:0!important;border-radius:50%!important;display:grid;place-items:center;box-shadow:0 12px 26px -10px rgba(91,210,255,.8)}
+#profSheet .pt-foot .pt-send:active{transform:scale(.94)}
+
+/* ---- Phone top bar spans the width ---- */
+@media (max-width:1099px){
+  body header.top{margin:8px 8px 0!important;width:auto!important;max-width:none!important;box-sizing:border-box!important;padding:12px 18px!important;border-radius:22px!important}
+}
+`;
+  document.head.appendChild(st);
+
+  function openPhoto(src, alt) {
+    var old = document.getElementById("zzPhoto"); if (old) old.remove();
+    var v = document.createElement("div");
+    v.id = "zzPhoto";
+    v.setAttribute("role", "dialog");
+    v.setAttribute("aria-modal", "true");
+    v.innerHTML = '<button type="button" class="zzx" aria-label="Close">×</button>' +
+      (alt ? '<div class="zzcap"></div>' : "") + '<img alt="">';
+    var im = v.querySelector("img");
+    im.src = src;
+    if (alt) v.querySelector(".zzcap").textContent = alt;
+    function close() { v.remove(); document.removeEventListener("keydown", onKey, true); }
+    function onKey(e) { if (e.key === "Escape") close(); }
+    v.addEventListener("click", function (e) {
+      if (e.target === im) { v.classList.toggle("z"); return; }
+      close();
+    });
+    document.addEventListener("keydown", onKey, true);
+    document.body.appendChild(v);
+  }
+
+  // Teacher chat photos: open here instead of a new browser tab.
+  document.addEventListener("click", function (e) {
+    var im = e.target.closest && e.target.closest("img.pt-img");
+    if (!im) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    openPhoto(im.currentSrc || im.src, im.alt && im.alt !== "photo" ? im.alt : "");
+  }, true);
+})();

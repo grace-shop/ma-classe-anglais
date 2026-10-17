@@ -85,18 +85,25 @@
   var ist = document.createElement("style");
   ist.id = "zzzzfintro";
   ist.textContent = `
-#zzIntro{position:fixed;inset:0;z-index:300;background:#000;display:grid;place-content:center;pointer-events:none;animation:zzOut .45s ease 3.8s forwards !important}
+#zzIntro{position:fixed;inset:0;z-index:300;background:#000;display:grid;place-content:center;pointer-events:none;animation:zzOut .45s ease 4.2s forwards !important}
 #zzIntro .zzrow{display:flex;align-items:center;gap:14px}
-#zzIntro img{width:78px;height:78px;border-radius:22px;opacity:0;animation:zzLogo .9s cubic-bezier(.2,.7,.2,1) .7s forwards !important}
+#zzIntro .zzlg{position:relative;width:78px;height:78px}
+#zzIntro .zzlg img{position:absolute;inset:0;width:78px;height:78px;border-radius:22px;opacity:0;animation:zzLogo .8s cubic-bezier(.2,.7,.2,1) 1.25s forwards !important}
+#zzIntro .zzlg svg{position:absolute;inset:0;width:78px;height:78px;overflow:visible;animation:zzFadeOut .45s ease 1.9s forwards !important}
+#zzIntro .zzsq,#zzIntro .zze{fill:none;stroke:#9DB0FF;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+#zzIntro .zzsq{animation:zzDraw .75s ease .25s forwards !important}
+#zzIntro .zze{animation:zzDraw .6s ease .95s forwards !important}
+@keyframes zzDraw{to{stroke-dashoffset:0}}
+@keyframes zzFadeOut{to{opacity:0}}
 #zzIntro .zzt{display:grid;gap:6px;text-align:left}
-#zzIntro b{font:800 1.85rem/1 Manrope,system-ui,sans-serif;color:#fff;letter-spacing:-.01em;opacity:0;transform:translateX(-16px);animation:zzWord .6s 1.5s forwards !important}
-#zzIntro span{font:500 .8rem/1.3 Manrope,system-ui,sans-serif;color:#C9CEE8;opacity:0;animation:zzFade .5s 2.4s forwards !important}
+#zzIntro b{font:800 1.85rem/1 Manrope,system-ui,sans-serif;color:#fff;letter-spacing:-.01em;opacity:0;transform:translateX(-16px);animation:zzWord .6s 1.9s forwards !important}
+#zzIntro span{font:500 .8rem/1.3 Manrope,system-ui,sans-serif;color:#C9CEE8;opacity:0;animation:zzFade .5s 2.8s forwards !important}
 @keyframes zzOut{to{opacity:0;visibility:hidden}}
 @keyframes zzLogo{from{opacity:0;filter:brightness(0) blur(6px);transform:scale(.8)}60%{opacity:1}to{opacity:1;filter:none;transform:none}}
 @keyframes zzWord{to{opacity:1;transform:none}}
 @keyframes zzFade{to{opacity:1}}
-html.zzintro #authGate .lg-top{animation:zzFade .6s 3.6s both !important}
-html.zzintro #authGate .lg-sheet{animation:zzSheet .7s cubic-bezier(.2,.8,.2,1) 3.7s both !important}
+html.zzintro #authGate .lg-top{animation:zzFade .6s 4s both !important}
+html.zzintro #authGate .lg-sheet{animation:zzSheet .7s cubic-bezier(.2,.8,.2,1) 4.1s both !important}
 @keyframes zzSheet{from{transform:translateY(100%)}to{transform:none}}
 `;
   document.head.appendChild(ist);
@@ -105,9 +112,9 @@ html.zzintro #authGate .lg-sheet{animation:zzSheet .7s cubic-bezier(.2,.8,.2,1) 
     document.documentElement.classList.add("zzintro");
     var iv = document.createElement("div");
     iv.id = "zzIntro";
-    iv.innerHTML = '<div class="zzrow"><img src="icons/logo-3d.png" alt="" onerror="this.style.display=\'none\'"><div class="zzt"><b>English Classes</b><span>Learn English, one lesson at a time.</span></div></div>';
+    iv.innerHTML = '<div class="zzrow"><div class="zzlg"><svg viewBox="0 0 78 78" aria-hidden="true"><rect class="zzsq" x="2" y="2" width="74" height="74" rx="22" pathLength="1"/><path class="zze" pathLength="1" d="M25 19H53M25 19V59M25 39H49M25 59H53"/></svg><img src="icons/logo-3d.png" alt="" onerror="this.style.display=\'none\'"></div><div class="zzt"><b>English Classes</b><span>Learn English, one lesson at a time.</span></div></div>';
     document.body.appendChild(iv);
-    setTimeout(function () { iv.remove(); document.documentElement.classList.remove("zzintro"); }, 4400);
+    setTimeout(function () { iv.remove(); document.documentElement.classList.remove("zzintro"); }, 4800);
   }
 
   /* PC sidebar: brand and user at the top, log out at the bottom. Re-added if the menu re-renders. */
