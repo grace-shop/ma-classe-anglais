@@ -1,6 +1,6 @@
 /* English Classes — offline cache of the app files */
-const V = "mca-v8";
-const CORE = ["./", "index.html", "config.js", "claude-shim.js", "manifest.webmanifest", "vendor/three.min.js", "vendor/supabase.js", "icons/icon-192.png"];
+const V = "mca-v9";
+const CORE = ["./", "index.html", "config.js", "claude-shim.js", "manifest.webmanifest", "vendor/three.min.js", "vendor/supabase.js", "icons/icon-192.png", "content.json", "typed-jeux.json"];   // lessons, quizzes and typed questions: available offline from the first install
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => Promise.all(CORE.map((u) => c.add(new Request(u, { cache: "reload" })).catch(() => {})))).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== V && !k.startsWith("mca-files")).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 const keyOf = (u) => { const x = new URL(u); x.search = ""; x.hash = ""; return x.href; };   // "?v=123" and plain URL share one cached copy
@@ -28,6 +28,17 @@ self.addEventListener("fetch", (e) => {
   if (forced) { e.respondWith(net.catch(old)); return; }                             // "?v=…": the user asked for the new version, wait for it
   const slow = new Promise((resolve) => setTimeout(() => old().then((r) => resolve(r || null)), 6000));   // network too slow: open the saved copy
   e.respondWith(Promise.race([net.catch(() => null), slow]).then((r) => r || net.catch(old)));
+});
+
+// "Download lessons for offline": the page asks, the app saves the listed files
+self.addEventListener("message", (e) => {
+  const d = e.data || {};
+  if (d.type !== "precache" || !Array.isArray(d.files)) return;
+  e.waitUntil(
+    caches.open(V).then((c) => Promise.all(d.files.map((u) =>
+      fetch(u, { cache: "no-store" }).then((res) => { if (res.ok) return c.put(u, res.clone()); }).catch(() => {})
+    ))).then(() => { if (e.source && e.source.postMessage) e.source.postMessage({ type: "precached" }); })
+  );
 });
 
 // tap on a notification: open the app
