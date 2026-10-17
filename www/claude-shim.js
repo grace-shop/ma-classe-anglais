@@ -700,11 +700,30 @@
       title = "Create account."; sub = "Join your class and start learning English.";
       body = `${seg}<form data-f="up"><label>First and last name<input id="agN" required maxlength="60" autocomplete="name" placeholder="E.g. Ama Kossi"></label>${idField}${pwField("new-password", "At least 6 characters")}<div class="msg ok" style="font-size:.85rem">Never share your password, not even with a classmate. It protects your marks and messages.</div><button class="lg-btn" type="submit">Create my account</button></form>${social}<p class="lg-foot">Already have an account? <button type="button" data-x="in">Sign in</button></p>${idSw}`;
     } else {
-      body = `${seg}<form data-f="in">${idField}${pwField("current-password", "At least 6 characters")}<div class="lg-row">${idSw}<button type="button" class="lg-link" data-x="otpreq">Forgot password?</button></div><button class="lg-btn" type="submit">Sign in</button></form>${social}<p class="lg-foot">New to English Classes? <button type="button" data-x="up">Create an account</button></p>`;
+      body = `${seg}<form data-f="in">${idField}${pwField("current-password", "At least 6 characters")}<div class="lg-row"><label class="lg-keep"><input type="checkbox" checked> Keep me signed in</label><button type="button" class="lg-link" data-x="otpreq">Forgot password?</button></div><button class="lg-btn" type="submit">Sign in</button></form>${social}<div class="lg-idrow">${idSw}</div><p class="lg-foot">New to English Classes? <button type="button" data-x="up">Create an account</button></p>`;
     }
     const badges = `${!isNative() && !window.__standaloneApp && window.__isIOS ? `<a class="dlc" href="#" data-x="ios"><img src="icons/icon-192.png" alt=""><span><b>iPhone app</b><small>Free · installs from Safari in 30 seconds</small></span><span class="go">Install</span></a>` : ""}${!isNative() && !window.__standaloneApp && !window.__isIOS && CFG.apkUrl ? `<a class="dlc" href="${esc(CFG.apkUrl)}" rel="noopener"><img src="icons/icon-192.png" alt=""><span><b>Android app</b><small>Free · full screen · works even offline</small></span><span class="go">Download</span></a>` : ""}`;
+    if (mode === "otpreq" || mode === "otp" || reset) {
+      gate.className = "otpv";
+      const eyeOt = `<button type="button" class="ot-eye" data-x="eye" aria-label="Show password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>`;
+      let inner = "";
+      if (mode === "otpreq") {
+        inner = `<h2 class="ot-h">Reset password</h2><p class="ot-p">Enter the e-mail address of your account.</p><form data-f="otpreq" class="ot-form"><label class="ot-field"><span class="ot-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></span><input id="agE" type="email" autocomplete="email" placeholder="your.email@gmail.com" required></label><button class="ot-btn" type="submit">Send code</button></form><button type="button" class="ot-link" data-x="in">Back to sign in</button>`;
+      } else if (mode === "otp") {
+        inner = `<h2 class="ot-h">Verify OTP</h2><p class="ot-p">Enter the 6-digit security code sent to ${esc(otpEmail)}</p><form data-f="otp" class="ot-form"><div class="ot-boxes">${[0, 1, 2, 3, 4, 5].map((i) => `<input class="ot ot-box" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit ${i + 1}">`).join("")}</div><button class="ot-btn" type="submit">Verify Now</button></form><button type="button" class="ot-link" data-x="resend">Send the code again</button>`;
+      } else if (okView) {
+        inner = `<div class="ot-ok"><svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="34" fill="#E7F8EE"/><circle cx="36" cy="36" r="24" fill="#22C55E"/><path d="M26 37l7 7 13-14" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg><h2 class="ot-h ot-green">Success!</h2><p class="ot-p">Identity confirmed successfully.</p></div>`;
+      } else {
+        inner = `<h2 class="ot-h">New password</h2><p class="ot-p">Choose a password you will remember.</p><form data-f="newpass" class="ot-form"><label class="ot-field"><span class="ot-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><input id="agP" type="password" minlength="6" required autocomplete="new-password" placeholder="At least 6 characters"></label><button class="ot-btn" type="submit">Save password</button></form>`;
+      }
+      gate.innerHTML = `<div class="ot-card">${note && !okView ? `<div class="msg ${note.ok ? "ok" : "err"} ot-msg">${esc(note.t)}</div>` : ""}${inner}</div>`;
+      if (mode === "otp") wireBoxes();
+      return;
+    }
+    gate.className = "";
     gate.innerHTML = `<div class="lg"><div class="lg-top"><div class="lg-logo"><img src="icons/logo-3d.png" alt="English Classes" style="width:100%;height:100%;display:block" onerror="this.outerHTML='E'"></div><span class="lg-brand">English Classes</span><h1 class="lg-title" id="agT">${title}</h1><p class="lg-sub">${sub}</p></div><section class="lg-sheet" role="dialog" aria-labelledby="agT">${note && !okView ? `<div class="msg ${note.ok ? "ok" : "err"}">${esc(note.t)}</div>` : ""}${body}</section>${badges}</div>`;
-    if (mode === "otp") {
+    if (mode === "otp") wireBoxes();
+    function wireBoxes() {
       const boxes = [...gate.querySelectorAll(".ot")];
       if (boxes[0]) boxes[0].focus();
       boxes.forEach((b, i) => {
