@@ -9111,7 +9111,7 @@ const MAS_LOOKS=["","look-2","look-3"];
 function masLook(){try{return +(localStorage.getItem("ec_mas_look")||0)%MAS_LOOKS.length}catch(e){return 0}}
 function masApplyLook(box){box.classList.remove("look-2","look-3");const c=MAS_LOOKS[masLook()];if(c)box.classList.add(c)}
 /* L'avatar n'est caché que si l'élève a choisi lui-même l'économie d'énergie (pas quand elle s'active toute seule). */
-function masHidden(){try{return LITE&&LITE_SRC==="user"}catch(e){return false}}
+function masHidden(){return false}
 function masShow(text,mood){if(masHidden()){const b=document.getElementById("mas");if(b)b.remove();return}
   if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
   let box=document.getElementById("mas");
@@ -10997,7 +10997,7 @@ var CH_BANK={sprint:[{"q":"If the chief listens to us, the problem ___ solved.",
 var AR_TITLE={"ch-sprint":"Grammar Sprint","ch-vocab":"Vocabulary Mix","ch-2nde":"Grade 10 Challenge","ch-1re":"Grade 11 Challenge","ch-tle":"Grade 12 Challenge"};
 (function(){
   if(typeof AR_MODES==="undefined"||typeof arPlay!=="function") return;
-  AR_MODES.push(
+  AR_MODES.unshift(
     {id:"ch-sprint",t:"Grammar Sprint",d:"Grammar questions from the lycée syllabus",ic:"bolt",max:400},
     {id:"ch-vocab",t:"Vocabulary Mix",d:"What does this English word mean?",ic:"cards",max:400},
     {id:"ch-2nde",t:"Grade 10 Challenge",d:"Grade 10 syllabus (2nde) · blue",ic:"trophy",max:400},
@@ -11025,14 +11025,14 @@ var AR_TITLE={"ch-sprint":"Grammar Sprint","ch-vocab":"Vocabulary Mix","ch-2nde"
 (function(){
   if(typeof ROYALE_CH==="undefined"||typeof royalePool!=="function"||typeof royaleQs!=="function") return;
   var BANK_KEY={"ch-sprint":"sprint","ch-vocab":"vocab","ch-2nde":"ch-2nde","ch-1re":"ch-1re","ch-tle":"ch-tle"};
-  ROYALE_CH.push(
+  Array.prototype.splice.apply(ROYALE_CH,[1,0].concat([
     {t:"Grade 10 battle",     d:"Grade 10 syllabus (2nde), medium", lv:"medium", kind:"ch-2nde",  n:12},
     {t:"Grade 11 battle",     d:"Grade 11 syllabus (1re), medium",  lv:"medium", kind:"ch-1re",   n:12},
     {t:"Grade 12 battle",     d:"Grade 12 syllabus (Tle), hard",    lv:"hard",   kind:"ch-tle",   n:15},
     {t:"Grammar sprint battle",d:"Lycée grammar, medium",           lv:"medium", kind:"ch-sprint",n:15},
     {t:"Vocabulary battle",   d:"Word meanings, easy",              lv:"easy",   kind:"ch-vocab", n:15},
     {t:"Vocabulary battle: hard", d:"Precise meanings",             lv:"hard",   kind:"ch-vocab", n:15}
-  );
+  ]));
   var _pool=royalePool;
   royalePool=function(kind,lv){
     if(BANK_KEY[kind]){
@@ -11043,6 +11043,87 @@ var AR_TITLE={"ch-sprint":"Grammar Sprint","ch-vocab":"Vocabulary Mix","ch-2nde"
       return same.concat(near);
     }
     return _pool(kind,lv);
+  };
+})();
+
+/* ---- celebrations: confetti on right answers, fireworks on wins ---- */
+(function(){
+  if(window.__fxReady) return; window.__fxReady=true;
+  var cv=document.createElement("canvas"); cv.id="fxFx";
+  cv.setAttribute("aria-hidden","true");
+  cv.style.cssText="position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:99998";
+  document.body.appendChild(cv);
+  var ctx=cv.getContext("2d"), P=[], raf=0, dpr=Math.min(2,window.devicePixelRatio||1);
+  var COL=["#5EEAD4","#818CF8","#F472B6","#FBBF24","#34D399","#60A5FA","#FB923C","#FFFFFF"];
+  function size(){ cv.width=innerWidth*dpr; cv.height=innerHeight*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+  size(); addEventListener("resize", size);
+  function reduced(){ try{ return matchMedia("(prefers-reduced-motion: reduce)").matches }catch(e){ return false } }
+  function spawn(x,y,n,spd,life,g,fall){
+    for(var i=0;i<n;i++){
+      var a=fall?(Math.random()-0.5)*0.6-Math.PI/2:Math.random()*Math.PI*2, v=spd*(0.4+Math.random()*0.8);
+      P.push({x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:g,life:life*(0.7+Math.random()*0.5),age:0,
+              c:COL[(Math.random()*COL.length)|0],r:2+Math.random()*2.5,rect:Math.random()<0.5});
+    }
+    if(!raf) raf=requestAnimationFrame(step);
+  }
+  function step(){
+    raf=0; ctx.clearRect(0,0,innerWidth,innerHeight);
+    P=P.filter(function(p){return p.age<p.life});
+    for(var i=0;i<P.length;i++){
+      var p=P[i]; p.age++; p.vx*=0.985; p.vy=p.vy*0.985+p.g; p.x+=p.vx; p.y+=p.vy;
+      ctx.globalAlpha=Math.max(0,1-p.age/p.life); ctx.fillStyle=p.c;
+      if(p.rect){ ctx.fillRect(p.x,p.y,p.r*1.8,p.r*0.9); }
+      else { ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.2832); ctx.fill(); }
+    }
+    ctx.globalAlpha=1;
+    if(P.length) raf=requestAnimationFrame(step);
+  }
+  // confetti falling from the top
+  window.fxConfetti=function(n){
+    if(reduced()) return;
+    for(var i=0;i<(n||60);i++) spawn(Math.random()*innerWidth,-10,1,1.5+Math.random()*2,260,0.06,true);
+  };
+  // fireworks: several bursts over about 2.5 seconds, plus confetti
+  window.fxFireworks=function(big){
+    if(reduced()) return;
+    var n=big?7:4;
+    for(var i=0;i<n;i++){
+      (function(k){ setTimeout(function(){
+        var x=innerWidth*(0.15+Math.random()*0.7), y=innerHeight*(0.18+Math.random()*0.35);
+        spawn(x,y,big?90:50,big?7:5,80,0.08,false);
+      }, k*380); })(i);
+    }
+    window.fxConfetti(big?90:40);
+  };
+  // every correct answer shown on screen gets a small burst (throttled)
+  var lastOk=0;
+  new MutationObserver(function(ms){
+    for(var m=0;m<ms.length;m++){ var nodes=ms[m].addedNodes;
+      for(var j=0;j<nodes.length;j++){ var n=nodes[j]; if(n.nodeType!==1) continue;
+        var hit=(n.matches&&n.matches(".ar-note.good"))||(n.querySelector&&n.querySelector(".ar-note.good"));
+        if(hit && Date.now()-lastOk>1500){ lastOk=Date.now(); if(!reduced()) spawn(innerWidth/2,innerHeight*0.55,46,6,70,0.12,false); }
+      }
+    }
+  }).observe(document.body,{childList:true,subtree:true});
+  // victory in the Arena (quiz, games, challenges)
+  var _arEnd=arEnd;
+  arEnd=function(mode,score,max,msg){
+    var r=_arEnd.apply(this,arguments);
+    var f=max?score/max:1;
+    if(f>=0.85) fxFireworks(true); else if(f>=0.5) fxFireworks(false);
+    return r;
+  };
+  // victory in a battle: first place (or last one standing in the Royale)
+  var _btRes=btResults;
+  btResults=function(st){
+    var r=_btRes.apply(this,arguments);
+    try{
+      var win=false;
+      if(st.kind==="royale"){ var al=st.players.filter(function(p){return p.alive}); win=al.length===1&&al[0].uid===st.me; }
+      else { win=st.players.length>0&&st.players[0].uid===st.me&&st.players[0].score>0; }
+      if(win && window.__fxWon!==st.id){ window.__fxWon=st.id; fxFireworks(true); }
+    }catch(e){}
+    return r;
   };
 })();
 
