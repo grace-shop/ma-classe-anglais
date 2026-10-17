@@ -763,7 +763,7 @@ const PROG_CLASSES=["CP1","CP2","CE1","CE2","CM1","CM2","6e","5e","4e","3e","2nd
 const PROG_GROUP={primaire:["CP1","CP2","CE1","CE2","CM1","CM2"],college:["6e","5e","4e","3e"],lycee:["2nde","1re","Tle"],etudiant:["Université"],adulte:["Adultes"]};
 function myProgClass(m){if(!m)return null;if(m.profile==="etudiant")return"Université";if(m.profile==="adulte")return"Adultes";const c=String(m.classe||"");return PROG_CLASSES.find(k=>c.startsWith(k))||(m.profile==="primaire"?"CP1":m.profile==="college"?"6e":m.profile==="lycee"?"2nde":null)}
 const progUnits=pc=>S.lessons.filter(l=>l.classe===pc&&teacherOk(l)).sort((a,b)=>(a.unit||99)-(b.unit||99));
-const CLN={"Université":"University","Adultes":"Adults","Devoir surveillé":"Class test","Composition":"Term exam","Concours":"Competitive exam","Autre":"Other","Licence 1":"Year 1 (Licence 1)","Licence 2":"Year 2 (Licence 2)","Licence 3":"Year 3 (Licence 3)","Master":"Master's","BTS / autre":"BTS / other","Professionnel":"Professional","En recherche d'emploi":"Looking for a job"},CL=c=>CLN[c]||c||"";
+const CLN={"Université":"University","Adultes":"Adults","Devoir surveillé":"Class test","Composition":"Term exam","Concours":"Competitive exam","Autre":"Other","Licence 1":"Bachelor year 1","Licence 2":"Bachelor year 2","Licence 3":"Bachelor year 3","Master":"Master's","BTS / autre":"BTS / other","Professionnel":"Professional","En recherche d'emploi":"Looking for a job"},CL=c=>CLN[c]||c||"";
 const EXAMS=["CEPD","BEPC","BAC I","BAC II","Devoir surveillé","Composition","Concours","TOEFL / IELTS","TOEIC","Autre"];
 const ICONS={
  home:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
@@ -898,7 +898,7 @@ const UTT_KEEP=[];
 function localVoice(lang){const p=lang==="fr"?/^fr/i:/^en/i;return VOICE.list.find(v=>p.test(v.lang)&&v.localService)||null}
 function speakNow(text,lang,v,retry){let fell=false;
   for(const c of chunks(text)){const u=new SpeechSynthesisUtterance(c);UTT_KEEP.push(u);if(UTT_KEEP.length>60)UTT_KEEP.shift();
-    if(v){u.voice=v;u.lang=v.lang}else u.lang=lang==="fr"?"fr-FR":"en-US";
+    if(v){u.voice=v;u.lang=v.lang}else u.lang=lang==="fr"?"en-GB":"en-US";
     u.rate=lang==="fr"?1:VOICE.rate;u.pitch=1;u.volume=1;
     u.onerror=ev=>{if(ev&&(ev.error==="interrupted"||ev.error==="canceled"))return;
       /* a online voice can fail without internet: try the phone's own voice once */
@@ -1465,7 +1465,7 @@ function appelHTML(){const date=S.drafts.att_date||today(),doc=(S.att||[]).find(
   ${(S.att||[]).length?`<div><span class="eyebrow">History</span></div><div class="glass tablewrap"><table><thead><tr><th>Date</th><th>Present</th><th>Late</th><th>Absent</th><th>Absent (names)</th></tr></thead><tbody>${(S.att||[]).slice(0,40).map(d=>{const m=d.marks||{},c=v=>Object.values(m).filter(x=>x===v).length,ab=Object.entries(m).filter(([k,v])=>v==="A").map(([k])=>person(k)?.name).filter(Boolean);return`<tr class="click" data-a="attOpen" data-k="${d.date}"><td>${fmtDate(d.date)}</td><td class="num">${c("P")}</td><td class="num">${c("R")}</td><td class="num">${c("A")}</td><td class="small">${ab.map(esc).join(", ")||"—"}</td></tr>`}).join("")}</tbody></table></div>`:""}</div>`}
 function fichesHTML(){const pc=S.ficheClass||"",qs=vis(S.quizzes).filter(q=>!pc||(pc==="hors"?!q.classe:q.classe===pc)),ds=vis(S.decks);
   return`<div class="section"><div><span class="eyebrow">To print or share</span><h2>Worksheets</h2><p class="sub">Each quiz becomes a worksheet ready to print: lesson reminder, exercises, tick boxes and lines for writing. The “with answer key” version adds an answer page for the teacher only. Students can also download the worksheet without answers from their quizzes.</p></div>
-  <div class="seg">${["",...PROG_CLASSES,"hors"].map(c=>`<button data-a="ficheClass" data-k="${c}" aria-pressed="${pc===c}">${c===""?"All":c==="hors"?"Outside syllabus":c}</button>`).join("")}</div>
+  <div class="seg">${["",...PROG_CLASSES,"hors"].map(c=>`<button data-a="ficheClass" data-k="${c}" aria-pressed="${pc===c}">${c===""?"All":c==="hors"?"Outside syllabus":CL(c)}</button>`).join("")}</div>
   ${qs.length?`<div class="glass list">${qs.slice(0,80).map(q=>`<div class="it"><span class="ic t-coral" style="width:36px;height:36px;border-radius:10px;display:grid;place-items:center">${ic("bolt")}</span><div class="txt"><b>${esc(q.title)}</b><div class="small muted">${esc(q.level||"")}${q.classe?" · "+esc(CL(q.classe)):""} · ${(q.questions||[]).length} questions${q.exam?" · exam":""}</div></div><div class="row"><button class="btn ghost sm" data-a="sheet" data-id="${q.id}" data-k="0">${ic("download")}Student sheet</button><button class="btn sm" data-a="sheet" data-id="${q.id}" data-k="1">${ic("lock")}With answer key</button></div></div>`).join("")}</div>${qs.length>80?`<p class="hint">The first 80 quizzes are shown: choose a class to filter.</p>`:""}`:`<div class="empty">No quizzes here.</div>`}
   <div><span class="eyebrow">Vocabulary</span><h3>Word sheets</h3></div>
   ${ds.length?`<div class="glass list">${ds.map(d=>`<div class="it"><span class="ic t-gold" style="width:36px;height:36px;border-radius:10px;display:grid;place-items:center">${ic("cards")}</span><div class="txt"><b>${esc(d.title)}</b><div class="small muted">${esc(d.level||"")} · ${(d.cards||[]).length} words</div></div><button class="btn ghost sm" data-a="deckSheet" data-id="${d.id}">${ic("download")}Download</button></div>`).join("")}</div>`:`<div class="empty">No vocabulary lists.</div>`}</div>`}
@@ -1476,7 +1476,7 @@ const SHEET_CSS=`body{font-family:"Segoe UI",Arial,sans-serif;color:#16213A;max-
 table{width:100%;border-collapse:collapse}th,td{border:1px solid #D5DBE6;padding:8px 10px;text-align:left}th{background:#F3F5FB;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#5B6782}td.blank{width:40%}
 .pb{page-break-before:always;break-before:page;height:0}@media print{body{padding:0}}`;
 const sheetHead=(kind,title,sub)=>`<div class="top"><div><div class="muted">${esc(kind)}${sub?" · "+esc(sub):""}</div><h1>${esc(title)}</h1></div><div class="id">Name: ………………………………………<br>Class: ……………… Date: ………………</div></div>`;
-const sheetWrap=(title,body)=>`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>${SHEET_CSS}</style></head><body><div id="boot" aria-hidden="true"><div class="stage"><div class="zoom"><div class="mark"><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-1.4px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-2.8px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-4.2px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-5.6px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-7.0px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-8.4px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-9.8px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-11.2px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-12.6px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-14.0px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly front" viewBox="0 0 200 200" overflow="visible"><defs><linearGradient id="bgF" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6FFFB"/><stop offset=".45" stop-color="#5EEAD4"/><stop offset="1" stop-color="#818CF8"/></linearGradient><linearGradient id="shG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="bM"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z" fill="#fff"/></mask></defs><path class="face" fill="url(#bgF)" d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/><rect class="shine" x="-60" y="0" width="60" height="200" fill="url(#shG)" mask="url(#bM)"/><path class="edge" pathLength="100" d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/><circle class="node" cx="50" cy="28" r="3" data-k="0.0"/><circle class="node" cx="150" cy="28" r="3" data-k="0.1437"/><circle class="node" cx="150" cy="58" r="3" data-k="0.1868"/><circle class="node" cx="92" cy="58" r="3" data-k="0.2701"/><circle class="node" cx="92" cy="92" r="3" data-k="0.319"/><circle class="node" cx="138" cy="92" r="3" data-k="0.3851"/><circle class="node" cx="138" cy="122" r="3" data-k="0.4282"/><circle class="node" cx="92" cy="122" r="3" data-k="0.4943"/><circle class="node" cx="92" cy="142" r="3" data-k="0.523"/><circle class="node" cx="150" cy="142" r="3" data-k="0.6063"/><circle class="node" cx="150" cy="172" r="3" data-k="0.6494"/><circle class="node" cx="50" cy="172" r="3" data-k="0.7931"/><circle class="pen" r="4.5" cx="50" cy="28"/></svg></div></div><div class="word">English Classes</div><div class="tag">Practise · Play · Progress</div></div><script>(function(){var p=document.querySelector("#boot .edge"),pen=document.querySelector("#boot .pen"),nodes=[].slice.call(document.querySelectorAll("#boot .node"));if(!p||!pen)return;var L=p.getTotalLength(),D=1500,t0=0;function f(t){if(!t0)t0=t;var k=Math.min(1,(t-t0)/D);var pt=p.getPointAtLength(L*k);pen.setAttribute("cx",pt.x);pen.setAttribute("cy",pt.y);nodes.forEach(function(n){if(k>=+n.getAttribute("data-k"))n.classList.add("on")});if(k<1)requestAnimationFrame(f);else pen.classList.add("done")}requestAnimationFrame(f)})();</script></div></div>${body}<p class="foot">English Classes${S.staff.length?" · "+esc(staffName(myTid()||principalId())):""}</p></body></html>`;
+const sheetWrap=(title,body)=>`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>${SHEET_CSS}</style></head><body><div id="boot" aria-hidden="true"><div class="stage"><div class="zoom"><div class="mark"><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-1.4px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-2.8px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-4.2px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-5.6px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-7.0px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-8.4px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-9.8px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-11.2px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-12.6px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly depth" viewBox="0 0 200 200" style="transform:translateZ(-14.0px)"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/></svg><svg class="ly front" viewBox="0 0 200 200" overflow="visible"><defs><linearGradient id="bgF" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6FFFB"/><stop offset=".45" stop-color="#5EEAD4"/><stop offset="1" stop-color="#818CF8"/></linearGradient><linearGradient id="shG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="bM"><path d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z" fill="#fff"/></mask></defs><path class="face" fill="url(#bgF)" d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/><rect class="shine" x="-60" y="0" width="60" height="200" fill="url(#shG)" mask="url(#bM)"/><path class="edge" pathLength="100" d="M50 28 L150 28 L150 58 L92 58 L92 92 L138 92 L138 122 L92 122 L92 142 L150 142 L150 172 L50 172 Z"/><circle class="node" cx="50" cy="28" r="3" data-k="0.0"/><circle class="node" cx="150" cy="28" r="3" data-k="0.1437"/><circle class="node" cx="150" cy="58" r="3" data-k="0.1868"/><circle class="node" cx="92" cy="58" r="3" data-k="0.2701"/><circle class="node" cx="92" cy="92" r="3" data-k="0.319"/><circle class="node" cx="138" cy="92" r="3" data-k="0.3851"/><circle class="node" cx="138" cy="122" r="3" data-k="0.4282"/><circle class="node" cx="92" cy="122" r="3" data-k="0.4943"/><circle class="node" cx="92" cy="142" r="3" data-k="0.523"/><circle class="node" cx="150" cy="142" r="3" data-k="0.6063"/><circle class="node" cx="150" cy="172" r="3" data-k="0.6494"/><circle class="node" cx="50" cy="172" r="3" data-k="0.7931"/><circle class="pen" r="4.5" cx="50" cy="28"/></svg></div></div><div class="word">English Classes</div><div class="tag">Practise · Play · Progress</div></div><script>(function(){var p=document.querySelector("#boot .edge"),pen=document.querySelector("#boot .pen"),nodes=[].slice.call(document.querySelectorAll("#boot .node"));if(!p||!pen)return;var L=p.getTotalLength(),D=1500,t0=0;function f(t){if(!t0)t0=t;var k=Math.min(1,(t-t0)/D);var pt=p.getPointAtLength(L*k);pen.setAttribute("cx",pt.x);pen.setAttribute("cy",pt.y);nodes.forEach(function(n){if(k>=+n.getAttribute("data-k"))n.classList.add("on")});if(k<1)requestAnimationFrame(f);else pen.classList.add("done")}requestAnimationFrame(f)})();<\/script></div></div>${body}<p class="foot">English Classes${S.staff.length?" · "+esc(staffName(myTid()||principalId())):""}</p></body></html>`;
 function worksheetDoc(q,key){const L=q.lessonId&&S.lessons.find(l=>l.id===q.lessonId),qs=q.questions||[],lt=j=>String.fromCharCode(97+j);
   const items=qs.map(x=>`<li><p>${esc(x.q)}</p>${x.choices?`<div class="ch">${x.choices.map((c,j)=>`<span>☐ ${lt(j)}) ${esc(c)}</span>`).join("")}</div>`:`<div class="line"></div>`}</li>`).join("");
   const ans=qs.map(x=>`<li>${x.choices?`<b>${lt(x.answer)})</b> ${esc(x.choices[x.answer]??"")}`:`<b>${esc((x.accept||[]).join(" / "))}</b>`}${x.explain?` <span class="muted">— ${esc(x.explain)}</span>`:""}</li>`).join("");
@@ -1740,10 +1740,10 @@ const TALK_SC=[
  {k:"family",e:"🏡",t:"My family and my home",en:"Family and home",d:"Describe your family, your house and your neighbourhood.",role:"You are a pen friend curious about the learner's family, house and neighbourhood in Togo."},
  {k:"school",e:"🏫",t:"School life",en:"At school",d:"Subjects, timetable, teachers, exams.",role:"You are a classmate talking about school: subjects, timetable, teachers, homework, exams (CEPD, BEPC, BAC).",only:["primaire","college","lycee"]},
  {k:"hobbies",e:"⚽",t:"Free time",en:"Hobbies and sport",d:"Football, music, films, weekends.",role:"You are a friend chatting about hobbies, sport (football!), music, films and weekends."},
- {k:"market",e:"🛒",t:"At the Lomé market",en:"At the market",d:"Buy fruit at the Grand Marché and bargain for a good price.",role:"You are a friendly seller at the Grand Marché in Lomé. The learner is the customer. Sell fruit, vegetables and fabric, give prices in CFA francs, and let them bargain."},
- {k:"food",e:"🍲",t:"Eating out",en:"At the restaurant",d:"Order your meal in a maquis: fufu, akoumé, chicken…",role:"You are a waiter in a small restaurant (maquis) in Lomé. Take the learner's order (fufu, akoumé, rice, grilled chicken, drinks), answer questions and bring the bill."},
+ {k:"market",e:"🛒",t:"At the Lomé market",en:"At the market",d:"Buy fruit at the Grand Market and bargain for a good price.",role:"You are a friendly seller at the Grand Market in Lomé. The learner is the customer. Sell fruit, vegetables and fabric, give prices in CFA francs, and let them bargain."},
+ {k:"food",e:"🍲",t:"Eating out",en:"At the restaurant",d:"Order your meal in a local restaurant: fufu, akoumé, chicken…",role:"You are a waiter in a small local restaurant in Lomé. Take the learner's order (fufu, akoumé, rice, grilled chicken, drinks), answer questions and bring the bill."},
  {k:"story",e:"🧚",t:"Story time",en:"Let's make a story",d:"Make up a story together, one sentence at a time.",role:"You are a storyteller. Build a fun story together with the learner: add one or two sentences, then ask what happens next.",only:["primaire","college"]},
- {k:"directions",e:"🗺️",t:"Giving directions",en:"Asking the way",d:"A tourist asks you the way to the beach or the market.",role:"You are a tourist visiting Lomé who is lost. Ask the learner for directions to places (the beach, the Grand Marché, the Independence Monument, a hotel). React to their directions.",only:["college","lycee","etudiant","adulte"]},
+ {k:"directions",e:"🗺️",t:"Giving directions",en:"Asking the way",d:"A tourist asks you the way to the beach or the market.",role:"You are a tourist visiting Lomé who is lost. Ask the learner for directions to places (the beach, the Grand Market, the Independence Monument, a hotel). React to their directions.",only:["college","lycee","etudiant","adulte"]},
  {k:"doctor",e:"🩺",t:"Seeing the doctor",en:"At the doctor's",d:"Say what is wrong and understand the advice.",role:"You are a doctor in a clinic. The learner is the patient. Ask about symptoms and give simple advice.",only:["college","lycee","etudiant","adulte"]},
  {k:"travel",e:"✈️",t:"Airport",en:"At the airport",d:"Check-in, luggage, passport control.",role:"You are an airline agent at Lomé airport (check-in, then passport control). The learner is the traveller.",only:["lycee","etudiant","adulte"]},
  {k:"phone",e:"📞",t:"Phone call",en:"On the phone",d:"Make an appointment, leave a message.",role:"You are a receptionist answering the phone. The learner calls to make an appointment or leave a message.",only:["lycee","etudiant","adulte"]},
@@ -1904,7 +1904,7 @@ function saveContent(col,data){const ed=S.editing&&S.editing.kind===col?S.editin
 /* ============ parents: bulletin & export ============ */
 async function saveFile(name,data){if(S.dl===undefined)S.dl=await claude.use("downloads");if(!S.dl){toast("Downloads are not available on this device.","x");return}
   try{await S.dl.save({filename:name,data});toast("File ready","download")}catch(e){if(e&&e.code==="declined")return;toast(e&&e.code==="rate_limited"?"A download is already in progress.":"Download not possible right now.","x")}}
-const safeName=s=>String(s||"eleve").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"")||"eleve";
+const safeName=s=>String(s||"student").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"")||"student";
 function hwAvg(s){const g=Object.values(s.feedback||{}).map(f=>+f.grade).filter(n=>!isNaN(n));return g.length?Math.round(g.reduce((a,b)=>a+b,0)/g.length*10)/10:null}
 function bulletinDoc(s){const x=stats(s),a=[...(s.attempts||[])].reverse(),fb=s.feedback||{},subs=s.submissions||{},words=Object.values(s.deckProgress||{}).reduce((n,d)=>n+((d&&d.known)||[]).length,0),ha=hwAvg(s);
   const exams=a.filter(r=>r.exam),badges=BADGES.filter(b=>(s.badges||{})[b.id]).map(b=>b.name);
@@ -2022,13 +2022,13 @@ function aiContext(){
   if(S.mode==="teacher")return`The user is the English TEACHER who manages the class (${S.students.length} learners: middle school, high school, university students and adults). Help her prepare lessons, quizzes, tests, answer keys, report comments and activities. For a quiz meant for the app, use exactly this format: one question per block, one empty line between two questions, "* " before the correct answer and "- " before the wrong ones; for a written answer: the question, then "= answer1 / answer2". For a vocabulary list: one line per word, "word | simple English meaning | example".`;
   if(isParent(S.me))return`The user is a student's PARENT (child: ${S.me.childName||"not specified"}${S.me.childClasse?", class "+S.me.childClasse:""}). Answer simply, with practical tips to help the child.`;
   const m=S.me||{};return`The user is a learner: ${PROFILES[m.profile]||"student"}${m.classe?" ("+m.classe+")":""}, English level ${m.level||"A2"} (${LEVEL_NAMES[m.level]||""}). Adapt your vocabulary and examples to their age and level. If they ask you to do a class homework or test for them, do not give the full answer: explain the method, give a similar example and guide them so they find the answer themselves. For any other question, answer directly.`}
-const aiRules=()=>`You are Nova, the AI assistant of the "English Classes" app, used in Togo. You know the Togolese school system: primary school from CP1 to CM2 (CEPD exam, English taught in primary school since 2025), middle school (collège) from 6e to 3e (BEPC, 2-hour English test, coefficient 2: reading, grammar and writing), high school (lycée) from 2nde to Terminale (BAC I in 1re, BAC II in Terminale; series A4, C, D, E, F1 to F4, G1 to G3, Ti), marks out of 20 with the grades Passable, Assez bien, Bien and Très bien, school year in three terms. Take your examples from life in Togo (Lomé, Kara, Kpalimé, Sokodé, Aného, the market, the CFA franc, the rainy season, the harmattan). Today is ${new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}${schoolPeriod().label?", "+schoolPeriod().label:""}. ${aiContext()}\nYou can answer any question: English, other subjects, general knowledge, career guidance, everyday life. This is an app for learning English: ALWAYS answer ONLY in English, even if the user writes in French or another language. Use very simple English (A1–A2 level words and short sentences) unless the user's level is higher. Be clear, warm and rather short (3 to 8 sentences, unless asked for more). Put important words in **bold**, use lists with "- " when useful, and give examples when relevant. Do not use tables or headings with #.`;
+const aiRules=()=>`You are Nova, the AI assistant of the "English Classes" app, used in Togo. You know the Togolese school system: primary school from CP1 to CM2 (CEPD exam, English taught in primary school since 2025), middle school from 6e to 3e (BEPC, 2-hour English test, coefficient 2: reading, grammar and writing), high school from 2nde to Terminale (BAC I in 1re, BAC II in Terminale; series A4, C, D, E, F1 to F4, G1 to G3, Ti), marks out of 20 with the grades Not enough, Pass, Good, Very good and Excellent, school year in three terms. Take your examples from life in Togo (Lomé, Kara, Kpalimé, Sokodé, Aného, the market, the CFA franc, the rainy season, the harmattan). Today is ${new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}${schoolPeriod().label?", "+schoolPeriod().label:""}. ${aiContext()}\nYou can answer any question: English, other subjects, general knowledge, career guidance, everyday life. This is an app for learning English: ALWAYS answer ONLY in English, even if the user writes in French or another language. Use very simple English (A1–A2 level words and short sentences) unless the user's level is higher. Be clear, warm and rather short (3 to 8 sentences, unless asked for more). Put important words in **bold**, use lists with "- " when useful, and give examples when relevant. Do not use tables or headings with #.`;
 function mdLite(t){const out=[];let list=false;for(const raw of String(t||"").split("\n")){let line=esc(raw).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`([^`]+)`/g,"<code>$1</code>").replace(/^#{1,4}\s*(.+)$/,"<b>$1</b>");const li=/^\s*(?:[-•*]|\d+[.)])\s+(.*)$/.exec(line);
-  if(li){if(!list){out.push("<ul>");list=true}out.push("<li>"+li[1].replace(/\*/g,"")+"</li>");continue}if(list){out.push("</ul>");list=false}if(line.trim())out.push("<p>"+line.replace(/\*/g,"")+"</p>")}if(list)out.push("</ul>");return out.join("")}
+  if(li){if(!list){out.push("<ul>");list=true}out.push("<li>"+li[1]+"</li>");continue}if(list){out.push("</ul>");list=false}if(line.trim())out.push("<p>"+line+"</p>")}if(list)out.push("</ul>");return out.join("")}
 function aiSuggestions(){if(S.mode==="teacher")return["Create a 5-question quiz on the present perfect in the app format","Suggest 10 vocabulary words about health in the app format","Write a report comment for a serious but shy student","Give me a 15-minute speaking activity for a 3e class"];
   if(isParent(S.me))return["How can I help my child improve their English at home?","Which cartoons in English do you recommend for a 12-year-old child?","How can I motivate a teenager who does not like English?"];
   const p=S.me?.profile;return[p==="college"?"How can I revise well for the BEPC English test?":p==="lycee"?"How can I pass the BAC English test?":p==="etudiant"?"How do I structure an essay in English?":"How do I introduce myself in English at a job interview?","What is the difference between since and for?","Correct my sentence: She don't like rice.","Explain the present perfect to me with simple examples"]}
-function aiSpeakText(t){if(!canSpeak)return;const plain=String(t).replace(/[*`#]/g,"").replace(/^\s*[-•]\s+/gm,"").trim();const en=(plain.match(/\b(the|is|are|you|and|to|of|I|it|in|my|have|do)\b/gi)||[]).length,fr=(plain.match(/\b(le|la|les|est|et|de|des|un|une|tu|je|pour|que|en)\b/gi)||[]).length;speak(plain,en>fr?"en":"fr")}
+function aiSpeakText(t){if(!canSpeak)return;const plain=String(t).replace(/[*`#]/g,"").replace(/^\s*[-•]\s+/gm,"").trim();const en=(plain.match(/\b(the|is|are|you|and|to|of|I|it|in|my|have|do)\b/gi)||[]).length,fr=(plain.match(/\b(le|la|les|est|et|de|des|un|une|tu|je|pour|que|en)\b/gi)||[]).length;speak(plain,"en")}
 function renderAI(visOnly){const fab=$("#aiFab"),panel=$("#aiPanel");if(!fab||!panel)return;
   const ok=!!AI.sample&&!AI.disabled&&!S.offline&&(S.mode==="teacher"||!!S.me);fab.hidden=!ok||AI.open;const wasHidden=panel.hidden;panel.hidden=!ok||!AI.open;if(!ok||!AI.open||(visOnly&&!wasHidden))return;
   $("#aiSpeakBtn").innerHTML=ic(AI.speak?"speaker":"mute");$("#aiSpeakBtn").setAttribute("aria-pressed",String(AI.speak));
@@ -2894,12 +2894,12 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
  const dist=()=>{const[a,b]=[...PV.p.values()];return Math.hypot(a.x-b.x,a.y-b.y)||1};
  const bounds=img=>{const w=img.clientWidth,h=img.clientHeight;return{mx:(PV.s-1)*w/2,my:(PV.s-1)*h/2}};
  const paint=img=>{const b=bounds(img);PV.x=Math.max(-b.mx,Math.min(b.mx,PV.x));PV.y=Math.max(-b.my,Math.min(b.my,PV.y));if(PV.s<=1){PV.x=0;PV.y=0}img.style.transform=`translate(${PV.x}px,${PV.y}px) scale(${PV.s})`};
- const reset=img=>{PV.s=1;PV.x=0;PV.y=0;if(img)img.style.transform="translate(0px,0px)"};
+ const reset=img=>{PV.s=1;PV.x=0;PV.y=0;if(img)img.style.transform=""};
  const setup=()=>{const body=document.getElementById("docvBody"),img=body&&body.querySelector("img.docv-img");
    if(!img){if(PV.img){PV.img=null}return}
    if(PV.img!==img){PV.img=img;reset(img);body.classList.add("docv-pic");
      const top=body.parentElement&&body.parentElement.querySelector(".docv-top"),th=top?Math.round(top.getBoundingClientRect().height):56;
-     img.style.cssText=`position:fixed;left:0;top:${th}px;width:100vw;height:${window.innerHeight-th}px;max-width:none;max-height:none;margin:0;padding:0;object-fit:contain;border-radius:0;background:transparent;transform-origin:50% 50%;transform:translate(0px,0px)`}};
+     img.style.cssText=`position:fixed;left:0;top:${th}px;width:100vw;height:${window.innerHeight-th}px;max-width:none;max-height:none;margin:0;padding:0;object-fit:contain;border-radius:0;background:transparent;transform-origin:50% 50%`}};
  new MutationObserver(setup).observe(document.body,{childList:true,subtree:true});
  const inView=e=>e.target&&e.target.closest&&e.target.closest("#docvBody")&&PV.img&&PV.img.isConnected;
  document.addEventListener("pointerdown",e=>{if(!inView(e))return;PV.p.set(e.pointerId,{x:e.clientX,y:e.clientY});
@@ -2982,7 +2982,7 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
 
  const PT={mode:"student",student:null,rows:[],names:{},urls:{},timer:null,busy:false,err:""};
  const nameOf=u=>PT.names[u]||"Student";
- const timeOf=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+ const timeOf=t=>new Date(t).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
 
  async function load(){const sb=window.__sb;if(!sb)return;
    let q=sb.from("prof_messages").select("*").order("created_at",{ascending:true}).limit(500);
@@ -3003,7 +3003,7 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
    const mine=PT.mode==="student"?r.from_student:!r.from_student;
    const p=r.att&&r.att.k==="img"&&r.att.p;
    const img=p&&PT.urls[p]&&PT.urls[p]!=="…"?`<img class="pt-img" src="${esc(PT.urls[p])}" alt="${esc(r.att.n||"photo")}" onclick="window.open(this.src,'_blank')">`:(p?`<div class="pt-meta">📷 photo</div>`:"");
-   const body=r.body?`<div class="pt-bub">${img}${natEmo(String(r.body).replace(/\*+/g,""))}</div>`:(img?`<div class="pt-bub">${img}</div>`:"");
+   const body=r.body?`<div class="pt-bub">${img}${natEmo(r.body)}</div>`:(img?`<div class="pt-bub">${img}</div>`:"");
    const auto=r.auto?`<span class="pt-auto">Automatic reply</span>`:"";
    return `<div class="pt-row ${mine?"me":"them"}">${body}<div class="pt-meta">${timeOf(r.created_at)}${auto}</div></div>`;
  }
@@ -3749,7 +3749,7 @@ function v4MsgHTML(kind,m,c){const a=m.att,once=!!(a&&a.o)&&!m.del,stk=a&&a.k===
   return`<div class="msg ${m.mine?"mine":""}${stk?" stk":""}${m.del?" del":""}${rxh?" hasrx":""}" data-mid="${esc(m.id)}" data-k="${kind}" id="m-${esc(m.id)}">${re}${body}<span>${fmtTime(m.at)}${tick}</span>${rxh}</div>`}
 function v4ActSheet(kind,list,c){const raw=list.find(x=>x.id===V4.act.id);if(!raw)return"";const m=v4Norm(kind,raw,c),txt=v4Plain(m.text);
   return`<div class="v4sheet-bg" data-v4="actClose"></div><div class="v4sheet" role="dialog" aria-label="Message options">
-  ${!m.del?`<div class="v4rxrow">${V4RE.map(e=>`<button type="button" data-v4="react" data-e="${e}" aria-pressed="${(m.react||{})[S.uid]===e}" aria-label="React ${e}">${E(e)}</button>`).join("")}<details class="v4rxmore"><summary aria-label="More emojis">+</summary><div class="v4grid emo">${V4EMO.map(x=>`<button type="button" data-v4="react" data-e="${x}" aria-label="React ${x}">${natEmo(x)}</button>`).join("")}</div></details></div>`:""}
+  ${!m.del?`<div class="v4rxrow">${V4RE.map(e=>`<button type="button" data-v4="react" data-e="${e}" aria-pressed="${(m.react||{})[S.uid]===e}" aria-label="React ${e}">${E(e)}</button>`).join("")}</div>`:""}
   ${!m.del?`<button type="button" data-v4="reply">${ic("left")}Reply</button>`:""}
   ${!m.del&&txt?`<button type="button" data-v4="copy">${ic("copy")}Copy</button>`:""}
   <button type="button" data-v4="delMe">${ic("trash")}Delete for me</button>
@@ -4751,20 +4751,20 @@ const AR_O=[
 ];
 
 const AR_C=[
- ["resilient","able to recover quickly from difficulties","She is resilient after the storm."],
- ["curious","eager to know or learn things","Kids are curious about everything."],
- ["ambitious","having a strong desire to succeed","He is ambitious and works hard."],
- ["generous","willing to give and share","My grandmother is very generous."],
- ["reliable","can be trusted to work well","This bus is reliable."],
- ["improve","to make or become better","I want to improve my English."],
- ["confident","sure of yourself and your abilities","She feels confident when she speaks."],
+ ["resilient","able to recover quickly","She is resilient after the storm."],
+ ["curious","wanting to know more","Kids are curious about everything."],
+ ["ambitious","wanting to succeed a lot","He is ambitious and works hard."],
+ ["generous","happy to give and share","My grandmother is very generous."],
+ ["reliable","you can trust it","This bus is reliable."],
+ ["improve","make something better","I want to improve my English."],
+ ["confident","sure of yourself","She feels confident when she speaks."],
  ["journey","a trip from one place to another","The journey took five hours."],
- ["homework","tasks students do at home","I finished my homework early."],
- ["borrow","to take something and give it back later","Can I borrow your pen?"],
- ["remember","to keep something in your mind","I remember my first day at school."],
+ ["homework","school work to do at home","I finished my homework early."],
+ ["borrow","take something and give it back later","Can I borrow your pen?"],
+ ["remember","keep something in your mind","I remember my first day at school."],
  ["enormous","very, very big","The elephant is enormous."],
- ["whisper","to speak very quietly","Please whisper in the library."],
- ["delicious","very tasty","This soup is delicious!"]
+ ["whisper","speak very quietly","Please whisper in the library."],
+ ["delicious","very good to eat","This soup is delicious!"]
 ];
 
 const AR_G=[
@@ -5026,7 +5026,7 @@ function arPlay(mode){AR.mode=mode;if(mode==="quiz"||mode==="odd"||mode==="traps
 /* quiz */
 function arQuiz(){if(AR.i>=AR.qs.length)return arEnd(AR.mode,AR.score,AR.qs.length*40);
   const q=AR.qs[AR.i];AR.locked=false;
-  arSet(arTop(AR.mode==="odd"?"Odd One Out":AR.mode==="traps"?"Grammar Traps":(AR_TITLE[AR.mode]||"Quiz Blitz"),`${AR.i+1} / ${AR.qs.length} · ${AR.score} pts`)+arBar(AR.i/AR.qs.length)+
+  arSet(arTop(AR.mode==="odd"?"Odd One Out":AR.mode==="traps"?"Grammar Traps":"Quiz Blitz",`${AR.i+1} / ${AR.qs.length} · ${AR.score} pts`)+arBar(AR.i/AR.qs.length)+
     `<div class="ar-ring-wrap">${arRing()}</div>
      <div class="ar-card"><p class="ar-kicker">Question ${AR.i+1}</p><h2>${arEsc(q.q)}</h2></div>
      <div class="ar-opts">${q.o.map((o,k)=>`<button class="ar-opt" data-ar="qa" data-k="${k}">${arEsc(o)}</button>`).join("")}</div>
@@ -5037,7 +5037,7 @@ function arQAnswer(k){if(AR.locked)return;AR.locked=true;arStopT();const q=AR.qs
   document.querySelectorAll(".ar-opt").forEach((b,j)=>{b.disabled=true;if(j===q.a)b.classList.add("ok");else if(j===k)b.classList.add("bad")});
   const fb=document.getElementById("arFb");
   if(fb)fb.innerHTML=`<div class="ar-note ${ok?"good":"bad"}"><b>${ok?"Correct!":(k<0?"Time's up!":"Not quite.")}</b> ${arEsc(q.e)}</div><div style="height:12px"></div><button class="ar-go" data-ar="next" style="width:100%">Next →</button>`}
-function arNext(){if(AR.mode==="quiz"||AR.mode==="odd"||AR.mode==="traps"||String(AR.mode).indexOf("ch-")===0){AR.i++;arQuiz()}else if(AR.mode==="fill"){AR.i++;arFill()}else if(AR.mode==="order"){AR.i++;arOrder()}}
+function arNext(){if(AR.mode==="quiz"||AR.mode==="odd"||AR.mode==="traps"){AR.i++;arQuiz()}else if(AR.mode==="fill"){AR.i++;arFill()}else if(AR.mode==="order"){AR.i++;arOrder()}}
 
 /* guess the word */
 function arGuess(){const w=AR.word.w;const lost=AR.guessed.filter(c=>!w.includes(c)).length;AR.lives=Math.max(0,6-lost);
@@ -5119,7 +5119,7 @@ function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
   const names={quiz:"Quiz Blitz",guess:"Guess the Word",fill:"Fill the Gap",order:"Word Order",cards:"Flashcards",clock:"Beat the Clock",odd:"Odd One Out",traps:"Grammar Traps"};
   const label=mode==="cards"?"cards learned":mode==="clock"?"correct answers":"points";
   const conf=stars>=2?`<div class="ar-confetti">${Array.from({length:36},(_,k)=>`<i style="left:${(k*37)%100}%;animation-delay:${((k%7)*0.18).toFixed(2)}s;background:${["#5EEAD4","#818CF8","#F472B6","#FBBF24"][k%4]}"></i>`).join("")}</div>`:"";
-  arSet(arTop(AR_TITLE[mode]||names[mode]||"Arena","")+
+  arSet(arTop(names[mode]||"Arena","")+
     `<div class="ar-end">${conf}<div class="ar-trophy">${arIc("trophy")}</div>
       <h2>${stars===3?"Brilliant!":stars===2?"Well done!":"Keep going!"}</h2>
       <div class="ar-score"><b>${score}</b><small>${label}</small></div>
@@ -5380,7 +5380,7 @@ const BT={diff:"hard",room:null,st:null,off:0,iv:null,clk:null,on:false,busy:fal
 const BT_KINDS={
  duel:{t:"Duel",d:"Two students, the same questions. Best score wins.",n:8,ic:"bolt"},
  battle:{t:"Group battle",d:"2 to 8 students. Live ranking on every question.",n:10,ic:"trophy"},
- royale:{t:"Battle Royale",d:"Up to 12 students. Hard questions, 12 seconds each. One wrong answer and you are out.",n:15,ic:"crown"},
+ royale:{t:"Battle Royale",d:"Up to 12 students. Hard questions, 8 seconds each. One wrong answer and you are out.",n:15,ic:"crown"},
  challenge:{t:"Daily challenge",d:"The same questions for everyone today. Play alone, then see the board.",n:8,ic:"pen"}};
 
 /* ---------- server calls ---------- */
@@ -9105,7 +9105,7 @@ const MAS_LOOKS=["","look-2","look-3"];
 function masLook(){try{return +(localStorage.getItem("ec_mas_look")||0)%MAS_LOOKS.length}catch(e){return 0}}
 function masApplyLook(box){box.classList.remove("look-2","look-3");const c=MAS_LOOKS[masLook()];if(c)box.classList.add(c)}
 /* L'avatar n'est caché que si l'élève a choisi lui-même l'économie d'énergie (pas quand elle s'active toute seule). */
-function masHidden(){return false}
+function masHidden(){try{return LITE&&LITE_SRC==="user"}catch(e){return false}}
 function masShow(text,mood){if(masHidden()){const b=document.getElementById("mas");if(b)b.remove();return}
   if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
   let box=document.getElementById("mas");
@@ -9314,7 +9314,7 @@ function schDecorate(){
   }
   if(!document.getElementById("f_sched")&&SCH.list.length){
     const w=document.querySelector(".fwhen");
-    if(w) w.insertAdjacentHTML("afterend",`<div class="fsched" id="f_sched">${SCH.list.map(x=>`<div class="fsched-it"><span>⏱ ${esc(new Date(x.created_at).toLocaleString([],{dateStyle:"short",timeStyle:"short"}))} · ${esc(String(x.body||"").slice(0,40)||(x.media?"📷 media":""))}</span><button type="button" class="btn ghost sm" data-fsc="${esc(x.id)}">Cancel</button></div>`).join("")}</div>`);
+    if(w) w.insertAdjacentHTML("afterend",`<div class="fsched" id="f_sched">${SCH.list.map(x=>`<div class="fsched-it"><span>⏱ ${esc(new Date(x.created_at).toLocaleString("en-GB",{dateStyle:"short",timeStyle:"short"}))} · ${esc(String(x.body||"").slice(0,40)||(x.media?"📷 media":""))}</span><button type="button" class="btn ghost sm" data-fsc="${esc(x.id)}">Cancel</button></div>`).join("")}</div>`);
   }
   schLoad(false);
 }
@@ -9347,7 +9347,7 @@ document.addEventListener("click",async e=>{
     const id=await schSB().rpc("schedule_post",{p_body:body||"",p_media:media&&media.length?media:null,p_at:at});
     if(id.error) throw new Error(id.error.message||"Could not schedule");
     delete S.drafts.f_when;
-    toast("Scheduled for "+new Date(at).toLocaleString([],{dateStyle:"short",timeStyle:"short"}),"clock");
+    toast("Scheduled for "+new Date(at).toLocaleString("en-GB",{dateStyle:"short",timeStyle:"short"}),"clock");
     SCH.at=0; schLoad(true);
     return id.data}}
 
@@ -10970,6 +10970,53 @@ mdUseSelfie=function(c,blob){
   if(c.facing==="environment"&&c.to==="chat"){return v4SendFile(c.kind,c.target,blob,"photo.jpg")}
   return _mdUse(c,blob);
 };
+
+/* ---- app-v5-zzzzd-bank.js ---- */
+/* v5 · Grammar and vocabulary bank (www/banque-grammaire.json).
+   About 150 multiple-choice questions: 60 grammar (src "grammar2") and
+   90 vocabulary (src "vocab2"), across levels 1 to 3. They are added to
+   AR_Q so the Arena and Battle Royale can use them. Never throws. */
+(function banqueGrammaireLoad(){
+  try{
+    const add=(list)=>{
+      const seen=new Set(AR_Q.map(x=>x.q+"|"+x.o.join("|")));
+      let n=0;
+      for(const it of list){
+        const key=it.q+"|"+it.o.join("|");
+        if(seen.has(key))continue;
+        seen.add(key);AR_Q.push(it);n++;
+      }
+      return n;
+    };
+    fetch("banque-grammaire.json",{cache:"no-store"}).then(r=>r.json()).then(list=>{
+      if(!Array.isArray(list))return;
+      window.__grammaire=(window.__grammaire||0)+add(list);
+    }).catch(()=>{});
+  }catch(e){}
+})();
+
+/* ---- app-v5-zzzzd-modes.js ---- */
+/* v5 · Battle Royale challenges for the grammar and vocabulary bank.
+   The lead merges this list into ROYALE_CH. Kinds: "grammar2", "vocab2". */
+window.ROYALE_NEW=[
+ {t:"Grammar: easy",   d:"Tenses, articles and prepositions", lv:"easy",   kind:"grammar2", n:12},
+ {t:"Vocabulary: easy",d:"Everyday words",                    lv:"easy",   kind:"vocab2",   n:12},
+ {t:"Grammar: medium", d:"Modals, conditionals and passive",  lv:"medium", kind:"grammar2", n:15},
+ {t:"Vocabulary: medium",d:"Health, work and travel",         lv:"medium", kind:"vocab2",   n:15},
+ {t:"Grammar: hard",   d:"Reported speech and relative clauses", lv:"hard", kind:"grammar2", n:15},
+ {t:"Vocabulary: hard",d:"Money, media and technology",       lv:"hard",   kind:"vocab2",   n:15}
+];
+
+/* merge the new challenges into the Battle Royale list, and let them draw their own questions */
+ROYALE_CH.push(...(window.ROYALE_NEW||[]));
+{const _rp=royalePool;
+ royalePool=function(kind,lv){
+   if(kind==="grammar2"||kind==="vocab2"){
+     const same=AR_Q.filter(x=>x.src===kind&&(x.lv||1)===lv);
+     return same.length>=8?same:AR_Q.filter(x=>x.src===kind);
+   }
+   return _rp(kind,lv);
+ };}
 
 /* ==== v4 END ==== */
 render();

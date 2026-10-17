@@ -67,20 +67,20 @@ const AR_O=[
 ];
 
 const AR_C=[
- ["resilient","résistant, qui tient bon","She is resilient after the storm."],
- ["curious","curieux","Kids are curious about everything."],
- ["ambitious","ambitieux","He is ambitious and works hard."],
- ["generous","généreux","My grandmother is very generous."],
- ["reliable","fiable","This bus is reliable."],
- ["improve","améliorer","I want to improve my English."],
- ["confident","confiant","She feels confident when she speaks."],
- ["journey","voyage","The journey took five hours."],
- ["homework","devoirs","I finished my homework early."],
- ["borrow","emprunter","Can I borrow your pen?"],
- ["remember","se souvenir","I remember my first day at school."],
- ["enormous","énorme","The elephant is enormous."],
- ["whisper","chuchoter","Please whisper in the library."],
- ["delicious","délicieux","This soup is delicious!"]
+ ["resilient","able to recover quickly","She is resilient after the storm."],
+ ["curious","wanting to know more","Kids are curious about everything."],
+ ["ambitious","wanting to succeed a lot","He is ambitious and works hard."],
+ ["generous","happy to give and share","My grandmother is very generous."],
+ ["reliable","you can trust it","This bus is reliable."],
+ ["improve","make something better","I want to improve my English."],
+ ["confident","sure of yourself","She feels confident when she speaks."],
+ ["journey","a trip from one place to another","The journey took five hours."],
+ ["homework","school work to do at home","I finished my homework early."],
+ ["borrow","take something and give it back later","Can I borrow your pen?"],
+ ["remember","keep something in your mind","I remember my first day at school."],
+ ["enormous","very, very big","The elephant is enormous."],
+ ["whisper","speak very quietly","Please whisper in the library."],
+ ["delicious","very good to eat","This soup is delicious!"]
 ];
 
 const AR_G=[
@@ -414,7 +414,7 @@ function arCards(){if(!AR.deck.length)return arEnd("cards",AR.known,AR.total);
   arSet(arTop("Flashcards",`${AR.known} / ${AR.total} learned`)+arBar(AR.known/AR.total)+
     `<div class="ar-scene"><div class="ar-card3d" id="arCard" data-ar="flip">
        <div class="ar-face front"><span class="ar-kicker">English</span><h2>${arEsc(c[0])}</h2><small>Tap to flip</small></div>
-       <div class="ar-face back"><span class="ar-kicker">Français</span><h2>${arEsc(c[1])}</h2><p>${arEsc(c[2])}</p></div>
+       <div class="ar-face back"><span class="ar-kicker">Meaning</span><h2>${arEsc(c[1])}</h2><p>${arEsc(c[2])}</p></div>
      </div></div>
      <div class="ar-inrow" style="justify-content:center"><button class="ar-go ghost" data-ar="again">Again</button><button class="ar-go" data-ar="know">I know it</button></div>`)}
 
