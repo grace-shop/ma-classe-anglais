@@ -10975,6 +10975,23 @@ mdUseSelfie=function(c,blob){
 render();
 loadThree();
 </script>
+<style id="ui-future">
+.ai-b,.pt-bub{position:relative;border-radius:22px!important;background:linear-gradient(145deg,rgba(30,37,88,.94),rgba(12,16,42,.94))!important;border:1px solid rgba(94,234,212,.22)!important;box-shadow:0 14px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.06),0 0 26px rgba(94,234,212,.09)!important;backdrop-filter:blur(12px);transition:transform .2s ease}
+.ai-b:hover,.pt-bub:hover{transform:translateY(-2px)}
+.ai-b.u,.pt-row.me .pt-bub{background:linear-gradient(135deg,#5EEAD4 0%,#60A5FA 55%,#818CF8 100%)!important;border:none!important;color:#06121f!important;box-shadow:0 16px 36px rgba(94,234,212,.28),0 0 30px rgba(96,165,250,.25)!important}
+.pt-auto{display:inline-block;padding:3px 11px;border-radius:999px;font-weight:700;letter-spacing:.03em;color:#C7D2FE;background:linear-gradient(90deg,rgba(129,140,248,.28),rgba(94,234,212,.18));border:1px solid rgba(129,140,248,.45);box-shadow:0 0 14px rgba(129,140,248,.25)}
+.v4rxrow{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(10,14,36,.88);backdrop-filter:blur(16px);border:1px solid rgba(94,234,212,.28);box-shadow:0 16px 42px rgba(0,0,0,.5),0 0 30px rgba(94,234,212,.16)}
+.v4rxrow button{transition:transform .2s cubic-bezier(.2,.9,.3,1.5),filter .2s}
+.v4rxrow button:hover{transform:translateY(-5px) scale(1.25);filter:drop-shadow(0 6px 10px rgba(94,234,212,.45))}
+.v4rxrow button[aria-pressed="true"]{transform:scale(1.2);filter:drop-shadow(0 0 10px rgba(94,234,212,.7))}
+.v4rxmore{position:relative}
+.v4rxmore summary{list-style:none;cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:22px;font-weight:700;color:#5EEAD4;background:linear-gradient(145deg,rgba(94,234,212,.22),rgba(129,140,248,.18));border:1px solid rgba(94,234,212,.45);box-shadow:0 0 16px rgba(94,234,212,.3)}
+.v4rxmore summary::-webkit-details-marker{display:none}
+.v4rxmore[open] .v4grid{position:absolute;bottom:calc(100% + 12px);right:0;width:min(290px,80vw);max-height:230px;overflow:auto;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:10px;border-radius:20px;background:rgba(10,14,36,.97);border:1px solid rgba(94,234,212,.3);box-shadow:0 22px 50px rgba(0,0,0,.6),0 0 40px rgba(129,140,248,.25);z-index:50}
+.v4rxmore[open] .v4grid button{font-size:22px;background:none;border:0;border-radius:12px;padding:4px;cursor:pointer;transition:transform .15s,background .15s}
+.v4rxmore[open] .v4grid button:hover{transform:scale(1.25);background:rgba(94,234,212,.12)}
+.fsv-top,.fsv-bot{background:linear-gradient(180deg,rgba(6,9,24,.75),transparent)!important;backdrop-filter:blur(6px)}
+.fsv-bot{background:linear-gradient(0deg,rgba(6,9,24,.8),transparent)!important}
 
 .pg-set{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(94,234,212,.15)}
 .pg-time{display:flex;align-items:center;gap:8px;font-weight:600}
@@ -10999,24 +11016,6 @@ loadThree();
 .pg-badge small{opacity:.7}
 .pg-badge.on{opacity:1;border-color:rgba(94,234,212,.5);box-shadow:0 0 22px rgba(94,234,212,.22)}
 .pg-badge.on i{background:linear-gradient(135deg,#5EEAD4,#818CF8);color:#06121f;box-shadow:0 0 16px rgba(94,234,212,.5)}
-
-<style id="ui-future">
-.ai-b,.pt-bub{position:relative;border-radius:22px!important;background:linear-gradient(145deg,rgba(30,37,88,.94),rgba(12,16,42,.94))!important;border:1px solid rgba(94,234,212,.22)!important;box-shadow:0 14px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.06),0 0 26px rgba(94,234,212,.09)!important;backdrop-filter:blur(12px);transition:transform .2s ease}
-.ai-b:hover,.pt-bub:hover{transform:translateY(-2px)}
-.ai-b.u,.pt-row.me .pt-bub{background:linear-gradient(135deg,#5EEAD4 0%,#60A5FA 55%,#818CF8 100%)!important;border:none!important;color:#06121f!important;box-shadow:0 16px 36px rgba(94,234,212,.28),0 0 30px rgba(96,165,250,.25)!important}
-.pt-auto{display:inline-block;padding:3px 11px;border-radius:999px;font-weight:700;letter-spacing:.03em;color:#C7D2FE;background:linear-gradient(90deg,rgba(129,140,248,.28),rgba(94,234,212,.18));border:1px solid rgba(129,140,248,.45);box-shadow:0 0 14px rgba(129,140,248,.25)}
-.v4rxrow{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(10,14,36,.88);backdrop-filter:blur(16px);border:1px solid rgba(94,234,212,.28);box-shadow:0 16px 42px rgba(0,0,0,.5),0 0 30px rgba(94,234,212,.16)}
-.v4rxrow button{transition:transform .2s cubic-bezier(.2,.9,.3,1.5),filter .2s}
-.v4rxrow button:hover{transform:translateY(-5px) scale(1.25);filter:drop-shadow(0 6px 10px rgba(94,234,212,.45))}
-.v4rxrow button[aria-pressed="true"]{transform:scale(1.2);filter:drop-shadow(0 0 10px rgba(94,234,212,.7))}
-.v4rxmore{position:relative}
-.v4rxmore summary{list-style:none;cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:22px;font-weight:700;color:#5EEAD4;background:linear-gradient(145deg,rgba(94,234,212,.22),rgba(129,140,248,.18));border:1px solid rgba(94,234,212,.45);box-shadow:0 0 16px rgba(94,234,212,.3)}
-.v4rxmore summary::-webkit-details-marker{display:none}
-.v4rxmore[open] .v4grid{position:absolute;bottom:calc(100% + 12px);right:0;width:min(290px,80vw);max-height:230px;overflow:auto;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:10px;border-radius:20px;background:rgba(10,14,36,.97);border:1px solid rgba(94,234,212,.3);box-shadow:0 22px 50px rgba(0,0,0,.6),0 0 40px rgba(129,140,248,.25);z-index:50}
-.v4rxmore[open] .v4grid button{font-size:22px;background:none;border:0;border-radius:12px;padding:4px;cursor:pointer;transition:transform .15s,background .15s}
-.v4rxmore[open] .v4grid button:hover{transform:scale(1.25);background:rgba(94,234,212,.12)}
-.fsv-top,.fsv-bot{background:linear-gradient(180deg,rgba(6,9,24,.75),transparent)!important;backdrop-filter:blur(6px)}
-.fsv-bot{background:linear-gradient(0deg,rgba(6,9,24,.8),transparent)!important}
 </style>
 
 <style id="ch-modes">
