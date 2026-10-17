@@ -18,10 +18,8 @@
 #zzPhoto .zzx{position:absolute;top:max(14px,env(safe-area-inset-top,0px));right:14px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(20,24,48,.75);color:#fff;font-size:1.4rem;line-height:1;cursor:pointer;display:grid;place-items:center}
 #zzPhoto .zzcap{position:absolute;left:16px;top:max(24px,env(safe-area-inset-top,0px));color:#C9CEE8;font:600 .9rem Manrope,system-ui,sans-serif;max-width:70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* ---- Classmate photo preview: whole picture visible ---- */
-#docv .docv-img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
-#docv #docvBody{display:grid;place-items:center;min-height:0;flex:1;padding:14px;box-sizing:border-box;overflow:hidden}
-
+/* ---- Classmate photo: the picture is placed by the viewer, not shifted by a centring offset ---- */
+#docvBody.docv-pic .docv-img:not([style*="translate("]){transform:none!important}
 /* ---- Teacher chat ---- */
 #profSheet{background:radial-gradient(120% 60% at 50% -10%,#1F2A66 0%,#0E1330 55%,#080B1C 100%)!important}
 #profSheet .pt-head{background:rgba(14,18,44,.72)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid rgba(140,160,255,.14)!important;padding-top:max(12px,env(safe-area-inset-top,0px))!important;padding-bottom:12px!important}
@@ -44,7 +42,7 @@
 
 /* ---- Phone top bar spans the width ---- */
 @media (max-width:1099px){
-  body header.top{margin:8px 8px 0!important;width:auto!important;max-width:none!important;box-sizing:border-box!important;padding:12px 18px!important;border-radius:22px!important}
+  body header.top{margin:8px 0 0 calc(50% - 50vw + 6px)!important;width:calc(100vw - 12px)!important;max-width:none!important;box-sizing:border-box!important;padding:12px 16px!important;border-radius:22px!important;justify-content:space-between!important;gap:8px}
 }
 `;
   document.head.appendChild(st);
