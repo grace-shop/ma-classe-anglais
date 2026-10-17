@@ -31,7 +31,7 @@ function schDecorate(){
   }
   if(!document.getElementById("f_sched")&&SCH.list.length){
     const w=document.querySelector(".fwhen");
-    if(w) w.insertAdjacentHTML("afterend",`<div class="fsched" id="f_sched">${SCH.list.map(x=>`<div class="fsched-it"><span>⏱ ${esc(new Date(x.created_at).toLocaleString([],{dateStyle:"short",timeStyle:"short"}))} · ${esc(String(x.body||"").slice(0,40)||(x.media?"📷 media":""))}</span><button type="button" class="btn ghost sm" data-fsc="${esc(x.id)}">Cancel</button></div>`).join("")}</div>`);
+    if(w) w.insertAdjacentHTML("afterend",`<div class="fsched" id="f_sched">${SCH.list.map(x=>`<div class="fsched-it"><span>⏱ ${esc(new Date(x.created_at).toLocaleString("en-GB",{dateStyle:"short",timeStyle:"short"}))} · ${esc(String(x.body||"").slice(0,40)||(x.media?"📷 media":""))}</span><button type="button" class="btn ghost sm" data-fsc="${esc(x.id)}">Cancel</button></div>`).join("")}</div>`);
   }
   schLoad(false);
 }
@@ -64,7 +64,7 @@ document.addEventListener("click",async e=>{
     const id=await schSB().rpc("schedule_post",{p_body:body||"",p_media:media&&media.length?media:null,p_at:at});
     if(id.error) throw new Error(id.error.message||"Could not schedule");
     delete S.drafts.f_when;
-    toast("Scheduled for "+new Date(at).toLocaleString([],{dateStyle:"short",timeStyle:"short"}),"clock");
+    toast("Scheduled for "+new Date(at).toLocaleString("en-GB",{dateStyle:"short",timeStyle:"short"}),"clock");
     SCH.at=0; schLoad(true);
     return id.data}}
 

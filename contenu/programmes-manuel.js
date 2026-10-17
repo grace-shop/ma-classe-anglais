@@ -975,7 +975,7 @@ Heroes **are remembered** by the nation.
 
 **Skill: discussion.** Model sentences: Patriotism means working for the nation. In my opinion, paying taxes is a patriotic act.
 
-**Skill: translation.** FR: Le drapeau est hisse chaque matin devant l'ecole. EN: The flag is raised every morning in front of the school.
+**Skill: rewriting.** Model: The flag is raised every morning in front of the school. Rewrite the sentence in the past tense.
 
 **Skill: formal letter.** Dear Sir, I am writing to suggest that the school celebrate National Day with a parade. Yours faithfully,
 
@@ -1604,7 +1604,7 @@ She has a degree, yet she was not hired.
 She works at night **so that** she can care for her children.
 **While** men dominate some sectors, women are growing in others.
 
-**Skill: translating a passage.** FR: Les femmes entrepreneures creent des emplois dans leur quartier. EN: Women entrepreneurs create jobs in their neighbourhood.
+**Skill: rewriting.** Model: Women entrepreneurs create jobs in their neighbourhood. Rewrite the sentence in the passive voice.
 
 **Skill: debating.** Model sentence: Women should have the same opportunities as men, because talent has no gender.
 
@@ -1874,21 +1874,21 @@ to protect | to keep safe | We must protect our rivers.
 awareness | knowledge and understanding of a problem | Awareness campaigns help people change.`,
 hw:{t:"A polluted river",b:"Write a paragraph of 6 sentences about a polluted river. Use at least two passive sentences and one superlative."}},
 {c:"1re",u:6,lv:"B1",t:"Hunting and National Parks",th:"Wildlife and national parks",g:"Question tags",
-body:`Les parcs nationaux protegent les animaux et les plantes. Dans cette lecon, on parle de la **chasse**, des **parcs** et des especes menacees.
+body:`National parks protect animals and plants. In this lesson, we talk about **hunting**, **parks** and endangered species.
 
-**Vocabulary** (mots et expressions) :
-**wildlife** (faune sauvage) ; **flora** (flore) ; **fauna** (faune) ; **national park** (parc national) ; **to hunt** (chasser) ; **poaching** (braconnage) ; **endangered species** (especes menacees) ; **to protect** (proteger) ; **ranger** (garde forestier) ; **to fine** (infliger une amende) ; **ban** (interdiction) ; **to survive** (survivre).
+**Vocabulary** (words and expressions):
+**wildlife** (animals and plants living in nature) ; **flora** (the plants of a region) ; **fauna** (the animals of a region) ; **national park** (a large protected area of nature) ; **to hunt** (to chase and kill wild animals) ; **poaching** (illegal hunting) ; **endangered species** (animals or plants at risk of disappearing) ; **to protect** (to keep someone or something safe from harm) ; **ranger** (a person who guards a park) ; **to fine** (to make someone pay money as a punishment) ; **ban** (an official rule that forbids something) ; **to survive** (to stay alive).
 
-**Grammar : Question tags.** On ajoute une petite question a la fin d'une phrase. Si la phrase est affirmative, la question tag est negative. Si elle est negative, elle est affirmative. On reprend le verbe auxiliaire et le sujet (pronom).
-The park is protected, **isn't it?** (Le parc est protege, n'est-ce pas ?)
-They don't hunt in the park, **do they?** (Ils ne chassent pas dans le parc, n'est-ce pas ?)
+**Grammar: Question tags.** We add a short question at the end of a sentence. If the sentence is positive, the question tag is negative. If the sentence is negative, the question tag is positive. We repeat the auxiliary verb and the subject (pronoun).
+The park is protected, **isn't it?**
+They don't hunt in the park, **do they?**
 You can see elephants here, **can't you?**
-Let's go to the park, **shall we?** (Allons au parc, d'accord ?)
-I am late, **aren't I?** (Je suis en retard, non ?)
+Let's go to the park, **shall we?**
+I am late, **aren't I?**
 
-**Skill : speaking and writing.** Un garde forestier demande a un touriste : You didn't see the lions yesterday, did you? Le touriste repond : No, we didn't, but we saw many birds.
+**Skill: speaking and writing.** A ranger asks a tourist: You didn't see the lions yesterday, did you? The tourist answers: No, we didn't, but we saw many birds.
 
-**Final activity.** Ecris un court dialogue de 6 lignes entre un garde forestier et un chasseur. Utilise au moins quatre question tags.`,
+**Final activity.** Write a short dialogue of 6 lines between a ranger and a hunter. Use at least four question tags.`,
 quiz:`The park is protected, ___?
 * isn't it
 - is it
@@ -1919,57 +1919,57 @@ You won't kill the animals, ___?
 - won't you
 - do you
 
-What does « poaching » mean ?
-* braconnage
-- garde forestier
-- parc
+What does "poaching" mean?
+* illegal hunting
+- the work of a park guard
+- a type of national park
 
-What does « endangered species » mean ?
-* especes menacees
-- especes nouvelles
-- animaux domestiques
+What does "endangered species" mean?
+* animals or plants at risk of disappearing
+- new kinds of animals
+- domestic animals
 
 He is a good ranger, ___?
 = isn't he
 
-Choose the right word : The ___ must protect the animals in the park.
+Choose the right word: The ___ must protect the animals in the park.
 * ranger
 - ban
 - flora`,
-deck:`wildlife | faune sauvage | Wildlife needs protected areas.
-flora | flore | The flora of the park is rich.
-fauna | faune | The fauna includes many birds.
-national park | parc national | Togo has several national parks.
-to hunt | chasser | Hunting is banned in the park.
-poaching | braconnage | Poaching threatens the elephants.
-endangered species | especes menacees | The leopard is an endangered species.
-ranger | garde forestier | The ranger patrols the park every morning.
-to fine | infliger une amende | They were fined for hunting.
-ban | interdiction | The government put a ban on hunting.
-to survive | survivre | Animals survive when their habitat is safe.`,
-hw:{t:"A visit to the park",b:"Ecris 6 phrases sur une visite dans un parc national. Utilise au moins trois question tags differents."}},
+deck:`wildlife | animals and plants living in nature | Wildlife needs protected areas.
+flora | the plants of a region | The flora of the park is rich.
+fauna | the animals of a region | The fauna includes many birds.
+national park | a large protected area of nature | Togo has several national parks.
+to hunt | to chase and kill wild animals | Hunting is banned in the park.
+poaching | illegal hunting | Poaching threatens the elephants.
+endangered species | animals or plants at risk of disappearing | The leopard is an endangered species.
+ranger | a person who guards a park | The ranger patrols the park every morning.
+to fine | to make someone pay money as a punishment | They were fined for hunting.
+ban | an official rule that forbids something | The government put a ban on hunting.
+to survive | to stay alive | Animals survive when their habitat is safe.`,
+hw:{t:"A visit to the park",b:"Write 6 sentences about a visit to a national park. Use at least three different question tags."}},
 {c:"1re",u:7,lv:"B1",t:"The Internet",th:"The Internet and technology",g:"Gerund and infinitive; comparative of superiority; parallel comparative",
-body:`Internet a change notre facon de vivre, d'apprendre et de travailler. Dans cette lecon, on parle d'**Internet**, de ses avantages et de ses dangers.
+body:`The Internet has changed the way we live, learn and work. In this lesson, we talk about **the Internet**, its advantages and its dangers.
 
-**Vocabulary** (mots et expressions) :
-**website** (site web) ; **to browse** (naviguer) ; **search engine** (moteur de recherche) ; **to download** (telecharger) ; **connection** (connexion) ; **device** (appareil) ; **online** (en ligne) ; **to upload** (mettre en ligne) ; **social network** (reseau social) ; **privacy** (vie privee) ; **to access** (acceder a) ; **impact** (impact).
+**Vocabulary** (words and expressions):
+**website** (a set of pages on the Internet) ; **to browse** (to look at websites and pages) ; **search engine** (a tool that finds information online) ; **to download** (to copy a file from the Internet to your device) ; **connection** (the link that lets a device go online) ; **device** (a machine such as a phone or a computer) ; **online** (connected to the Internet) ; **to upload** (to put a file on the Internet) ; **social network** (a website where people share and talk) ; **privacy** (the right to keep personal information secret) ; **to access** (to get to something) ; **impact** (an effect on someone or something).
 
-**Grammar 1 : Gerund and infinitive.** Certains verbes sont suivis du **gerund** (verbe + -ing) : **enjoy, avoid, stop, finish, suggest**. D'autres sont suivis de **to + infinitive** : **want, decide, hope, learn, agree**.
-I enjoy **browsing** the internet. (J'aime naviguer sur internet.)
-She decided **to buy** a new phone. (Elle a decide d'acheter un nouveau telephone.)
-They avoid **sharing** their passwords. (Ils evitent de partager leurs mots de passe.)
+**Grammar 1: Gerund and infinitive.** Some verbs are followed by the **-ing form** (the gerund): **enjoy, avoid, stop, finish, suggest**. Others are followed by **to + infinitive**: **want, decide, hope, learn, agree**.
+I enjoy **browsing** the Internet.
+She decided **to buy** a new phone.
+They avoid **sharing** their passwords.
 
-**Grammar 2 : Comparative of superiority.** Adjectif court : **adjective + -er + than**. Adjectif long : **more + adjective + than**.
-The internet is **faster than** the old connection. (Internet est plus rapide que l'ancienne connexion.)
-Online news is **more popular than** printed newspapers. (Les infos en ligne sont plus populaires que les journaux papier.)
+**Grammar 2: Comparative of superiority.** Short adjective: **adjective + -er + than**. Long adjective: **more + adjective + than**.
+The Internet is **faster than** the old connection.
+Online news is **more popular than** printed newspapers.
 
-**Grammar 3 : Parallel comparative.** On compare deux choses qui changent ensemble : **The + comparative, the + comparative**.
-**The more** you use the internet, **the more** you need to protect your privacy. (Plus tu utilises internet, plus tu dois proteger ta vie privee.)
-**The faster** the connection, **the better** the video. (Plus la connexion est rapide, meilleure est la video.)
+**Grammar 3: Parallel comparative.** We compare two things that change together: **The + comparative, the + comparative**.
+**The more** you use the Internet, **the more** you need to protect your privacy.
+**The faster** the connection, **the better** the video.
 
-**Skill : model text.** Some people think that the internet makes students lazy. Others believe that it gives access to knowledge. In my opinion, it is a useful tool if we use it wisely.
+**Skill: model text.** Some people think that the Internet makes students lazy. Others believe that it gives access to knowledge. In my opinion, it is a useful tool if we use it wisely.
 
-**Final activity.** Ecris un paragraphe de 6 phrases sur l'internet dans ta ville. Utilise un gerondif, une comparaison et une comparaison parallele.`,
+**Final activity.** Write a paragraph of 6 sentences about the Internet in your town. Use a gerund, a comparison and a parallel comparison.`,
 quiz:`I enjoy ___ new music online.
 * listening to
 - to listen
@@ -1985,7 +1985,7 @@ They avoid ___ their passwords.
 - to share
 - shares
 
-The internet is ___ than the old connection.
+The Internet is ___ than the old connection.
 * faster
 - more fast
 - fastest
@@ -1995,61 +1995,61 @@ Online news is ___ than printed newspapers.
 - popularer
 - most popular
 
-___ you use the internet, ___ you need to protect your privacy.
+___ you use the Internet, ___ you need to protect your privacy.
 * The more / the more
 - More / more
 - The most / the most
 
-What does « to download » mean ?
-* telecharger
-- televerser
-- naviguer
+What does "to download" mean?
+* to copy a file from the Internet to your device
+- to send a file from your device
+- to look at a website
 
-What does « privacy » mean ?
-* vie privee
-- publicite
-- connexion
+What does "privacy" mean?
+* the right to keep personal information secret
+- advertising
+- a fast connection
 
 This phone is ___ expensive than the old one. (use the comparative)
 = more
 
-Choose the right word : A ___ is a device to visit websites.
+Choose the right word: A ___ is a device to visit websites.
 * browser
 - privacy
 - impact`,
-deck:`website | site web | This website gives free lessons.
-to browse | naviguer | I browse the web after school.
-search engine | moteur de recherche | A search engine finds information quickly.
-to download | telecharger | You can download the lesson for free.
-connection | connexion | The connection is slow in my village.
-device | appareil | A phone is a useful device.
-online | en ligne | We learn online every Monday.
-to upload | mettre en ligne | She uploaded her video yesterday.
-social network | reseau social | Social networks are very popular.
-privacy | vie privee | Protect your privacy on the internet.
-to access | acceder a | Students access the library online.
-impact | impact | The internet has a big impact on education.`,
-hw:{t:"Internet at school",b:"Ecris 6 phrases sur l'internet a l'ecole. Utilise au moins un gerondif, une comparaison et une comparaison parallele."}},
+deck:`website | a set of pages on the Internet | This website offers free lessons.
+to browse | to look at websites and pages | I browse the web after school.
+search engine | a tool that finds information online | A search engine finds information quickly.
+to download | to copy a file from the Internet to your device | You can download the lesson for free.
+connection | the link that lets a device go online | The connection is slow in my village.
+device | a machine such as a phone or a computer | A phone is a useful device.
+online | connected to the Internet | We learn online every Monday.
+to upload | to put a file on the Internet | She uploaded her video yesterday.
+social network | a website where people share and talk | Social networks are very popular.
+privacy | the right to keep personal information secret | Protect your privacy on the Internet.
+to access | to get to something | Students access the library online.
+impact | an effect on someone or something | The Internet has a big impact on education.`,
+hw:{t:"The Internet at school",b:"Write 6 sentences about the Internet at school. Use at least one gerund, one comparison and one parallel comparison."}},
 {c:"1re",u:8,lv:"B1",t:"Cybercrime",th:"Cybercrime and online safety",g:"Gerund and infinitive (revision); comparative of superiority; parallel comparative",
-body:`La **cybercriminalite** designe les crimes commis avec un ordinateur ou un telephone : vols de donnees, arnaques, fausses informations. Dans cette lecon, on apprend a se proteger.
+body:`**Cybercrime** means crimes committed with a computer or a phone: data theft, scams and false information. In this lesson, we learn how to protect ourselves.
 
-**Vocabulary** (mots et expressions) :
-**cybercrime** (cybercriminalite) ; **hacker** (pirate informatique) ; **scam** (arnaque) ; **fraud** (fraude) ; **stolen** (vole) ; **password** (mot de passe) ; **to report** (signaler) ; **victim** (victime) ; **to scam** (arnaquer) ; **security** (securite) ; **virus** (virus) ; **to block** (bloquer).
+**Vocabulary** (words and expressions):
+**cybercrime** (crime committed online or with a computer) ; **hacker** (a person who breaks into computer systems) ; **scam** (a trick to steal money or information) ; **fraud** (the crime of cheating someone to get money) ; **stolen** (taken without permission) ; **password** (a secret word that protects an account) ; **to report** (to tell the authorities about a problem) ; **victim** (a person who is harmed by a crime) ; **to scam** (to trick someone in order to steal from them) ; **security** (protection against danger) ; **virus** (a harmful program that damages a computer) ; **to block** (to stop someone or something from reaching you).
 
-**Grammar 1 : Gerund and infinitive.** Apres **avoid, deny, suggest, finish** on met le gerondif. Apres **promise, refuse, plan, learn** on met **to + infinitive**.
-Never give your password, and avoid **clicking** on strange links. (Ne donne jamais ton mot de passe et evite de cliquer sur des liens etranges.)
-He refused **to pay** the money to the scammer. (Il a refuse de payer l'arnaqueur.)
+**Grammar 1: Gerund and infinitive.** After **avoid, deny, suggest, finish** we use the gerund. After **promise, refuse, plan, learn** we use **to + infinitive**.
+Never give your password, and avoid **clicking** on strange links.
+He refused **to pay** the money to the scammer.
 
-**Grammar 2 : Comparative of superiority.** **More dangerous than**, **safer than**, **bigger than**.
-Online fraud is **more dangerous than** you think. (La fraude en ligne est plus dangereuse que tu ne le penses.)
-A strong password is **safer than** a short one. (Un mot de passe fort est plus sur qu'un mot de passe court.)
+**Grammar 2: Comparative of superiority.** **More dangerous than**, **safer than**, **bigger than**.
+Online fraud is **more dangerous than** you think.
+A strong password is **safer than** a short one.
 
-**Grammar 3 : Parallel comparative.** **The more careful you are, the less you risk.** (Plus tu es prudent, moins tu risques.)
+**Grammar 3: Parallel comparative.** **The more careful you are, the less you risk.**
 **The longer** the password, **the stronger** it is.
 
-**Skill : reading.** A message says : You have won a prize! Send us your bank code. This is a scam. Real companies never ask for your password by message.
+**Skill: reading.** A message says: You have won a prize! Send us your bank code. This is a scam. Real companies never ask for your password by message.
 
-**Final activity.** Ecris une affiche de 5 phrases pour sensibiliser les eleves a la cybercriminalite. Utilise un gerondif, une comparaison et une comparaison parallele.`,
+**Final activity.** Write a poster of 5 sentences to make students aware of cybercrime. Use a gerund, a comparison and a parallel comparison.`,
 quiz:`He suggested ___ the link before you click.
 * checking
 - to check
@@ -2080,54 +2080,54 @@ ___ the password, ___ the account is safe.
 - Longer / safer
 - The more / the most
 
-What does « scam » mean ?
-* arnaque
-- virus
-- victime
+What does "scam" mean?
+* a trick to steal money or information
+- a computer virus
+- a victim
 
-What does « to block » mean ?
-* bloquer
-- signaler
-- proteger
+What does "to block" mean?
+* to stop someone from reaching you
+- to report a problem
+- to protect someone
 
 Online fraud is ___ dangerous than a simple virus. (use the comparative)
 = more
 
-Choose the right word : A person who attacks computers is a ___.
+Choose the right word: A person who attacks computers is a ___.
 * hacker
 - victim
 - password`,
-deck:`cybercrime | cybercriminalite | Cybercrime costs millions every year.
-hacker | pirate informatique | The hacker stole the data.
-scam | arnaque | Do not answer a scam message.
-fraud | fraude | The fraud was discovered by the bank.
-stolen | vole | The phone was stolen at the market.
-password | mot de passe | Choose a strong password.
-to report | signaler | Report the scam to the police.
-victim | victime | The victim lost her money.
-security | securite | Online security is important.
-virus | virus | The virus deleted my files.
-to block | bloquer | Block the number of the scammer.
-to scam | arnaquer | They tried to scam us by phone.`,
-hw:{t:"Stay safe online",b:"Ecris 6 phrases de conseils pour rester en securite sur internet. Utilise au moins deux gerondifs et une comparaison."}},
+deck:`cybercrime | crime committed with a computer or a phone | Cybercrime costs millions every year.
+hacker | a person who breaks into computer systems | The hacker stole the data.
+scam | a trick to steal money or information | Do not answer a scam message.
+fraud | cheating someone to get money illegally | The fraud was discovered by the bank.
+stolen | taken without permission | The phone was stolen at the market.
+password | a secret word that protects an account | Choose a strong password.
+to report | to tell the authorities about a problem | Report the scam to the police.
+victim | a person who is harmed by a crime | The victim lost her money.
+security | protection against danger | Online security is important.
+virus | a harmful program that damages a computer | The virus deleted my files.
+to block | to stop someone from contacting you | Block the number of the scammer.
+to scam | to trick someone in order to steal from them | They tried to scam us by phone.`,
+hw:{t:"Stay safe online",b:"Write 6 sentences giving advice on how to stay safe on the Internet. Use at least two gerunds and one comparison."}},
 {c:"tle",u:1,lv:"B2",t:"Democracy in the USA",th:"Democracy and the American system",g:"Tenses in English; subordinating conjunctions",
-body:`La democratie americaine repose sur une constitution, trois pouvoirs et des elections regulieres. Dans cette lecon, on etudie le **systeme democratique des Etats-Unis** et ses debats.
+body:`American democracy is based on a constitution, three branches of power and regular elections. In this lesson, we study **the democratic system of the United States** and its debates.
 
-**Vocabulary** (mots et expressions) :
-**democracy** (democratie) ; **constitution** (constitution) ; **congress** (congres) ; **president** (president) ; **election** (election) ; **vote** (vote) ; **separation of powers** (separation des pouvoirs) ; **checks and balances** (controles et contrepoids) ; **citizen** (citoyen) ; **to elect** (elire) ; **rights** (droits) ; **freedom of speech** (liberte d'expression).
+**Vocabulary** (words and expressions):
+**democracy** (a system where citizens choose their leaders) ; **constitution** (the basic laws of a country) ; **congress** (the national law-making body of the USA) ; **president** (the head of state of the USA) ; **election** (an official vote to choose leaders) ; **vote** (a choice made by a citizen) ; **separation of powers** (dividing government into separate branches) ; **checks and balances** (systems that stop one branch from having too much power) ; **citizen** (a person with rights in a country) ; **to elect** (to choose someone by vote) ; **rights** (things everyone is allowed to have or do) ; **freedom of speech** (the right to express your opinions).
 
-**Grammar 1 : Tenses in English.** Revoir le present simple (habitudes), le present perfect (experience et resultat), le past simple (faits passes) et le past perfect (avant un autre fait passe).
-Americans **vote** every four years. (Les Americains votent tous les quatre ans.)
-The Constitution **has guided** the country since 1787. (La Constitution guide le pays depuis 1787.)
+**Grammar 1: Tenses in English.** Revise the present simple (habits), the present perfect (experience and result), the past simple (past facts) and the past perfect (before another past event).
+Americans **vote** every four years.
+The Constitution **has guided** the country since 1787.
 The president **was elected** before the crisis began. Before the vote, the candidates **had debated** for weeks.
 
-**Grammar 2 : Subordinating conjunctions.** Ils relient une proposition principale a une subordonnee : **although, because, while, unless, whereas, since, until**.
-**Although** the system is old, it still works. (Bien que le systeme soit ancien, il fonctionne encore.)
-Citizens can criticise the government **because** freedom of speech is protected. (Les citoyens peuvent critiquer le gouvernement parce que la liberte d'expression est protegee.)
+**Grammar 2: Subordinating conjunctions.** They link a main clause to a subordinate clause: **although, because, while, unless, whereas, since, until**.
+**Although** the system is old, it still works.
+Citizens can criticise the government **because** freedom of speech is protected.
 
-**Skill : reading.** The American democracy has strengths : free elections, a strong constitution and a free press. It also has weaknesses : money can influence campaigns, and some citizens do not vote.
+**Skill: reading.** American democracy has strengths: free elections, a strong constitution and a free press. It also has weaknesses: money can influence campaigns, and some citizens do not vote.
 
-**Final activity.** Ecris un paragraphe de 8 phrases sur les forces et les faiblesses de la democratie americaine. Utilise deux conjonctions de subordination.`,
+**Final activity.** Write a paragraph of 8 sentences on the strengths and weaknesses of American democracy. Use two subordinating conjunctions.`,
 quiz:`Americans ___ their president every four years.
 * elect
 - are electing
@@ -2153,50 +2153,50 @@ Citizens can vote ___ they are registered.
 - although
 - whereas
 
-What does « democracy » mean ?
-* democratie
-- monarchie
-- dictature
+What does "democracy" mean?
+* a system where citizens choose their leaders
+- a system ruled by one king
+- a system ruled by the army
 
-What does « checks and balances » mean ?
-* controles et contrepoids
-- equilibre des budgets
-- contrats
+What does "checks and balances" mean?
+* systems that stop one branch from having too much power
+- a balanced budget
+- a type of contract
 
 The president has been ___ twice. (elect)
 = elected
 
-Choose the right word : The ___ is the document that organises the state.
+Choose the right word: The ___ is the document that organises the state.
 * constitution
 - vote
 - congress`,
-deck:`democracy | democratie | Democracy gives citizens a voice.
-constitution | constitution | The constitution protects basic rights.
-congress | congres | The congress passes the laws.
-president | president | The president leads the executive branch.
-election | election | The election takes place every four years.
-vote | vote | Every adult can vote.
-separation of powers | separation des pouvoirs | The separation of powers limits abuse.
-checks and balances | controles et contrepoids | Checks and balances protect democracy.
-citizen | citoyen | Each citizen has rights.
-to elect | elire | They elect their leaders.
-rights | droits | Human rights must be respected.
-freedom of speech | liberte d'expression | Freedom of speech is essential.`,
-hw:{t:"My view of democracy",b:"Ecris 8 phrases sur la democratie dans ton pays. Utilise au moins un present perfect et deux conjonctions de subordination."}},
+deck:`democracy | a system where citizens choose their leaders | Democracy gives citizens a voice.
+constitution | the basic laws of a country | The constitution protects basic rights.
+congress | the national law-making body of the USA | The Congress passes the laws.
+president | the head of state of the USA | The president leads the executive branch.
+election | an official vote to choose leaders | The election takes place every four years.
+vote | a choice made by a citizen in an election | Every adult can vote.
+separation of powers | dividing government into separate branches | The separation of powers limits abuse.
+checks and balances | systems that stop one branch from having too much power | Checks and balances protect democracy.
+citizen | a person with rights in a country | Each citizen has rights.
+to elect | to choose someone by vote | They elect their leaders.
+rights | things everyone is allowed to have or do | Human rights must be respected.
+freedom of speech | the right to express your opinions | Freedom of speech is essential.`,
+hw:{t:"My view of democracy",b:"Write 8 sentences about democracy in your country. Use at least one present perfect and two subordinating conjunctions."}},
 {c:"tle",u:2,lv:"B2",t:"Different Political Regimes",th:"Political regimes compared",g:"Subordinating conjunctions (revision); tenses in English",
-body:`Il existe plusieurs types de regimes politiques : la **democratie**, la **monarchie**, la **dictature** et le **regime parlementaire** ou **presidentiel**. Dans cette lecon, on compare leurs caracteristiques.
+body:`There are several types of political regime: **democracy**, **monarchy**, **dictatorship**, and the **parliamentary** or **presidential** system. In this lesson, we compare their features.
 
-**Vocabulary** (mots et expressions) :
-**monarchy** (monarchie) ; **dictatorship** (dictature) ; **republic** (republique) ; **parliament** (parlement) ; **prime minister** (premier ministre) ; **opposition** (opposition) ; **coup d'etat** (coup d'etat) ; **to rule** (gouverner) ; **term of office** (mandat) ; **to overthrow** (renverser) ; **censorship** (censure) ; **stability** (stabilite).
+**Vocabulary** (words and expressions):
+**monarchy** (a state ruled by a king or queen) ; **dictatorship** (a system where one person rules with total power) ; **republic** (a state led by an elected head, not a king) ; **parliament** (the group of elected people who make the laws) ; **prime minister** (the head of government in many countries) ; **opposition** (the political parties that are not in power) ; **coup d'etat** (a sudden seizure of power, often by the army) ; **to rule** (to govern a country) ; **term of office** (the period a leader serves) ; **to overthrow** (to remove a leader from power by force) ; **censorship** (control of what can be published or said) ; **stability** (a state where things stay calm and steady).
 
-**Grammar : Subordinating conjunctions (revision).** Utiliser **whereas** pour opposer deux faits, **unless** pour une condition negative, **until** pour une duree, **as long as** pour une condition.
-In a monarchy, the king rules for life, **whereas** in a republic, the president has a fixed term. (Dans une monarchie, le roi regne a vie, alors que dans une republique, le president a un mandat fixe.)
-The government will stay in power **until** the next election. (Le gouvernement restera au pouvoir jusqu'aux prochaines elections.)
-You cannot criticise the leader **unless** the law allows it. (Tu ne peux pas critiquer le chef, sauf si la loi le permet.)
+**Grammar: Subordinating conjunctions (revision).** Use **whereas** to contrast two facts, **unless** for a negative condition, **until** for a period of time, and **as long as** for a condition.
+In a monarchy, the king rules for life, **whereas** in a republic, the president has a fixed term.
+The government will stay in power **until** the next election.
+You cannot criticise the leader **unless** the law allows it.
 
-**Skill : summarising.** A passage describes a country where the army took power and newspapers were closed. Summarise it in three sentences.
+**Skill: summarising.** A text describes a country where the army took power and newspapers were closed. Summarise it in three sentences.
 
-**Final activity.** Compare un regime democratique et une dictature en 8 phrases. Utilise whereas et unless.`,
+**Final activity.** Compare a democratic regime and a dictatorship in 8 sentences. Use whereas and unless.`,
 quiz:`In a monarchy, the king rules for life, ___ in a republic the president has a term.
 * whereas
 - unless
@@ -2217,50 +2217,50 @@ A military ___ can overthrow a government.
 - vote
 - election
 
-What does « censorship » mean ?
-* censure
-- liberte
-- election
+What does "censorship" mean?
+* control of what can be published or said
+- freedom
+- an election
 
-What does « opposition » mean ?
-* opposition politique
-- armee
-- gouvernement
+What does "opposition" mean?
+* the political parties that are not in power
+- the army
+- the government
 
-What is the opposite of « democracy » (one word)?
+What is the opposite of "democracy" (one word)?
 = dictatorship
 
-Choose the right word : The ___ leads the government in many parliamentary systems.
+Choose the right word: The ___ leads the government in many parliamentary systems.
 * prime minister
 - senator
 - citizen`,
-deck:`monarchy | monarchie | Britain has a monarchy with a parliament.
-dictatorship | dictature | A dictatorship allows no free elections.
-republic | republique | Togo is a republic.
-parliament | parlement | The parliament votes the laws.
-prime minister | premier ministre | The prime minister leads the government.
-opposition | opposition | The opposition criticises the government.
-coup d'etat | coup d'etat | The coup d'etat ended the elections.
-to rule | gouverner | The king rules the country.
-term of office | mandat | Her term of office lasts five years.
-to overthrow | renverser | The people overthrew the leader.
-censorship | censure | Censorship limits the freedom of the press.
-stability | stabilite | Political stability attracts investors.`,
-hw:{t:"Comparing two regimes",b:"Ecris 8 phrases comparant une monarchie et une republique. Utilise whereas et until."}},
+deck:`monarchy | a state ruled by a king or queen | Britain has a monarchy with a parliament.
+dictatorship | a system where one person rules with total power | A dictatorship allows no free elections.
+republic | a state led by an elected head, not a king | Togo is a republic.
+parliament | the group of elected people who make the laws | The parliament votes the laws.
+prime minister | the head of government in many countries | The prime minister leads the government.
+opposition | the political parties that are not in power | The opposition criticises the government.
+coup d'etat | a sudden seizure of power, often by the army | The coup d'etat ended the elections.
+to rule | to govern a country | The king rules the country.
+term of office | the period a leader serves | Her term of office lasts five years.
+to overthrow | to remove a leader from power by force | The people overthrew the leader.
+censorship | control of what can be published or said | Censorship limits the freedom of the press.
+stability | a state where things stay calm and steady | Political stability attracts investors.`,
+hw:{t:"Comparing two regimes",b:"Write 8 sentences comparing a monarchy and a republic. Use whereas and until."}},
 {c:"tle",u:3,lv:"B2",t:"Women's Role in Entrepreneurship",th:"Women and business",g:"Conditional sentences (revision); subordinating conjunctions",
-body:`De plus en plus de femmes creent leur entreprise. Dans cette lecon, on etudie le **role des femmes dans l'entrepreneuriat**, les obstacles et les reussites.
+body:`More and more women are starting their own businesses. In this lesson, we study **the role of women in entrepreneurship**, the obstacles they face and their successes.
 
-**Vocabulary** (mots et expressions) :
-**entrepreneur** (entrepreneur) ; **business** (entreprise, affaires) ; **to launch** (lancer) ; **loan** (pret) ; **investor** (investisseur) ; **profit** (benefice) ; **to succeed** (reussir) ; **obstacle** (obstacle) ; **shop owner** (commercante) ; **to employ** (employer) ; **training** (formation) ; **credit** (credit).
+**Vocabulary** (words and expressions):
+**entrepreneur** (a person who starts and runs a business) ; **business** (a company, or the activity of buying and selling) ; **to launch** (to start something new) ; **loan** (money that you borrow and must pay back) ; **investor** (a person who puts money into a company) ; **profit** (money earned after costs are paid) ; **to succeed** (to achieve what you want) ; **obstacle** (something that makes progress difficult) ; **shop owner** (a person who runs a shop) ; **to employ** (to give someone a paid job) ; **training** (a course that teaches practical skills) ; **credit** (the possibility to borrow money and pay later).
 
-**Grammar : Conditional sentences (revision).** Type 1 : **if + present, will + verb** (fait probable). Type 2 : **if + past, would + verb** (fait imaginaire). Type 3 : **if + had + past participle, would have + past participle** (regret).
-If she **gets** a loan, she **will open** a shop. (Si elle obtient un pret, elle ouvrira une boutique.)
-If women **had** more access to credit, more businesses **would grow**. (Si les femmes avaient plus acces au credit, davantage d'entreprises se developperaient.)
-If she **had received** training, she **would have succeeded** faster. (Si elle avait recu une formation, elle aurait reussi plus vite.)
+**Grammar: Conditional sentences (revision).** Type 1: **if + present, will + verb** (a probable situation). Type 2: **if + past, would + verb** (an imaginary situation). Type 3: **if + had + past participle, would have + past participle** (a regret).
+If she **gets** a loan, she **will open** a shop.
+If women **had** more access to credit, more businesses **would grow**.
+If she **had received** training, she **would have succeeded** faster.
 
-**Skill : interview.** Interviewer : Why did you start your business ? Entrepreneur : Because I wanted to earn my own money, and I knew many women needed jobs.
+**Skill: interview.** Interviewer: Why did you start your business? Entrepreneur: Because I wanted to earn my own money, and I knew many women needed jobs.
 
-**Final activity.** Ecris une interview de 8 lignes avec une femme entrepreneur. Utilise une phrase de chaque type conditionnel.`,
+**Final activity.** Write an interview of 8 lines with a woman entrepreneur. Use one sentence of each conditional type.`,
 quiz:`If she ___ a loan, she will open a shop.
 * gets
 - will get
@@ -2281,53 +2281,53 @@ An ___ is a person who creates a business.
 - investor
 - employer
 
-What does « loan » mean ?
-* pret
-- profit
-- credit
+What does "loan" mean?
+* money that you borrow and must pay back
+- money that you earn
+- a salary
 
-What does « profit » mean ?
-* benefice
-- perte
-- salaire
+What does "profit" mean?
+* money earned after costs are paid
+- a loss of money
+- a monthly salary
 
 The city has ___ a lot in ten years. (grow)
 = grown
 
-Choose the right word : A ___ gives money to a company in exchange for shares.
+Choose the right word: A ___ gives money to a company in exchange for shares.
 * investor
 - shop owner
 - trainee`,
-deck:`entrepreneur | entrepreneur | She is a young entrepreneur.
-business | entreprise | Her business sells cloth.
-to launch | lancer | They launched a new product.
-loan | pret | The bank gave her a small loan.
-investor | investisseur | The investor believed in her idea.
-profit | benefice | The profit doubled this year.
-to succeed | reussir | She wants to succeed in business.
-obstacle | obstacle | Lack of credit is an obstacle.
-shop owner | commercante | The shop owner employs three women.
-to employ | employer | The company employs many young people.
-training | formation | Training helps women manage money.
-credit | credit | Access to credit is important.`,
-hw:{t:"A woman in business",b:"Ecris 8 phrases sur une femme qui cree son entreprise. Utilise un conditionnel de type 2 et un de type 3."}},
+deck:`entrepreneur | a person who starts and runs a business | She is a young entrepreneur.
+business | a company that sells goods or services | Her business sells cloth.
+to launch | to start something new | They launched a new product.
+loan | money that you borrow and must pay back | The bank gave her a small loan.
+investor | a person who puts money into a company | The investor believed in her idea.
+profit | money earned after costs are paid | The profit doubled this year.
+to succeed | to achieve what you want | She wants to succeed in business.
+obstacle | something that makes progress difficult | Lack of credit is an obstacle.
+shop owner | a person who runs a shop | The shop owner employs three women.
+to employ | to give someone a paid job | The company employs many young people.
+training | a course that teaches practical skills | Training helps women manage money.
+credit | the possibility to borrow money and pay later | Access to credit is important.`,
+hw:{t:"A woman in business",b:"Write 8 sentences about a woman who starts her own business. Use one type 2 and one type 3 conditional."}},
 {c:"tle",u:4,lv:"B2",t:"Global Warming",th:"Climate change",g:"The use of had better; the use of should and would",
-body:`Le rechauffement climatique augmente la temperature de la planete. Dans cette lecon, on parle des **causes**, des **effets** et des conseils pour agir.
+body:`Global warming is increasing the temperature of the planet. In this lesson, we talk about the **causes**, the **effects** and how we can act.
 
-**Vocabulary** (mots et expressions) :
-**global warming** (rechauffement climatique) ; **greenhouse gas** (gaz a effet de serre) ; **emission** (emission) ; **flood** (inondation) ; **drought** (secheresse) ; **to reduce** (reduire) ; **sea level** (niveau de la mer) ; **to melt** (fondre) ; **climate** (climat) ; **to pollute** (polluer) ; **awareness** (prise de conscience) ; **to recycle** (recycler).
+**Vocabulary** (words and expressions):
+**global warming** (the gradual rise in the Earth's temperature) ; **greenhouse gas** (a gas that traps heat in the atmosphere) ; **emission** (a gas or substance released into the air) ; **flood** (a large amount of water covering land) ; **drought** (a long period without rain) ; **to reduce** (to make something smaller or less) ; **sea level** (the height of the surface of the sea) ; **to melt** (to change from solid to liquid because of heat) ; **climate** (the usual weather of a place over time) ; **to pollute** (to make air, water or soil dirty) ; **awareness** (knowledge and understanding of a problem) ; **to recycle** (to use materials again to make new products).
 
-**Grammar 1 : The use of had better.** **Had better + verbe de base** = il vaut mieux. Ne pas oublier **not** : **had better not**.
-You **had better** reduce your energy use. (Tu ferais mieux de reduire ta consommation d'energie.)
-We **had better not** burn plastic. (Nous ferions mieux de ne pas bruler du plastique.)
+**Grammar 1: The use of had better.** **Had better + base verb** = it would be wise to. Do not forget **not**: **had better not**.
+You **had better** reduce your energy use.
+We **had better not** burn plastic.
 
-**Grammar 2 : The use of should and would.** **Should** = conseil ou obligation morale. **Would** = habitude passee ou demande polie, et dans les conditionnels.
-Governments **should** protect the forests. (Les gouvernements devraient proteger les forets.)
-When I was young, the rivers **would** flood every year. (Quand j'etais jeune, les rivieres inondaient chaque annee.)
+**Grammar 2: The use of should and would.** **Should** = advice or a moral obligation. **Would** = a past habit, a polite request, and in conditionals.
+Governments **should** protect the forests.
+When I was young, the rivers **would** flood every year.
 
-**Skill : speech.** Ladies and gentlemen, global warming is a threat. We had better act now : plant trees, use solar energy and recycle our waste.
+**Skill: speech.** Ladies and gentlemen, global warming is a threat. We had better act now: plant trees, use solar energy and recycle our waste.
 
-**Final activity.** Ecris un discours de 8 phrases sur le rechauffement climatique. Utilise had better et should.`,
+**Final activity.** Write a speech of 8 sentences about global warming. Use had better and should.`,
 quiz:`You ___ reduce your use of plastic.
 * had better
 - had best to
@@ -2350,53 +2350,53 @@ When I was a child, the river ___ flood every year.
 
 The ___ is rising every year.
 * sea level
-- lever
-- lavel
+- sea bird
+- sea salt
 
-What does « emission » mean ?
-* emission
-- inondation
-- secheresse
+What does "emission" mean?
+* a gas or substance released into the air
+- a flood
+- a drought
 
-What does « to recycle » mean ?
-* recycler
-- polluer
-- fondre
+What does "to recycle" mean?
+* to use materials again to make new products
+- to pollute
+- to melt
 
 Use had better: you / take a coat. → You ___ a coat.
 = had better take
 
-Choose the right word : Burning forests produces greenhouse ___.
+Choose the right word: Burning forests produces greenhouse ___.
 * gases
 - floods
 - climates`,
-deck:`global warming | rechauffement climatique | Global warming changes the weather.
-greenhouse gas | gaz a effet de serre | Carbon dioxide is a greenhouse gas.
-emission | emission | Car emissions pollute the air.
-flood | inondation | The flood destroyed the village.
-drought | secheresse | The drought killed the crops.
-to reduce | reduire | We must reduce waste.
-sea level | niveau de la mer | The sea level is rising.
-to melt | fondre | Ice melts in the heat.
-climate | climat | The climate is changing quickly.
-to pollute | polluer | Factories pollute the air.
-awareness | prise de conscience | Awareness is growing among young people.
-to recycle | recycler | We recycle bottles at school.`,
-hw:{t:"Act for the climate",b:"Ecris 6 phrases de conseils pour lutter contre le rechauffement climatique. Utilise had better et should."}},
+deck:`global warming | the gradual rise in the Earth's temperature | Global warming changes the weather.
+greenhouse gas | a gas that traps heat in the atmosphere | Carbon dioxide is a greenhouse gas.
+emission | a gas or substance released into the air | Car emissions pollute the air.
+flood | a large amount of water covering land | The flood destroyed the village.
+drought | a long period without rain | The drought killed the crops.
+to reduce | to make something smaller or less | We must reduce waste.
+sea level | the height of the surface of the sea | The sea level is rising.
+to melt | to change from solid to liquid because of heat | Ice melts in the heat.
+climate | the usual weather of a place over time | The climate is changing quickly.
+to pollute | to make air, water or soil dirty | Factories pollute the air.
+awareness | knowledge and understanding of a problem | Awareness is growing among young people.
+to recycle | to use materials again to make new products | We recycle bottles at school.`,
+hw:{t:"Act for the climate",b:"Write 6 sentences giving advice on how to fight global warming. Use had better and should."}},
 {c:"tle",u:5,lv:"B2",t:"Renewable Energies",th:"Clean energy for Africa",g:"The use of had better; the use of should and would (practice)",
-body:`Les **energies renouvelables** viennent du soleil, du vent, de l'eau et de la biomasse. Dans cette lecon, on etudie leurs avantages pour l'Afrique et les projets qui existent deja.
+body:`**Renewable energy** comes from the sun, the wind, water and biomass. In this lesson, we study its advantages for Africa and the projects that already exist.
 
-**Vocabulary** (mots et expressions) :
-**renewable energy** (energie renouvelable) ; **solar panel** (panneau solaire) ; **wind turbine** (eolienne) ; **hydropower** (energie hydraulique) ; **fuel** (carburant) ; **to generate** (produire) ; **off-grid** (hors reseau) ; **cost** (cout) ; **to store** (stocker) ; **battery** (batterie) ; **sustainable** (durable) ; **investment** (investissement).
+**Vocabulary** (words and expressions):
+**renewable energy** (energy from sources that never run out) ; **solar panel** (a device that turns sunlight into electricity) ; **wind turbine** (a machine that turns wind into electricity) ; **hydropower** (electricity produced by moving water) ; **fuel** (a substance burned to produce energy) ; **to generate** (to produce electricity) ; **off-grid** (not connected to the main electricity network) ; **cost** (the amount of money needed to buy or do something) ; **to store** (to keep energy for later use) ; **battery** (a device that stores electricity) ; **sustainable** (able to continue without harming the environment) ; **investment** (money spent to earn more money later).
 
-**Grammar : The use of had better and should / would (practice).** Utiliser **had better** pour un conseil urgent et **should** pour une recommandation generale. **Would** pour une habitude passee ou une proposition.
-You **had better** install solar panels before the rainy season. (Tu ferais mieux d'installer des panneaux solaires avant la saison des pluies.)
-Villages **should** have access to clean electricity. (Les villages devraient avoir acces a une electricite propre.)
-When the sun shines, the panels **would** produce enough power for the school. (Quand il fait soleil, les panneaux produiraient assez d'electricite pour l'ecole.)
+**Grammar: The use of had better and should / would (practice).** Use **had better** for urgent advice and **should** for general recommendations. Use **would** for a past habit or a suggestion.
+You **had better** install solar panels before the rainy season.
+Villages **should** have access to clean electricity.
+When the sun shines, the panels **would** produce enough power for the school.
 
-**Skill : speech.** A minister says : Solar energy is cheap and sustainable. Our country should invest in wind and solar projects now.
+**Skill: speech.** A minister says: Solar energy is cheap and sustainable. Our country should invest in wind and solar projects now.
 
-**Final activity.** Ecris un texte de 8 phrases sur une energie renouvelable utilisee dans ton village. Utilise had better, should et would.`,
+**Final activity.** Write a text of 8 sentences about a renewable energy used in your village. Use had better, should and would.`,
 quiz:`You ___ check the solar panel before the storm.
 * had better
 - better had
@@ -2417,50 +2417,50 @@ The ___ turns the wind into electricity.
 - solar panel
 - battery
 
-What does « sustainable » mean ?
-* durable
-- cher
+What does "sustainable" mean?
+* able to continue without harming the environment
+- expensive
 - rare
 
-What does « to store » mean ?
-* stocker
-- produire
-- vendre
+What does "to store" mean?
+* to keep energy for later use
+- to produce
+- to sell
 
-Which modal gives strong advice? You ___ drink clean water.
+Which modal gives general advice? You ___ drink clean water.
 = should
 
-Choose the right word : ___ energy comes from the sun, the wind and water.
+Choose the right word: ___ energy comes from the sun, the wind and water.
 * Renewable
 - Fossil
 - Nuclear`,
-deck:`renewable energy | energie renouvelable | Renewable energy is clean.
-solar panel | panneau solaire | The solar panel charges the phone.
-wind turbine | eolienne | The wind turbine stands on the hill.
-hydropower | energie hydraulique | Hydropower comes from the river.
-fuel | carburant | Fuel prices are rising.
-to generate | produire | The dam generates electricity.
-off-grid | hors reseau | Off-grid homes use solar energy.
-cost | cout | The cost of solar panels has fallen.
-to store | stocker | Batteries store the energy.
-battery | batterie | The battery lasts all night.
-sustainable | durable | Sustainable farming protects the soil.
-investment | investissement | This project is a big investment.`,
-hw:{t:"My village and energy",b:"Ecris 6 phrases sur l'energie dans ton village. Utilise had better et should."}},
+deck:`renewable energy | energy from sources that never run out | Renewable energy is clean.
+solar panel | a device that turns sunlight into electricity | The solar panel charges the phone.
+wind turbine | a machine that turns wind into electricity | The wind turbine stands on the hill.
+hydropower | electricity produced by moving water | Hydropower comes from the river.
+fuel | a substance burned to produce energy | Fuel prices are rising.
+to generate | to produce electricity or energy | The dam generates electricity.
+off-grid | not connected to the main electricity network | Off-grid homes use solar energy.
+cost | the amount of money needed to buy something | The cost of solar panels has fallen.
+to store | to keep energy for later use | Batteries store the energy.
+battery | a device that stores electricity | The battery lasts all night.
+sustainable | able to continue without harming the environment | Sustainable farming protects the soil.
+investment | money spent to earn more money later | This project is a big investment.`,
+hw:{t:"My village and energy",b:"Write 6 sentences about energy in your village. Use had better and should."}},
 {c:"tle",u:6,lv:"B2",t:"Farming in Modern Society",th:"Agriculture today",g:"Connectors of contrast and cause (revision); comparatives",
-body:`L'agriculture moderne utilise des machines, des engrais et des techniques nouvelles. Dans cette lecon, on compare l'**agriculture traditionnelle** et l'**agriculture moderne**, puis on parle de l'agriculture biologique.
+body:`Modern farming uses machines, fertilisers and new techniques. In this lesson, we compare **traditional farming** and **modern farming**, and then we talk about organic farming.
 
-**Vocabulary** (mots et expressions) :
-**farming** (agriculture) ; **crop** (culture, recolte) ; **harvest** (recolte) ; **fertiliser** (engrais) ; **irrigation** (irrigation) ; **organic farming** (agriculture biologique) ; **tractor** (tracteur) ; **yield** (rendement) ; **pesticide** (pesticide) ; **livestock** (betail) ; **soil** (sol) ; **to plant** (planter).
+**Vocabulary** (words and expressions):
+**farming** (the work of growing crops and raising animals) ; **crop** (a plant grown for food, such as maize or cassava) ; **harvest** (the gathering of crops when they are ripe) ; **fertiliser** (a substance added to soil to help plants grow) ; **irrigation** (supplying water to crops through channels or pipes) ; **organic farming** (farming without artificial chemicals) ; **tractor** (a vehicle used to plough fields) ; **yield** (the amount of crops produced) ; **pesticide** (a chemical that kills insects or pests) ; **livestock** (animals kept on a farm) ; **soil** (the top layer of earth where plants grow) ; **to plant** (to put seeds or young plants into the ground).
 
-**Grammar : Comparatives and connectors.** Pour comparer : **more / less / as ... as**. Pour opposer : **whereas, while, although**. Pour expliquer : **because, since, as**.
-Modern farming gives a higher yield **than** traditional farming. (L'agriculture moderne donne un rendement plus eleve que l'agriculture traditionnelle.)
-Traditional farming is **less expensive**, **whereas** modern farming needs machines. (L'agriculture traditionnelle coute moins cher, alors que l'agriculture moderne a besoin de machines.)
-Organic farming is **as healthy as** it is productive. (L'agriculture biologique est aussi saine qu'elle est productive.)
+**Grammar: Comparatives and connectors.** To compare: **more / less / as ... as**. To contrast: **whereas, while, although**. To explain: **because, since, as**.
+Modern farming gives a higher yield **than** traditional farming.
+Traditional farming is **less expensive**, **whereas** modern farming needs machines.
+Organic farming is **as healthy as** it is productive.
 
-**Skill : formal letter.** Dear Minister, I am writing to promote organic farming in our region. Organic products are healthier, and they protect the soil.
+**Skill: formal letter.** Dear Minister, I am writing to promote organic farming in our region. Organic products are healthier, and they protect the soil.
 
-**Final activity.** Ecris une lettre formelle de 8 phrases pour promouvoir l'agriculture biologique. Utilise deux comparatifs et un connecteur d'opposition.`,
+**Final activity.** Write a formal letter of 8 sentences to promote organic farming. Use two comparatives and one contrast connector.`,
 quiz:`Modern farming gives a higher yield ___ traditional farming.
 * than
 - as
@@ -2481,54 +2481,54 @@ The farmer uses a ___ to plough the field.
 - harvest
 - fertiliser
 
-What does « irrigation » mean ?
-* irrigation
-- engrais
-- recolte
+What does "irrigation" mean?
+* supplying water to crops through channels or pipes
+- a chemical fertiliser
+- the harvest
 
-What does « yield » mean ?
-* rendement
-- sol
-- betail
+What does "yield" mean?
+* the amount of crops produced
+- the soil
+- the livestock
 
 Organic food is ___ healthy than fast food. (use more)
 = more
 
-Choose the right word : ___ improves the quality of the soil.
+Choose the right word: ___ improves the quality of the soil.
 * Fertiliser
 - Pesticide
 - Harvest`,
-deck:`farming | agriculture | Farming feeds the whole country.
-crop | culture | The maize crop is good this year.
-harvest | recolte | The harvest starts in November.
-fertiliser | engrais | The fertiliser helps the plants grow.
-irrigation | irrigation | Irrigation brings water to the fields.
-organic farming | agriculture biologique | Organic farming avoids chemicals.
-tractor | tracteur | The tractor ploughs the land.
-yield | rendement | The yield doubled after the new seeds.
-pesticide | pesticide | Pesticides can harm bees.
-livestock | betail | The livestock graze in the valley.
-soil | sol | The soil is rich and dark.
-to plant | planter | We plant cassava in April.`,
-hw:{t:"Traditional or modern?",b:"Ecris 6 phrases comparant l'agriculture traditionnelle et l'agriculture moderne. Utilise whereas et un comparatif."}},
+deck:`farming | the work of growing crops and raising animals | Farming feeds the whole country.
+crop | a plant grown for food | The maize crop is good this year.
+harvest | the gathering of ripe crops | The harvest starts in November.
+fertiliser | a substance added to soil to help plants grow | The fertiliser helps the plants grow.
+irrigation | supplying water to crops through channels or pipes | Irrigation brings water to the fields.
+organic farming | farming without artificial chemicals | Organic farming avoids chemicals.
+tractor | a vehicle used to plough fields | The tractor ploughs the land.
+yield | the amount of crops produced | The yield doubled after the new seeds.
+pesticide | a chemical that kills insects or pests | Pesticides can harm bees.
+livestock | animals kept on a farm | The livestock graze in the valley.
+soil | the top layer of earth where plants grow | The soil is rich and dark.
+to plant | to put seeds or young plants into the ground | We plant cassava in April.`,
+hw:{t:"Traditional or modern?",b:"Write 6 sentences comparing traditional and modern farming. Use whereas and a comparative."}},
 {c:"tle",u:7,lv:"B2",t:"E-commerce in Africa",th:"Online trade and business",g:"No sooner ... than; hardly ... when; conditional sentences",
-body:`Le **commerce electronique** se developpe vite en Afrique : on achete et on vend en ligne avec son telephone. Dans cette lecon, on parle des avantages, des risques et des termes du commerce.
+body:`**E-commerce** is growing fast in Africa: people buy and sell online with their phones. In this lesson, we talk about its advantages, its risks and the key business terms.
 
-**Vocabulary** (mots et expressions) :
-**e-commerce** (commerce electronique) ; **customer** (client) ; **delivery** (livraison) ; **payment** (paiement) ; **mobile money** (argent mobile) ; **to order** (commander) ; **refund** (remboursement) ; **to advertise** (faire de la publicite) ; **trust** (confiance) ; **seller** (vendeur) ; **price tag** (etiquette de prix) ; **stock** (stock).
+**Vocabulary** (words and expressions):
+**e-commerce** (buying and selling products online) ; **customer** (a person who buys goods or services) ; **delivery** (bringing a product to the buyer) ; **payment** (the act of paying for something) ; **mobile money** (a service to send and receive money by phone) ; **to order** (to ask for goods to be sent to you) ; **refund** (money given back to a customer) ; **to advertise** (to present a product to attract buyers) ; **trust** (confidence that someone is honest and reliable) ; **seller** (a person who sells something) ; **price tag** (a label that shows the price) ; **stock** (goods that a shop has available for sale).
 
-**Grammar 1 : No sooner ... than.** Structure : **No sooner + had + subject + past participle + than + past simple**. Elle indique que deux actions se suivent tout de suite.
-**No sooner had** the order **arrived than** the customer paid. (Des que la commande est arrivee, le client a paye.)
+**Grammar 1: No sooner ... than.** Structure: **No sooner + had + subject + past participle + than + past simple**. It shows that two actions follow each other immediately.
+**No sooner had** the order **arrived than** the customer paid.
 
-**Grammar 2 : Hardly ... when.** Structure : **Hardly + had + subject + past participle + when + past simple**.
-**Hardly had** the shop opened **when** the customers came in. (A peine le magasin etait-il ouvert que les clients sont entres.)
+**Grammar 2: Hardly ... when.** Structure: **Hardly + had + subject + past participle + when + past simple**.
+**Hardly had** the shop opened **when** the customers came in.
 
-**Grammar 3 : Conditional sentences.** Revoir les trois types avec le commerce en ligne.
-If you **order** today, you **will receive** the parcel tomorrow. (Si tu commandes aujourd'hui, tu recevras le colis demain.)
+**Grammar 3: Conditional sentences.** Revise the three types with online shopping.
+If you **order** today, you **will receive** the parcel tomorrow.
 
-**Skill : advertising.** Buy online, pay with mobile money, and get your product in two days! Free delivery for orders above 10 000 F.
+**Skill: advertising.** Buy online, pay with mobile money, and get your product in two days! Free delivery for orders above 10,000 CFA francs.
 
-**Final activity.** Ecris une publicite de 8 phrases pour vendre un produit en ligne. Utilise no sooner ... than et hardly ... when.`,
+**Final activity.** Write an advertisement of 8 sentences to sell a product online. Use no sooner ... than and hardly ... when.`,
 quiz:`No sooner ___ the order ___ than the customer paid.
 * had arrived / than
 - arrived / than
@@ -2549,49 +2549,49 @@ If I ___ more money, I would buy a laptop online.
 - have
 - will have
 
-What does « refund » mean ?
-* remboursement
-- livraison
+What does "refund" mean?
+* money given back to a customer
+- delivery
 - stock
 
-What does « trust » mean ?
-* confiance
-- prix
-- vendeur
+What does "trust" mean?
+* confidence that someone is honest and reliable
+- a price
+- a seller
 
 The order has been ___ online. (order)
 = ordered
 
-Choose the right word : The ___ sells products to customers online.
+Choose the right word: The ___ sells products to customers online.
 * seller
 - payment
 - delivery`,
-deck:`e-commerce | commerce electronique | E-commerce grows every year.
-customer | client | The customer pays by mobile money.
-delivery | livraison | Delivery takes two days.
-payment | paiement | Payment is made at the door.
-mobile money | argent mobile | Mobile money is popular in Togo.
-to order | commander | I ordered shoes online.
-refund | remboursement | She asked for a refund.
-to advertise | faire de la publicite | They advertise on social media.
-trust | confiance | Trust is essential in online trade.
-seller | vendeur | The seller answers quickly.
-price tag | etiquette de prix | The price tag shows the cost.
-stock | stock | The shop has no stock left.`,
-hw:{t:"Shopping online",b:"Ecris 6 phrases sur tes achats en ligne. Utilise une structure no sooner ... than ou hardly ... when."}},
+deck:`e-commerce | buying and selling products online | E-commerce grows every year.
+customer | a person who buys goods or services | The customer pays by mobile money.
+delivery | bringing a product to the buyer | Delivery takes two days.
+payment | the act of paying for something | Payment is made at the door.
+mobile money | a service to send and receive money by phone | Mobile money is popular in Togo.
+to order | to ask for goods to be sent to you | I ordered shoes online.
+refund | money given back to a customer | She asked for a refund.
+to advertise | to present a product to attract buyers | They advertise on social media.
+trust | confidence that someone is honest and reliable | Trust is essential in online trade.
+seller | a person who sells something | The seller answers quickly.
+price tag | a label that shows the price | The price tag shows the cost.
+stock | goods that a shop has available for sale | The shop has no stock left.`,
+hw:{t:"Shopping online",b:"Write 6 sentences about your online shopping. Use no sooner ... than or hardly ... when."}},
 {c:"tle",u:8,lv:"B2",t:"E-learning in the World",th:"Online learning and health",g:"Conditional sentences (practice); present perfect; passive",
-body:`L'**e-learning** permet d'apprendre a distance, avec un telephone ou un ordinateur. Dans cette lecon, on parle des cours en ligne et de la **phytotherapie**, la medecine par les plantes.
+body:`**E-learning** lets people learn at a distance, with a phone or a computer. In this lesson, we talk about online courses and **herbal medicine**, the treatment of illness with plants.
 
-**Vocabulary** (mots et expressions) :
-**e-learning** (formation en ligne) ; **course** (cours) ; **certificate** (certificat) ; **platform** (plateforme) ; **herbal medicine** (phytotherapie) ; **remedy** (remede) ; **symptom** (symptome) ; **to diagnose** (diagnostiquer) ; **dosage** (dosage) ; **side effect** (effet secondaire) ; **to recommend** (recommander) ; **to access** (acceder a).
+**Vocabulary** (words and expressions):
+**e-learning** (learning through the Internet) ; **course** (a series of lessons on one subject) ; **certificate** (an official document that proves you finished a course) ; **platform** (a website or app that offers online courses) ; **herbal medicine** (the use of plants to treat illness) ; **remedy** (a treatment that cures or relieves an illness) ; **symptom** (a sign that shows someone is ill) ; **to diagnose** (to identify an illness) ; **dosage** (the amount of medicine to take) ; **side effect** (an unwanted result of a medicine) ; **to recommend** (to advise someone to do something) ; **to access** (to get to something, such as a course).
 
-**Grammar : Conditional sentences (practice).** If you **study** online, you **will get** a certificate. If the course **were** free, more people **would take** it. If she **had registered** earlier, she **would have finished** the course.
+**Grammar: Conditional sentences (practice).** If you **study** online, you **will get** a certificate. If the course **were** free, more people **would take** it. If she **had registered** earlier, she **would have finished** the course.
 
-**Grammar : Present perfect and passive.** The course **has been published** on the platform. (Le cours a ete publie sur la plateforme.)
+**Grammar: Present perfect and passive.** The course **has been published** on the platform.
 
-**Skill : advertising.** Learn English online at home, and get a certificate. Discover herbal remedies with a trained doctor.
+**Skill: advertising.** Learn English online at home, and get a certificate. Discover herbal remedies with a trained doctor.
 
-**Final activity.** Ecris une publicite de 8 phrases pour un cours en ligne ou un produit de phytotherapie. Utilise un conditionnel de chaque type.`,
+**Final activity.** Write an advertisement of 8 sentences for an online course or a herbal medicine product. Use one conditional of each type.`,
 quiz:`If you study online, you ___ a certificate.
 * will get
 - would get
@@ -2609,39 +2609,39 @@ If she had registered earlier, she ___ the course.
 
 The course ___ on the platform last week.
 * was published
-- published
-- has publish
+- publishes
+- has published yesterday
 
 A ___ is a sign that shows an illness.
 * symptom
 - remedy
 - certificate
 
-What does « side effect » mean ?
-* effet secondaire
-- remede
-- dosage
+What does "side effect" mean?
+* an unwanted result of a medicine
+- a remedy
+- a dosage
 
 The doctor has ___ this remedy. (recommend)
 = recommended
 
-Choose the right word : Herbal medicine is also called ___.
+Choose the right word: Herbal medicine is also called ___.
 * phytotherapy
 - e-learning
 - platform`,
-deck:`e-learning | formation en ligne | E-learning saves time and money.
-course | cours | The English course starts Monday.
-certificate | certificat | She received a certificate at the end.
-platform | plateforme | The learning platform has many lessons.
-herbal medicine | phytotherapie | Herbal medicine is used in many villages.
-remedy | remede | This leaf is a remedy for fever.
-symptom | symptome | A cough is a common symptom.
-to diagnose | diagnostiquer | The doctor diagnosed the disease.
-dosage | dosage | Follow the dosage on the box.
-side effect | effet secondaire | Some medicines have side effects.
-to recommend | recommander | I recommend this course.
-to access | acceder a | Students access the lessons at home.`,
-hw:{t:"Learning online",b:"Ecris 6 phrases sur l'apprentissage en ligne. Utilise un conditionnel de type 2 et le passif."}},
+deck:`e-learning | learning through the Internet | E-learning saves time and money.
+course | a series of lessons on one subject | The English course starts Monday.
+certificate | an official document proving you finished a course | She received a certificate at the end.
+platform | a website or app that offers courses | The learning platform has many lessons.
+herbal medicine | the use of plants to treat illness | Herbal medicine is used in many villages.
+remedy | a treatment that relieves an illness | This leaf is a remedy for fever.
+symptom | a sign that shows someone is ill | A cough is a common symptom.
+to diagnose | to identify an illness | The doctor diagnosed the disease.
+dosage | the amount of medicine to take | Follow the dosage on the box.
+side effect | an unwanted result of a medicine | Some medicines have side effects.
+to recommend | to advise someone to do something | I recommend this course.
+to access | to get to something, such as a course | Students access the lessons at home.`,
+hw:{t:"Learning online",b:"Write 6 sentences about learning online. Use a type 2 conditional and the passive."}},
 {c:"2nde",u:7,lv:"B1",t:"Effects of WhatsApp on the Youth",th:"Social media and young people",g:"Would prefer, would rather ... than, prefer ... to; not only ... but also; used to and be used to",
 body:`WhatsApp is the most popular messaging app among young people. It is free, fast and easy to use, so many students use it every day to talk with friends, share photos and learn new things. But it also has effects that we must understand.
 

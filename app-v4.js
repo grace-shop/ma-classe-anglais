@@ -271,7 +271,7 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
 
  const PT={mode:"student",student:null,rows:[],names:{},urls:{},timer:null,busy:false,err:""};
  const nameOf=u=>PT.names[u]||"Student";
- const timeOf=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+ const timeOf=t=>new Date(t).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
 
  async function load(){const sb=window.__sb;if(!sb)return;
    let q=sb.from("prof_messages").select("*").order("created_at",{ascending:true}).limit(500);

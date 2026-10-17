@@ -770,7 +770,7 @@ const PROG_CLASSES=["CP1","CP2","CE1","CE2","CM1","CM2","6e","5e","4e","3e","2nd
 const PROG_GROUP={primaire:["CP1","CP2","CE1","CE2","CM1","CM2"],college:["6e","5e","4e","3e"],lycee:["2nde","1re","Tle"],etudiant:["Université"],adulte:["Adultes"]};
 function myProgClass(m){if(!m)return null;if(m.profile==="etudiant")return"Université";if(m.profile==="adulte")return"Adultes";const c=String(m.classe||"");return PROG_CLASSES.find(k=>c.startsWith(k))||(m.profile==="primaire"?"CP1":m.profile==="college"?"6e":m.profile==="lycee"?"2nde":null)}
 const progUnits=pc=>S.lessons.filter(l=>l.classe===pc&&teacherOk(l)).sort((a,b)=>(a.unit||99)-(b.unit||99));
-const CLN={"Université":"University","Adultes":"Adults","Devoir surveillé":"Class test","Composition":"Term exam","Concours":"Competitive exam","Autre":"Other","Licence 1":"Year 1 (Licence 1)","Licence 2":"Year 2 (Licence 2)","Licence 3":"Year 3 (Licence 3)","Master":"Master's","BTS / autre":"BTS / other","Professionnel":"Professional","En recherche d'emploi":"Looking for a job"},CL=c=>CLN[c]||c||"";
+const CLN={"Université":"University","Adultes":"Adults","Devoir surveillé":"Class test","Composition":"Term exam","Concours":"Competitive exam","Autre":"Other","Licence 1":"Bachelor year 1","Licence 2":"Bachelor year 2","Licence 3":"Bachelor year 3","Master":"Master's","BTS / autre":"BTS / other","Professionnel":"Professional","En recherche d'emploi":"Looking for a job"},CL=c=>CLN[c]||c||"";
 const EXAMS=["CEPD","BEPC","BAC I","BAC II","Devoir surveillé","Composition","Concours","TOEFL / IELTS","TOEIC","Autre"];
 const ICONS={
  home:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
@@ -905,7 +905,7 @@ const UTT_KEEP=[];
 function localVoice(lang){const p=lang==="fr"?/^fr/i:/^en/i;return VOICE.list.find(v=>p.test(v.lang)&&v.localService)||null}
 function speakNow(text,lang,v,retry){let fell=false;
   for(const c of chunks(text)){const u=new SpeechSynthesisUtterance(c);UTT_KEEP.push(u);if(UTT_KEEP.length>60)UTT_KEEP.shift();
-    if(v){u.voice=v;u.lang=v.lang}else u.lang=lang==="fr"?"fr-FR":"en-US";
+    if(v){u.voice=v;u.lang=v.lang}else u.lang=lang==="fr"?"en-GB":"en-US";
     u.rate=lang==="fr"?1:VOICE.rate;u.pitch=1;u.volume=1;
     u.onerror=ev=>{if(ev&&(ev.error==="interrupted"||ev.error==="canceled"))return;
       /* a online voice can fail without internet: try the phone's own voice once */
@@ -1186,7 +1186,7 @@ function joinView(){const role=S.drafts.j_role,R=ROLES.find(r=>r[0]===role);
   if(role==="prof")return`<div class="section" style="max-width:600px;margin-inline:auto"><div class="glass card" style="padding:clamp(22px,4vw,32px);gap:18px"><div class="steps"><i class="on"></i><i class="on"></i></div><div><button class="back" data-a="pickRole" data-k="">${ic("left")}Change category</button></div>
     <div class="row"><span class="ic t-gold" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center">${ic("pen")}</span><div><span class="eyebrow">Teacher</span><h2>Join the team</h2></div></div>
     <p class="sub" style="margin:0">The head teacher must accept your request. Then you will have your own space: your students, lessons, quizzes, homework and messages, separate from the other teachers.</p>
-    <form class="form" data-f="joinProf"><label>Your first and last name<input id="j_name" required maxlength="60" value="${esc(S.drafts.j_name??(S.who?.name||""))}" placeholder="E.g. Mr Kodjo Amouzou"></label><label>Your classes (optional)<input id="j_subject" maxlength="80" placeholder="E.g. 4e A and 3e B, Lycée de Tokoin"></label><button class="btn" type="submit">${ic("send")}Send my request</button></form></div></div>`;
+    <form class="form" data-f="joinProf"><label>Your first and last name<input id="j_name" required maxlength="60" value="${esc(S.drafts.j_name??(S.who?.name||""))}" placeholder="E.g. Mr Kodjo Amouzou"></label><label>Your classes (optional)<input id="j_subject" maxlength="80" placeholder="E.g. 4e A and 3e B, Tokoin High School"></label><button class="btn" type="submit">${ic("send")}Send my request</button></form></div></div>`;
   if(!R)return`<div class="section" style="max-width:860px;margin-inline:auto"><div class="glass card" style="padding:clamp(22px,4vw,36px);gap:20px">
     <div class="steps"><i class="on"></i><i></i></div>${whoHTML()}
     <div><span class="eyebrow">Welcome</span><h2>Who are <span class="gradtext">you?</span></h2><p class="sub">Choose your category: the app adapts to you, with lessons, quizzes and exams for your level.</p></div>
@@ -1472,7 +1472,7 @@ function appelHTML(){const date=S.drafts.att_date||today(),doc=(S.att||[]).find(
   ${(S.att||[]).length?`<div><span class="eyebrow">History</span></div><div class="glass tablewrap"><table><thead><tr><th>Date</th><th>Present</th><th>Late</th><th>Absent</th><th>Absent (names)</th></tr></thead><tbody>${(S.att||[]).slice(0,40).map(d=>{const m=d.marks||{},c=v=>Object.values(m).filter(x=>x===v).length,ab=Object.entries(m).filter(([k,v])=>v==="A").map(([k])=>person(k)?.name).filter(Boolean);return`<tr class="click" data-a="attOpen" data-k="${d.date}"><td>${fmtDate(d.date)}</td><td class="num">${c("P")}</td><td class="num">${c("R")}</td><td class="num">${c("A")}</td><td class="small">${ab.map(esc).join(", ")||"—"}</td></tr>`}).join("")}</tbody></table></div>`:""}</div>`}
 function fichesHTML(){const pc=S.ficheClass||"",qs=vis(S.quizzes).filter(q=>!pc||(pc==="hors"?!q.classe:q.classe===pc)),ds=vis(S.decks);
   return`<div class="section"><div><span class="eyebrow">To print or share</span><h2>Worksheets</h2><p class="sub">Each quiz becomes a worksheet ready to print: lesson reminder, exercises, tick boxes and lines for writing. The “with answer key” version adds an answer page for the teacher only. Students can also download the worksheet without answers from their quizzes.</p></div>
-  <div class="seg">${["",...PROG_CLASSES,"hors"].map(c=>`<button data-a="ficheClass" data-k="${c}" aria-pressed="${pc===c}">${c===""?"All":c==="hors"?"Outside syllabus":c}</button>`).join("")}</div>
+  <div class="seg">${["",...PROG_CLASSES,"hors"].map(c=>`<button data-a="ficheClass" data-k="${c}" aria-pressed="${pc===c}">${c===""?"All":c==="hors"?"Outside syllabus":CL(c)}</button>`).join("")}</div>
   ${qs.length?`<div class="glass list">${qs.slice(0,80).map(q=>`<div class="it"><span class="ic t-coral" style="width:36px;height:36px;border-radius:10px;display:grid;place-items:center">${ic("bolt")}</span><div class="txt"><b>${esc(q.title)}</b><div class="small muted">${esc(q.level||"")}${q.classe?" · "+esc(CL(q.classe)):""} · ${(q.questions||[]).length} questions${q.exam?" · exam":""}</div></div><div class="row"><button class="btn ghost sm" data-a="sheet" data-id="${q.id}" data-k="0">${ic("download")}Student sheet</button><button class="btn sm" data-a="sheet" data-id="${q.id}" data-k="1">${ic("lock")}With answer key</button></div></div>`).join("")}</div>${qs.length>80?`<p class="hint">The first 80 quizzes are shown: choose a class to filter.</p>`:""}`:`<div class="empty">No quizzes here.</div>`}
   <div><span class="eyebrow">Vocabulary</span><h3>Word sheets</h3></div>
   ${ds.length?`<div class="glass list">${ds.map(d=>`<div class="it"><span class="ic t-gold" style="width:36px;height:36px;border-radius:10px;display:grid;place-items:center">${ic("cards")}</span><div class="txt"><b>${esc(d.title)}</b><div class="small muted">${esc(d.level||"")} · ${(d.cards||[]).length} words</div></div><button class="btn ghost sm" data-a="deckSheet" data-id="${d.id}">${ic("download")}Download</button></div>`).join("")}</div>`:`<div class="empty">No vocabulary lists.</div>`}</div>`}
@@ -1747,10 +1747,10 @@ const TALK_SC=[
  {k:"family",e:"🏡",t:"My family and my home",en:"Family and home",d:"Describe your family, your house and your neighbourhood.",role:"You are a pen friend curious about the learner's family, house and neighbourhood in Togo."},
  {k:"school",e:"🏫",t:"School life",en:"At school",d:"Subjects, timetable, teachers, exams.",role:"You are a classmate talking about school: subjects, timetable, teachers, homework, exams (CEPD, BEPC, BAC).",only:["primaire","college","lycee"]},
  {k:"hobbies",e:"⚽",t:"Free time",en:"Hobbies and sport",d:"Football, music, films, weekends.",role:"You are a friend chatting about hobbies, sport (football!), music, films and weekends."},
- {k:"market",e:"🛒",t:"At the Lomé market",en:"At the market",d:"Buy fruit at the Grand Marché and bargain for a good price.",role:"You are a friendly seller at the Grand Marché in Lomé. The learner is the customer. Sell fruit, vegetables and fabric, give prices in CFA francs, and let them bargain."},
- {k:"food",e:"🍲",t:"Eating out",en:"At the restaurant",d:"Order your meal in a maquis: fufu, akoumé, chicken…",role:"You are a waiter in a small restaurant (maquis) in Lomé. Take the learner's order (fufu, akoumé, rice, grilled chicken, drinks), answer questions and bring the bill."},
+ {k:"market",e:"🛒",t:"At the Lomé market",en:"At the market",d:"Buy fruit at the Grand Market and bargain for a good price.",role:"You are a friendly seller at the Grand Market in Lomé. The learner is the customer. Sell fruit, vegetables and fabric, give prices in CFA francs, and let them bargain."},
+ {k:"food",e:"🍲",t:"Eating out",en:"At the restaurant",d:"Order your meal in a local restaurant: fufu, akoumé, chicken…",role:"You are a waiter in a small local restaurant in Lomé. Take the learner's order (fufu, akoumé, rice, grilled chicken, drinks), answer questions and bring the bill."},
  {k:"story",e:"🧚",t:"Story time",en:"Let's make a story",d:"Make up a story together, one sentence at a time.",role:"You are a storyteller. Build a fun story together with the learner: add one or two sentences, then ask what happens next.",only:["primaire","college"]},
- {k:"directions",e:"🗺️",t:"Giving directions",en:"Asking the way",d:"A tourist asks you the way to the beach or the market.",role:"You are a tourist visiting Lomé who is lost. Ask the learner for directions to places (the beach, the Grand Marché, the Independence Monument, a hotel). React to their directions.",only:["college","lycee","etudiant","adulte"]},
+ {k:"directions",e:"🗺️",t:"Giving directions",en:"Asking the way",d:"A tourist asks you the way to the beach or the market.",role:"You are a tourist visiting Lomé who is lost. Ask the learner for directions to places (the beach, the Grand Market, the Independence Monument, a hotel). React to their directions.",only:["college","lycee","etudiant","adulte"]},
  {k:"doctor",e:"🩺",t:"Seeing the doctor",en:"At the doctor's",d:"Say what is wrong and understand the advice.",role:"You are a doctor in a clinic. The learner is the patient. Ask about symptoms and give simple advice.",only:["college","lycee","etudiant","adulte"]},
  {k:"travel",e:"✈️",t:"Airport",en:"At the airport",d:"Check-in, luggage, passport control.",role:"You are an airline agent at Lomé airport (check-in, then passport control). The learner is the traveller.",only:["lycee","etudiant","adulte"]},
  {k:"phone",e:"📞",t:"Phone call",en:"On the phone",d:"Make an appointment, leave a message.",role:"You are a receptionist answering the phone. The learner calls to make an appointment or leave a message.",only:["lycee","etudiant","adulte"]},
@@ -1911,7 +1911,7 @@ function saveContent(col,data){const ed=S.editing&&S.editing.kind===col?S.editin
 /* ============ parents: bulletin & export ============ */
 async function saveFile(name,data){if(S.dl===undefined)S.dl=await claude.use("downloads");if(!S.dl){toast("Downloads are not available on this device.","x");return}
   try{await S.dl.save({filename:name,data});toast("File ready","download")}catch(e){if(e&&e.code==="declined")return;toast(e&&e.code==="rate_limited"?"A download is already in progress.":"Download not possible right now.","x")}}
-const safeName=s=>String(s||"eleve").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"")||"eleve";
+const safeName=s=>String(s||"student").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"")||"student";
 function hwAvg(s){const g=Object.values(s.feedback||{}).map(f=>+f.grade).filter(n=>!isNaN(n));return g.length?Math.round(g.reduce((a,b)=>a+b,0)/g.length*10)/10:null}
 function bulletinDoc(s){const x=stats(s),a=[...(s.attempts||[])].reverse(),fb=s.feedback||{},subs=s.submissions||{},words=Object.values(s.deckProgress||{}).reduce((n,d)=>n+((d&&d.known)||[]).length,0),ha=hwAvg(s);
   const exams=a.filter(r=>r.exam),badges=BADGES.filter(b=>(s.badges||{})[b.id]).map(b=>b.name);
@@ -2029,13 +2029,13 @@ function aiContext(){
   if(S.mode==="teacher")return`The user is the English TEACHER who manages the class (${S.students.length} learners: middle school, high school, university students and adults). Help her prepare lessons, quizzes, tests, answer keys, report comments and activities. For a quiz meant for the app, use exactly this format: one question per block, one empty line between two questions, "* " before the correct answer and "- " before the wrong ones; for a written answer: the question, then "= answer1 / answer2". For a vocabulary list: one line per word, "word | simple English meaning | example".`;
   if(isParent(S.me))return`The user is a student's PARENT (child: ${S.me.childName||"not specified"}${S.me.childClasse?", class "+S.me.childClasse:""}). Answer simply, with practical tips to help the child.`;
   const m=S.me||{};return`The user is a learner: ${PROFILES[m.profile]||"student"}${m.classe?" ("+m.classe+")":""}, English level ${m.level||"A2"} (${LEVEL_NAMES[m.level]||""}). Adapt your vocabulary and examples to their age and level. If they ask you to do a class homework or test for them, do not give the full answer: explain the method, give a similar example and guide them so they find the answer themselves. For any other question, answer directly.`}
-const aiRules=()=>`You are Nova, the AI assistant of the "English Classes" app, used in Togo. You know the Togolese school system: primary school from CP1 to CM2 (CEPD exam, English taught in primary school since 2025), middle school (collège) from 6e to 3e (BEPC, 2-hour English test, coefficient 2: reading, grammar and writing), high school (lycée) from 2nde to Terminale (BAC I in 1re, BAC II in Terminale; series A4, C, D, E, F1 to F4, G1 to G3, Ti), marks out of 20 with the grades Passable, Assez bien, Bien and Très bien, school year in three terms. Take your examples from life in Togo (Lomé, Kara, Kpalimé, Sokodé, Aného, the market, the CFA franc, the rainy season, the harmattan). Today is ${new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}${schoolPeriod().label?", "+schoolPeriod().label:""}. ${aiContext()}\nYou can answer any question: English, other subjects, general knowledge, career guidance, everyday life. This is an app for learning English: ALWAYS answer ONLY in English, even if the user writes in French or another language. Use very simple English (A1–A2 level words and short sentences) unless the user's level is higher. Be clear, warm and rather short (3 to 8 sentences, unless asked for more). Put important words in **bold**, use lists with "- " when useful, and give examples when relevant. Do not use tables or headings with #.`;
+const aiRules=()=>`You are Nova, the AI assistant of the "English Classes" app, used in Togo. You know the Togolese school system: primary school from CP1 to CM2 (CEPD exam, English taught in primary school since 2025), middle school from 6e to 3e (BEPC, 2-hour English test, coefficient 2: reading, grammar and writing), high school from 2nde to Terminale (BAC I in 1re, BAC II in Terminale; series A4, C, D, E, F1 to F4, G1 to G3, Ti), marks out of 20 with the grades Not enough, Pass, Good, Very good and Excellent, school year in three terms. Take your examples from life in Togo (Lomé, Kara, Kpalimé, Sokodé, Aného, the market, the CFA franc, the rainy season, the harmattan). Today is ${new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}${schoolPeriod().label?", "+schoolPeriod().label:""}. ${aiContext()}\nYou can answer any question: English, other subjects, general knowledge, career guidance, everyday life. This is an app for learning English: ALWAYS answer ONLY in English, even if the user writes in French or another language. Use very simple English (A1–A2 level words and short sentences) unless the user's level is higher. Be clear, warm and rather short (3 to 8 sentences, unless asked for more). Put important words in **bold**, use lists with "- " when useful, and give examples when relevant. Do not use tables or headings with #.`;
 function mdLite(t){const out=[];let list=false;for(const raw of String(t||"").split("\n")){let line=esc(raw).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`([^`]+)`/g,"<code>$1</code>").replace(/^#{1,4}\s*(.+)$/,"<b>$1</b>");const li=/^\s*(?:[-•*]|\d+[.)])\s+(.*)$/.exec(line);
   if(li){if(!list){out.push("<ul>");list=true}out.push("<li>"+li[1]+"</li>");continue}if(list){out.push("</ul>");list=false}if(line.trim())out.push("<p>"+line+"</p>")}if(list)out.push("</ul>");return out.join("")}
 function aiSuggestions(){if(S.mode==="teacher")return["Create a 5-question quiz on the present perfect in the app format","Suggest 10 vocabulary words about health in the app format","Write a report comment for a serious but shy student","Give me a 15-minute speaking activity for a 3e class"];
   if(isParent(S.me))return["How can I help my child improve their English at home?","Which cartoons in English do you recommend for a 12-year-old child?","How can I motivate a teenager who does not like English?"];
   const p=S.me?.profile;return[p==="college"?"How can I revise well for the BEPC English test?":p==="lycee"?"How can I pass the BAC English test?":p==="etudiant"?"How do I structure an essay in English?":"How do I introduce myself in English at a job interview?","What is the difference between since and for?","Correct my sentence: She don't like rice.","Explain the present perfect to me with simple examples"]}
-function aiSpeakText(t){if(!canSpeak)return;const plain=String(t).replace(/[*`#]/g,"").replace(/^\s*[-•]\s+/gm,"").trim();const en=(plain.match(/\b(the|is|are|you|and|to|of|I|it|in|my|have|do)\b/gi)||[]).length,fr=(plain.match(/\b(le|la|les|est|et|de|des|un|une|tu|je|pour|que|en)\b/gi)||[]).length;speak(plain,en>fr?"en":"fr")}
+function aiSpeakText(t){if(!canSpeak)return;const plain=String(t).replace(/[*`#]/g,"").replace(/^\s*[-•]\s+/gm,"").trim();const en=(plain.match(/\b(the|is|are|you|and|to|of|I|it|in|my|have|do)\b/gi)||[]).length,fr=(plain.match(/\b(le|la|les|est|et|de|des|un|une|tu|je|pour|que|en)\b/gi)||[]).length;speak(plain,"en")}
 function renderAI(visOnly){const fab=$("#aiFab"),panel=$("#aiPanel");if(!fab||!panel)return;
   const ok=!!AI.sample&&!AI.disabled&&!S.offline&&(S.mode==="teacher"||!!S.me);fab.hidden=!ok||AI.open;const wasHidden=panel.hidden;panel.hidden=!ok||!AI.open;if(!ok||!AI.open||(visOnly&&!wasHidden))return;
   $("#aiSpeakBtn").innerHTML=ic(AI.speak?"speaker":"mute");$("#aiSpeakBtn").setAttribute("aria-pressed",String(AI.speak));
@@ -2988,7 +2988,7 @@ async function drawPdf(){const P=V4.pdf,body=document.getElementById("docvBody")
 
  const PT={mode:"student",student:null,rows:[],names:{},urls:{},timer:null,busy:false,err:""};
  const nameOf=u=>PT.names[u]||"Student";
- const timeOf=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+ const timeOf=t=>new Date(t).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
 
  async function load(){const sb=window.__sb;if(!sb)return;
    let q=sb.from("prof_messages").select("*").order("created_at",{ascending:true}).limit(500);
@@ -4757,20 +4757,20 @@ const AR_O=[
 ];
 
 const AR_C=[
- ["resilient","résistant, qui tient bon","She is resilient after the storm."],
- ["curious","curieux","Kids are curious about everything."],
- ["ambitious","ambitieux","He is ambitious and works hard."],
- ["generous","généreux","My grandmother is very generous."],
- ["reliable","fiable","This bus is reliable."],
- ["improve","améliorer","I want to improve my English."],
- ["confident","confiant","She feels confident when she speaks."],
- ["journey","voyage","The journey took five hours."],
- ["homework","devoirs","I finished my homework early."],
- ["borrow","emprunter","Can I borrow your pen?"],
- ["remember","se souvenir","I remember my first day at school."],
- ["enormous","énorme","The elephant is enormous."],
- ["whisper","chuchoter","Please whisper in the library."],
- ["delicious","délicieux","This soup is delicious!"]
+ ["resilient","able to recover quickly","She is resilient after the storm."],
+ ["curious","wanting to know more","Kids are curious about everything."],
+ ["ambitious","wanting to succeed a lot","He is ambitious and works hard."],
+ ["generous","happy to give and share","My grandmother is very generous."],
+ ["reliable","you can trust it","This bus is reliable."],
+ ["improve","make something better","I want to improve my English."],
+ ["confident","sure of yourself","She feels confident when she speaks."],
+ ["journey","a trip from one place to another","The journey took five hours."],
+ ["homework","school work to do at home","I finished my homework early."],
+ ["borrow","take something and give it back later","Can I borrow your pen?"],
+ ["remember","keep something in your mind","I remember my first day at school."],
+ ["enormous","very, very big","The elephant is enormous."],
+ ["whisper","speak very quietly","Please whisper in the library."],
+ ["delicious","very good to eat","This soup is delicious!"]
 ];
 
 const AR_G=[
@@ -5104,7 +5104,7 @@ function arCards(){if(!AR.deck.length)return arEnd("cards",AR.known,AR.total);
   arSet(arTop("Flashcards",`${AR.known} / ${AR.total} learned`)+arBar(AR.known/AR.total)+
     `<div class="ar-scene"><div class="ar-card3d" id="arCard" data-ar="flip">
        <div class="ar-face front"><span class="ar-kicker">English</span><h2>${arEsc(c[0])}</h2><small>Tap to flip</small></div>
-       <div class="ar-face back"><span class="ar-kicker">Français</span><h2>${arEsc(c[1])}</h2><p>${arEsc(c[2])}</p></div>
+       <div class="ar-face back"><span class="ar-kicker">Meaning</span><h2>${arEsc(c[1])}</h2><p>${arEsc(c[2])}</p></div>
      </div></div>
      <div class="ar-inrow" style="justify-content:center"><button class="ar-go ghost" data-ar="again">Again</button><button class="ar-go" data-ar="know">I know it</button></div>`)}
 
@@ -9320,7 +9320,7 @@ function schDecorate(){
   }
   if(!document.getElementById("f_sched")&&SCH.list.length){
     const w=document.querySelector(".fwhen");
-    if(w) w.insertAdjacentHTML("afterend",`<div class="fsched" id="f_sched">${SCH.list.map(x=>`<div class="fsched-it"><span>⏱ ${esc(new Date(x.created_at).toLocaleString([],{dateStyle:"short",timeStyle:"short"}))} · ${esc(String(x.body||"").slice(0,40)||(x.media?"📷 media":""))}</span><button type="button" class="btn ghost sm" data-fsc="${esc(x.id)}">Cancel</button></div>`).join("")}</div>`);
+    if(w) w.insertAdjacentHTML("afterend",`<div class="fsched" id="f_sched">${SCH.list.map(x=>`<div class="fsched-it"><span>⏱ ${esc(new Date(x.created_at).toLocaleString("en-GB",{dateStyle:"short",timeStyle:"short"}))} · ${esc(String(x.body||"").slice(0,40)||(x.media?"📷 media":""))}</span><button type="button" class="btn ghost sm" data-fsc="${esc(x.id)}">Cancel</button></div>`).join("")}</div>`);
   }
   schLoad(false);
 }
@@ -9353,7 +9353,7 @@ document.addEventListener("click",async e=>{
     const id=await schSB().rpc("schedule_post",{p_body:body||"",p_media:media&&media.length?media:null,p_at:at});
     if(id.error) throw new Error(id.error.message||"Could not schedule");
     delete S.drafts.f_when;
-    toast("Scheduled for "+new Date(at).toLocaleString([],{dateStyle:"short",timeStyle:"short"}),"clock");
+    toast("Scheduled for "+new Date(at).toLocaleString("en-GB",{dateStyle:"short",timeStyle:"short"}),"clock");
     SCH.at=0; schLoad(true);
     return id.data}}
 
