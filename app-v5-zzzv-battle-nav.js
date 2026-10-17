@@ -1,9 +1,9 @@
 /* =====================================================================
-   v5 · Battles: navigation, codes and the Retour button.
-   - "‹ Retour" on every Arena page (same as the reference screen).
+   v5 · Battles: navigation, codes and the Back button.
+   - "‹ Back" on every Arena page (English only, as the reference screen).
    - Battles hub -> one page per kind (Duel, Group battle, Battle Royale,
      Daily challenge). Each page has its own create / join / code area.
-   - Leaving a room (Retour, or after a challenge) goes back to the page of
+   - Leaving a room (Back, or after a challenge) goes back to the page of
      that kind (Battle Royale stays Battle Royale), never to the Arena home.
    - The battle code stays visible on every screen of the room.
    This file loads last, so it replaces the matching functions of
@@ -32,8 +32,8 @@ function btKindOf(){return (BT.st&&BT.st.kind)||(BT.room&&BT.room.kind)||BTNAV.k
 .bt-kpage .ar-go+.ar-go{margin-top:10px}
 `;document.head.appendChild(s)})();
 
-/* 1 · the back button: "‹ Retour" */
-function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Retour">${arIc("back")}<span>Retour</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
+/* 1 · the back button: "‹ Back" */
+function arTop(title,right){return`<div class="ar-top"><button class="ar-back" data-ar="home" aria-label="Back">${arIc("back")}<span>Back</span></button><b>${arEsc(title)}</b><span>${arEsc(right||"")}</span></div>`}
 
 /* 2 · the join box (used on the hub and on each kind page) */
 function btJoinBox(){return `<div class="ar-card"><p class="ar-kicker">Join a battle with a code</p>
@@ -127,7 +127,7 @@ btClick=function(b){const a=b.dataset.ar;
   if(a==="bt-diff"){BT.diff=b.dataset.l;return BTNAV.view==="kind"?btKindPage(BTNAV.kind):btHub()}
   return _btClick(b)};
 
-/* 9 · Retour: room -> its kind page, kind page -> hub, hub -> Arena home */
+/* 9 · Back: room -> its kind page, kind page -> hub, hub -> Arena home */
 const _btArHome=arHome;
 arHome=function(){
   if(BTNAV.view==="room"){const k=btKindOf();btStop();BT.on=false;

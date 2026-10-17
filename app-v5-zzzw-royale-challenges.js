@@ -5,8 +5,24 @@
      Arena bank, so two challenges never play the same set.
    - "Random mix" keeps the old quick start.
    - Each challenge gets a room code, shown on every screen (see
-     app-v5-zzzv-battle-nav.js), and returns to this page on Retour.
+     app-v5-zzzv-battle-nav.js), and returns to this page on Back.
    ===================================================================== */
+
+/* difficulty colours, the same everywhere: easy green, medium amber, hard red */
+(function lvColours(){
+  if(document.getElementById("lvColourCss"))return;
+  const s=document.createElement("style");s.id="lvColourCss";
+  s.textContent=`
+.lvt{font-weight:800;letter-spacing:.02em}
+.lvt.lv-easy{color:#6EE7B7}.lvt.lv-medium{color:#FBBF24}.lvt.lv-hard{color:#F87171}
+#arena .ar-seg button[data-l="easy"],#arena .bt-diff button[data-l="easy"]{color:#6EE7B7}
+#arena .ar-seg button[data-l="medium"],#arena .bt-diff button[data-l="medium"]{color:#FBBF24}
+#arena .ar-seg button[data-l="hard"],#arena .bt-diff button[data-l="hard"]{color:#F87171}
+#arena .ar-seg button.on[data-l="easy"]{background:rgba(110,231,183,.18);color:#6EE7B7}
+#arena .ar-seg button.on[data-l="medium"]{background:rgba(251,191,36,.18);color:#FBBF24}
+#arena .ar-seg button.on[data-l="hard"]{background:rgba(248,113,113,.18);color:#F87171}`;
+  document.head.appendChild(s);
+})();
 const ROYALE_CH=[
  {t:"Quick start",        d:"Warm up together",          lv:"easy",   kind:"all",     n:10},
  {t:"Grammar storm",      d:"Tenses, modals, passive",   lv:"medium", kind:"grammar", n:12},
@@ -42,7 +58,7 @@ btKindPage=function(k){
   const live=BT.room&&(!BT.st||!btFinished(BT.st))&&btKindOf()==="royale";
   const cards=ROYALE_CH.map((ch,i)=>`<button class="ar-mode bt-glow" style="--d:${(i*0.05).toFixed(2)}s" data-ar="bt-rch" data-i="${i}">
       <span class="ar-badge" style="width:44px;height:44px;border-radius:14px">${arIc(K.ic)}</span>
-      <b>${arEsc(ch.t)}</b><small>${arEsc(ch.lv[0].toUpperCase()+ch.lv.slice(1))} · ${ch.n} questions · ${arEsc(ch.d)}</small></button>`).join("");
+      <b>${arEsc(ch.t)}</b><small><span class="lvt lv-${ch.lv}">${arEsc(ch.lv[0].toUpperCase()+ch.lv.slice(1))}</span> · ${ch.n} questions · ${arEsc(ch.d)}</small></button>`).join("");
   arSet(arTop(K.t,"")+`<div class="bt-kpage"><div class="ar-hero"><p class="ar-kicker">${arEsc(K.d)}</p><h1>${arEsc(K.t)}</h1>
       <p>Pick a challenge. Each one has its own questions. Then share the code with your classmates.</p></div>
     ${live?`<button class="ar-go bt-entry" data-ar="bt-back" style="width:100%">Back to my battle</button>`:""}
