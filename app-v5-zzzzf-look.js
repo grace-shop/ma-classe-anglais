@@ -85,15 +85,18 @@
   var ist = document.createElement("style");
   ist.id = "zzzzfintro";
   ist.textContent = `
-#zzIntro{position:fixed;inset:0;z-index:300;background:#05060F;display:grid;place-content:center;justify-items:center;gap:14px;pointer-events:none;animation:zzOut .5s ease 2.1s forwards}
-#zzIntro img{width:112px;height:112px;border-radius:30px;animation:zzPop .9s cubic-bezier(.2,.8,.2,1) both}
-#zzIntro b{font:800 1.5rem/1 Manrope,system-ui,sans-serif;color:#fff;letter-spacing:.01em;animation:zzUp2 .6s .45s both}
-#zzIntro span{font:500 .92rem/1.4 Manrope,system-ui,sans-serif;color:#9AA3CC;animation:zzUp2 .6s .6s both}
+#zzIntro{position:fixed;inset:0;z-index:300;background:#000;display:grid;place-content:center;pointer-events:none;animation:zzOut .45s ease 3.8s forwards !important}
+#zzIntro .zzrow{display:flex;align-items:center;gap:14px}
+#zzIntro img{width:78px;height:78px;border-radius:22px;opacity:0;animation:zzLogo .9s cubic-bezier(.2,.7,.2,1) .7s forwards !important}
+#zzIntro .zzt{display:grid;gap:6px;text-align:left}
+#zzIntro b{font:800 1.85rem/1 Manrope,system-ui,sans-serif;color:#fff;letter-spacing:-.01em;opacity:0;transform:translateX(-16px);animation:zzWord .6s 1.5s forwards !important}
+#zzIntro span{font:500 .8rem/1.3 Manrope,system-ui,sans-serif;color:#C9CEE8;opacity:0;animation:zzFade .5s 2.4s forwards !important}
 @keyframes zzOut{to{opacity:0;visibility:hidden}}
-@keyframes zzPop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
-@keyframes zzUp2{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
-html.zzintro #authGate .lg-sheet{animation:zzSheet .7s cubic-bezier(.2,.8,.2,1) 1.2s both}
-html.zzintro #authGate .lg-top{animation:zzUp2 .6s 1s both}
+@keyframes zzLogo{from{opacity:0;filter:brightness(0) blur(6px);transform:scale(.8)}60%{opacity:1}to{opacity:1;filter:none;transform:none}}
+@keyframes zzWord{to{opacity:1;transform:none}}
+@keyframes zzFade{to{opacity:1}}
+html.zzintro #authGate .lg-top{animation:zzFade .6s 3.6s both !important}
+html.zzintro #authGate .lg-sheet{animation:zzSheet .7s cubic-bezier(.2,.8,.2,1) 3.7s both !important}
 @keyframes zzSheet{from{transform:translateY(100%)}to{transform:none}}
 `;
   document.head.appendChild(ist);
@@ -102,9 +105,9 @@ html.zzintro #authGate .lg-top{animation:zzUp2 .6s 1s both}
     document.documentElement.classList.add("zzintro");
     var iv = document.createElement("div");
     iv.id = "zzIntro";
-    iv.innerHTML = '<img src="icons/logo-3d.png" alt="" onerror="this.style.display=\'none\'"><b>English Classes</b><span>Learn English, one lesson at a time.</span>';
+    iv.innerHTML = '<div class="zzrow"><img src="icons/logo-3d.png" alt="" onerror="this.style.display=\'none\'"><div class="zzt"><b>English Classes</b><span>Learn English, one lesson at a time.</span></div></div>';
     document.body.appendChild(iv);
-    setTimeout(function () { iv.remove(); document.documentElement.classList.remove("zzintro"); }, 2700);
+    setTimeout(function () { iv.remove(); document.documentElement.classList.remove("zzintro"); }, 4400);
   }
 
   /* PC sidebar: brand and user at the top, log out at the bottom. Re-added if the menu re-renders. */
