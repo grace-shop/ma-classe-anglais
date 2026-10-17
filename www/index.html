@@ -929,7 +929,7 @@ let actx=null;
 function beep(kind){if(!S.sound)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const seq=kind==="ok"?[[660,0],[990,.09]]:kind==="win"?[[523,0],[659,.1],[784,.2],[1047,.3]]:[[220,0],[180,.12]];
   for(const[f,t]of seq){const o=actx.createOscillator(),g=actx.createGain();o.type=kind==="bad"?"sawtooth":"sine";o.frequency.value=f;g.gain.setValueAtTime(.0001,actx.currentTime+t);g.gain.exponentialRampToValueAtTime(kind==="bad"?.06:.14,actx.currentTime+t+.02);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+t+.22);o.connect(g).connect(actx.destination);o.start(actx.currentTime+t);o.stop(actx.currentTime+t+.25)}}catch(e){}}
 const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
-function confetti(){if(reduceMotion||LITE)return;const c=$("#fx"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;const cols=["#1E2558","#C9A45C","#B4546F","#4B6BD6","#E6D2A3"];
+function confetti(){if(reduceMotion)return;const c=$("#fx"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;const cols=["#1E2558","#C9A45C","#B4546F","#4B6BD6","#E6D2A3"];
   const ps=Array.from({length:160},()=>({x:innerWidth/2,y:innerHeight*.35,vx:(Math.random()-.5)*16,vy:-Math.random()*14-4,r:Math.random()*6+3,c:cols[Math.random()*5|0],a:Math.random()*6,va:(Math.random()-.5)*.4}));let f=0;
   (function tick(){x.clearRect(0,0,c.width,c.height);for(const p of ps){p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore()}if(++f<150)requestAnimationFrame(tick);else x.clearRect(0,0,c.width,c.height)})()}
 function xpFloat(n,el){const d=document.createElement("div");d.className="xpfloat";d.textContent="+"+n+" XP";const r=el?el.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2,width:0};d.style.left=(r.left+r.width/2)+"px";d.style.top=r.top+"px";document.body.appendChild(d);setTimeout(()=>d.remove(),1150)}
@@ -2261,10 +2261,11 @@ async function notifOff(){const P=LN();try{localStorage.setItem("mca_notif","0")
   try{if(P){const p=await P.getPending();if(p.notifications?.length)await P.cancel({notifications:p.notifications.map(n=>({id:n.id}))})}}catch(e){}toast("Reminders off","check")}
 let notifT=null;const notifRefresh=now=>{clearTimeout(notifT);notifT=setTimeout(notifDo,now?0:2500)};
 const DAILY=["5 minutes of English today? One short quiz and you are done.","Your English gets better every day: come and do a quiz!","A new word today? Open your English class."];
+function notifHM(){try{const v=(localStorage.getItem("mca_notif_hm")||"18:00").split(":");const h=+v[0],m=+v[1];return [isNaN(h)?18:h,isNaN(m)?0:m]}catch(e){return [18,0]}}
 async function notifDo(){const P=LN();if(!P||!notifOn()||!S.me||S.mode!=="student")return;
   try{const pend=await P.getPending();if(pend.notifications?.length)await P.cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
     const list=[],now=new Date(),at=(d,h,m)=>{const x=new Date(d);x.setHours(h,m,0,0);return x},streak=liveStreak(S.me),did=S.me.lastDay===today();
-    for(let i=0;i<3;i++){const d=new Date();d.setDate(d.getDate()+i);const t=at(d,18,0);if(t<=now||(i===0&&did))continue;
+    for(let i=0;i<3;i++){const d=new Date();d.setDate(d.getDate()+i);const hm=notifHM(),t=at(d,hm[0],hm[1]);if(t<=now||(i===0&&did))continue;
       list.push({id:nid("daily"+i),title:"English Classes",body:i===0&&streak>0?`Your ${streak}-day streak is waiting: 5 minutes of English?`:DAILY[i%DAILY.length],schedule:{at:t,allowWhileIdle:true},channelId:"rappels"})}
     for(const h of S.homework.filter(visible)){if(!h.due||(S.me.submissions||{})[h.id])continue;const due=new Date(h.due+"T00:00:00"),t1=at(new Date(due.getTime()-864e5),17,0),t2=at(due,8,0);
       if(t1>now)list.push({id:nid("hw1"+h.id),title:"Homework due tomorrow",body:h.title,schedule:{at:t1,allowWhileIdle:true},channelId:"rappels"});
@@ -3755,7 +3756,7 @@ function v4MsgHTML(kind,m,c){const a=m.att,once=!!(a&&a.o)&&!m.del,stk=a&&a.k===
   return`<div class="msg ${m.mine?"mine":""}${stk?" stk":""}${m.del?" del":""}${rxh?" hasrx":""}" data-mid="${esc(m.id)}" data-k="${kind}" id="m-${esc(m.id)}">${re}${body}<span>${fmtTime(m.at)}${tick}</span>${rxh}</div>`}
 function v4ActSheet(kind,list,c){const raw=list.find(x=>x.id===V4.act.id);if(!raw)return"";const m=v4Norm(kind,raw,c),txt=v4Plain(m.text);
   return`<div class="v4sheet-bg" data-v4="actClose"></div><div class="v4sheet" role="dialog" aria-label="Message options">
-  ${!m.del?`<div class="v4rxrow">${V4RE.map(e=>`<button type="button" data-v4="react" data-e="${e}" aria-pressed="${(m.react||{})[S.uid]===e}" aria-label="React ${e}">${E(e)}</button>`).join("")}</div>`:""}
+  ${!m.del?`<div class="v4rxrow">${V4RE.map(e=>`<button type="button" data-v4="react" data-e="${e}" aria-pressed="${(m.react||{})[S.uid]===e}" aria-label="React ${e}">${E(e)}</button>`).join("")}<details class="v4rxmore"><summary aria-label="More emojis">+</summary><div class="v4grid emo">${V4EMO.map(x=>`<button type="button" data-v4="react" data-e="${x}" aria-label="React ${x}">${natEmo(x)}</button>`).join("")}</div></details></div>`:""}
   ${!m.del?`<button type="button" data-v4="reply">${ic("left")}Reply</button>`:""}
   ${!m.del&&txt?`<button type="button" data-v4="copy">${ic("copy")}Copy</button>`:""}
   <button type="button" data-v4="delMe">${ic("trash")}Delete for me</button>
@@ -10984,6 +10985,49 @@ loadThree();
 
 <script>if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
 
+.pg-set{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(94,234,212,.15)}
+.pg-time{display:flex;align-items:center;gap:8px;font-weight:600}
+.pg-time input{background:rgba(10,14,36,.8);color:inherit;border:1px solid rgba(94,234,212,.35);border-radius:12px;padding:6px 10px;font:inherit}
+.pg-dl{border:1px solid rgba(94,234,212,.45);background:linear-gradient(145deg,rgba(94,234,212,.18),rgba(129,140,248,.14));color:inherit;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;box-shadow:0 0 16px rgba(94,234,212,.2)}
+.pg-note{opacity:.7;flex-basis:100%}
+
+.pg-panel{margin:14px auto 6px;max-width:760px;padding:16px;border-radius:24px;background:linear-gradient(145deg,rgba(30,37,88,.7),rgba(10,14,36,.7));border:1px solid rgba(94,234,212,.22);box-shadow:0 18px 44px rgba(0,0,0,.35),0 0 30px rgba(94,234,212,.08);backdrop-filter:blur(14px)}
+.pg-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+.pg-goal{display:grid;gap:6px;min-width:180px;flex:1}
+.pg-goal small{opacity:.7;letter-spacing:.06em;text-transform:uppercase}
+.pg-goal b{font-size:1.05rem}
+.pg-bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.pg-bar i{display:block;height:100%;background:linear-gradient(90deg,#5EEAD4,#60A5FA,#818CF8);box-shadow:0 0 14px rgba(94,234,212,.6);border-radius:999px;transition:width .6s ease}
+.pg-review{border:0;cursor:pointer;padding:12px 18px;border-radius:999px;font-weight:700;color:#06121f;background:linear-gradient(135deg,#5EEAD4,#818CF8);box-shadow:0 12px 28px rgba(94,234,212,.3)}
+.pg-review:disabled{opacity:.4;cursor:default;box-shadow:none}
+.pg-review span{display:inline-block;margin-left:6px;padding:1px 9px;border-radius:999px;background:rgba(6,18,31,.25)}
+.pg-badges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.pg-badge{display:grid;justify-items:center;gap:4px;padding:12px 6px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);opacity:.55;text-align:center}
+.pg-badge i{font-style:normal;font-size:20px;width:40px;height:40px;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.06)}
+.pg-badge b{font-size:.85rem}
+.pg-badge small{opacity:.7}
+.pg-badge.on{opacity:1;border-color:rgba(94,234,212,.5);box-shadow:0 0 22px rgba(94,234,212,.22)}
+.pg-badge.on i{background:linear-gradient(135deg,#5EEAD4,#818CF8);color:#06121f;box-shadow:0 0 16px rgba(94,234,212,.5)}
+
+<style id="ui-future">
+.ai-b,.pt-bub{position:relative;border-radius:22px!important;background:linear-gradient(145deg,rgba(30,37,88,.94),rgba(12,16,42,.94))!important;border:1px solid rgba(94,234,212,.22)!important;box-shadow:0 14px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.06),0 0 26px rgba(94,234,212,.09)!important;backdrop-filter:blur(12px);transition:transform .2s ease}
+.ai-b:hover,.pt-bub:hover{transform:translateY(-2px)}
+.ai-b.u,.pt-row.me .pt-bub{background:linear-gradient(135deg,#5EEAD4 0%,#60A5FA 55%,#818CF8 100%)!important;border:none!important;color:#06121f!important;box-shadow:0 16px 36px rgba(94,234,212,.28),0 0 30px rgba(96,165,250,.25)!important}
+.pt-auto{display:inline-block;padding:3px 11px;border-radius:999px;font-weight:700;letter-spacing:.03em;color:#C7D2FE;background:linear-gradient(90deg,rgba(129,140,248,.28),rgba(94,234,212,.18));border:1px solid rgba(129,140,248,.45);box-shadow:0 0 14px rgba(129,140,248,.25)}
+.v4rxrow{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(10,14,36,.88);backdrop-filter:blur(16px);border:1px solid rgba(94,234,212,.28);box-shadow:0 16px 42px rgba(0,0,0,.5),0 0 30px rgba(94,234,212,.16)}
+.v4rxrow button{transition:transform .2s cubic-bezier(.2,.9,.3,1.5),filter .2s}
+.v4rxrow button:hover{transform:translateY(-5px) scale(1.25);filter:drop-shadow(0 6px 10px rgba(94,234,212,.45))}
+.v4rxrow button[aria-pressed="true"]{transform:scale(1.2);filter:drop-shadow(0 0 10px rgba(94,234,212,.7))}
+.v4rxmore{position:relative}
+.v4rxmore summary{list-style:none;cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:22px;font-weight:700;color:#5EEAD4;background:linear-gradient(145deg,rgba(94,234,212,.22),rgba(129,140,248,.18));border:1px solid rgba(94,234,212,.45);box-shadow:0 0 16px rgba(94,234,212,.3)}
+.v4rxmore summary::-webkit-details-marker{display:none}
+.v4rxmore[open] .v4grid{position:absolute;bottom:calc(100% + 12px);right:0;width:min(290px,80vw);max-height:230px;overflow:auto;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:10px;border-radius:20px;background:rgba(10,14,36,.97);border:1px solid rgba(94,234,212,.3);box-shadow:0 22px 50px rgba(0,0,0,.6),0 0 40px rgba(129,140,248,.25);z-index:50}
+.v4rxmore[open] .v4grid button{font-size:22px;background:none;border:0;border-radius:12px;padding:4px;cursor:pointer;transition:transform .15s,background .15s}
+.v4rxmore[open] .v4grid button:hover{transform:scale(1.25);background:rgba(94,234,212,.12)}
+.fsv-top,.fsv-bot{background:linear-gradient(180deg,rgba(6,9,24,.75),transparent)!important;backdrop-filter:blur(6px)}
+.fsv-bot{background:linear-gradient(0deg,rgba(6,9,24,.8),transparent)!important}
+</style>
+
 <style id="ch-modes">
 .ar-mode[data-m="ch-2nde"]{box-shadow:inset 0 0 0 1px rgba(59,130,246,.55),0 0 22px rgba(59,130,246,.18)}
 .ar-mode[data-m="ch-2nde"] .ar-badge{background:rgba(59,130,246,.2);color:#60A5FA}
@@ -11010,7 +11054,7 @@ var AR_TITLE={"ch-mix":"Mixed Review","ch-sprint":"Grammar Sprint","ch-vocab":"V
   var _play=arPlay;
   arPlay=function(mode){
     if(String(mode).indexOf("ch-")!==0) return _play(mode);
-    var bank=CH_BANK[key[mode]]||[];
+    var bank=mode==="ch-review"?arMistakesBank():(CH_BANK[key[mode]]||[]);
     var L=arLv(), pool=arPool(bank,10);
     if(pool.length<10){
       var have={}; pool.forEach(function(q){have[q.q]=1});
@@ -11134,6 +11178,79 @@ var AR_TITLE={"ch-mix":"Mixed Review","ch-sprint":"Grammar Sprint","ch-vocab":"V
       else { win=st.players.length>0&&st.players[0].uid===st.me&&st.players[0].score>0; }
       if(win && window.__fxWon!==st.id){ window.__fxWon=st.id; fxFireworks(true); fxRain(3000); }
     }catch(e){}
+    return r;
+  };
+})();
+
+/* ---- progress: mistakes to review, weekly goal, badges ---- */
+(function(){
+  if(typeof AR==="undefined"||typeof arQAnswer!=="function"||typeof arEnd!=="function"||typeof arHome!=="function") return;
+  function load(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
+  function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  function weekId(){return Math.floor((Date.now()-Date.UTC(1970,0,5))/(7*864e5))}
+  function week(){var w=load("ar_week",{w:0,n:0}); return w.w===weekId()?w:{w:weekId(),n:0}}
+  function mistakes(){return load("ar_mistakes",[])}
+  window.arMistakesBank=mistakes;
+  function addMistake(q){var l=mistakes(); if(l.some(function(x){return x.q===q.q})) return; l.push({q:q.q,o:q.o,a:q.a,e:q.e||"",lv:q.lv||1}); if(l.length>200) l=l.slice(-200); save("ar_mistakes",l)}
+  function clearMistake(q){var l=mistakes(), n=l.length; l=l.filter(function(x){return x.q!==q.q}); if(l.length!==n){save("ar_mistakes",l); save("ar_cleared",load("ar_cleared",0)+1)}}
+  // remember every wrong answer; in review mode a right answer removes it
+  var _qa=arQAnswer;
+  arQAnswer=function(k){
+    var q=AR.qs&&AR.qs[AR.i], was=AR.locked, r=_qa.apply(this,arguments);
+    if(!was&&q&&Array.isArray(q.o)){ try{ if(k===q.a){ if(AR.mode==="ch-review") clearMistake(q); } else addMistake(q); }catch(e){} }
+    return r;
+  };
+  // count finished games for the weekly goal
+  var _end=arEnd;
+  arEnd=function(mode,score,max,msg){
+    if(AR.qs&&AR.qs.length){ var w=week(); w.n++; save("ar_week",w); }
+    return _end.apply(this,arguments);
+  };
+
+  function settingsRowHTML(){
+    var hm=(function(){try{return localStorage.getItem("mca_notif_hm")||"18:00"}catch(e){return "18:00"}})();
+    var off=load("ar_offline_at",0);
+    return '<div class="pg-set"><label class="pg-time"><span>Daily reminder</span><input type="time" data-pgact="time" value="'+hm+'"></label>'
+      +'<button type="button" class="pg-dl" data-pgact="offline">'+(off?'Lessons ready offline':'Download lessons for offline')+'</button>'
+      +'<small class="pg-note">'+(notifOn()?'Reminders are on.':'Turn on reminders in your phone notifications settings.')+'</small></div>';
+  }
+  document.addEventListener("change",function(e){
+    var t=e.target; if(!t||t.getAttribute("data-pgact")!=="time") return;
+    try{ localStorage.setItem("mca_notif_hm", t.value||"18:00") }catch(x){}
+    if(typeof notifRefresh==="function") notifRefresh(true);
+    if(typeof toast==="function") toast("Reminder set to "+(t.value||"18:00"),"check");
+  });
+  document.addEventListener("click",function(e){
+    var b=e.target.closest&&e.target.closest('[data-pgact="offline"]'); if(!b) return;
+    e.preventDefault();
+    if(!("serviceWorker" in navigator)||!navigator.serviceWorker.controller){
+      if(typeof toast==="function") toast("Open the app once with internet, then try again.","x"); return;
+    }
+    var files=["./","index.html","content.json","typed-jeux.json"];
+    navigator.serviceWorker.controller.postMessage({type:"precache",files:files});
+    if(typeof toast==="function") toast("Downloading lessons…","check");
+    navigator.serviceWorker.addEventListener("message",function onmsg(m){
+      if(m.data&&m.data.type==="precached"){ navigator.serviceWorker.removeEventListener("message",onmsg); save("ar_offline_at",Date.now());
+        if(typeof toast==="function") toast("Lessons ready offline","check"); if(typeof arHome==="function"&&AR.mode===null){ try{ var p=document.querySelector("#arBody .pg-panel"); if(p) p.outerHTML=panelHTML(); }catch(x){} } }
+    });
+  });
+  function panelHTML(){
+    var best=load("ar_best",{}), played=Object.keys(best).length, cleared=load("ar_cleared",0), n=week().n, m=mistakes().length;
+    var badges=[
+      {t:"Explorer",have:played,need:3,ic:"\u2605"},
+      {t:"All-rounder",have:played,need:AR_MODES.length,ic:"\u2726"},
+      {t:"Mistake master",have:cleared,need:10,ic:"\u2714"}
+    ];
+    var goal=Math.min(n,5);
+    return '<section class="pg-panel" aria-label="Your progress">'
+      +'<div class="pg-row"><div class="pg-goal"><small>Weekly goal</small><b>'+goal+'/5 games</b><div class="pg-bar"><i style="width:'+(goal*20)+'%"></i></div></div>'
+      +'<button type="button" class="pg-review" data-ar="start" data-m="ch-review"'+(m?'':' disabled')+'>Review my mistakes <span>'+m+'</span></button></div>'
+      +'<div class="pg-badges">'+badges.map(function(b){var ok=b.have>=b.need;return '<div class="pg-badge'+(ok?' on':'')+'"><i>'+(ok?b.ic:'\u2022')+'</i><b>'+b.t+'</b><small>'+Math.min(b.have,b.need)+'/'+b.need+'</small></div>'}).join("")+'</div>'+settingsRowHTML()+'</section>';
+  }
+  var _home=arHome;
+  arHome=function(){
+    var r=_home.apply(this,arguments);
+    try{ var hero=document.querySelector("#arBody .ar-hero"); if(hero&&!document.querySelector("#arBody .pg-panel")) hero.insertAdjacentHTML("afterend",panelHTML()); }catch(e){}
     return r;
   };
 })();
