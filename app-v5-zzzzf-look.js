@@ -12,9 +12,12 @@
   st.id = "zzzzflook";
   st.textContent = `
 /* ---- Sign-in extras ---- */
-#authGate .lg-keep{display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;color:#3A3F55;cursor:pointer}
-#authGate .lg-keep input{width:16px;height:16px;margin:0;accent-color:#3D6BF0}
+#authGate .lg label.lg-keep{display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;color:#3A3F55;cursor:pointer}
+#authGate .lg label.lg-keep input{width:16px;height:16px;margin:0;accent-color:#3D6BF0}
 #authGate .lg-idrow{text-align:center;margin-top:-2px}
+
+/* Phone: the sign-in sheet ends with the button, as in the video (download badges are desktop only). */
+@media (max-width:720px){#authGate .dlc{display:none!important}}
 
 /* ---- Email code screens (video 2): light embossed card ---- */
 #authGate.otpv{background:#E3E7EE!important;display:grid!important;place-items:center;padding:24px 18px!important;overflow:auto}
@@ -77,6 +80,32 @@
 }
 `;
   document.head.appendChild(st);
+
+  /* Opening (video 1): dark screen with the logo, then the sign-in sheet rises from the bottom. */
+  var ist = document.createElement("style");
+  ist.id = "zzzzfintro";
+  ist.textContent = `
+#zzIntro{position:fixed;inset:0;z-index:300;background:#05060F;display:grid;place-content:center;justify-items:center;gap:14px;pointer-events:none;animation:zzOut .5s ease 2.1s forwards}
+#zzIntro img{width:112px;height:112px;border-radius:30px;animation:zzPop .9s cubic-bezier(.2,.8,.2,1) both}
+#zzIntro b{font:800 1.5rem/1 Manrope,system-ui,sans-serif;color:#fff;letter-spacing:.01em;animation:zzUp2 .6s .45s both}
+#zzIntro span{font:500 .92rem/1.4 Manrope,system-ui,sans-serif;color:#9AA3CC;animation:zzUp2 .6s .6s both}
+@keyframes zzOut{to{opacity:0;visibility:hidden}}
+@keyframes zzPop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes zzUp2{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+html.zzintro #authGate .lg-sheet{animation:zzSheet .7s cubic-bezier(.2,.8,.2,1) 1.2s both}
+html.zzintro #authGate .lg-top{animation:zzUp2 .6s 1s both}
+@keyframes zzSheet{from{transform:translateY(100%)}to{transform:none}}
+`;
+  document.head.appendChild(ist);
+  if (!document.hidden && !window.__zzIntroSeen) {
+    window.__zzIntroSeen = true;
+    document.documentElement.classList.add("zzintro");
+    var iv = document.createElement("div");
+    iv.id = "zzIntro";
+    iv.innerHTML = '<img src="icons/logo-3d.png" alt="" onerror="this.style.display=\'none\'"><b>English Classes</b><span>Learn English, one lesson at a time.</span>';
+    document.body.appendChild(iv);
+    setTimeout(function () { iv.remove(); document.documentElement.classList.remove("zzintro"); }, 2700);
+  }
 
   /* PC sidebar: brand and user at the top, log out at the bottom. Re-added if the menu re-renders. */
   function addSidebarParts() {
