@@ -631,65 +631,104 @@
   window.__telOf = (e) => { const d = String(e || "").split("@")[0]; return d.startsWith("228") && d.length === 11 ? "+228 " + d.slice(3).replace(/(\d\d)(?=\d)/g, "$1 ") : "+" + d; };
   const loginId = () => { const raw = ((document.getElementById("agE") || {}).value || "").trim(); if (idMode !== "tel") return { email: raw }; const d = telDigits(raw); return telOk(d) ? { email: telEmail(raw) } : { err: "Invalid number: write your phone number, for example 90 12 34 56." }; };
   const G = `<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2c-2 1.5-4.5 2.4-7.2 2.4-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
-  const CSS2 = `#authGate{background:#E9E7E0!important;padding:clamp(14px,3vw,36px)!important;align-content:center;justify-items:center}
-#authGate .ag2-wrap{display:grid;gap:18px;width:min(900px,100%);justify-items:center}
-#authGate .ag2{position:relative;width:100%;display:grid;grid-template-columns:1fr 1fr;min-height:540px;border-radius:34px;background:#EEECE5;box-shadow:14px 14px 30px #c8c5bb,-14px -14px 30px #fff;overflow:hidden;color:#2A2A2A;font-family:Manrope,system-ui,sans-serif;box-sizing:border-box}
-#authGate .ag2-info{position:relative;display:grid;align-content:center;justify-items:center;text-align:center;gap:14px;padding:48px 40px;background:#EEECE5;overflow:hidden}
-#authGate .ag2-info::before{content:"";position:absolute;width:200px;height:200px;border-radius:50%;right:-95px;top:-95px;background:#EEECE5;box-shadow:inset 8px 8px 16px #d3cfc3,inset -8px -8px 16px #fff}
-#authGate .ag2-info::after{content:"";position:absolute;width:230px;height:230px;border-radius:50%;left:-130px;bottom:-150px;background:#EEECE5;box-shadow:inset 8px 8px 16px #d3cfc3,inset -8px -8px 16px #fff}
-#authGate .ag2-info>*{position:relative;z-index:1}
-#authGate .ag2-cap{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#8A877D;font-weight:700}
-#authGate .ag2-info h2{margin:0;font:800 2rem/1.1 Manrope,system-ui,sans-serif;color:#1E1E1E}
-#authGate .ag2-info p{margin:0;max-width:280px;font-size:.95rem;line-height:1.55;color:#4A4A48}
-#authGate .ag2-btn{margin-top:8px;width:auto;border:0;cursor:pointer;padding:13px 42px;border-radius:999px;background:#EEECE5;color:#1E1E1E;font-weight:800;letter-spacing:.2em;font-size:.8rem;text-transform:uppercase;box-shadow:6px 6px 14px #c8c5bb,-6px -6px 14px #fff}
-#authGate .ag2-btn:active{box-shadow:inset 4px 4px 10px #c8c5bb,inset -4px -4px 10px #fff}
-#authGate .ag2-form{display:grid;align-content:center;gap:12px;padding:40px 44px;text-align:center;background:#EEECE5;min-width:0}
-#authGate .ag2-form h3{margin:0 0 4px;font:800 1.85rem/1.1 Manrope,system-ui,sans-serif;color:#1E1E1E}
-#authGate .ag2-soc{display:flex;justify-content:center;gap:14px}
-#authGate .ag2-round{width:50px;height:50px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:#EEECE5;box-shadow:6px 6px 14px #c8c5bb,-6px -6px 14px #fff}
-#authGate .ag2-or{margin:4px 0 2px;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#8A877D}
-#authGate .ag2 form{display:grid;gap:12px;justify-items:stretch;margin:0}
-#authGate .ag2 label{display:grid;gap:6px;font-weight:600;font-size:.78rem;color:#6F6C63;text-align:left}
-#authGate .ag2 input{width:100%;box-sizing:border-box;font:inherit;font-size:.95rem;background:#EEECE5;border:0;border-radius:14px;padding:14px 18px;color:#2A2A2A;box-shadow:inset 4px 4px 8px #cdcac0,inset -4px -4px 8px #fff}
-#authGate .ag2 input::placeholder{color:#9C998E}
-#authGate .ag2 input:focus{outline:none;box-shadow:inset 4px 4px 8px #cdcac0,inset -4px -4px 8px #fff,0 0 0 2px rgba(35,42,59,.25)}
-#authGate .ag2 .pw input{padding-right:52px}
-#authGate .ag2 .pw .eye{color:#6F6C63;background:none;width:42px;height:42px}
-#authGate .ag2 .pw .eye.on{color:#1E1E1E;background:none;box-shadow:none}
-#authGate .ag2 .idsw{background:#EEECE5;border:0;border-radius:14px;box-shadow:inset 3px 3px 7px #cdcac0,inset -3px -3px 7px #fff}
-#authGate .ag2 .idsw button{background:none;color:#6F6C63;border:0;font-weight:700}
-#authGate .ag2 .idsw button[aria-pressed=true]{background:#EEECE5;color:#1E1E1E;border-radius:10px;box-shadow:4px 4px 8px #c8c5bb,-4px -4px 8px #fff}
-#authGate .ag2 .ag2-submit{justify-self:center;width:auto;margin-top:6px;border:0;cursor:pointer;padding:15px 52px;border-radius:999px;background:#232A3B;color:#fff;font-weight:800;letter-spacing:.2em;text-transform:uppercase;font-size:.8rem;box-shadow:8px 8px 18px #c8c5bb,-6px -6px 14px #fff}
-#authGate .ag2 .ag2-link{justify-self:center;width:auto;background:none;border:0;color:#6F6C63;cursor:pointer;font-weight:600;font-size:.85rem;padding:4px}
-#authGate .ag2 .warn{background:#E6E3DA;color:#4A4A48;border:0;border-radius:14px;box-shadow:inset 3px 3px 7px #cdcac0,inset -3px -3px 7px #fff;text-align:left}
-#authGate .ag2 .warn b{color:#232A3B}#authGate .ag2 .warn svg{color:#6F6C63}
-#authGate .ag2 .msg{border-radius:14px;text-align:left}
-#authGate .ag2 .msg.err{background:#F6DEDE;color:#7A1F26}#authGate .ag2 .msg.ok{background:#DDF1E4;color:#1D5C3A}
-#authGate .ag2 button:disabled{opacity:.5}
-@media (max-width:720px){#authGate .ag2{grid-template-columns:1fr;min-height:0;border-radius:28px}#authGate .ag2-info{padding:30px 24px 34px}#authGate .ag2-info h2{font-size:1.6rem}#authGate .ag2-info p{font-size:.88rem}#authGate .ag2-info::after{width:170px;height:170px;left:-100px;bottom:-120px}#authGate .ag2-form{padding:26px 22px 30px}#authGate .ag2-form h3{font-size:1.5rem}}`;
+  const CSS3 = `#authGate{position:fixed;inset:0;z-index:200;display:block!important;overflow:auto;padding:0!important;background:radial-gradient(120% 60% at 50% -5%,#2B3170 0%,#121531 45%,#070817 100%)!important}
+#authGate .lg{width:min(440px,100%);min-height:100%;margin:0 auto;display:flex;flex-direction:column;box-sizing:border-box;color:#fff;font-family:Manrope,system-ui,sans-serif}
+#authGate .lg-top{padding:calc(env(safe-area-inset-top,0px) + 40px) 28px 30px;text-align:center;display:grid;justify-items:center;gap:8px}
+#authGate .lg-logo{width:56px;height:56px;border-radius:18px;overflow:hidden;display:grid;place-items:center}
+#authGate .lg-brand{font:700 .8rem/1 Manrope,system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#AEB6E0}
+#authGate .lg-title{margin:12px 0 0;font:italic 400 3rem/1.05 "Instrument Serif",Georgia,serif;color:#fff;letter-spacing:-.01em}
+#authGate .lg-sub{margin:0;color:#BFC5E4;font-size:.95rem;line-height:1.45;max-width:300px}
+#authGate .lg-sheet{margin-top:auto;background:#FFFFFF;color:#14161F;border-radius:34px 34px 0 0;padding:24px 24px calc(24px + env(safe-area-inset-bottom,0px));display:grid;gap:14px;box-shadow:0 -24px 60px rgba(0,0,0,.4);min-height:58vh;box-sizing:border-box}
+#authGate .lg-seg{display:grid;grid-template-columns:1fr 1fr;background:#EEF0F5;border-radius:999px;padding:4px;gap:4px}
+#authGate .lg-seg button{border:0;background:none;border-radius:999px;padding:12px 10px;font:inherit;font-weight:700;color:#6B7089;cursor:pointer;width:auto;font-size:.95rem}
+#authGate .lg-seg button[aria-pressed=true]{background:#14161F;color:#fff;box-shadow:0 6px 16px rgba(20,22,31,.25)}
+#authGate .lg-h{margin:2px 0 0;font:800 1.35rem/1.2 Manrope,system-ui,sans-serif;color:#14161F;text-align:left}
+#authGate .lg-p{margin:0;color:#6B7089;font-size:.88rem;line-height:1.5;text-align:left}
+#authGate .lg form{display:grid;gap:12px;margin:0}
+#authGate .lg label{display:grid;gap:6px;font-size:.8rem;font-weight:700;color:#3A3F55;text-align:left}
+#authGate .lg input{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;background:#F3F4F8;border:1.5px solid transparent;border-radius:16px;padding:15px 16px;color:#14161F;margin:0}
+#authGate .lg input::placeholder{color:#9AA0B8}
+#authGate .lg input:focus{outline:none;border-color:#4F7BF7;background:#fff;box-shadow:0 0 0 4px rgba(79,123,247,.15)}
+#authGate .lg .pw{position:relative;display:block}#authGate .lg .pw input{padding-right:52px}
+#authGate .lg .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;padding:0;border:0;background:none;color:#8A90A8;display:grid;place-items:center;cursor:pointer;border-radius:12px}
+#authGate .lg-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.85rem}
+#authGate .lg-link,#authGate .lg-idsw{width:auto;background:none;border:0;color:#4F7BF7;font:inherit;font-weight:700;font-size:.85rem;cursor:pointer;padding:0}
+#authGate .lg-btn{width:100%;border:0;border-radius:18px;padding:16px;font:inherit;font-weight:800;font-size:1rem;letter-spacing:.02em;color:#fff;background:linear-gradient(135deg,#5B8BFF,#3D6BF0);box-shadow:0 14px 28px rgba(61,107,240,.35);cursor:pointer;margin-top:4px}
+#authGate .lg-or{display:flex;align-items:center;gap:12px;color:#9AA0B8;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+#authGate .lg-or::before,#authGate .lg-or::after{content:"";flex:1;height:1px;background:#E4E6EE}
+#authGate .lg-soc{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1.5px solid #E4E6EE;background:#fff;border-radius:16px;padding:13px;font:inherit;font-weight:700;color:#14161F;cursor:pointer}
+#authGate .lg-foot{text-align:center;color:#6B7089;font-size:.9rem;margin:2px 0 0}
+#authGate .lg-foot button{background:none;border:0;color:#4F7BF7;font:inherit;font-weight:800;cursor:pointer;padding:0;width:auto}
+#authGate .msg{border-radius:14px;padding:10px 12px;font-size:.9rem;text-align:left}
+#authGate .msg.err{background:#FDE7E9;color:#8A1F2B}#authGate .msg.ok{background:#E3F6EA;color:#1D6B3F}
+#authGate .lg-ot{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+#authGate .lg-ot input{text-align:center;font-size:1.4rem;font-weight:800;padding:14px 0;border-radius:14px;background:#F3F4F8;box-shadow:inset 3px 3px 7px #DCDFEA,inset -3px -3px 7px #fff}
+#authGate .lg-ok{display:grid;justify-items:center;gap:8px;padding:18px 0 6px;text-align:center}
+#authGate .lg-ok b{font:800 1.5rem Manrope,system-ui,sans-serif;color:#16A34A}#authGate .lg-ok small{color:#6B7089;font-size:.95rem}
+#authGate .lg .dlc{margin:0 16px 16px}
+#authGate .dlc{position:relative;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:12px;border-radius:20px;text-decoration:none;color:#F1F3FB;background:linear-gradient(135deg,#171B36,#101329);border:1px solid #2A3056}
+#authGate .dlc img{width:46px;height:46px;border-radius:14px}
+#authGate .dlc b{display:block;font-size:1rem}#authGate .dlc small{display:block;color:#AEB6D8;font-size:.8rem;margin-top:2px}
+#authGate .dlc .go{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#6C80FF,#9A7CFF 55%,#4FD1E8);color:#06091c;font-weight:800}
+@media (max-width:440px){#authGate .dlc{grid-template-columns:auto 1fr}#authGate .dlc .go{grid-column:1/-1;justify-content:center}}
+@media (min-width:441px){#authGate .lg{padding:24px 0}#authGate .lg-sheet{min-height:0;border-radius:34px}}`;
+  let otpEmail = "", okView = false;
   function drawGate() {
-    if (!gate) { const st = document.createElement("style"); st.textContent = CSS + CSS2; document.head.appendChild(st); gate = document.createElement("div"); gate.id = "authGate"; document.body.appendChild(gate); }
+    if (!gate) { const st = document.createElement("style"); st.textContent = CSS + CSS3; document.head.appendChild(st); gate = document.createElement("div"); gate.id = "authGate"; document.body.appendChild(gate); }
     const sp = document.getElementById("splash"); if (sp) sp.style.display = "none";
-    const reset = mode === "newpass", isUp = mode === "up";
+    const isIn = mode === "in", isUp = mode === "up", reset = mode === "newpass";
     const eyeBtn = `<button type="button" class="eye" data-x="eye" aria-label="Show password" title="Show password"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>`;
+    const phone = idMode === "tel";
+    const idField = `<label>${phone ? "Phone number" : "E-mail"}<input id="agE" ${phone ? 'type="tel" inputmode="tel" autocomplete="tel" placeholder="90 12 34 56" maxlength="20"' : 'type="email" autocomplete="email" placeholder="your.email@gmail.com"'} required></label>`;
+    const pwField = (ac, ph) => `<label>Password<span class="pw"><input id="agP" type="password" required minlength="6" autocomplete="${ac}" placeholder="${ph}">${eyeBtn}</span></label>`;
+    const seg = isIn || isUp ? `<div class="lg-seg" role="group" aria-label="Account"><button type="button" data-x="in" aria-pressed="${isIn}">Sign In</button><button type="button" data-x="up" aria-pressed="${isUp}">Sign Up</button></div>` : "";
+    const social = CFG.googleEnabled === false ? "" : `<div class="lg-or">or continue with</div><button type="button" class="lg-soc" data-x="google">${G}Google</button>`;
+    const idSw = `<button type="button" class="lg-idsw" data-x="${phone ? "idEmail" : "idTel"}">${phone ? "Use e-mail instead" : "Use a phone number instead"}</button>`;
     const warnIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/></svg>`;
-    const social = CFG.googleEnabled === false || reset ? "" : `<div class="ag2-soc"><button type="button" class="ag2-round" data-x="google" aria-label="Continue with Google" title="Continue with Google">${G}</button></div><p class="ag2-or">or use your e-mail</p>`;
-    const body = reset
-      ? `<form data-f="newpass"><label>New password<span class="pw"><input id="agP" type="password" minlength="6" required autocomplete="new-password">${eyeBtn}</span></label><button class="ag2-submit" type="submit">Save</button></form>`
-      : `${social}<form data-f="${mode}">${isUp ? `<label>First and last name<input id="agN" required maxlength="60" autocomplete="name" placeholder="E.g. Ama Kossi"></label>` : ""}
-    <div class="idsw" role="group" aria-label="Log in with"><button type="button" data-x="idEmail" aria-pressed="${idMode !== "tel"}">E-mail</button><button type="button" data-x="idTel" aria-pressed="${idMode === "tel"}">Phone</button></div>
-    ${idMode === "tel" ? `<label>Phone number<input id="agE" type="tel" inputmode="tel" required autocomplete="tel" placeholder="90 12 34 56" maxlength="20"></label>` : `<label>E-mail<input id="agE" type="email" required autocomplete="email" placeholder="your.email@gmail.com"></label>`}
-    <label>Password<span class="pw"><input id="agP" type="password" required minlength="6" autocomplete="${isUp ? "new-password" : "current-password"}" placeholder="At least 6 characters">${eyeBtn}</span></label>
-    ${isUp ? `<div class="warn" role="note">${warnIcon}<div>${idMode === "tel" ? "" : ""}<b>Important: never forget your password.</b> Choose one you will remember and write it down in a safe place. Do not give it to anyone, not even a classmate: this is a safety rule.</div></div>` : ""}
-    <button class="ag2-submit" type="submit">${isUp ? "Sign up" : "Log in"}</button></form>
-    ${mode === "in" ? `<button class="ag2-link" data-x="forgot">Forgot password?</button>` : ""}`;
-    const info = reset
-      ? `<span class="ag2-cap">English Classes</span><h2>Almost there</h2><p>Choose a new password to get back into your class.</p>`
-      : isUp
-        ? `<span class="ag2-cap">English Classes</span><h2>Welcome Back!</h2><p>To keep connected with us please log in with your personal info.</p><button type="button" class="ag2-btn" data-x="in">Sign in</button>`
-        : `<span class="ag2-cap">English Classes</span><h2>Hello, friend!</h2><p>Enter your details and start learning English with us.</p><button type="button" class="ag2-btn" data-x="up">Sign up</button>`;
-    const badges = `${!isNative() && !window.__standaloneApp && window.__isIOS ? `<a class="dlc" href="#" data-x="ios"><img src="icons/icon-192.png" alt=""><span><b>iPhone app</b><small>Free · installs from Safari in 30 seconds</small></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Install</span></a>` : ""}${!isNative() && !window.__standaloneApp && !window.__isIOS && CFG.apkUrl ? `<a class="dlc" href="${esc(CFG.apkUrl)}" rel="noopener"><img src="icons/icon-192.png" alt=""><span><b>Android app</b><small>Free · full screen · works even offline</small></span><span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Download</span></a>` : ""}`;
-    gate.innerHTML = `<div class="ag2-wrap"><div class="ag2" role="dialog" aria-labelledby="agT"><section class="ag2-info">${info.replace("<h2>", '<h2 id="agT">')}</section><section class="ag2-form"><h3>${reset ? "New password" : isUp ? "Create Account" : "Log in"}</h3>${note ? `<div class="msg ${note.ok ? "ok" : "err"}">${esc(note.t)}</div>` : ""}${body}</section></div>${badges}</div>`;
+    let title = "Welcome back.", sub = "Pick up where you left off — your class is waiting.", body = "";
+    if (reset) {
+      title = "New password."; sub = "Choose a password you will remember.";
+      body = okView ? `<div class="lg-ok"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#E3F6EA"/><path d="M19 33l9 9 18-20" fill="none" stroke="#16A34A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Success!</b><small>Identity confirmed successfully.</small></div>`
+        : `<form data-f="newpass"><label>New password<span class="pw"><input id="agP" type="password" minlength="6" required autocomplete="new-password" placeholder="At least 6 characters">${eyeBtn}</span></label><button class="lg-btn" type="submit">Save password</button></form>`;
+    } else if (mode === "otpreq") {
+      title = "Reset with a code."; sub = "We will send a 6-digit code to your e-mail.";
+      body = `<form data-f="otpreq">${idField}<button class="lg-btn" type="submit">Send code</button></form><p class="lg-foot"><button type="button" data-x="in">Back to sign in</button></p>`;
+    } else if (mode === "otp") {
+      title = "Enter your code."; sub = `Type the 6-digit code we sent to ${esc(otpEmail)}.`;
+      body = `<form data-f="otp"><div class="lg-ot">${[0, 1, 2, 3, 4, 5].map((i) => `<input class="ot" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit ${i + 1}">`).join("")}</div><button class="lg-btn" type="submit">Verify</button></form><p class="lg-foot">No code? <button type="button" data-x="resend">Send again</button> · <button type="button" data-x="in">Back</button></p>`;
+    } else if (isUp) {
+      title = "Create account."; sub = "Join your class and start learning English.";
+      body = `${seg}<form data-f="up"><label>First and last name<input id="agN" required maxlength="60" autocomplete="name" placeholder="E.g. Ama Kossi"></label>${idField}${pwField("new-password", "At least 6 characters")}<div class="msg ok" style="font-size:.85rem">Never share your password, not even with a classmate. It protects your marks and messages.</div><button class="lg-btn" type="submit">Create my account</button></form>${social}<p class="lg-foot">Already have an account? <button type="button" data-x="in">Sign in</button></p>${idSw}`;
+    } else {
+      body = `${seg}<form data-f="in">${idField}${pwField("current-password", "At least 6 characters")}<div class="lg-row">${idSw}<button type="button" class="lg-link" data-x="otpreq">Forgot password?</button></div><button class="lg-btn" type="submit">Sign in</button></form>${social}<p class="lg-foot">New to English Classes? <button type="button" data-x="up">Create an account</button></p>`;
+    }
+    const badges = `${!isNative() && !window.__standaloneApp && window.__isIOS ? `<a class="dlc" href="#" data-x="ios"><img src="icons/icon-192.png" alt=""><span><b>iPhone app</b><small>Free · installs from Safari in 30 seconds</small></span><span class="go">Install</span></a>` : ""}${!isNative() && !window.__standaloneApp && !window.__isIOS && CFG.apkUrl ? `<a class="dlc" href="${esc(CFG.apkUrl)}" rel="noopener"><img src="icons/icon-192.png" alt=""><span><b>Android app</b><small>Free · full screen · works even offline</small></span><span class="go">Download</span></a>` : ""}`;
+    gate.innerHTML = `<div class="lg"><div class="lg-top"><div class="lg-logo"><img src="icons/logo-3d.png" alt="English Classes" style="width:100%;height:100%;display:block" onerror="this.outerHTML='E'"></div><span class="lg-brand">English Classes</span><h1 class="lg-title" id="agT">${title}</h1><p class="lg-sub">${sub}</p></div><section class="lg-sheet" role="dialog" aria-labelledby="agT">${note && !okView ? `<div class="msg ${note.ok ? "ok" : "err"}">${esc(note.t)}</div>` : ""}${body}</section>${badges}</div>`;
+    if (mode === "otp") {
+      const boxes = [...gate.querySelectorAll(".ot")];
+      if (boxes[0]) boxes[0].focus();
+      boxes.forEach((b, i) => {
+        b.addEventListener("input", () => { b.value = b.value.replace(/\D/g, "").slice(-1); if (b.value && boxes[i + 1]) boxes[i + 1].focus(); });
+        b.addEventListener("keydown", (e) => { if (e.key === "Backspace" && !b.value && boxes[i - 1]) boxes[i - 1].focus(); });
+        b.addEventListener("paste", (e) => { const t = ((e.clipboardData && e.clipboardData.getData("text")) || "").replace(/\D/g, "").slice(0, 6); if (!t) return; e.preventDefault(); t.split("").forEach((c, k) => { if (boxes[k]) boxes[k].value = c; }); (boxes[Math.min(t.length, 5)] || boxes[5]).focus(); });
+      });
+    }
+  }
+  async function sendOtp() {
+    const raw = ((document.getElementById("agE") || {}).value || "").trim();
+    if (!/^\S+@\S+\.\S+$/.test(raw)) return say("Write a valid e-mail address first.");
+    const { error } = await sb.auth.signInWithOtp({ email: raw, options: { shouldCreateUser: false } });
+    if (error) return say(/signups not allowed|not found|user not/i.test(error.message) ? "No account uses this e-mail address." : frErr(error.message));
+    otpEmail = raw; mode = "otp"; say("A code was sent to " + raw + ". Check your inbox and your spam folder.", true);
+  }
+  async function verifyOtpCode() {
+    const token = [...gate.querySelectorAll(".ot")].map((b) => b.value).join("");
+    if (token.length < 6) return say("Enter all 6 digits.");
+    mode = "newpass";                                   // no automatic sign-in until the new password is saved
+    const { error } = await sb.auth.verifyOtp({ email: otpEmail, token, type: "email" });
+    if (error) { mode = "otp"; return say("That code is not right or has expired. Send a new one."); }
+    note = null; okView = true; drawGate();
+    setTimeout(() => { okView = false; if (mode === "newpass") drawGate(); }, 1400);
   }
   function showGate() { drawGate(); }
   function hideGate() { if (gate) { gate.remove(); gate = null; } const sp = document.getElementById("splash"); if (sp) sp.style.display = ""; }
@@ -700,6 +739,8 @@
     const x = b.dataset.x;
     if (x === "eye") { const inp = b.parentNode.querySelector("input"); const show = inp.type === "password"; inp.type = show ? "text" : "password"; b.classList.toggle("on", show); b.setAttribute("aria-label", show ? "Hide password" : "Show password"); inp.focus(); return; }
     if (x === "in" || x === "up") { mode = x; note = null; drawGate(); return; }
+    if (x === "otpreq") { mode = "otpreq"; note = null; drawGate(); return; }
+    if (x === "resend") return sendOtp();
     if (x === "ios") { window.__iosGuide(); return; }
     if (x === "idEmail" || x === "idTel") { idMode = x === "idTel" ? "tel" : "email"; try { localStorage.setItem("mca_idmode", idMode); } catch (e) {} note = null; drawGate(); const f = document.getElementById("agE"); if (f) f.focus(); return; }
     if (x === "google") {
@@ -719,6 +760,8 @@
   });
   document.addEventListener("submit", async (e) => {
     const f = e.target.closest && e.target.closest("#authGate form"); if (!f) return; e.preventDefault(); e.stopImmediatePropagation();
+    if (f.dataset.f === "otpreq") return sendOtp();
+    if (f.dataset.f === "otp") return verifyOtpCode();
     const v = (id) => ((document.getElementById(id) || {}).value || "").trim();
     const btn = f.querySelector("button[type=submit]"); if (btn) btn.disabled = true;
     try {
