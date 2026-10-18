@@ -12012,8 +12012,8 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
     cls = cls || "";
     return segG(String(str || "")).map(function (g) {
       var base = g.replace(/️/g, "");
-      var mapped = ICO3_MAP[g] || ICO3_MAP[base] || ICO3_MAP[base.charAt(0)];
-      if ((mapped && !window.__quizImg) || !/\p{Extended_Pictographic}/u.test(g)) return _E(g, cls);
+      // the real 3D picture wins whenever one exists (no vector icons)
+      if (!/\p{Extended_Pictographic}/u.test(g)) return _E(g, cls);
       var c;
       try { c = emoCode(g); } catch (e) { return _E(g, cls); }
       if (EMO_SET.has(c)) {
