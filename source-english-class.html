@@ -12573,6 +12573,20 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
     return "";
   }
 
+  // Wait for a short silence before answering, so a pause in the middle
+  // of a sentence does not cut the person off. Speech that keeps coming
+  // within the window is added to the same message.
+  var PAUSE_MS = 1400;
+  async function settle(first) {
+    var acc = String(first || "").trim();
+    while (L && L.on && !L.fatal) {
+      var got = await Promise.race([startListen(), sleep(PAUSE_MS).then(function () { return null; })]);
+      if (got === null) break;                    // silence: the person is done
+      if (got && got.trim()) acc = (acc + " " + got.trim()).trim();
+    }
+    return acc;
+  }
+
   async function loop() {
     var queued = null;
     while (L && L.on) {
@@ -12583,13 +12597,16 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
       if (!L || !L.on) break;
       if (L.fatal) { toast("Allow the microphone to talk with Nova.", "x"); break; }
       if (!text || !text.trim()) continue;
-      if (window.speechSynthesis && speechSynthesis.speaking) {
-        if (looksLikeEcho(text, L.reply)) continue; // Nova hearing its own voice
-        speechSynthesis.cancel();                   // you spoke: Nova stops
-      }
+      // Nova is talking: an echo of her own voice is ignored
+      if (window.speechSynthesis && speechSynthesis.speaking && looksLikeEcho(text, L.reply)) continue;
+      text = await settle(text);
+      if (!L || !L.on) break;
+      if (!text) continue;
+      if (window.speechSynthesis && speechSynthesis.speaking) speechSynthesis.cancel(); // you spoke: Nova stops
       heard(text);
       setPhase("think", "Nova is thinking…");
       talkSend(text);
+      startListen();                               // keep listening while Nova thinks
       await waitUntil(function () { return !S.talk || !S.talk.busy; });
       if (!L || !L.on || !S.talk) break;
       L.reply = lastAi();
