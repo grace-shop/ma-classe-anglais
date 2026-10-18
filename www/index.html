@@ -11990,7 +11990,10 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
       var hit = lookup(x.say || x.answer || (x.accept && x.accept[0]) || "");
       if (hit) x = Object.assign({}, x, { pic: hit });
     }
-    return _ps(x, done, ok);
+    var html = _ps(x, done, ok);
+    // no real picture: show nothing rather than a generic sparkle
+    if (/data-i3="sparkle"/.test(html)) return "";
+    return html;
   };
 })();
 
@@ -12119,6 +12122,44 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
 #callScr.zz-mini>.zz-pill{display:flex!important;pointer-events:auto}
 `;
   document.head.appendChild(st);
+})();
+
+/* ---- app-v5-zzzzs-callkeep.js ---- */
+/* =====================================================================
+   v5 · Keep a call going when the person leaves the app (Android).
+   The app asks the native CallKeeper service to run while a call is
+   connected, and stops it when the call ends. On the web nothing happens.
+   ===================================================================== */
+(function () {
+  function keeper() {
+    try {
+      var P = window.Capacitor && window.Capacitor.Plugins;
+      return P && P.CallKeeper ? P.CallKeeper : null;
+    } catch (e) { return null; }
+  }
+
+  var _st = callScreenStatus;
+  callScreenStatus = function () {
+    var r = _st.apply(this, arguments);
+    try {
+      var k = keeper();
+      if (k && CALL.connAt && !CALL.keeping) {
+        CALL.keeping = true;
+        k.start({ title: "English Classes", video: !!CALL.video }).catch(function () {});
+      }
+    } catch (e) {}
+    return r;
+  };
+
+  var _cc = callCleanup;
+  callCleanup = function () {
+    try {
+      var k = keeper();
+      if (k && CALL.keeping) k.stop().catch(function () {});
+      CALL.keeping = false;
+    } catch (e) {}
+    return _cc.apply(this, arguments);
+  };
 })();
 
 /* ==== v4 END ==== */

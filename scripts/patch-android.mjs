@@ -57,3 +57,29 @@ if (existsSync("android-extras/google-services.json")) {
   writeFileSync(app, a);
   console.log("✓ Firebase (notifications) ajouté au projet Android");
 }
+
+// Appel en cours quand on quitte l'application : service de premier plan (micro et caméra)
+import { mkdirSync, copyFileSync as cp, readdirSync } from "node:fs";
+if (existsSync("android-extras/callkeeper")) {
+  const dir = "android/app/src/main/java/tg/maclasse/anglais";
+  mkdirSync(dir, { recursive: true });
+  for (const f of readdirSync("android-extras/callkeeper")) cp("android-extras/callkeeper/" + f, dir + "/" + f);
+  const mf = "android/app/src/main/AndroidManifest.xml";
+  let m = readFileSync(mf, "utf8");
+  if (!m.includes("CallKeeperService")) {
+    m = m.replace("<application", `<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <application`);
+    m = m.replace("</application>", `    <service android:name=".CallKeeperService" android:foregroundServiceType="microphone|camera" android:exported="false" />
+    </application>`);
+    writeFileSync(mf, m);
+  }
+  const act = dir + "/MainActivity.java";
+  let a = readFileSync(act, "utf8");
+  if (!a.includes("CallKeeperPlugin")) {
+    a = a.replace("super.onCreate(savedInstanceState);", "registerPlugin(CallKeeperPlugin.class);\n        super.onCreate(savedInstanceState);");
+    writeFileSync(act, a);
+  }
+  console.log("✓ appel en arrière-plan (service de premier plan) ajouté");
+}

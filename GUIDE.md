@@ -110,6 +110,16 @@ Cette version (« debug ») s'installe directement mais ne peut pas aller sur le
 
 ---
 
+## Appels en arrière-plan (Android)
+
+Pour qu'un appel continue quand on quitte l'application, il faut reconstruire l'APK :
+
+1. `python3 scripts/inject-v4.py && python3 build.py`
+2. `npx cap sync android` (copie le site et applique les fichiers natifs via `scripts/patch-android.mjs`)
+3. Générer le nouvel APK dans Android Studio.
+
+Limites : un navigateur web ne peut pas garder un appel en arrière-plan. Sur Android, la caméra peut se mettre en pause quand l'application n'est pas visible, même avec le service d'appel actif.
+
 ## Bon à savoir
 
 - **Projet gratuit en pause** : sur l'offre gratuite de Supabase, un projet sans aucune connexion pendant 7 jours est mis en pause (vacances !). Il suffit de cliquer *Restore* dans Supabase ; aucune donnée n'est perdue. L'offre Pro (25 $/mois) supprime les pauses.
