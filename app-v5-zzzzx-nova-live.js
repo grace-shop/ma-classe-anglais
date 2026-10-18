@@ -25,8 +25,60 @@
     if (el) el.textContent = "“" + text + "”";
   }
 
+  // Web speech: one recognizer stays open for the whole conversation and is
+  // restarted by itself when the browser stops it. Words are kept as they
+  // arrive, so nothing said between two turns is lost, and the text you are
+  // saying shows on screen while you speak.
+  function showHeard() {
+    if (!L) return;
+    heard(((L.buf || "") + " " + (L.interim || "")).trim());
+  }
+  function webStart() {
+    var R = SRclass();
+    if (!R || !L || !L.on || L.fatal) return;
+    var r = new R();
+    r.lang = "en-US"; r.interimResults = true; r.continuous = true; r.maxAlternatives = 1;
+    r.onresult = function (ev) {
+      if (!L) return;
+      var fin = "", inter = "";
+      for (var i = ev.resultIndex; i < ev.results.length; i++) {
+        var t = (ev.results[i][0] && ev.results[i][0].transcript) || "";
+        if (ev.results[i].isFinal) fin += t + " "; else inter += t + " ";
+      }
+      if (fin.trim()) L.buf = (L.buf + " " + fin).trim();
+      L.interim = inter.trim();
+      if (fin.trim() || inter.trim()) L.last = Date.now();
+      showHeard();
+    };
+    r.onerror = function (ev) {
+      if (ev && (ev.error === "not-allowed" || ev.error === "service-not-allowed" || ev.error === "audio-capture")) { if (L) L.fatal = true; }
+    };
+    r.onend = function () {
+      if (L && L.rec === r) L.rec = null;
+      if (L && L.on && !L.fatal) setTimeout(webStart, 150);
+    };
+    L.rec = r;
+    try { r.start(); } catch (e) { L.rec = null; setTimeout(webStart, 500); }
+  }
+  // resolves once the person has paused for PAUSE_MS after speaking
+  function takeUtterance() {
+    return new Promise(function (res) {
+      (function tick() {
+        if (!L || !L.on || L.fatal) return res("");
+        if (L.buf && Date.now() - (L.last || 0) >= PAUSE_MS) {
+          var t = L.buf;
+          L.buf = ""; L.interim = "";
+          showHeard();
+          return res(t);
+        }
+        setTimeout(tick, 100);
+      })();
+    });
+  }
+
   // one utterance: resolves with the text, or "" when nothing was said
   function listenOnce() {
+    if (SRclass()) return takeUtterance();
     return new Promise(function (res) {
       var P = native();
       if (!SRclass() && P) {
@@ -88,6 +140,7 @@
   var PAUSE_MS = 1400;
   async function settle(first) {
     var acc = String(first || "").trim();
+    if (SRclass()) return acc; // web: takeUtterance already waited for the pause
     while (L && L.on && !L.fatal) {
       var got = await Promise.race([startListen(), sleep(PAUSE_MS).then(function () { return null; })]);
       if (got === null) break;                    // silence: the person is done
@@ -107,7 +160,7 @@
       if (L.fatal) { toast("Allow the microphone to talk with Nova.", "x"); break; }
       if (!text || !text.trim()) continue;
       // Nova is talking: an echo of her own voice is ignored
-      if (window.speechSynthesis && speechSynthesis.speaking && looksLikeEcho(text, L.reply)) continue;
+      if (looksLikeEcho(text, L.reply)) continue;
       text = await settle(text);
       if (!L || !L.on) break;
       if (!text) continue;
@@ -130,13 +183,14 @@
   function startLive() {
     if (L) return;
     if (!S.talk || !SRclass() && !native()) { toast("Talking to Nova needs the microphone on this device.", "x"); return; }
-    L = { on: true, phase: "listen", pending: null, rec: null, stopper: null, fatal: false, reply: "" };
+    L = { on: true, phase: "listen", pending: null, rec: null, stopper: null, fatal: false, reply: "", buf: "", interim: "", last: 0 };
     var box = document.createElement("div");
     box.id = "novaLive";
     box.dataset.phase = "listen";
     box.innerHTML = '<div class="nl-orb" aria-hidden="true"></div><div class="nl-status">Starting…</div><div class="nl-heard"></div>' +
       '<button type="button" class="btn ghost" data-zz="liveEnd">End conversation</button>';
     document.body.appendChild(box);
+    if (SRclass()) webStart();
     loop();
   }
 
