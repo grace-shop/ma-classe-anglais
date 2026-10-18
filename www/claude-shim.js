@@ -705,11 +705,19 @@
     const badges = `${!isNative() && !window.__standaloneApp && window.__isIOS ? `<a class="dlc" href="#" data-x="ios"><img src="icons/icon-192.png" alt=""><span><b>iPhone app</b><small>Free · installs from Safari in 30 seconds</small></span><span class="go">Install</span></a>` : ""}${!isNative() && !window.__standaloneApp && !window.__isIOS && CFG.apkUrl ? `<a class="dlc" href="${esc(CFG.apkUrl)}" rel="noopener"><img src="icons/icon-192.png" alt=""><span><b>Android app</b><small>Free · full screen · works even offline</small></span><span class="go">Download</span></a>` : ""}`;
     if (mode === "in" || mode === "up") {
       gate.className = "cream";
-      const isUpM = mode === "up";
-      const nameField = `<label>Full name<input id="agN" required maxlength="60" autocomplete="name" placeholder="E.g. Ama Kossi"></label>`;
-      const topM = `<div class="cr-top"><div class="lg-logo"><img src="icons/logo-3d.png" alt="English Classes" style="width:100%;height:100%;display:block" onerror="this.outerHTML='E'"></div><span class="lg-brand">English Classes</span><h1 class="cr-title">${isUpM ? "Join us." : "Welcome back."}</h1><p class="lg-sub">${isUpM ? "Create your free account and start learning." : "Pick up where you left off — your class is waiting."}</p></div>`;
-      const noteM = note && !okView ? `<div class="msg ${note.ok ? "ok" : "err"}">${esc(note.t)}</div>` : "";
-      gate.innerHTML = `<div class="lg">${topM}<div class="ag2${isUpM ? " flip" : ""}"><div class="ag2-form"><h3>${isUpM ? "Create Account" : "Sign In"}</h3>${social}<form data-f="${isUpM ? "up" : "in"}">${noteM}${isUpM ? nameField : ""}${idField}${pwField(isUpM ? "new-password" : "current-password", "At least 6 characters")}${isUpM ? "" : `<div class="lg-row"><label class="lg-keep"><input type="checkbox" checked> Keep me signed in</label><button type="button" class="lg-link" data-x="otpreq">Forgot password?</button></div>`}<button class="ag2-btn" type="submit">${isUpM ? "Sign up" : "Sign in"}</button></form>${idSw}</div><div class="ag2-info"><h2>${isUpM ? "Welcome Back!" : "Hello Friend!"}</h2><p>${isUpM ? "To keep connected with us, please sign in with your personal info." : "Enter your personal details and start your English journey with us."}</p><button type="button" class="ag2-btn" data-x="${isUpM ? "in" : "up"}">${isUpM ? "Sign In" : "Sign Up"}</button></div></div><p class="cr-foot">Your results and messages stay private.</p></div>`;
+      const upT = mode === "up";
+      const eyeT = `<button type="button" class="tw-eye" data-x="eye" aria-label="Show password"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>`;
+      const phoneT = idMode === "tel";
+      const idT = `<input id="agE" ${phoneT ? 'type="tel" inputmode="tel" placeholder="Phone number"' : 'type="email" autocomplete="email" placeholder="Email"'} required>`;
+      const pwT = `<span class="tw-pw"><input id="agP" type="password" minlength="6" required autocomplete="${upT ? "new-password" : "current-password"}" placeholder="Password">${eyeT}</span>`;
+      const nameT = `<input id="agN" required maxlength="60" autocomplete="name" placeholder="Name">`;
+      const formT = upT
+        ? `<h3>Create Account</h3><form data-f="up" class="tw-form">${note && !okView ? `<div class="msg ${note.ok ? "ok" : "err"} tw-msg">${esc(note.t)}</div>` : ""}${nameT}${idT}${pwT}<button class="tw-btn" type="submit">SIGN UP</button></form>`
+        : `<h3>Sign in to Website</h3><form data-f="in" class="tw-form">${note && !okView ? `<div class="msg ${note.ok ? "ok" : "err"} tw-msg">${esc(note.t)}</div>` : ""}${idT}${pwT}<button class="tw-link" type="button" data-x="otpreq">Forgot password?</button><button class="tw-btn" type="submit">SIGN IN</button></form>`;
+      const infoT = upT
+        ? `<h2>Welcome Back !</h2><p>To keep connected with us please login with your personal info</p><button type="button" class="tw-btn" data-x="in">SIGN IN</button>`
+        : `<h2>Hello Friend !</h2><p>Enter your personal details and start your English journey with us.</p><button type="button" class="tw-btn" data-x="up">SIGN UP</button>`;
+      gate.innerHTML = `<div class="lg"><div class="cr-top"><div class="lg-logo"><img src="icons/logo-3d.png" alt="English Classes" style="width:100%;height:100%;display:block" onerror="this.outerHTML='E'"></div><span class="lg-brand">English Classes</span><h1 class="cr-title">${upT ? "Join us." : "Welcome back."}</h1></div><div class="tw${upT ? " flip" : ""}"><div class="tw-p tw-form-p">${formT}${idSw}</div><div class="tw-p tw-info-p">${infoT}</div></div>${social}</div>`;
       return;
     }
     if (mode === "otpreq" || mode === "otp" || reset) {
