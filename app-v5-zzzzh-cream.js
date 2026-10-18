@@ -63,6 +63,13 @@
 #authGate.cream .ag2-info p{color:#4A4A48!important;position:relative;z-index:1}
 #authGate.cream .ag2-info .ag2-btn{position:relative;z-index:1}
 @media (max-width:720px){#authGate.cream .ag2{overflow:visible!important;min-height:0!important;display:grid}#authGate.cream .ag2-info{min-height:250px;padding:34px 24px 44px!important;overflow:hidden;align-content:center}#authGate.cream .ag2-info h2{font-size:1.7rem!important}#authGate.cream .ag2-info p{font-size:.9rem}}
+#authGate.cream .ag2 .ag2-btn{background:#1F2636!important;color:#FFFFFF!important;box-shadow:0 12px 24px -12px rgba(20,26,40,.75)!important;border-radius:999px!important}
+#authGate.cream .ag2 .ag2-btn:hover{background:#2A3349!important}
+#authGate.cream .ag2 .ag2-btn:active{transform:scale(.98)}
+#authGate.cream .ag2.flip .ag2-info{order:-1}
+#authGate.cream .ag2 h3,#authGate.cream .ag2-info h2{font-weight:800!important;letter-spacing:-.01em}
+#authGate.cream .ag2 .lg-soc{display:none!important}
+
 `;
   document.head.appendChild(st);
 })();
