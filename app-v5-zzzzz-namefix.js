@@ -32,6 +32,20 @@
     f.style.height = h + "px";
   }
 
+  // Every redraw of the screen (a sent message, a new message) rebuilds the
+  // chat. Frame it right away, before the browser paints, so the name and the
+  // frame never show in their unstyled state, and keep the scroll position.
+  var _render = render;
+  render = function () {
+    var box = document.getElementById("chatScroll");
+    var pos = box ? box.scrollTop : 0;
+    var out = _render.apply(this, arguments);
+    try { fit(); } catch (e) {}
+    var nb = document.getElementById("chatScroll");
+    if (nb && box && nb !== box) nb.scrollTop = pos;
+    return out;
+  };
+
   var raf = 0;
   function schedule() {
     if (raf) return;
