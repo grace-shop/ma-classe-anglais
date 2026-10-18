@@ -12094,7 +12094,16 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
       var b = document.createElement("button");
       b.type = "button"; b.className = "zz-min"; b.title = "Minimise"; b.setAttribute("aria-label", "Minimise the call");
       b.textContent = "↙";
-      el.appendChild(b);
+      // a stage holds the minimise bar just above the tiles
+      var grid = document.getElementById("csGrid");
+      if (grid && !grid.parentNode.classList.contains("zz-stage")) {
+        var stage = document.createElement("div"); stage.className = "zz-stage";
+        var bar = document.createElement("div"); bar.className = "zz-bar";
+        grid.parentNode.insertBefore(stage, grid);
+        stage.appendChild(bar); stage.appendChild(grid);
+      }
+      var where = el.querySelector(".zz-bar") || el;
+      where.appendChild(b);
       var p = document.createElement("div");
       p.className = "zz-pill";
       p.innerHTML = '<span class="zz-dot"></span><b class="zz-who"></b><small class="zz-t"></small><span class="zz-open">Open</span>';
@@ -12111,7 +12120,9 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
   var st = document.createElement("style");
   st.id = "zzzzrCallLog";
   st.textContent = `
-#callScr .zz-min{position:absolute;bottom:calc(104px + env(safe-area-inset-bottom,0px));right:16px;z-index:6;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.22);color:#fff;font-size:1.3rem;font-weight:700;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.6)}
+#callScr .zz-stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+#callScr .zz-bar{display:flex;justify-content:flex-end;padding:0 4px 6px;flex:none}
+#callScr .zz-min{position:relative;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.2);color:#fff;font-size:1.15rem;font-weight:700;cursor:pointer;box-shadow:0 6px 16px -6px rgba(0,0,0,.6)}
 #callScr .zz-pill{display:none;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:rgba(12,15,30,.94);color:#fff;border:1px solid rgba(120,230,195,.5);box-shadow:0 0 22px -4px rgba(110,231,193,.6);font:600 .8rem/1.1 system-ui,sans-serif;cursor:pointer;white-space:nowrap}
 #callScr .zz-pill small{color:#9FF5DA;font-weight:600}
 #callScr .zz-dot{width:8px;height:8px;border-radius:50%;background:#6EE7C1;box-shadow:0 0 10px #6EE7C1;animation:zzDotPulse 1.4s ease-in-out infinite}
@@ -12160,6 +12171,116 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
     } catch (e) {}
     return _cc.apply(this, arguments);
   };
+})();
+
+/* ---- app-v5-zzzzt-callview.js ---- */
+/* =====================================================================
+   v5 · Video call layout, like WhatsApp:
+   - in a two-person video call, the other person is shown full screen
+     and you are in a small corner; tap the small picture to swap them.
+   - each tile shows the person's profile photo as its background.
+   ===================================================================== */
+(function () {
+  var bigKey = null; // the tile shown full screen, chosen by a tap
+
+  function photoOf(key) {
+    try {
+      var p = typeof personOf === "function" ? personOf(key) : null;
+      var url = (p && p.photo) || (key === "me" && S.me && S.me.photo) || "";
+      return /^https:\/\/[^/]+\/storage\/v1\/object\/public\/avatars\//.test(url) ? url : "";
+    } catch (e) { return ""; }
+  }
+
+  function layout() {
+    var grid = document.getElementById("csGrid");
+    if (!grid) return;
+    var tiles = [].slice.call(grid.querySelectorAll(":scope > .call-tile"));
+    var swap = !!CALL.video && tiles.length === 2;
+    grid.classList.toggle("zz-swap", swap);
+
+    var big = null;
+    if (swap) {
+      var keys = tiles.map(function (t) { return t.dataset.u; });
+      if (bigKey && keys.indexOf(bigKey) !== -1) big = bigKey;
+      else big = keys.filter(function (k) { return k !== "me"; })[0] || keys[0];
+    }
+    tiles.forEach(function (t) {
+      var u = t.dataset.u;
+      t.classList.toggle("zz-big", swap && u === big);
+      t.classList.toggle("zz-pip", swap && u !== big);
+      var url = photoOf(u);
+      if (url) {
+        if (t.dataset.zzp !== url) {
+          t.dataset.zzp = url;
+          t.style.backgroundImage = 'url("' + url + '")';
+        }
+        t.classList.add("zz-ph");
+      } else if (t.dataset.zzp) {
+        t.dataset.zzp = ""; t.style.backgroundImage = ""; t.classList.remove("zz-ph");
+      }
+    });
+  }
+
+  // tap a small picture to make it the big one
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest) return;
+    var tile = e.target.closest("#csGrid.zz-swap > .call-tile");
+    if (!tile) return;
+    bigKey = tile.dataset.u;
+    layout();
+  }, true);
+
+  var _sync = callScreenSync;
+  callScreenSync = function () {
+    var r = _sync.apply(this, arguments);
+    try { layout(); } catch (e) {}
+    return r;
+  };
+
+  var st = document.createElement("style");
+  st.id = "zzzztCallView";
+  st.textContent = `
+#callScr .call-grid.zz-swap{flex:1 1 auto;min-height:0;position:relative;display:block}
+#callScr .call-grid.zz-swap .call-tile{position:absolute;transition:all .25s ease;cursor:pointer;aspect-ratio:auto}
+#callScr .call-grid.zz-swap .call-tile.zz-big{inset:0;width:auto;height:auto;border-radius:22px}
+#callScr .call-grid.zz-swap .call-tile.zz-pip{top:10px;right:10px;width:112px;height:162px;z-index:3;box-shadow:0 8px 22px -6px rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.35)}
+#callScr .call-tile.zz-ph{background-color:#0b0e1c;background-size:cover;background-position:center}
+#callScr .call-tile.zz-ph .call-av{display:none}
+`;
+  document.head.appendChild(st);
+})();
+
+/* ---- app-v5-zzzzu-msgpress.js ---- */
+/* =====================================================================
+   v5 · Hold a message to open its options, like WhatsApp
+   (Delete for me · Delete for everyone · Reply · Copy · React).
+   A quick tap still works as before.
+   ===================================================================== */
+(function () {
+  var timer = null, sx = 0, sy = 0, el = null;
+
+  function clear() { clearTimeout(timer); timer = null; el = null; }
+
+  document.addEventListener("pointerdown", function (e) {
+    if (e.button > 0 || !e.target.closest) return;
+    var m = e.target.closest(".msg[data-mid]");
+    if (!m || e.target.closest("button,a,input,textarea,audio,video,label,.v4quote")) return;
+    if (String(m.dataset.mid).indexOf("tmp") === 0) return;
+    el = m; sx = e.clientX; sy = e.clientY;
+    timer = setTimeout(function () {
+      var target = el; clear();
+      if (!target || !document.body.contains(target)) return;
+      try { if (navigator.vibrate) navigator.vibrate(12); } catch (x) {}
+      try { v4MsgTap({ target: target, preventDefault: function () {} }); } catch (x) {}
+    }, 450);
+  }, true);
+
+  document.addEventListener("pointermove", function (e) {
+    if (timer && (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10)) clear();
+  }, true);
+  ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
+    document.addEventListener(ev, clear, true);
+  });
 })();
 
 /* ==== v4 END ==== */
