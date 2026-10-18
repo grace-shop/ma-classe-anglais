@@ -20,7 +20,7 @@
   }
   function drawPanel() {
     var r = V4.rec;
-    var holding = !!(hold && hold.down);
+    var holding = !!(hold && (hold.down || hold.pending));
     if (!r && !holding) { if (ov) ov.style.display = "none"; ovMode = ""; return; }
     var el = panel();
     el.style.display = "flex";
@@ -65,8 +65,10 @@
 
   function micStart(kind, target) {
     if (V4.rec || !target) return;
+    if (hold) hold.pending = true;          // the panel stays up while the mic starts
     navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
       .then(function (stream) {
+        if (hold) hold.pending = false;
         var mime = MIME.find(function (t) { try { return MediaRecorder.isTypeSupported(t); } catch (e) { return false; } }) || "";
         var mr;
         try { mr = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 24000 } : undefined); }
@@ -100,7 +102,9 @@
         drawPanel();
       })
       .catch(function (e) {
+        if (hold) hold.pending = false;
         hideKnob();
+        drawPanel();
         toast(e && (e.name === "NotAllowedError" || e.name === "SecurityError")
           ? "Allow the microphone to send a voice message (phone Settings → Apps → English Classes → Permissions → Microphone)."
           : "Microphone not available on this device.", "x");

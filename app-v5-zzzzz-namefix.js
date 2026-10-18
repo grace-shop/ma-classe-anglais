@@ -7,14 +7,15 @@
 (function () {
   function fit() {
     var f = document.querySelector(".glass.chat");
-    if (!f || !f.parentElement) return;
+    if (!f || !f.parentElement) { document.documentElement.classList.remove("zz-chatlock"); return; }
     var sec = f.parentElement;
-    var row = null;
-    for (var i = 0; i < sec.children.length; i++) {
+    var row = f.classList.contains("zz-framed") ? f.querySelector(":scope > .zz-cname") : null;
+    for (var i = 0; !row && i < sec.children.length; i++) {
       var c = sec.children[i];
       if (c.classList.contains("row") && c.querySelector("h2") && c.nextElementSibling === f) { row = c; break; }
     }
-    if (!row) return;                       // not a classmate chat
+    if (!row) { document.documentElement.classList.remove("zz-chatlock"); return; }  // not a classmate chat
+    document.documentElement.classList.add("zz-chatlock");   // the page does not scroll: the name stays still
     if (!f.classList.contains("zz-framed")) {
       f.classList.add("zz-framed");
       row.classList.add("zz-cname");
@@ -38,6 +39,7 @@
   var st = document.createElement("style");
   st.id = "zzzzzNameFix";
   st.textContent = `
+html.zz-chatlock,html.zz-chatlock body{overflow:hidden!important;height:100%;overscroll-behavior:none}
 .glass.chat.zz-framed{display:flex;flex-direction:column;overflow:hidden}
 .glass.chat.zz-framed > .zz-cname{flex:none;margin:0!important;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:12px}
 .glass.chat.zz-framed > .zz-cname h2{margin:0}
