@@ -33,6 +33,10 @@
 #authGate .ot-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:40px;height:40px;padding:0;border:0;background:none;color:#8A90A8;display:grid;place-items:center;cursor:pointer;border-radius:12px}
 #authGate .ot-eye.on{color:#22E37A}
 
+/* sign-in page stays still: no sweeping shapes, no floating logo, no scrolling */
+#authGate.cream{overflow:hidden!important;justify-content:center!important;touch-action:none}
+#authGate.cream .tw::after,#authGate.cream .tw-p::before,#authGate.cream .tw-p::after,#authGate.cream .tw-info-p::before,#authGate.cream .tw-info-p::after{animation:none!important;transition:none!important}
+#authGate .lg-logo,#authGate .lg-logo *,#authGate .cr-top *{animation:none!important}
 @media (prefers-reduced-motion:reduce){
   #authGate .tw::before,#authGate .ot-card::before,#authGate .tw:has(.msg.err),#authGate .ot-card:has(.msg.err){animation:none!important}
 }

@@ -11651,12 +11651,16 @@ header.top,nav.tabs{backdrop-filter:blur(24px) saturate(170%)!important;-webkit-
 (function () {
   var PT = window.__PT, nameOf = window.__chatH.nameOf, timeOf = window.__chatH.timeOf;
   function clean(t) {
-    return String(t || "")
+    var s = String(t || "")
+      .replace(/\*\([\s\S]*?\)\*/g, "")                       // *(...)* asides
       .replace(/\*\*(.+?)\*\*/gs, "$1")
       .replace(/__(.+?)__/gs, "$1")
       .replace(/`([^`]+)`/g, "$1")
       .replace(/^\s*#{1,6}\s+/gm, "")
       .replace(/\*/g, "");
+    // never talk about being a bot or an assistant: drop those sentences
+    s = s.replace(/[^.!?\n]*(automatic assistant|automatic reply|artificial intelligence|\bAI\b|\bchatbot\b|\bbot\b|assistant of the teacher|I am the teacher)[^.!?\n]*[.!?]?/gi, "");
+    return s.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
   }
   function dayLabel(iso) {
     var d = new Date(iso), now = new Date();
@@ -11896,6 +11900,10 @@ nav.tabs button:focus:not(:focus-visible){outline:none}
 #authGate .ot-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:40px;height:40px;padding:0;border:0;background:none;color:#8A90A8;display:grid;place-items:center;cursor:pointer;border-radius:12px}
 #authGate .ot-eye.on{color:#22E37A}
 
+/* sign-in page stays still: no sweeping shapes, no floating logo, no scrolling */
+#authGate.cream{overflow:hidden!important;justify-content:center!important;touch-action:none}
+#authGate.cream .tw::after,#authGate.cream .tw-p::before,#authGate.cream .tw-p::after,#authGate.cream .tw-info-p::before,#authGate.cream .tw-info-p::after{animation:none!important;transition:none!important}
+#authGate .lg-logo,#authGate .lg-logo *,#authGate .cr-top *{animation:none!important}
 @media (prefers-reduced-motion:reduce){
   #authGate .tw::before,#authGate .ot-card::before,#authGate .tw:has(.msg.err),#authGate .ot-card:has(.msg.err){animation:none!important}
 }
@@ -11997,6 +12005,113 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
       return _E(g, cls);
     }).join("");
   };
+})();
+
+/* ---- app-v5-zzzzr-calllog.js ---- */
+/* =====================================================================
+   v5 · Call history in the chat, and a call you can minimise.
+   - One-to-one calls leave a line in the chat of both people:
+       "Missed voice call" / "Missed video call" when nobody answered,
+       "Voice call · 3 min 12 s" / "Video call · 3 min 12 s" when it was answered.
+   - While in a call, the call screen can be minimised to a small pill
+     that stays on top of the app; tap the pill to open the call again.
+   ===================================================================== */
+(function () {
+  function dur(s) {
+    var m = Math.floor(s / 60), r = s % 60;
+    return m ? m + " min " + r + " s" : r + " s";
+  }
+
+  function logLine(text) {
+    var to = (CALL.logTo || []).filter(Boolean);
+    to.forEach(function (u) {
+      try { window.__peer.send(u, text, null, null).catch(function () {}); } catch (e) {}
+      try {
+        PR.inbox.unshift({ id: "tmp" + Date.now() + u, sender: S.uid, receiver: u, body: text,
+          created_at: new Date().toISOString(), att: null, meta: null });
+      } catch (e) {}
+    });
+    try { render(); } catch (e) {}
+  }
+
+  // remember who we called, for the history line
+  var _cs = callStart;
+  callStart = async function (kind, uids) {
+    CALL.logTo = (uids || []).filter(function (u) { return u && u !== S.uid; });
+    CALL.logKind = kind;
+    CALL.connAt = null;
+    return _cs.apply(this, arguments);
+  };
+
+  // the moment someone picks up
+  var _st = callScreenStatus;
+  callScreenStatus = function () {
+    try {
+      if (!CALL.connAt && Object.values(CALL.peers).some(function (P) { return P.state === "connected"; })) CALL.connAt = Date.now();
+    } catch (e) {}
+    var r = _st.apply(this, arguments);
+    try {
+      var pill = document.querySelector("#callScr .zz-pill");
+      if (pill) {
+        pill.querySelector(".zz-who").textContent = (document.getElementById("csTitle") || {}).textContent || "Call";
+        pill.querySelector(".zz-t").textContent = (document.getElementById("csStatus") || {}).textContent || "";
+      }
+    } catch (e) {}
+    return r;
+  };
+
+  // when the call ends (the host writes the line)
+  var _cl = callLeave;
+  callLeave = async function () {
+    try {
+      if (CALL.id && CALL.host === S.uid && CALL.logKind === "duo" && !CALL.group && (CALL.logTo || []).length) {
+        var v = !!CALL.video;
+        if (CALL.connAt) logLine((v ? "Video call" : "Voice call") + " · " + dur(Math.max(1, Math.round((Date.now() - CALL.connAt) / 1000))));
+        else logLine(v ? "Missed video call" : "Missed voice call");
+      }
+    } catch (e) {}
+    return _cl.apply(this, arguments);
+  };
+
+  // minimise to a pill
+  var _sh = callScreenShow;
+  callScreenShow = function () {
+    _sh.apply(this, arguments);
+    var el = document.getElementById("callScr");
+    if (!el) return;
+    el.classList.remove("zz-mini");
+    if (!el.querySelector(".zz-min")) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "zz-min"; b.title = "Minimise"; b.setAttribute("aria-label", "Minimise the call");
+      b.textContent = "↙";
+      el.appendChild(b);
+      var p = document.createElement("div");
+      p.className = "zz-pill";
+      p.innerHTML = '<span class="zz-dot"></span><b class="zz-who"></b><small class="zz-t"></small><span class="zz-open">Open</span>';
+      el.appendChild(p);
+    }
+  };
+  document.addEventListener("click", function (e) {
+    var el = document.getElementById("callScr");
+    if (!el || el.hidden || !e.target.closest) return;
+    if (e.target.closest("#callScr .zz-min")) { el.classList.add("zz-mini"); e.stopPropagation(); e.preventDefault(); return; }
+    if (el.classList.contains("zz-mini") && e.target.closest("#callScr .zz-pill")) el.classList.remove("zz-mini");
+  }, true);
+
+  var st = document.createElement("style");
+  st.id = "zzzzrCallLog";
+  st.textContent = `
+#callScr .zz-min{position:absolute;top:12px;right:12px;z-index:6;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);color:#fff;font-size:1.1rem;cursor:pointer}
+#callScr .zz-pill{display:none;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:rgba(12,15,30,.94);color:#fff;border:1px solid rgba(120,230,195,.5);box-shadow:0 0 22px -4px rgba(110,231,193,.6);font:600 .8rem/1.1 system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+#callScr .zz-pill small{color:#9FF5DA;font-weight:600}
+#callScr .zz-dot{width:8px;height:8px;border-radius:50%;background:#6EE7C1;box-shadow:0 0 10px #6EE7C1;animation:zzDotPulse 1.4s ease-in-out infinite}
+@keyframes zzDotPulse{50%{opacity:.35}}
+#callScr .zz-open{color:#0B0D18;background:#6EE7C1;border-radius:999px;padding:4px 9px;font-weight:800}
+#callScr.zz-mini{position:fixed!important;inset:auto 12px calc(96px + env(safe-area-inset-bottom,0px)) auto!important;width:auto!important;height:auto!important;background:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:0!important;pointer-events:none;z-index:9990}
+#callScr.zz-mini>*{display:none!important}
+#callScr.zz-mini>.zz-pill{display:flex!important;pointer-events:auto}
+`;
+  document.head.appendChild(st);
 })();
 
 /* ==== v4 END ==== */

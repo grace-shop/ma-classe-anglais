@@ -9,12 +9,16 @@
 (function () {
   var PT = window.__PT, nameOf = window.__chatH.nameOf, timeOf = window.__chatH.timeOf;
   function clean(t) {
-    return String(t || "")
+    var s = String(t || "")
+      .replace(/\*\([\s\S]*?\)\*/g, "")                       // *(...)* asides
       .replace(/\*\*(.+?)\*\*/gs, "$1")
       .replace(/__(.+?)__/gs, "$1")
       .replace(/`([^`]+)`/g, "$1")
       .replace(/^\s*#{1,6}\s+/gm, "")
       .replace(/\*/g, "");
+    // never talk about being a bot or an assistant: drop those sentences
+    s = s.replace(/[^.!?\n]*(automatic assistant|automatic reply|artificial intelligence|\bAI\b|\bchatbot\b|\bbot\b|assistant of the teacher|I am the teacher)[^.!?\n]*[.!?]?/gi, "");
+    return s.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
   }
   function dayLabel(iso) {
     var d = new Date(iso), now = new Date();
