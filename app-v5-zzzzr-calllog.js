@@ -12,16 +12,18 @@
     return m ? m + " min " + r + " s" : r + " s";
   }
 
-  function logLine(text) {
+  // one line per call, written once. The line is sent to the server only:
+  // no temporary copy is added to the inbox (a temporary copy is never removed
+  // by the refresh, so every call used to show "Missed call" several times).
+  var WRITTEN = {};
+  function logLine(text, callId) {
+    var key = String(callId || "") + "|" + text;
+    if (callId && WRITTEN[key]) return;
+    if (callId) WRITTEN[key] = true;
     var to = (CALL.logTo || []).filter(Boolean);
     to.forEach(function (u) {
       try { window.__peer.send(u, text, null, null).catch(function () {}); } catch (e) {}
-      try {
-        PR.inbox.unshift({ id: "tmp" + Date.now() + u, sender: S.uid, receiver: u, body: text,
-          created_at: new Date().toISOString(), att: null, meta: null });
-      } catch (e) {}
     });
-    try { render(); } catch (e) {}
   }
 
   // remember who we called, for the history line
@@ -56,8 +58,8 @@
     try {
       if (CALL.id && CALL.host === S.uid && CALL.logKind === "duo" && !CALL.group && (CALL.logTo || []).length) {
         var v = !!CALL.video;
-        if (CALL.connAt) logLine((v ? "Video call" : "Voice call") + " · " + dur(Math.max(1, Math.round((Date.now() - CALL.connAt) / 1000))));
-        else logLine(v ? "Missed video call" : "Missed voice call");
+        if (CALL.connAt) logLine((v ? "Video call" : "Voice call") + " · " + dur(Math.max(1, Math.round((Date.now() - CALL.connAt) / 1000))), CALL.id);
+        else logLine(v ? "Missed video call" : "Missed voice call", CALL.id);
       }
     } catch (e) {}
     return _cl.apply(this, arguments);
