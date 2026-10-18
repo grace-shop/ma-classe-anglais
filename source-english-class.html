@@ -11977,13 +11977,20 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
     try { return EMO_SET.has(emoCode(emo)); } catch (e) { return false; }
   }
 
+  // true while a quiz picture is drawn: the real 3D image is used, never a vector icon
   var _ps = picStage;
   picStage = function (x, done, ok) {
-    if (x && !x.picId && (!x.pic || GENERIC.has(x.pic) || !has3D(x.pic))) {
-      var hit = lookup(x.say || x.answer || (x.accept && x.accept[0]) || "");
-      if (hit) x = Object.assign({}, x, { pic: hit });
+    if (x && !x.picId) {
+      var real = function (e) { return !!e && !GENERIC.has(e) && has3D(e); };
+      if (!real(x.pic)) {
+        var hit = lookup(x.say || x.answer || (x.accept && x.accept[0]) || "");
+        if (!real(hit)) return "";
+        x = Object.assign({}, x, { pic: hit });
+      }
     }
-    var html = _ps(x, done, ok);
+    window.__quizImg = true;
+    var html;
+    try { html = _ps(x, done, ok); } finally { window.__quizImg = false; }
     // no real picture: show nothing rather than a generic sparkle
     if (/data-i3="sparkle"/.test(html)) return "";
     return html;
@@ -11999,7 +12006,7 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
     return segG(String(str || "")).map(function (g) {
       var base = g.replace(/️/g, "");
       var mapped = ICO3_MAP[g] || ICO3_MAP[base] || ICO3_MAP[base.charAt(0)];
-      if (mapped || !/\p{Extended_Pictographic}/u.test(g)) return _E(g, cls);
+      if ((mapped && !window.__quizImg) || !/\p{Extended_Pictographic}/u.test(g)) return _E(g, cls);
       var c;
       try { c = emoCode(g); } catch (e) { return _E(g, cls); }
       if (EMO_SET.has(c)) {
@@ -12104,7 +12111,7 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
   var st = document.createElement("style");
   st.id = "zzzzrCallLog";
   st.textContent = `
-#callScr .zz-min{position:absolute;top:12px;right:12px;z-index:6;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);color:#fff;font-size:1.1rem;cursor:pointer}
+#callScr .zz-min{position:absolute;bottom:calc(104px + env(safe-area-inset-bottom,0px));right:16px;z-index:6;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.22);color:#fff;font-size:1.3rem;font-weight:700;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.6)}
 #callScr .zz-pill{display:none;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:rgba(12,15,30,.94);color:#fff;border:1px solid rgba(120,230,195,.5);box-shadow:0 0 22px -4px rgba(110,231,193,.6);font:600 .8rem/1.1 system-ui,sans-serif;cursor:pointer;white-space:nowrap}
 #callScr .zz-pill small{color:#9FF5DA;font-weight:600}
 #callScr .zz-dot{width:8px;height:8px;border-radius:50%;background:#6EE7C1;box-shadow:0 0 10px #6EE7C1;animation:zzDotPulse 1.4s ease-in-out infinite}

@@ -91,7 +91,7 @@
   var st = document.createElement("style");
   st.id = "zzzzrCallLog";
   st.textContent = `
-#callScr .zz-min{position:absolute;top:12px;right:12px;z-index:6;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);color:#fff;font-size:1.1rem;cursor:pointer}
+#callScr .zz-min{position:absolute;bottom:calc(104px + env(safe-area-inset-bottom,0px));right:16px;z-index:6;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.22);color:#fff;font-size:1.3rem;font-weight:700;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.6)}
 #callScr .zz-pill{display:none;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:rgba(12,15,30,.94);color:#fff;border:1px solid rgba(120,230,195,.5);box-shadow:0 0 22px -4px rgba(110,231,193,.6);font:600 .8rem/1.1 system-ui,sans-serif;cursor:pointer;white-space:nowrap}
 #callScr .zz-pill small{color:#9FF5DA;font-weight:600}
 #callScr .zz-dot{width:8px;height:8px;border-radius:50%;background:#6EE7C1;box-shadow:0 0 10px #6EE7C1;animation:zzDotPulse 1.4s ease-in-out infinite}
