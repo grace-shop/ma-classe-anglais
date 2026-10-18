@@ -731,7 +731,7 @@
       } else if (okView) {
         inner = `<div class="ot-ok"><svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="34" fill="#E7F8EE"/><circle cx="36" cy="36" r="24" fill="#22C55E"/><path d="M26 37l7 7 13-14" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg><h2 class="ot-h ot-green">Success!</h2><p class="ot-p">Identity confirmed successfully.</p></div>`;
       } else {
-        inner = `<h2 class="ot-h">New password</h2><p class="ot-p">Choose a password you will remember.</p><form data-f="newpass" class="ot-form"><label class="ot-field"><span class="ot-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><input id="agP" type="password" minlength="6" required autocomplete="new-password" placeholder="At least 6 characters"></label><button class="ot-btn" type="submit">Save password</button></form>`;
+        inner = `<h2 class="ot-h">New password</h2><p class="ot-p">Choose a password you will remember.</p><form data-f="newpass" class="ot-form"><label class="ot-field"><span class="ot-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><input id="agP" type="password" minlength="6" required autocomplete="new-password" placeholder="At least 6 characters">${eyeOt}</label><button class="ot-btn" type="submit">Save password</button></form>`;
       }
       gate.innerHTML = `<div class="ot-card">${note && !okView ? `<div class="msg ${note.ok ? "ok" : "err"} ot-msg">${esc(note.t)}</div>` : ""}${inner}</div>`;
       if (mode === "otp") wireBoxes();
@@ -769,7 +769,7 @@
   function showGate() { drawGate(); }
   function hideGate() { if (gate) { gate.remove(); gate = null; } const sp = document.getElementById("splash"); if (sp) sp.style.display = ""; }
   const say = (t, ok) => { note = { t, ok }; drawGate(); };
-  const frErr = (m) => /Invalid login/i.test(m) ? "Wrong e-mail or password." : /already registered|already exists/i.test(m) ? (idMode === "tel" ? "An account already exists with this number: please log in." : "An account already exists with this e-mail: please log in.") : /Email not confirmed/i.test(m) ? "First confirm your e-mail with the link you received." : /Password should/i.test(m) ? "The password must have at least 6 characters." : /rate limit/i.test(m) ? "Too many tries. Wait a few minutes." : m;
+  const frErr = (m) => /Invalid login/i.test(m) ? "Wrong e-mail or password." : /already registered|already exists/i.test(m) ? (idMode === "tel" ? "An account already exists with this number: please log in." : "An account already exists with this e-mail: please log in.") : /Email not confirmed/i.test(m) ? "First confirm your e-mail with the link you received." : /Password should/i.test(m) ? "The password must have at least 6 characters." : /rate limit/i.test(m) ? "Too many tries. Wait a few minutes." : /same.?password|different from the old/i.test(m) ? "Choose a password different from your old one." : /session|not authenticated|expired/i.test(m) ? "This code has expired. Ask for a new one." : m;
   document.addEventListener("click", async (e) => {
     const b = e.target.closest && e.target.closest("#authGate [data-x]"); if (!b) return; e.preventDefault();
     const x = b.dataset.x;
