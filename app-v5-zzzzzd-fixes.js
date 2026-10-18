@@ -136,6 +136,14 @@
     } catch (e) {}
   }
 
+  // the picker button opens the sheet (a click anywhere else is left alone)
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest(".zz-bgbtn");
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    openSheet();
+  }, true);
+
   // ---- hook into the redraw and watch for a chat appearing
   var _r = render;
   render = function () {
@@ -153,6 +161,9 @@
   var st = document.createElement("style");
   st.id = "zzzzzdFixes";
   st.textContent = `
+/* top bar: sits at the very top, so the call buttons under it stay visible */
+html body header.top{position:sticky!important;top:0!important;margin-top:0!important}
+
 /* call screen: starts below the status bar, so the top row is never hidden */
 #callScr:not(.zz-mini){padding-top:calc(env(safe-area-inset-top,0px) + 30px)!important}
 
