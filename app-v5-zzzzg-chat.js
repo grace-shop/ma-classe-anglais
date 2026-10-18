@@ -40,6 +40,24 @@
 #profSheet .pt-foot .pt-send{width:50px!important;height:50px!important;min-width:50px;padding:0!important;border-radius:50%!important;display:grid;place-items:center;box-shadow:0 12px 26px -10px rgba(91,210,255,.8)}
 #profSheet .pt-foot .pt-send:active{transform:scale(.94)}
 
+/* ---- Top bar: the icon row scrolls inside the bar instead of being cut at both edges ---- */
+@media (max-width:1099px){
+  body header.top .hdr-right{flex:1 1 auto;min-width:0;flex-wrap:nowrap!important;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;justify-content:flex-start;gap:6px;padding:2px 4px 2px 10px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 14px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 14px),transparent 100%)}
+  body header.top .hdr-right::-webkit-scrollbar{display:none}
+  body header.top .hdr-right>*{flex:0 0 auto}
+}
+
+/* ---- Teacher chat: glass bubbles, soft light, glowing composer ---- */
+#profSheet .pt-body{background:radial-gradient(60% 40% at 92% 8%,rgba(91,210,255,.16),transparent 70%),radial-gradient(55% 35% at 4% 92%,rgba(154,124,255,.18),transparent 70%),radial-gradient(rgba(160,176,255,.10) 1px,transparent 1.4px) 0 0/22px 22px,transparent!important}
+#profSheet .them .pt-bub{background:linear-gradient(160deg,rgba(40,50,108,.78),rgba(20,26,66,.82))!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 0 0 1px rgba(140,160,255,.10),0 22px 44px -20px rgba(70,90,255,.55)!important}
+#profSheet .me .pt-bub{background:linear-gradient(135deg,#8CF5DA 0%,#5FD4FF 50%,#9AA8FF 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 1px rgba(255,255,255,.12),0 18px 40px -14px rgba(91,210,255,.7)!important}
+#profSheet .pt-head{background:linear-gradient(180deg,rgba(24,30,70,.9),rgba(12,15,36,.78))!important;box-shadow:0 14px 34px -18px rgba(90,120,255,.55)}
+#profSheet .pt-head b{background:linear-gradient(90deg,#FFFFFF,#CFE0FF 60%,#B9C7FF);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+#profSheet .pt-foot{background:linear-gradient(180deg,rgba(12,15,36,.7),rgba(10,13,30,.94))!important;box-shadow:0 -18px 40px -22px rgba(90,120,255,.45)}
+#profSheet .pt-foot textarea{box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 0 1px rgba(140,160,255,.14),0 12px 30px -16px rgba(91,210,255,.35)!important}
+#profSheet .pt-foot .pt-send{background:linear-gradient(135deg,#8CF5DA,#5FD4FF 55%,#9AA8FF)!important;box-shadow:0 0 0 4px rgba(91,210,255,.14),0 14px 30px -8px rgba(91,210,255,.85)!important}
+#profSheet .pt-auto{box-shadow:0 0 14px -2px rgba(127,140,255,.55);display:inline-flex;align-items:center;gap:5px}
+#profSheet .pt-auto::before{content:"";width:6px;height:6px;border-radius:50%;background:#7DF7D2;box-shadow:0 0 8px #7DF7D2}
 /* ---- Phone top bar spans the width ---- */
 @media (max-width:1099px){
   body header.top{margin:8px 0 0 calc(50% - 50vw + 6px)!important;width:calc(100vw - 12px)!important;max-width:none!important;box-sizing:border-box!important;padding:12px 16px!important;border-radius:22px!important;justify-content:space-between!important;gap:8px}
