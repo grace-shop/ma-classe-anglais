@@ -43,13 +43,20 @@
     try { return EMO_SET.has(emoCode(emo)); } catch (e) { return false; }
   }
 
+  // true while a quiz picture is drawn: the real 3D image is used, never a vector icon
   var _ps = picStage;
   picStage = function (x, done, ok) {
-    if (x && !x.picId && (!x.pic || GENERIC.has(x.pic) || !has3D(x.pic))) {
-      var hit = lookup(x.say || x.answer || (x.accept && x.accept[0]) || "");
-      if (hit) x = Object.assign({}, x, { pic: hit });
+    if (x && !x.picId) {
+      var real = function (e) { return !!e && !GENERIC.has(e) && has3D(e); };
+      if (!real(x.pic)) {
+        var hit = lookup(x.say || x.answer || (x.accept && x.accept[0]) || "");
+        if (!real(hit)) return "";
+        x = Object.assign({}, x, { pic: hit });
+      }
     }
-    var html = _ps(x, done, ok);
+    window.__quizImg = true;
+    var html;
+    try { html = _ps(x, done, ok); } finally { window.__quizImg = false; }
     // no real picture: show nothing rather than a generic sparkle
     if (/data-i3="sparkle"/.test(html)) return "";
     return html;
@@ -65,7 +72,7 @@
     return segG(String(str || "")).map(function (g) {
       var base = g.replace(/️/g, "");
       var mapped = ICO3_MAP[g] || ICO3_MAP[base] || ICO3_MAP[base.charAt(0)];
-      if (mapped || !/\p{Extended_Pictographic}/u.test(g)) return _E(g, cls);
+      if ((mapped && !window.__quizImg) || !/\p{Extended_Pictographic}/u.test(g)) return _E(g, cls);
       var c;
       try { c = emoCode(g); } catch (e) { return _E(g, cls); }
       if (EMO_SET.has(c)) {
