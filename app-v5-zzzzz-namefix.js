@@ -21,11 +21,15 @@
       row.classList.add("zz-cname");
       f.insertBefore(row, f.firstChild);
     }
+    // the height is set once per screen width: a system banner (microphone,
+    // notifications) that changes the window height must not resize the chat
+    if (f.dataset.zzw === String(window.innerWidth) && f.style.height) return;
     var bar = sec.querySelector("form.v4bar");
     var bh = bar && !f.contains(bar) ? bar.getBoundingClientRect().height : 0;
     var top = f.getBoundingClientRect().top;
     var h = Math.max(260, Math.round(window.innerHeight - top - bh - 14));
-    if (f.dataset.zzh !== String(h)) { f.dataset.zzh = String(h); f.style.height = h + "px"; }
+    f.dataset.zzw = String(window.innerWidth);
+    f.style.height = h + "px";
   }
 
   var raf = 0;
@@ -40,6 +44,7 @@
   st.id = "zzzzzNameFix";
   st.textContent = `
 html.zz-chatlock,html.zz-chatlock body{overflow:hidden!important;height:100%;overscroll-behavior:none}
+.glass.chat.zz-framed ~ p.hint{display:none!important}
 .glass.chat.zz-framed{display:flex;flex-direction:column;overflow:hidden}
 .glass.chat.zz-framed > .zz-cname{flex:none;margin:0!important;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:12px}
 .glass.chat.zz-framed > .zz-cname h2{margin:0}
