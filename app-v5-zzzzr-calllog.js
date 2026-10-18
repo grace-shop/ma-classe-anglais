@@ -74,7 +74,16 @@
       var b = document.createElement("button");
       b.type = "button"; b.className = "zz-min"; b.title = "Minimise"; b.setAttribute("aria-label", "Minimise the call");
       b.textContent = "↙";
-      el.appendChild(b);
+      // a stage holds the minimise bar just above the tiles
+      var grid = document.getElementById("csGrid");
+      if (grid && !grid.parentNode.classList.contains("zz-stage")) {
+        var stage = document.createElement("div"); stage.className = "zz-stage";
+        var bar = document.createElement("div"); bar.className = "zz-bar";
+        grid.parentNode.insertBefore(stage, grid);
+        stage.appendChild(bar); stage.appendChild(grid);
+      }
+      var where = el.querySelector(".zz-bar") || el;
+      where.appendChild(b);
       var p = document.createElement("div");
       p.className = "zz-pill";
       p.innerHTML = '<span class="zz-dot"></span><b class="zz-who"></b><small class="zz-t"></small><span class="zz-open">Open</span>';
@@ -91,7 +100,9 @@
   var st = document.createElement("style");
   st.id = "zzzzrCallLog";
   st.textContent = `
-#callScr .zz-min{position:absolute;bottom:calc(104px + env(safe-area-inset-bottom,0px));right:16px;z-index:6;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.22);color:#fff;font-size:1.3rem;font-weight:700;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.6)}
+#callScr .zz-stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+#callScr .zz-bar{display:flex;justify-content:flex-end;padding:0 4px 6px;flex:none}
+#callScr .zz-min{position:relative;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.2);color:#fff;font-size:1.15rem;font-weight:700;cursor:pointer;box-shadow:0 6px 16px -6px rgba(0,0,0,.6)}
 #callScr .zz-pill{display:none;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:rgba(12,15,30,.94);color:#fff;border:1px solid rgba(120,230,195,.5);box-shadow:0 0 22px -4px rgba(110,231,193,.6);font:600 .8rem/1.1 system-ui,sans-serif;cursor:pointer;white-space:nowrap}
 #callScr .zz-pill small{color:#9FF5DA;font-weight:600}
 #callScr .zz-dot{width:8px;height:8px;border-radius:50%;background:#6EE7C1;box-shadow:0 0 10px #6EE7C1;animation:zzDotPulse 1.4s ease-in-out infinite}
