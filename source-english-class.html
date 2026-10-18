@@ -13418,8 +13418,10 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
 .zz-bgbtn-abs{position:absolute;top:8px;right:8px;z-index:5}
 
 /* the shared-change line: centred, with its 3D emoji */
-.msg.zz-thmsg{background:transparent!important;box-shadow:none!important;border:0!important;align-self:center;max-width:90%;text-align:center}
-.msg.zz-thmsg .zz-thim{display:block;width:48px;height:48px;margin:0 auto 4px}
+.msg.zz-thmsg{background:transparent!important;box-shadow:none!important;border:0!important;float:none!important;width:100%!important;max-width:100%!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;text-align:center;margin:8px auto!important;padding:2px 8px!important;color:rgba(255,255,255,.85)!important;text-shadow:0 1px 3px rgba(0,0,0,.6);font-size:.7rem!important;line-height:1.25!important;opacity:.9}
+.msg.zz-thmsg .zz-thim{display:inline-block;width:16px!important;height:16px!important;margin:0 0 2px!important;flex:none}
+.msg.zz-thmsg *{font-size:inherit}
+.msg.zz-thmsg .zz-thime{display:none}
 
 #zzBgSheet{position:fixed;inset:0;z-index:9600;background:rgba(3,4,12,.6);display:flex;align-items:flex-end;justify-content:center}
 #zzBgSheet .zbs-card{width:100%;max-width:520px;max-height:88vh;overflow:auto;box-sizing:border-box;padding:16px 16px max(18px,env(safe-area-inset-bottom,0px));border-radius:22px 22px 0 0;background:#141a33;color:#fff;box-shadow:0 -10px 30px rgba(0,0,0,.5)}
