@@ -14,6 +14,14 @@
 
   function elapsed(r) { return r.acc + (r.paused ? 0 : Date.now() - r.t0); }
 
+  // While a voice message is being recorded, the chat is not redrawn: a redraw
+  // from the background (new messages, sync) would make the screen blink.
+  var _render = render;
+  render = function () {
+    if (V4.rec && !V4.rec.cancel) return;
+    return _render.apply(this, arguments);
+  };
+
   // ---------- the recording bar (drawn over the composer, the chat is not redrawn) ----------
   var ov = null, lockEl = null, ovMode = "";
   function panel() {
