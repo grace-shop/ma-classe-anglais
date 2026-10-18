@@ -49,7 +49,10 @@
       var hit = lookup(x.say || x.answer || (x.accept && x.accept[0]) || "");
       if (hit) x = Object.assign({}, x, { pic: hit });
     }
-    return _ps(x, done, ok);
+    var html = _ps(x, done, ok);
+    // no real picture: show nothing rather than a generic sparkle
+    if (/data-i3="sparkle"/.test(html)) return "";
+    return html;
   };
 })();
 
