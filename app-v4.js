@@ -448,7 +448,7 @@ async function v4SendFile(kind,target,file,name,k,dur,opt){opt=opt||{};if(!windo
   if(!target)return;if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");return}
   let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type))f=await shrinkImg(f,1280,.72);
   const kk=k||(/^image\//.test(f.type)?"img":"file");V4.sending=true;V4.upl=kind;render();
-  try{const up=await window.__chatFiles.upload(f,name||f.name||"file");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{}),...(opt.once&&kk==="img"?{o:true}:{})};
+  try{const up=await window.__chatFiles.upload(f,name||f.name||"file");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{}),...(opt.once&&(kk==="img"||kk==="voice")?{o:true}:{})};
     if(kk!=="file"&&!opt.once){V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f)}
     let text="";if(opt.caption!=null)text=opt.once?"":String(opt.caption).trim();else if(kk!=="voice"){const inp=document.getElementById(V4IN(kind));text=(inp&&inp.value||"").trim();if(inp){inp.value="";delete S.drafts[inp.id]}}
     if(text&&v4NeedFix(text)){const r=await v4Check(text);if(r)text=v4Pack(text,r.en,r.k)}
