@@ -101,14 +101,14 @@ grant execute on function public.block_user(uuid, boolean) to authenticated;
 
 -- Tous les apprenants actifs de l'école (les camarades de la même professeure d'abord)
 drop function if exists public.peer_directory();
-create or replace function public.peer_directory() returns table(uid uuid, name text, classe text, same boolean)
+create or replace function public.peer_directory() returns table(uid uuid, name text, classe text, same boolean, last_active bigint)
 language plpgsql stable security definer set search_path = public as $$
 declare me uuid := auth.uid(); mt text;
 begin
   if me is null or public.my_level() <> 2 or not public.peer_enabled() or not public.peer_ok(me) then return; end if;
   select coalesce(data->>'teacherId', '') into mt from docs where path = 'students/' || me::text;
   return query
-    select d.id::uuid, coalesce(d.data->>'name', 'Student'), coalesce(d.data->>'classe', ''), coalesce(d.data->>'teacherId', '') = coalesce(mt, '')
+    select d.id::uuid, coalesce(d.data->>'name', 'Student'), coalesce(d.data->>'classe', ''), coalesce(d.data->>'teacherId', '') = coalesce(mt, ''), coalesce((d.data->>'lastActive')::bigint, 0)
     from docs d
     where d.col = 'students' and d.id <> me::text
       and d.id ~ '^[0-9a-fA-F-]{36}$' and public.peer_ok(d.id::uuid)
