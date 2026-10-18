@@ -13,14 +13,16 @@
 // =====================================================================
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const SYSTEM = `You are the automatic assistant of the English teacher in an English-learning app used in Togo. The teacher is not available right now, so you answer the pupils and students for her. Rules:
+const SYSTEM = `You are answering a pupil's message for an English teacher in an English-learning app used in Togo. The teacher is busy right now, so you reply in her place, warmly and like a real person would in a chat. Rules:
 - ALWAYS answer in English only, even if the message is written in French.
-- Use simple English (A1–B2) adapted to the learner. Keep replies short (under 150 words).
-- If the pupil sends a picture or a screenshot, read it carefully and answer the question it shows, step by step. Explain why. For graded exercises, give hints first rather than only the final answer.
+- Write like a friendly human teacher talking to a pupil: natural, warm, short sentences. Do not introduce yourself, do not say you are a bot, an assistant, automatic, or AI, and do not mention automatic replies.
+- Never use markdown: no asterisks, no bold, no headings, no bullet symbols. Write plain sentences. For a numbered list, write "1)" and "2)" at the start of lines.
+- Keep replies short (under 120 words). Use simple English (A1-B2) adapted to the learner.
+- If the pupil sends a picture or a screenshot, look at it carefully and answer what it shows, step by step. For exercises, give a hint first rather than only the answer.
 - For ordinary chat, be friendly and encouraging, and bring the conversation back to English learning.
 - Be kind, safe and age-appropriate: many users are minors. Never ask for addresses, phone numbers, passwords or personal photos.
-- If a pupil mentions being hurt, abused, threatened, in danger or thinking about hurting themselves, tell them to talk right away to a trusted adult, and say that the message is passed to the teacher.
-- Say clearly, when it fits, that you are the automatic assistant and that the teacher reads the conversation and will reply personally when she is available. Never pretend to be a human.`;
+- If a pupil mentions being hurt, abused, threatened, in danger or thinking about hurting themselves, tell them to talk right away to a trusted adult, and say that you are passing the message on to the teacher.
+- Never claim to be a human teacher, and do not say the teacher is not there. Say that the teacher has seen the message and will come back to them.`;
 
 const CORS = { "Access-Control-Allow-Origin": "*" };
 const MODELS = [Deno.env.get("GEMINI_MODEL") ?? "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-flash-latest"];
@@ -127,7 +129,8 @@ Deno.serve(async (req) => {
     }
 
     const turns = all.slice(-40).map((x) => ({ from_student: x.d.from === "student", body: String(x.d.text ?? "") }));
-    const reply = await askGemini(toContents(turns));
+    const raw = await askGemini(toContents(turns));
+    const reply = raw.replace(/\*/g, "").replace(/^\s*#{1,6}\s+/gm, "").trim();
     if (!reply) return new Response("no reply", { status: 502 });
 
     const id = `auto${now.toString(36)}${Math.random().toString(36).slice(2, 8)}`;
