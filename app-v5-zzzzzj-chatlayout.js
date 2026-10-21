@@ -21,6 +21,12 @@
     f.style.height = Math.max(200, Math.round(vh - top - bh - 14)) + "px";
     f.dataset.zzw = String(window.innerWidth);
   }
+  var st = document.createElement("style");
+  st.id = "zzzzzjChatLayout";
+  // In a classmate chat the page itself cannot move at all (the browser
+  // cannot scroll it to show the keyboard): only the messages scroll.
+  st.textContent = "html.zz-chatlock body{position:fixed;left:0;right:0;top:0;bottom:0;overflow:hidden!important}";
+  document.head.appendChild(st);
   var raf = 0;
   function later() { if (raf) return; raf = requestAnimationFrame(function () { raf = 0; try { size(); } catch (e) {} }); }
   if (window.visualViewport) visualViewport.addEventListener("resize", later);
