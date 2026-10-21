@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.media.AudioManager;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
@@ -32,6 +33,15 @@ public class CallKeeperService extends Service {
         String who = intent != null && intent.getStringExtra("title") != null ? intent.getStringExtra("title") : "English Classes";
         boolean video = intent != null && intent.getBooleanExtra("video", false);
 
+        // A call is a communication: Android then runs echo cancellation and
+        // routes the voices correctly (without this, both people talk over
+        // each other and the echo comes back).
+        AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (am != null) {
+            am.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            am.setSpeakerphoneOn(video);
+        }
+
         Notification n = new NotificationCompat.Builder(this, CHANNEL)
                 .setSmallIcon(android.R.drawable.ic_menu_call)
                 .setContentTitle(video ? "Video call in progress" : "Voice call in progress")
@@ -49,6 +59,16 @@ public class CallKeeperService extends Service {
             startForeground(NOTE_ID, n);
         }
         return START_NOT_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (am != null) {
+            am.setSpeakerphoneOn(false);
+            am.setMode(AudioManager.MODE_NORMAL);
+        }
+        super.onDestroy();
     }
 
     @Override

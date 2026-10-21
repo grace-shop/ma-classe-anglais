@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
 
   const first = MODELS[body.modelTier ?? "default"] ?? MODELS.default;
   // Si un modèle est saturé (503/429), lent ou retiré (404), on essaie le suivant : Nova répond presque toujours.
-  const chain = [...new Set([first, "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-flash-latest"])];
+  const chain = [...new Set([first, "gemini-3.5-flash-lite", "gemini-3.5-flash"])].slice(0, 3);   // 3 modèles au plus : la réponse arrive en moins de 50 s
   let res: Response | null = null;
   let out: any = {};
   let model = first;
@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
           method: "POST",
           headers: { "Content-Type": "application/json", "x-goog-api-key": key },
           body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM }] }, contents, generationConfig: gen }),
-          signal: AbortSignal.timeout(25000),
+          signal: AbortSignal.timeout(15000),
         });
       } catch (_e) { res = null; break; }
       out = await res.json().catch(() => ({}));
