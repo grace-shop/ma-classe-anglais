@@ -13878,7 +13878,7 @@ html.zz-cf body .msg{font-size:1.12em}
   st.id = "zzzzzmGrow";
   st.textContent = `
 /* the composer: one rounded row at the bottom; buttons stay on the bottom edge */
-html body .chatbar.v4bar:has(textarea.zz-grow){align-items:flex-end!important;padding:8px 10px!important;gap:6px!important;border-top:0!important;background:transparent!important}
+html body .chatbar.v4bar:has(textarea.zz-grow){align-items:flex-end!important;padding:8px 10px!important;gap:6px!important;border-top:0!important;background:rgba(58,38,110,.55)!important}
 /* the field: a rounded pill that grows upward with the text (overrides the app's general textarea style) */
 html body .chatbar.v4bar textarea.zz-grow{flex:1 1 auto!important;width:auto!important;min-width:0!important;min-height:44px!important;max-height:160px!important;height:44px;box-sizing:border-box!important;margin:0!important;padding:10px 16px!important;font:inherit!important;font-size:19px!important;line-height:24px!important;color:inherit!important;background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.16)!important;border-radius:22px!important;box-shadow:none!important;resize:none!important;outline:none!important;overflow:hidden;word-break:break-word}
 html body .chatbar.v4bar textarea.zz-grow:focus{border-color:rgba(127,190,255,.6)!important;box-shadow:none!important}
@@ -13889,7 +13889,7 @@ html body .chatbar.v4bar:has(>textarea.zz-grow:not(:placeholder-shown)) .v4att [
 /* the bottom band is see-through: the chat background shows through */
 html body .glass.chat.zz-framed{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:transparent!important;box-shadow:none!important}
 html body .glass.chat.zz-framed > .zz-cname{background:rgba(16,18,40,.55)!important}
-html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(8,10,24,.08)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:0!important;box-shadow:none!important}
+html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:0!important;box-shadow:none!important}
 `;  document.head.appendChild(st);
   try { upgrade(); } catch (e) {}
 })();
