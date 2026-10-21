@@ -170,7 +170,7 @@
       if (b.dataset.act === "cancel") return cancel();
       if (b.dataset.act === "share") return share();
       var id = b.dataset.bg;
-      if (id === "photo" && !photoOf(t)) return choosePhoto();
+      if (id === "photo") return choosePhoto(); // always pick a new photo
       preview(id);
     });
   }
