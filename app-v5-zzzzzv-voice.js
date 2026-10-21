@@ -56,7 +56,7 @@
     b.className = "zz-spk";
     b.addEventListener("click", function (e) { e.preventDefault(); toggleSpeaker(); });
     bar.appendChild(b);
-    if (spk === null) spk = !!(window.CALL && CALL.video);
+    if (spk === null) spk = !!((typeof CALL !== "undefined" ? CALL : undefined) && CALL.video);
     paintSpeaker();
   }
 

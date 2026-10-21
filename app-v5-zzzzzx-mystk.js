@@ -11,7 +11,7 @@
   var cache = {};                    // path -> object URL, for this page only
 
   function store() {
-    var uid = (window.S && S.uid) || "anon";
+    var uid = ((typeof S !== "undefined" ? S : undefined) && S.uid) || "anon";
     return {
       key: "mca_mystk_" + uid,
       list: function () {
@@ -82,7 +82,7 @@
 
   // ---- send ----
   function sendSticker(item) {
-    var k = (window.V4 && V4.panel && V4.panel.kind) || "peer";
+    var k = ((typeof V4 !== "undefined" ? V4 : undefined) && V4.panel && V4.panel.kind) || "peer";
     var t = (typeof v4Target === "function" && v4Target(k)) || (V4.panel && V4.panel.target) || "";
     V4.panel = null;
     if (typeof render === "function") render();

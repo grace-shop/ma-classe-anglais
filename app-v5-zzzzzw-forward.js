@@ -45,11 +45,11 @@
   var fwd = null;
   function targets() {
     var out = [];
-    var me = (window.S && S.uid) || "";
-    (window.PR && PR.dir || []).forEach(function (p) {
+    var me = ((typeof S !== "undefined" ? S : undefined) && S.uid) || "";
+    ((typeof PR !== "undefined" ? PR : undefined) && PR.dir || []).forEach(function (p) {
       if (p.uid && p.uid !== me) out.push({ k: "peer", id: p.uid, name: p.name || "Camarade", sub: "Camarade" });
     });
-    (window.GR && GR.list || []).forEach(function (g) {
+    ((typeof GR !== "undefined" ? GR : undefined) && GR.list || []).forEach(function (g) {
       out.push({ k: "group", id: g.id, name: g.name || "Groupe", sub: "Groupe" });
     });
     return out;
