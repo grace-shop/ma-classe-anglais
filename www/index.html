@@ -13477,20 +13477,37 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
 
 /* ---- app-v5-zzzzzh-fastsend.js ---- */
 /* =====================================================================
-   v5 · Classmates chat: a message appears at once when you send it.
-   - The bubble is shown right away, as "sending".
-   - The English check is given at most 4 seconds; if it is slower, the
-     message goes out as written (the check is not waited for).
-   - You can write the next message while one is still being sent.
+   v5 · Classmates chat: the message goes at once, the translation after.
+   - The message is sent as written, right away, and shown at once.
+   - When the English version is ready, the sent message is updated with
+     it (the other person sees the translation a moment later).
+   - Only one redraw on send and one when the server confirms it.
    ===================================================================== */
 (function () {
   var _orig = v4TextSend;
-  var CHECK_MS = 4000;
+  var TRANSLATE_MS = 15000;
 
   function scrollEnd() {
     CHAT_STICK.on = true;
     var cs = document.getElementById("chatScroll");
     if (cs) cs.scrollTop = cs.scrollHeight;
+  }
+
+  // translate in the background, then update the message that was sent
+  function translateLater(msgId, orig) {
+    (async function () {
+      try {
+        var r = await Promise.race([
+          v4Check(orig),
+          new Promise(function (res) { setTimeout(function () { res(null); }, TRANSLATE_MS); })
+        ]);
+        if (!r) return;
+        var packed = v4Pack(orig, r.en, r.k);
+        await window.__peer.edit(msgId, packed);
+        var row = PR.inbox.find(function (x) { return x.id === msgId; });
+        if (row) { row.body = packed; render(); }
+      } catch (e) {}
+    })();
   }
 
   v4TextSend = async function (kind, f) {
@@ -13507,21 +13524,22 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
       created_at: new Date().toISOString(), read_at: null, pending: true });
     render(); scrollEnd();
 
-    var text = orig;
+    var msgId = null;
     try {
-      if (v4NeedFix(orig)) {
-        var r = await Promise.race([v4Check(orig), new Promise(function (res) { setTimeout(function () { res(null); }, CHECK_MS); })]);
-        if (r) text = v4Pack(orig, r.en, r.k);
-      }
-    } catch (e) {}
-
-    try { await v4Deliver(kind, tgt, text, null, reply); }
-    catch (e) { toast((e && e.message) || "Could not send", "x"); S.drafts[id] = orig; }
-    finally {
+      msgId = await window.__peer.send(tgt, orig, null, reply || null);
+    } catch (e) {
       PR.inbox = PR.inbox.filter(function (x) { return x.id !== tmpId; });
-      render(); scrollEnd();
-      if (hadFocus) { var n = document.getElementById(id); if (n) n.focus({ preventScroll: true }); }
+      S.drafts[id] = orig;
+      toast((e && e.message) || "Could not send", "x");
+      render();
+      return;
     }
+    var row = PR.inbox.find(function (x) { return x.id === tmpId; });
+    if (row && msgId) { row.id = msgId; delete row.pending; }
+    render(); scrollEnd();
+    if (hadFocus) { var n = document.getElementById(id); if (n) n.focus({ preventScroll: true }); }
+
+    if (msgId && v4NeedFix(orig)) translateLater(msgId, orig);
   };
 })();
 
