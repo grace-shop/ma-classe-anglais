@@ -17,7 +17,25 @@
     { id: "caveat", label: "Caveat", css: "'Caveat', cursive", sample: "Bonjour, ça va ?" },
     { id: "righteous", label: "Righteous", css: "'Righteous', cursive", sample: "Bonjour, ça va ?" },
     { id: "cinzel", label: "Cinzel", css: "'Cinzel', serif", sample: "Bonjour, ça va ?" },
-    { id: "playfair", label: "Playfair Display", css: "'Playfair Display', serif", sample: "Bonjour, ça va ?" }
+    { id: "playfair", label: "Playfair Display", css: "'Playfair Display', serif", sample: "Bonjour, ça va ?" },
+    { id: "sacramento", label: "Sacramento", css: "'Sacramento', cursive", sample: "Bonjour, ça va ?" },
+    { id: "allura", label: "Allura", css: "'Allura', cursive", sample: "Bonjour, ça va ?" },
+    { id: "kaushan", label: "Kaushan Script", css: "'Kaushan Script', cursive", sample: "Bonjour, ça va ?" },
+    { id: "yellowtail", label: "Yellowtail", css: "'Yellowtail', cursive", sample: "Bonjour, ça va ?" },
+    { id: "lobstertwo", label: "Lobster Two", css: "'Lobster Two', cursive", sample: "Bonjour, ça va ?" },
+    { id: "bangers", label: "Bangers", css: "'Bangers', cursive", sample: "Bonjour, ça va ?" },
+    { id: "marker", label: "Permanent Marker", css: "'Permanent Marker', cursive", sample: "Bonjour, ça va ?" },
+    { id: "shadows", label: "Shadows Into Light", css: "'Shadows Into Light', cursive", sample: "Bonjour, ça va ?" },
+    { id: "indie", label: "Indie Flower", css: "'Indie Flower', cursive", sample: "Bonjour, ça va ?" },
+    { id: "amatic", label: "Amatic SC", css: "'Amatic SC', cursive", sample: "Bonjour, ça va ?" },
+    { id: "abril", label: "Abril Fatface", css: "'Abril Fatface', serif", sample: "Bonjour, ça va ?" },
+    { id: "cookie", label: "Cookie", css: "'Cookie', cursive", sample: "Bonjour, ça va ?" },
+    { id: "fredericka", label: "Fredericka the Great", css: "'Fredericka the Great', cursive", sample: "Bonjour, ça va ?" },
+    { id: "playball", label: "Playball", css: "'Playball', cursive", sample: "Bonjour, ça va ?" },
+    { id: "courgette", label: "Courgette", css: "'Courgette', cursive", sample: "Bonjour, ça va ?" },
+    { id: "badscript", label: "Bad Script", css: "'Bad Script', cursive", sample: "Bonjour, ça va ?" },
+    { id: "pirata", label: "Pirata One", css: "'Pirata One', cursive", sample: "Bonjour, ça va ?" },
+    { id: "cormorant", label: "Cormorant Garamond", css: "'Cormorant Garamond', serif", sample: "Bonjour, ça va ?" }
   ];
 
   function getChoice() {
@@ -47,7 +65,7 @@
     try {
       var l = document.createElement("link");
       l.rel = "stylesheet";
-      l.href = "https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@400..700&family=Lobster&family=Great+Vibes&family=Satisfy&family=Caveat:wght@400..700&family=Righteous&family=Cinzel:wght@400..700&family=Playfair+Display:wght@400..700&display=swap";
+      l.href = "https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@400..700&family=Lobster&family=Great+Vibes&family=Satisfy&family=Caveat:wght@400..700&family=Righteous&family=Cinzel:wght@400..700&family=Playfair+Display:wght@400..700&family=Sacramento&family=Allura&family=Kaushan+Script&family=Yellowtail&family=Lobster+Two&family=Bangers&family=Permanent+Marker&family=Shadows+Into+Light&family=Indie+Flower&family=Amatic+SC:wght@400;700&family=Abril+Fatface&family=Cookie&family=Fredericka+the+Great&family=Playball&family=Courgette&family=Bad+Script&family=Pirata+One&family=Cormorant+Garamond:wght@400..700&display=swap";
       document.head.appendChild(l);
     } catch (e) {}
   })();
@@ -124,7 +142,7 @@
 html body .chatbar.v4bar input{font-size:19px!important;line-height:1.3}
 
 /* chosen font, on message bubbles and the typing box */
-html.zz-cf body .msg,html.zz-cf body .chatbar.v4bar input{font-family:var(--zzf)!important}
+html.zz-cf body .msg,html.zz-cf body .chatbar.v4bar input,html.zz-cf body .chatbar.v4bar textarea{font-family:var(--zzf)!important}
 html.zz-cf body .msg{font-size:1.12em}
 
 .zz-fontbtn{width:40px;height:40px;border-radius:50%;flex:none;margin-left:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:inherit;font:700 .9rem/1 system-ui,sans-serif;cursor:pointer}

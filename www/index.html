@@ -13669,7 +13669,25 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
     { id: "caveat", label: "Caveat", css: "'Caveat', cursive", sample: "Bonjour, ça va ?" },
     { id: "righteous", label: "Righteous", css: "'Righteous', cursive", sample: "Bonjour, ça va ?" },
     { id: "cinzel", label: "Cinzel", css: "'Cinzel', serif", sample: "Bonjour, ça va ?" },
-    { id: "playfair", label: "Playfair Display", css: "'Playfair Display', serif", sample: "Bonjour, ça va ?" }
+    { id: "playfair", label: "Playfair Display", css: "'Playfair Display', serif", sample: "Bonjour, ça va ?" },
+    { id: "sacramento", label: "Sacramento", css: "'Sacramento', cursive", sample: "Bonjour, ça va ?" },
+    { id: "allura", label: "Allura", css: "'Allura', cursive", sample: "Bonjour, ça va ?" },
+    { id: "kaushan", label: "Kaushan Script", css: "'Kaushan Script', cursive", sample: "Bonjour, ça va ?" },
+    { id: "yellowtail", label: "Yellowtail", css: "'Yellowtail', cursive", sample: "Bonjour, ça va ?" },
+    { id: "lobstertwo", label: "Lobster Two", css: "'Lobster Two', cursive", sample: "Bonjour, ça va ?" },
+    { id: "bangers", label: "Bangers", css: "'Bangers', cursive", sample: "Bonjour, ça va ?" },
+    { id: "marker", label: "Permanent Marker", css: "'Permanent Marker', cursive", sample: "Bonjour, ça va ?" },
+    { id: "shadows", label: "Shadows Into Light", css: "'Shadows Into Light', cursive", sample: "Bonjour, ça va ?" },
+    { id: "indie", label: "Indie Flower", css: "'Indie Flower', cursive", sample: "Bonjour, ça va ?" },
+    { id: "amatic", label: "Amatic SC", css: "'Amatic SC', cursive", sample: "Bonjour, ça va ?" },
+    { id: "abril", label: "Abril Fatface", css: "'Abril Fatface', serif", sample: "Bonjour, ça va ?" },
+    { id: "cookie", label: "Cookie", css: "'Cookie', cursive", sample: "Bonjour, ça va ?" },
+    { id: "fredericka", label: "Fredericka the Great", css: "'Fredericka the Great', cursive", sample: "Bonjour, ça va ?" },
+    { id: "playball", label: "Playball", css: "'Playball', cursive", sample: "Bonjour, ça va ?" },
+    { id: "courgette", label: "Courgette", css: "'Courgette', cursive", sample: "Bonjour, ça va ?" },
+    { id: "badscript", label: "Bad Script", css: "'Bad Script', cursive", sample: "Bonjour, ça va ?" },
+    { id: "pirata", label: "Pirata One", css: "'Pirata One', cursive", sample: "Bonjour, ça va ?" },
+    { id: "cormorant", label: "Cormorant Garamond", css: "'Cormorant Garamond', serif", sample: "Bonjour, ça va ?" }
   ];
 
   function getChoice() {
@@ -13699,7 +13717,7 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
     try {
       var l = document.createElement("link");
       l.rel = "stylesheet";
-      l.href = "https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@400..700&family=Lobster&family=Great+Vibes&family=Satisfy&family=Caveat:wght@400..700&family=Righteous&family=Cinzel:wght@400..700&family=Playfair+Display:wght@400..700&display=swap";
+      l.href = "https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@400..700&family=Lobster&family=Great+Vibes&family=Satisfy&family=Caveat:wght@400..700&family=Righteous&family=Cinzel:wght@400..700&family=Playfair+Display:wght@400..700&family=Sacramento&family=Allura&family=Kaushan+Script&family=Yellowtail&family=Lobster+Two&family=Bangers&family=Permanent+Marker&family=Shadows+Into+Light&family=Indie+Flower&family=Amatic+SC:wght@400;700&family=Abril+Fatface&family=Cookie&family=Fredericka+the+Great&family=Playball&family=Courgette&family=Bad+Script&family=Pirata+One&family=Cormorant+Garamond:wght@400..700&display=swap";
       document.head.appendChild(l);
     } catch (e) {}
   })();
@@ -13776,7 +13794,7 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
 html body .chatbar.v4bar input{font-size:19px!important;line-height:1.3}
 
 /* chosen font, on message bubbles and the typing box */
-html.zz-cf body .msg,html.zz-cf body .chatbar.v4bar input{font-family:var(--zzf)!important}
+html.zz-cf body .msg,html.zz-cf body .chatbar.v4bar input,html.zz-cf body .chatbar.v4bar textarea{font-family:var(--zzf)!important}
 html.zz-cf body .msg{font-size:1.12em}
 
 .zz-fontbtn{width:40px;height:40px;border-radius:50%;flex:none;margin-left:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:inherit;font:700 .9rem/1 system-ui,sans-serif;cursor:pointer}
@@ -13794,6 +13812,77 @@ html.zz-cf body .msg{font-size:1.12em}
   document.head.appendChild(st);
   apply();
   try { scan(); } catch (e) {}
+})();
+
+/* ---- app-v5-zzzzzm-growbox.js ---- */
+/* =====================================================================
+   v5 · The typing box grows with the text.
+   The one-line box in a chat becomes a box that gets taller as you type
+   (up to about 6 lines), so you see everything you write. Enter sends,
+   Shift+Enter makes a new line. The box keeps the same id, so sending
+   works as before.
+   ===================================================================== */
+(function () {
+  var FORMS = /^(chat|peerchat|groupchat)$/;
+
+  function grow(ta) {
+    ta.style.height = "auto";
+    var max = 6 * 24 + 16;
+    ta.style.height = Math.min(ta.scrollHeight, max) + "px";
+    ta.style.overflowY = ta.scrollHeight > max ? "auto" : "hidden";
+  }
+
+  function upgrade() {
+    document.querySelectorAll("form.v4bar").forEach(function (f) {
+      if (!FORMS.test(f.dataset.f || "")) return;
+      var inp = f.querySelector("input:not([type=file]):not([type=hidden])");
+      if (!inp || !inp.id) return;
+      var ta = document.createElement("textarea");
+      ta.id = inp.id;
+      ta.name = inp.name || "";
+      ta.placeholder = inp.placeholder || "";
+      ta.className = (inp.className || "") + " zz-grow";
+      ta.rows = 1;
+      ta.value = inp.value || "";
+      ta.setAttribute("autocomplete", "off");
+      ta.setAttribute("autocorrect", "on");
+      ta.setAttribute("enterkeyhint", "send");
+      var wasFocus = document.activeElement === inp;
+      inp.parentNode.replaceChild(ta, inp);
+      if (wasFocus) { try { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } catch (e) {} }
+      grow(ta);
+    });
+  }
+
+  document.addEventListener("input", function (e) {
+    var t = e.target;
+    if (t && t.classList && t.classList.contains("zz-grow")) grow(t);
+  }, true);
+
+  document.addEventListener("keydown", function (e) {
+    var t = e.target;
+    if (!t || !t.classList || !t.classList.contains("zz-grow")) return;
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      if (t.form && t.value.trim()) t.form.requestSubmit();
+    }
+  }, true);
+
+  var raf = 0;
+  new MutationObserver(function () {
+    if (raf) return;
+    raf = requestAnimationFrame(function () { raf = 0; try { upgrade(); } catch (e) {} });
+  }).observe(document.body, { childList: true, subtree: true });
+
+  var st = document.createElement("style");
+  st.id = "zzzzzmGrow";
+  st.textContent = `
+html body .chatbar.v4bar textarea.zz-grow{flex:1;min-width:0;width:100%;font:inherit;font-size:19px;line-height:24px;padding:10px 14px;resize:none;border-radius:18px;background:rgba(255,255,255,.08);color:inherit;border:1px solid rgba(255,255,255,.18);outline:none;box-sizing:border-box;overflow:hidden;align-self:center;white-space:pre-wrap;word-break:break-word}
+html body .chatbar.v4bar textarea.zz-grow::placeholder{opacity:.7}
+html.zz-cf body .chatbar.v4bar textarea.zz-grow{font-family:var(--zzf)!important}
+`;
+  document.head.appendChild(st);
+  try { upgrade(); } catch (e) {}
 })();
 
 /* ==== v4 END ==== */
