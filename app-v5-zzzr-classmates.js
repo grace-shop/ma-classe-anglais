@@ -12,8 +12,9 @@ function pvOrganize(){
     const rows=[...L.children].filter(n=>n.classList&&n.classList.contains("it")&&n.dataset.a==="openPeer");
     if(!rows.length)return;
     const info=rows.map(r=>{const u=r.dataset.id,st=(typeof frState==="function")?frState(u):"none";
-      return{r,st,last:pvLastAt(u,me),un:r.classList.contains("pv-un"),name:(r.querySelector("b")||{}).textContent||""}});
-    const byRecent=(a,b)=>(b.un-a.un)||(b.last-a.last)||a.name.localeCompare(b.name);
+      return{r,st,pin:(typeof convHas==="function"&&convHas("peer:"+u,"pin"))?1:0,last:pvLastAt(u,me),un:r.classList.contains("pv-un"),name:(r.querySelector("b")||{}).textContent||""}});
+    // épinglés d'abord, puis les non lus, puis le plus récent
+    const byRecent=(a,b)=>(b.pin-a.pin)||(b.un-a.un)||(b.last-a.last)||a.name.localeCompare(b.name);
     const friends=info.filter(x=>x.st==="friends").sort(byRecent);
     const reqs=info.filter(x=>x.st==="in"||x.st==="out").sort(byRecent);
     const others=info.filter(x=>x.st!=="friends"&&x.st!=="in"&&x.st!=="out").sort(byRecent);

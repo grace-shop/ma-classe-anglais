@@ -129,7 +129,8 @@
   }
 
   function syncPanel() {
-    var show = isRoyale() && !!document.getElementById("arena");
+    var ar = document.getElementById("arena");
+    var show = isRoyale() && !!ar && !ar.hidden;   // only while the arena is open
     if (!show) { if (panel) panel.style.display = "none"; return; }
     ensurePanel().style.display = "";
     if (open) paintList();

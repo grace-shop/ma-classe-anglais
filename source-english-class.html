@@ -10080,8 +10080,9 @@ function pvOrganize(){
     const rows=[...L.children].filter(n=>n.classList&&n.classList.contains("it")&&n.dataset.a==="openPeer");
     if(!rows.length)return;
     const info=rows.map(r=>{const u=r.dataset.id,st=(typeof frState==="function")?frState(u):"none";
-      return{r,st,last:pvLastAt(u,me),un:r.classList.contains("pv-un"),name:(r.querySelector("b")||{}).textContent||""}});
-    const byRecent=(a,b)=>(b.un-a.un)||(b.last-a.last)||a.name.localeCompare(b.name);
+      return{r,st,pin:(typeof convHas==="function"&&convHas("peer:"+u,"pin"))?1:0,last:pvLastAt(u,me),un:r.classList.contains("pv-un"),name:(r.querySelector("b")||{}).textContent||""}});
+    // épinglés d'abord, puis les non lus, puis le plus récent
+    const byRecent=(a,b)=>(b.pin-a.pin)||(b.un-a.un)||(b.last-a.last)||a.name.localeCompare(b.name);
     const friends=info.filter(x=>x.st==="friends").sort(byRecent);
     const reqs=info.filter(x=>x.st==="in"||x.st==="out").sort(byRecent);
     const others=info.filter(x=>x.st!=="friends"&&x.st!=="in"&&x.st!=="out").sort(byRecent);
@@ -13982,15 +13983,26 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
       else if (t.closest(".zz-sx")) clear();
       return;
     }
-    var m = t.closest(".msgs .msg");
-    if (!m) return;
-    if (t.closest("button,a,audio,video,input,textarea,select,label")) return;
-    if (e.defaultPrevented) return;
+  });
+
+  // Tapping a message selects it. This runs before the app's own tap handler,
+  // which would open the message menu. A long press still opens the menu.
+  var downAt = 0;
+  document.addEventListener("pointerdown", function () { downAt = Date.now(); }, true);
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var m = t.closest(".msgs .msg[data-mid]");
+    if (!m || String(m.dataset.mid).indexOf("tmp") === 0) return;
+    if (t.closest("button,a,audio,video,input,textarea,select,label,.v4quote")) return;
+    if (Date.now() - downAt > 420) return;             // long press: the menu opens
     try { if (window.getSelection && String(window.getSelection())) return; } catch (x) {}
+    e.stopImmediatePropagation();
+    e.preventDefault();
     if (sel.has(m)) { sel.delete(m); m.classList.remove("zz-sel"); }
     else { sel.add(m); m.classList.add("zz-sel"); }
     refresh();
-  });
+  }, true);
 
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && sel.size) clear(); });
 
@@ -14902,12 +14914,17 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     paintSpeaker();
   }
 
+  // a speaker icon only, the same size as the other call buttons
+  var SPK_ICON = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
+
   function paintSpeaker() {
     var b = document.querySelector("#csBtns .zz-spk");
     if (!b) return;
     b.classList.toggle("on", !!spk);
     b.setAttribute("aria-pressed", spk ? "true" : "false");
-    b.textContent = spk ? "🔊 Haut-parleur : on" : "🔈 Haut-parleur";
+    b.innerHTML = SPK_ICON;
+    b.title = spk ? "Haut-parleur : activé" : "Haut-parleur";
+    b.setAttribute("aria-label", spk ? "Haut-parleur activé" : "Haut-parleur");
   }
 
   function ensureSpeakerButton() {
@@ -14954,8 +14971,8 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
   var st = document.createElement("style");
   st.id = "zzzzzvVoice";
   st.textContent = `
-#csBtns .zz-spk{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:10px 16px;font:700 .85rem system-ui,sans-serif;cursor:pointer;white-space:nowrap}
-#csBtns .zz-spk.on{background:#A78BFA;color:#0B0D18;border-color:#A78BFA}
+#csBtns .zz-spk{flex:0 0 auto;width:56px;height:56px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:rgba(55,60,80,.92);color:#fff;cursor:pointer}
+#csBtns .zz-spk.on{background:#A78BFA;color:#0B0D18}
 `;
   document.head.appendChild(st);
 })();
@@ -15419,7 +15436,8 @@ img.zz-stki,video.zz-stkv{width:150px;max-width:55vw;height:auto;display:block;b
   }
 
   function syncPanel() {
-    var show = isRoyale() && !!document.getElementById("arena");
+    var ar = document.getElementById("arena");
+    var show = isRoyale() && !!ar && !ar.hidden;   // only while the arena is open
     if (!show) { if (panel) panel.style.display = "none"; return; }
     ensurePanel().style.display = "";
     if (open) paintList();

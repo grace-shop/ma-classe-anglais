@@ -40,12 +40,17 @@
     paintSpeaker();
   }
 
+  // a speaker icon only, the same size as the other call buttons
+  var SPK_ICON = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
+
   function paintSpeaker() {
     var b = document.querySelector("#csBtns .zz-spk");
     if (!b) return;
     b.classList.toggle("on", !!spk);
     b.setAttribute("aria-pressed", spk ? "true" : "false");
-    b.textContent = spk ? "🔊 Haut-parleur : on" : "🔈 Haut-parleur";
+    b.innerHTML = SPK_ICON;
+    b.title = spk ? "Haut-parleur : activé" : "Haut-parleur";
+    b.setAttribute("aria-label", spk ? "Haut-parleur activé" : "Haut-parleur");
   }
 
   function ensureSpeakerButton() {
@@ -92,8 +97,8 @@
   var st = document.createElement("style");
   st.id = "zzzzzvVoice";
   st.textContent = `
-#csBtns .zz-spk{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:10px 16px;font:700 .85rem system-ui,sans-serif;cursor:pointer;white-space:nowrap}
-#csBtns .zz-spk.on{background:#A78BFA;color:#0B0D18;border-color:#A78BFA}
+#csBtns .zz-spk{flex:0 0 auto;width:56px;height:56px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:rgba(55,60,80,.92);color:#fff;cursor:pointer}
+#csBtns .zz-spk.on{background:#A78BFA;color:#0B0D18}
 `;
   document.head.appendChild(st);
 })();
