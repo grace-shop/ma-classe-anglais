@@ -69,6 +69,10 @@ html body .chatbar.v4bar textarea.zz-grow::placeholder{opacity:.65}
 html.zz-cf body .chatbar.v4bar textarea.zz-grow{font-family:var(--zzf)!important}
 /* the mic turns into the send arrow as soon as something is typed */
 html body .chatbar.v4bar:has(>textarea.zz-grow:not(:placeholder-shown)) .v4att [data-v4="rec"]{display:none!important}
+/* the bottom band is see-through: the chat background shows through */
+html body .glass.chat.zz-framed{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:transparent!important;box-shadow:none!important}
+html body .glass.chat.zz-framed > .zz-cname{background:rgba(16,18,40,.55)!important}
+html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(8,10,24,.08)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:0!important;box-shadow:none!important}
 `;  document.head.appendChild(st);
   try { upgrade(); } catch (e) {}
 })();
