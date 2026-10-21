@@ -13877,11 +13877,14 @@ html.zz-cf body .msg{font-size:1.12em}
   var st = document.createElement("style");
   st.id = "zzzzzmGrow";
   st.textContent = `
-html body .chatbar.v4bar textarea.zz-grow{flex:1;min-width:0;width:100%;font:inherit;font-size:19px;line-height:24px;padding:10px 14px;resize:none;border-radius:18px;background:rgba(255,255,255,.08);color:inherit;border:1px solid rgba(255,255,255,.18);outline:none;box-sizing:border-box;overflow:hidden;align-self:center;white-space:pre-wrap;word-break:break-word}
+/* the field grows upward; the buttons stay at the bottom edge */
+html body .chatbar.v4bar:has(textarea.zz-grow){align-items:flex-end}
+html body .chatbar.v4bar textarea.zz-grow{flex:1;min-width:0;width:100%;font:inherit;font-size:19px;line-height:24px;padding:10px 6px;margin:0;resize:none;border:0;background:transparent;color:inherit;outline:none;box-sizing:border-box;overflow:hidden;align-self:center;word-break:break-word}
 html body .chatbar.v4bar textarea.zz-grow::placeholder{opacity:.7}
 html.zz-cf body .chatbar.v4bar textarea.zz-grow{font-family:var(--zzf)!important}
-`;
-  document.head.appendChild(st);
+/* as soon as something is typed, the mic turns into the send arrow (like the attach rule for the old box) */
+html body .chatbar.v4bar:has(>textarea.zz-grow:not(:placeholder-shown)) .v4att [data-v4="rec"]{display:none!important}
+`;  document.head.appendChild(st);
   try { upgrade(); } catch (e) {}
 })();
 
