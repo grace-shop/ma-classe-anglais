@@ -49,6 +49,32 @@ Deno.serve(async (req) => {
   try { body = await req.json(); } catch { return fail("invalid_request", "Unreadable request."); }
   if (JSON.stringify(body).length > 6_000_000) return fail("prompt_too_large", "Request too long.", 413);
 
+  // Images d'IA : une image à partir d'une description (Gemini, même clé que Nova)
+  if (body.action === "image") {
+    const prompt = String((body as { prompt?: string }).prompt ?? "").trim().slice(0, 300);
+    if (!prompt) return fail("invalid_request", "Write what the picture should show.");
+    const key = Deno.env.get("GEMINI_API_KEY") ?? "";
+    if (!key) return fail("sampling_disabled", "The picture service is not configured.", 500);
+    const imgModel = Deno.env.get("GEMINI_IMAGE_MODEL") ?? "gemini-2.5-flash-image";
+    let r: Response;
+    try {
+      r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${imgModel}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: "A bright, child-friendly illustration: " + prompt }] }],
+          generationConfig: { responseModalities: ["IMAGE"] },
+        }),
+        signal: AbortSignal.timeout(40000),
+      });
+    } catch (_e) { return fail("upstream_error", "Could not reach the picture service.", 502); }
+    const outImg = await r.json().catch(() => ({} as Record<string, any>));
+    if (!r.ok) return fail("upstream_error", outImg?.error?.message ?? `Picture error ${r.status}`, 502);
+    const part = ((outImg?.candidates?.[0]?.content?.parts ?? []) as { inlineData?: { mimeType?: string; data?: string } }[]).find((p) => p.inlineData?.data);
+    if (!part?.inlineData) return fail("refused", "The picture could not be made. Try another description.", 400);
+    return json({ image: `data:${part.inlineData.mimeType || "image/png"};base64,${part.inlineData.data}` });
+  }
+
   // Professeure : réinitialiser le mot de passe d'un élève (comptes créés avec un numéro de téléphone)
   if (body.action === "reset_password") {
     const { data: me } = await admin.from("members").select("level").eq("uid", auth.user.id).maybeSingle();
