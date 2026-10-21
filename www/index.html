@@ -13586,9 +13586,16 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
    name row stays at the top and the message box stays above the keyboard.
    ===================================================================== */
 (function () {
+  // the browser scrolls the page to show the focused box: put it back at the top
+  function home() {
+    if (!document.documentElement.classList.contains("zz-chatlock")) return;
+    if (window.scrollY) window.scrollTo(0, 0);
+    if (document.scrollingElement && document.scrollingElement.scrollTop) document.scrollingElement.scrollTop = 0;
+  }
   function size() {
     var f = document.querySelector(".glass.chat.zz-framed");
     if (!f || !f.parentElement) return;
+    home();
     var bar = f.parentElement.querySelector("form.v4bar");
     var bh = bar && !f.contains(bar) ? bar.getBoundingClientRect().height : 0;
     var vh = window.visualViewport ? visualViewport.height : window.innerHeight;
@@ -13599,7 +13606,7 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
   var raf = 0;
   function later() { if (raf) return; raf = requestAnimationFrame(function () { raf = 0; try { size(); } catch (e) {} }); }
   if (window.visualViewport) visualViewport.addEventListener("resize", later);
-  document.addEventListener("focusin", function (e) { if (e.target && e.target.closest && e.target.closest(".glass.chat")) setTimeout(later, 60); }, true);
+  document.addEventListener("focusin", function (e) { if (e.target && e.target.closest && e.target.closest(".glass.chat")) { home(); setTimeout(later, 60); setTimeout(home, 250); } }, true);
   document.addEventListener("focusout", function () { setTimeout(later, 300); }, true);
 })();
 
