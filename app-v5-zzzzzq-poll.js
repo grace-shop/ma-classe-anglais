@@ -30,7 +30,7 @@
   window.__zzPoll = {
     enc: enc,
     mark: function (id, q, opts) {
-      return enc("P:" + id + ":" + ((window.S && S.uid) || "") + ":" + JSON.stringify({ q: q, o: opts }));
+      return enc("P:" + id + ":" + (((typeof S !== "undefined" ? S : undefined) && S.uid) || "") + ":" + JSON.stringify({ q: q, o: opts }));
     }
   };
 
@@ -48,7 +48,7 @@
   function sendVote(pid, idx) {
     var c = chatInfo();
     if (!c || !c.target) { toast("Ouvre la conversation pour voter.", "x"); return; }
-    var text = enc("V:" + pid + ":" + idx + ":" + ((window.S && S.uid) || ""));
+    var text = enc("V:" + pid + ":" + idx + ":" + (((typeof S !== "undefined" ? S : undefined) && S.uid) || ""));
     Promise.resolve(v4Deliver(c.kind, c.target, text, null, null)).catch(function () {
       toast("Vote non envoyé.", "x");
     });
@@ -108,7 +108,7 @@
   }
 
   function render(P, v) {
-    var me = (window.S && S.uid) || "";
+    var me = ((typeof S !== "undefined" ? S : undefined) && S.uid) || "";
     var counts = P.data.o.map(function () { return 0; });
     var total = 0;
     Object.keys(v).forEach(function (uid) {
