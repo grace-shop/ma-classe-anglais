@@ -92,15 +92,26 @@
       else if (t.closest(".zz-sx")) clear();
       return;
     }
-    var m = t.closest(".msgs .msg");
-    if (!m) return;
-    if (t.closest("button,a,audio,video,input,textarea,select,label")) return;
-    if (e.defaultPrevented) return;
+  });
+
+  // Tapping a message selects it. This runs before the app's own tap handler,
+  // which would open the message menu. A long press still opens the menu.
+  var downAt = 0;
+  document.addEventListener("pointerdown", function () { downAt = Date.now(); }, true);
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var m = t.closest(".msgs .msg[data-mid]");
+    if (!m || String(m.dataset.mid).indexOf("tmp") === 0) return;
+    if (t.closest("button,a,audio,video,input,textarea,select,label,.v4quote")) return;
+    if (Date.now() - downAt > 420) return;             // long press: the menu opens
     try { if (window.getSelection && String(window.getSelection())) return; } catch (x) {}
+    e.stopImmediatePropagation();
+    e.preventDefault();
     if (sel.has(m)) { sel.delete(m); m.classList.remove("zz-sel"); }
     else { sel.add(m); m.classList.add("zz-sel"); }
     refresh();
-  });
+  }, true);
 
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && sel.size) clear(); });
 
