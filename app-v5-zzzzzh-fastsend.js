@@ -56,8 +56,10 @@
       render();
       return;
     }
-    var row = PR.inbox.find(function (x) { return x.id === tmpId; });
-    if (row && msgId) { row.id = msgId; delete row.pending; }
+    // the sent message replaces the temporary one: never two copies
+    PR.inbox = PR.inbox.filter(function (x) { return x.id !== tmpId && x.id !== msgId; });
+    if (msgId) PR.inbox.unshift({ id: msgId, sender: S.uid, receiver: tgt, body: orig, att: null, meta: reply || null,
+      created_at: new Date().toISOString(), read_at: null });
     render(); scrollEnd();
     if (hadFocus) { var n = document.getElementById(id); if (n) n.focus({ preventScroll: true }); }
 
