@@ -27,4 +27,15 @@ public class CallKeeperPlugin extends Plugin {
         getContext().stopService(new Intent(getContext(), CallKeeperService.class));
         call.resolve();
     }
+
+    /* Haut-parleur on/off during a call (JS: Capacitor.Plugins.CallKeeper.speaker({on})). */
+    @PluginMethod
+    public void speaker(PluginCall call) {
+        android.media.AudioManager am = (android.media.AudioManager) getContext().getSystemService(android.content.Context.AUDIO_SERVICE);
+        if (am != null) {
+            am.setMode(android.media.AudioManager.MODE_IN_COMMUNICATION);
+            am.setSpeakerphoneOn(call.getBoolean("on", false));
+        }
+        call.resolve();
+    }
 }
