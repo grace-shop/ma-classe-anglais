@@ -59,7 +59,8 @@
     toast("Recherche de votre position…", "check");
     navigator.geolocation.getCurrentPosition(function (p) {
       var url = "https://maps.google.com/?q=" + p.coords.latitude.toFixed(6) + "," + p.coords.longitude.toFixed(6);
-      Promise.resolve(v4Deliver(k, t, "📍 Ma position : " + url, null, null)).catch(function () {
+      var mark = window.__zzPoll ? window.__zzPoll.enc("L:" + p.coords.latitude + ":" + p.coords.longitude) : "";
+      Promise.resolve(v4Deliver(k, t, "📍 Ma position" + mark, null, null)).catch(function () {
         toast("Envoi impossible.", "x");
       });
     }, function () {
@@ -98,7 +99,7 @@
       '<form class="zz-ff">' + F.fields.map(function (f) {
         return '<label class="zz-fl"><span>' + f.l + '</span><input name="' + f.n + '" type="' + (f.t || "text") + '" placeholder="' + f.p + '" maxlength="200"' + (f.req ? ' required' : '') + '></label>';
       }).join("") +
-      (F.picker ? '<button type="button" class="zz-fpick" data-pick="1">Choisir dans mes contacts</button>' : '') +
+      (F.picker && navigator.contacts && navigator.contacts.select ? '<button type="button" class="zz-fpick" data-pick="1">Choisir dans mes contacts</button>' : '') +
       '<div class="zz-fbtns"><button type="button" class="zz-fcancel" data-x="1">Annuler</button><button type="submit" class="zz-fok">' + F.ok + '</button></div>' +
       '</form></div>';
     document.body.appendChild(form);

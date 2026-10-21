@@ -28,6 +28,7 @@
 
   // the poll's invisible part, added to its message when it is sent
   window.__zzPoll = {
+    enc: enc,
     mark: function (id, q, opts) {
       return enc("P:" + id + ":" + ((window.S && S.uid) || "") + ":" + JSON.stringify({ q: q, o: opts }));
     }
@@ -55,7 +56,7 @@
 
   var scheduled = 0;
   function scan() {
-    var votes = {}, polls = [];
+    var votes = {}, polls = [], locs = [];
     document.querySelectorAll(".msgs .msg").forEach(function (m) {
       if (!/[⁡-⁤]/.test(m.textContent)) return;
       (m.textContent.match(RUN) || []).forEach(function (r) {
@@ -68,6 +69,10 @@
           if (p.length < 4) return;
           (votes[p[1]] = votes[p[1]] || {})[p[3]] = +p[2];
           m.classList.add("zz-vmsg");
+        } else if (type === "L") {
+          var q = s.split(":");
+          var lat = parseFloat(q[1]), lng = parseFloat(q[2]);
+          if (isFinite(lat) && isFinite(lng)) locs.push({ m: m, lat: lat, lng: lng });
         } else if (type === "P") {
           var i2 = s.indexOf(":", i1 + 1), i3 = s.indexOf(":", i2 + 1);
           var id = s.slice(i1 + 1, i2);
@@ -78,6 +83,28 @@
       });
     });
     polls.forEach(function (P) { render(P, votes[P.id] || {}); });
+    locs.forEach(function (L) { renderLoc(L); });
+  }
+
+  // a location card: a map tile of the place, tap to open the map
+  function renderLoc(L) {
+    var sig = L.lat + "," + L.lng;
+    var old = L.m.querySelector(":scope > .zz-loc");
+    if (old && old.dataset.sig === sig) return;
+    if (old) old.remove();
+    var z = 15, n = Math.pow(2, z);
+    var x = Math.floor((L.lng + 180) / 360 * n);
+    var lr = L.lat * Math.PI / 180;
+    var y = Math.floor((1 - Math.log(Math.tan(lr) + 1 / Math.cos(lr)) / Math.PI) / 2 * n);
+    var a = document.createElement("a");
+    a.className = "zz-loc";
+    a.dataset.sig = sig;
+    a.href = "https://www.openstreetmap.org/?mlat=" + L.lat + "&mlon=" + L.lng + "#map=16/" + L.lat + "/" + L.lng;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.innerHTML = '<span class="zz-lmap"><img alt="Carte" src="https://a.tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png" loading="lazy"><i class="zz-lpin"></i></span>' +
+      '<span class="zz-lt">📍 Position partagée</span><span class="zz-lo">Ouvrir la carte</span>';
+    L.m.appendChild(a);
   }
 
   function render(P, v) {
@@ -126,6 +153,12 @@
   st.id = "zzzzzqPoll";
   st.textContent = `
 .msgs .msg.zz-vmsg{display:none!important}
+.msgs .msg .zz-loc{position:relative;display:block;margin-top:8px;border-radius:14px;overflow:hidden;background:#0B0D18;color:#fff;text-decoration:none;width:min(260px,100%)}
+.msgs .msg .zz-lmap{position:relative;display:block;height:150px;overflow:hidden}
+.msgs .msg .zz-lmap img{width:100%;height:100%;object-fit:cover;display:block}
+.msgs .msg .zz-lpin{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-18px 0 0 -9px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#EF4444;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.msgs .msg .zz-lt{display:block;padding:8px 10px 0;font:700 .85rem system-ui,sans-serif}
+.msgs .msg .zz-lo{display:block;padding:2px 10px 10px;font:600 .75rem system-ui,sans-serif;color:#9FF5DA}
 .msgs .msg .zz-pl{margin-top:8px;display:flex;flex-direction:column;gap:6px;min-width:200px}
 .msgs .msg .zz-po{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:9px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:inherit;font:600 .92rem/1.2 system-ui,sans-serif;cursor:pointer}
 .msgs .msg .zz-po.on{border-color:#A78BFA;box-shadow:0 0 0 1px #A78BFA inset}
