@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>English Classes</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://i.ytimg.com https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src https://www.youtube-nocookie.com; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="theme-color" content="#0E1120"><meta name="description" content="Apprendre l'anglais au Togo avec sa professeure.">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="English Classes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;background:#0E1120}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
@@ -13534,8 +13534,10 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
       render();
       return;
     }
-    var row = PR.inbox.find(function (x) { return x.id === tmpId; });
-    if (row && msgId) { row.id = msgId; delete row.pending; }
+    // the sent message replaces the temporary one: never two copies
+    PR.inbox = PR.inbox.filter(function (x) { return x.id !== tmpId && x.id !== msgId; });
+    if (msgId) PR.inbox.unshift({ id: msgId, sender: S.uid, receiver: tgt, body: orig, att: null, meta: reply || null,
+      created_at: new Date().toISOString(), read_at: null });
     render(); scrollEnd();
     if (hadFocus) { var n = document.getElementById(id); if (n) n.focus({ preventScroll: true }); }
 
@@ -13574,6 +13576,30 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
     }
     return r;
   };
+})();
+
+/* ---- app-v5-zzzzzj-chatlayout.js ---- */
+/* =====================================================================
+   v5 · In a classmate chat, the name stays still when the keyboard opens.
+   The frame follows the space that is left above the keyboard, so the
+   name row stays at the top and the message box stays above the keyboard.
+   ===================================================================== */
+(function () {
+  function size() {
+    var f = document.querySelector(".glass.chat.zz-framed");
+    if (!f || !f.parentElement) return;
+    var bar = f.parentElement.querySelector("form.v4bar");
+    var bh = bar && !f.contains(bar) ? bar.getBoundingClientRect().height : 0;
+    var vh = window.visualViewport ? visualViewport.height : window.innerHeight;
+    var top = f.getBoundingClientRect().top;
+    f.style.height = Math.max(200, Math.round(vh - top - bh - 14)) + "px";
+    f.dataset.zzw = String(window.innerWidth);
+  }
+  var raf = 0;
+  function later() { if (raf) return; raf = requestAnimationFrame(function () { raf = 0; try { size(); } catch (e) {} }); }
+  if (window.visualViewport) visualViewport.addEventListener("resize", later);
+  document.addEventListener("focusin", function (e) { if (e.target && e.target.closest && e.target.closest(".glass.chat")) setTimeout(later, 60); }, true);
+  document.addEventListener("focusout", function () { setTimeout(later, 300); }, true);
 })();
 
 /* ==== v4 END ==== */

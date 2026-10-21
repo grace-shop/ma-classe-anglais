@@ -13527,8 +13527,10 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
       render();
       return;
     }
-    var row = PR.inbox.find(function (x) { return x.id === tmpId; });
-    if (row && msgId) { row.id = msgId; delete row.pending; }
+    // the sent message replaces the temporary one: never two copies
+    PR.inbox = PR.inbox.filter(function (x) { return x.id !== tmpId && x.id !== msgId; });
+    if (msgId) PR.inbox.unshift({ id: msgId, sender: S.uid, receiver: tgt, body: orig, att: null, meta: reply || null,
+      created_at: new Date().toISOString(), read_at: null });
     render(); scrollEnd();
     if (hadFocus) { var n = document.getElementById(id); if (n) n.focus({ preventScroll: true }); }
 
@@ -13567,6 +13569,30 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
     }
     return r;
   };
+})();
+
+/* ---- app-v5-zzzzzj-chatlayout.js ---- */
+/* =====================================================================
+   v5 · In a classmate chat, the name stays still when the keyboard opens.
+   The frame follows the space that is left above the keyboard, so the
+   name row stays at the top and the message box stays above the keyboard.
+   ===================================================================== */
+(function () {
+  function size() {
+    var f = document.querySelector(".glass.chat.zz-framed");
+    if (!f || !f.parentElement) return;
+    var bar = f.parentElement.querySelector("form.v4bar");
+    var bh = bar && !f.contains(bar) ? bar.getBoundingClientRect().height : 0;
+    var vh = window.visualViewport ? visualViewport.height : window.innerHeight;
+    var top = f.getBoundingClientRect().top;
+    f.style.height = Math.max(200, Math.round(vh - top - bh - 14)) + "px";
+    f.dataset.zzw = String(window.innerWidth);
+  }
+  var raf = 0;
+  function later() { if (raf) return; raf = requestAnimationFrame(function () { raf = 0; try { size(); } catch (e) {} }); }
+  if (window.visualViewport) visualViewport.addEventListener("resize", later);
+  document.addEventListener("focusin", function (e) { if (e.target && e.target.closest && e.target.closest(".glass.chat")) setTimeout(later, 60); }, true);
+  document.addEventListener("focusout", function () { setTimeout(later, 300); }, true);
 })();
 
 /* ==== v4 END ==== */
