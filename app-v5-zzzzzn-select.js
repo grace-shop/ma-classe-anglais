@@ -44,6 +44,9 @@
   function textOf(m) {
     var c = m.cloneNode(true);
     c.querySelectorAll("button,audio,video,img,svg,input,textarea,.v4voice,.v4file,.v4bars,.v4replybar,.v4quote").forEach(function (x) { x.remove(); });
+    // a translated message: keep the original text the person wrote (not the English)
+    var en = c.querySelector(".v4en");
+    if (en) { en.remove(); var fr = c.querySelector(".v4fr"); if (fr) return (fr.textContent || "").trim(); }
     var last = c.lastElementChild;
     if (last && last.tagName === "SPAN" && /\d{1,2}[:h.]\d{2}/.test(last.textContent)) last.remove();
     return (c.innerText || c.textContent || "").replace(/\n{3,}/g, "\n\n").trim();
@@ -113,7 +116,7 @@
   st.textContent = `
 /* no phone text selection in the messages (no blue box, no Copy popup) */
 .msgs .msg,.msgs .msg *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-tap-highlight-color:transparent}
-.msgs .msg.zz-sel{box-shadow:0 0 0 2px rgba(255,255,255,.75)!important;filter:brightness(1.06)}
+.msgs .msg.zz-sel{box-shadow:0 0 0 3px #38BDF8,0 0 16px rgba(56,189,248,.55)!important}
 #zzSelBar{flex:none;display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(16,18,40,.82);color:#fff;font:600 .85rem/1.2 system-ui,sans-serif;border-bottom:1px solid rgba(255,255,255,.12)}
 #zzSelBar[hidden]{display:none}
 #zzSelBar .zz-sn{flex:1;min-width:0}

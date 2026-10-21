@@ -13941,6 +13941,9 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
   function textOf(m) {
     var c = m.cloneNode(true);
     c.querySelectorAll("button,audio,video,img,svg,input,textarea,.v4voice,.v4file,.v4bars,.v4replybar,.v4quote").forEach(function (x) { x.remove(); });
+    // a translated message: keep the original text the person wrote (not the English)
+    var en = c.querySelector(".v4en");
+    if (en) { en.remove(); var fr = c.querySelector(".v4fr"); if (fr) return (fr.textContent || "").trim(); }
     var last = c.lastElementChild;
     if (last && last.tagName === "SPAN" && /\d{1,2}[:h.]\d{2}/.test(last.textContent)) last.remove();
     return (c.innerText || c.textContent || "").replace(/\n{3,}/g, "\n\n").trim();
@@ -14010,7 +14013,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
   st.textContent = `
 /* no phone text selection in the messages (no blue box, no Copy popup) */
 .msgs .msg,.msgs .msg *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-tap-highlight-color:transparent}
-.msgs .msg.zz-sel{box-shadow:0 0 0 2px rgba(255,255,255,.75)!important;filter:brightness(1.06)}
+.msgs .msg.zz-sel{box-shadow:0 0 0 3px #38BDF8,0 0 16px rgba(56,189,248,.55)!important}
 #zzSelBar{flex:none;display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(16,18,40,.82);color:#fff;font:600 .85rem/1.2 system-ui,sans-serif;border-bottom:1px solid rgba(255,255,255,.12)}
 #zzSelBar[hidden]{display:none}
 #zzSelBar .zz-sn{flex:1;min-width:0}
@@ -14472,6 +14475,107 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
 `;
   document.head.appendChild(st);
   try { scan(); } catch (e) {}
+})();
+
+/* ---- app-v5-zzzzzv-voice.js ---- */
+/* =====================================================================
+   v5 · Voice in calls.
+   - The other person's voice plays through its own sound element. Android
+     blocks sound that starts on its own, so the first tap in the call
+     starts it (the call video tile is muted: no double sound).
+   - A "Haut-parleur" button switches the speaker on and off (Android app).
+   ===================================================================== */
+(function () {
+  var spk = null;   // speaker state, set when the call starts
+
+  function audioFor(uid, P) {
+    var id = "zzA_" + uid;
+    var a = document.getElementById(id);
+    if (!a) {
+      a = document.createElement("audio");
+      a.id = id;
+      a.autoplay = true;
+      a.setAttribute("playsinline", "");
+      document.body.appendChild(a);
+    }
+    if (P && P.stream && a.srcObject !== P.stream) a.srcObject = P.stream;
+    return a;
+  }
+
+  function playAll() {
+    document.querySelectorAll("audio[id^='zzA_']").forEach(function (a) {
+      if (a.srcObject && a.paused) a.play().catch(function () {});
+    });
+  }
+
+  function keeper() {
+    return window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.CallKeeper;
+  }
+
+  function toggleSpeaker() {
+    spk = !spk;
+    var K = keeper();
+    if (K && K.speaker) K.speaker({ on: spk }).catch(function () {});
+    else toast("Haut-parleur : disponible dans l'application Android.", "x");
+    paintSpeaker();
+  }
+
+  function paintSpeaker() {
+    var b = document.querySelector("#csBtns .zz-spk");
+    if (!b) return;
+    b.classList.toggle("on", !!spk);
+    b.setAttribute("aria-pressed", spk ? "true" : "false");
+    b.textContent = spk ? "🔊 Haut-parleur : on" : "🔈 Haut-parleur";
+  }
+
+  function ensureSpeakerButton() {
+    var bar = document.getElementById("csBtns");
+    if (!bar || bar.querySelector(".zz-spk")) return;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "zz-spk";
+    b.addEventListener("click", function (e) { e.preventDefault(); toggleSpeaker(); });
+    bar.appendChild(b);
+    if (spk === null) spk = !!(window.CALL && CALL.video);
+    paintSpeaker();
+  }
+
+  // the call screen redraws: keep the remote sound, mute the video tiles of others
+  var _cs = callScreenSync;
+  callScreenSync = function () {
+    var r = _cs.apply(this, arguments);
+    try {
+      var keep = {};
+      Object.keys(CALL.peers || {}).forEach(function (u) {
+        var P = CALL.peers[u];
+        keep["zzA_" + u] = true;
+        var a = audioFor(u, P);
+        if (a.srcObject && a.paused) a.play().catch(function () {});
+      });
+      document.querySelectorAll("audio[id^='zzA_']").forEach(function (a) {
+        if (!keep[a.id]) a.remove();
+      });
+      document.querySelectorAll("#callScr .call-tile").forEach(function (t) {
+        var v = t.querySelector("video");
+        if (v && t.dataset.u !== "me") v.muted = true;
+      });
+      ensureSpeakerButton();
+    } catch (e) {}
+    return r;
+  };
+
+  // a tap in the call starts the voices if the phone blocked them
+  document.addEventListener("click", function (e) {
+    if (e.target && e.target.closest && e.target.closest("#callScr")) playAll();
+  }, true);
+
+  var st = document.createElement("style");
+  st.id = "zzzzzvVoice";
+  st.textContent = `
+#csBtns .zz-spk{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:10px 16px;font:700 .85rem system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+#csBtns .zz-spk.on{background:#A78BFA;color:#0B0D18;border-color:#A78BFA}
+`;
+  document.head.appendChild(st);
 })();
 
 /* ==== v4 END ==== */
