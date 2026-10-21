@@ -81,7 +81,9 @@
       { n: "q", l: "Question", p: "Quel jour on sort ?", req: 1 },
       { n: "o1", l: "Réponse 1", p: "Lundi", req: 1 },
       { n: "o2", l: "Réponse 2", p: "Samedi", req: 1 },
-      { n: "o3", l: "Réponse 3 (facultatif)", p: "", opt: 1 }], ok: "Envoyer le sondage" }
+      { n: "o3", l: "Réponse 3 (facultatif)", p: "", opt: 1 }], ok: "Envoyer le sondage" },
+    ai: { title: "Image créée par l'IA", fields: [
+      { n: "prompt", l: "Décris l'image", p: "Un lion qui lit un livre", req: 1 }], ok: "Créer et envoyer" }
   };
 
   var form = null;
@@ -123,6 +125,35 @@
     }).catch(function () {});
   }
 
+  // Images d'IA: the server makes the picture; it is then sent like a photo
+  function makeImage(prompt, k, t) {
+    if (!prompt || !k || !t) return;
+    closeForm();
+    toast("Création de l'image…", "check");
+    var cfg = window.APP_CONFIG || {};
+    var sb = window.__sb;
+    Promise.resolve(sb && sb.auth.getSession()).then(function (r) {
+      var tok = r && r.data && r.data.session ? r.data.session.access_token : "";
+      return fetch(String(cfg.supabaseUrl || "").replace(/\/$/, "") + "/functions/v1/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + tok, apikey: cfg.supabaseAnonKey || "" },
+        body: JSON.stringify({ action: "image", prompt: prompt })
+      });
+    }).then(function (res) {
+      return res.json().then(function (j) {
+        if (!res.ok || !j.image) throw new Error((j.error && j.error.message) || "Image impossible");
+        return j.image;
+      });
+    }).then(function (dataUrl) {
+      return fetch(dataUrl).then(function (r) { return r.blob(); }).then(function (blob) {
+        var file = new File([blob], "image-ia.png", { type: blob.type || "image/png" });
+        return v4SendFile(k, t, file, file.name);
+      });
+    }).catch(function (e) {
+      toast(String(e && e.message || "Image impossible.").slice(0, 120), "x");
+    });
+  }
+
   function sendForm(type, fd) {
     var k = ctx && ctx.kind, t = ctx && ctx.target;
     var v = function (n) { return String(fd.get(n) || "").trim(); };
@@ -135,8 +166,10 @@
     } else if (type === "poll") {
       var opts = ["o1", "o2", "o3"].map(v).filter(Boolean);
       if (opts.length < 2) { toast("Ajoute au moins 2 réponses.", "x"); return; }
-      text = "📊 Sondage : " + v("q") + "\n" + opts.map(function (o, i) { return (i + 1) + ". " + o; }).join("\n");
+      var pid = Math.random().toString(36).slice(2, 10);
+      text = "📊 Sondage : " + v("q") + (window.__zzPoll ? window.__zzPoll.mark(pid, v("q"), opts) : "");
     }
+    if (type === "ai") { makeImage(v("prompt"), k, t); return; }
     if (!text || !k || !t) return;
     closeForm();
     Promise.resolve(v4Deliver(k, t, text, null, null)).catch(function () { toast("Envoi impossible.", "x"); });
@@ -153,7 +186,7 @@
     else if (a === "camera") pick("image/*", true);
     else if (a === "doc") pick("application/pdf,audio/*,.doc,.docx,.ppt,.pptx,.txt");
     else if (a === "loc") sendLocation();
-    else if (a === "event" || a === "contact" || a === "poll") openForm(a);
+    else if (a === "event" || a === "contact" || a === "poll" || a === "ai") openForm(a);
     else toast("Bientôt disponible.", "x");
   }
 
