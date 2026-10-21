@@ -435,7 +435,7 @@
     const { data: { session: s } } = await sb.auth.getSession();
     let res;
     const tctl = new AbortController(); let timedOut = false;
-    const tmr = setTimeout(() => { timedOut = true; tctl.abort(); }, 30000);
+    const tmr = setTimeout(() => { timedOut = true; tctl.abort(); }, 50000);
     if (opts.signal) opts.signal.addEventListener("abort", () => tctl.abort(), { once: true });
     try {
       res = await fetch(CFG.supabaseUrl.replace(/\/$/, "") + "/functions/v1/ai", {
