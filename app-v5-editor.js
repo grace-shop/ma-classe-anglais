@@ -141,7 +141,7 @@ function ed5VidSync(){
 const ed5Fmt=s=>{s=Math.max(0,+s||0);return Math.floor(s/60)+":"+(s%60).toFixed(1).padStart(4,"0")};
 function ed5Preview(){
   const v=ED5.vid;if(!v)return;
-  v.currentTime=ED5.s;v.play().catch(()=>{});
+  v.muted=false;v.volume=1;v.currentTime=ED5.s;v.play().catch(()=>{});
   clearInterval(ED5.pvT);ED5.pvT=setInterval(()=>{if(v.currentTime>=ED5.e-0.05){v.pause();clearInterval(ED5.pvT)}},50);
 }
 async function ed5Cut(f,s,e,onp){
