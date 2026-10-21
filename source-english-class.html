@@ -6281,7 +6281,7 @@ function ed5VidSync(){
 const ed5Fmt=s=>{s=Math.max(0,+s||0);return Math.floor(s/60)+":"+(s%60).toFixed(1).padStart(4,"0")};
 function ed5Preview(){
   const v=ED5.vid;if(!v)return;
-  v.currentTime=ED5.s;v.play().catch(()=>{});
+  v.muted=false;v.volume=1;v.currentTime=ED5.s;v.play().catch(()=>{});
   clearInterval(ED5.pvT);ED5.pvT=setInterval(()=>{if(v.currentTime>=ED5.e-0.05){v.pause();clearInterval(ED5.pvT)}},50);
 }
 async function ed5Cut(f,s,e,onp){
@@ -9912,6 +9912,7 @@ function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
   try{
     const App=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
     if(App&&App.addListener)App.addListener("backButton",()=>{
+      if(typeof F!=="undefined"&&F.sv){fCloseStory();return}
       const r=document.getElementById("arena");
       if(r&&!r.hidden){if(AR.mode||BT.on)arHome();else arClose();return}
       if(!back()&&S.view){S.view=null;S.animate=true;render()}
@@ -13593,6 +13594,39 @@ body:has(.glass.chat) .msgs *,body:has(.glass.chat) .msg{animation:none!importan
   if (window.visualViewport) visualViewport.addEventListener("resize", later);
   document.addEventListener("focusin", function (e) { if (e.target && e.target.closest && e.target.closest(".glass.chat")) setTimeout(later, 60); }, true);
   document.addEventListener("focusout", function () { setTimeout(later, 300); }, true);
+})();
+
+/* ---- app-v5-zzzzzk-story-exit.js ---- */
+/* =====================================================================
+   v5 · Leaving a story is normal: swipe down (like Instagram), the phone's
+   back button, or Escape. The cross at the top still works.
+   ===================================================================== */
+(function () {
+  var sx = 0, sy = 0, active = false, moved = false, swiped = false;
+
+  document.addEventListener("pointerdown", function (e) {
+    if (!(typeof F !== "undefined" && F.sv) || !e.target.closest || !e.target.closest(".fsv")) return;
+    if (e.target.closest("button,a,input,textarea,select,video[controls]")) return;
+    sx = e.clientX; sy = e.clientY; active = true; moved = false; swiped = false;
+  }, true);
+
+  document.addEventListener("pointermove", function (e) {
+    if (!active) return;
+    var dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dy) > 8 || Math.abs(dx) > 8) moved = true;
+    if (!swiped && dy > 110 && Math.abs(dx) < 70) {
+      swiped = true; active = false;
+      try { fCloseStory(); } catch (err) {}
+    }
+  }, true);
+
+  document.addEventListener("pointerup", function () { active = false; }, true);
+  document.addEventListener("pointercancel", function () { active = false; }, true);
+
+  // a swipe must not also count as a tap (which would jump to the next story)
+  document.addEventListener("click", function (e) {
+    if (swiped) { swiped = false; e.stopPropagation(); e.preventDefault(); }
+  }, true);
 })();
 
 /* ==== v4 END ==== */

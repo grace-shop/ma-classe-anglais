@@ -41,6 +41,7 @@
   try{
     const App=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
     if(App&&App.addListener)App.addListener("backButton",()=>{
+      if(typeof F!=="undefined"&&F.sv){fCloseStory();return}
       const r=document.getElementById("arena");
       if(r&&!r.hidden){if(AR.mode||BT.on)arHome();else arClose();return}
       if(!back()&&S.view){S.view=null;S.animate=true;render()}
