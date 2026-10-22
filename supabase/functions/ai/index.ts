@@ -69,7 +69,8 @@ Deno.serve(async (req) => {
       });
     } catch (_e) { return fail("upstream_error", "Could not reach the picture service.", 502); }
     const outImg = await r.json().catch(() => ({} as Record<string, any>));
-    if (!r.ok) return fail("upstream_error", outImg?.error?.message ?? `Picture error ${r.status}`, 502);
+    if (r.status === 429) return fail("rate_limited", "Les images d'IA ne sont pas disponibles pour le moment : le service a atteint sa limite. Réessaie plus tard, ou demande à ton professeur.", 429);
+    if (!r.ok) return fail("upstream_error", "Les images d'IA ne sont pas disponibles pour le moment. Réessaie plus tard.", 502);
     const part = ((outImg?.candidates?.[0]?.content?.parts ?? []) as { inlineData?: { mimeType?: string; data?: string } }[]).find((p) => p.inlineData?.data);
     if (!part?.inlineData) return fail("refused", "The picture could not be made. Try another description.", 400);
     return json({ image: `data:${part.inlineData.mimeType || "image/png"};base64,${part.inlineData.data}` });

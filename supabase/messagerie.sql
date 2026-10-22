@@ -133,8 +133,12 @@ begin
   if p_att is not null and jsonb_typeof(p_att) = 'object' then
     k := p_att->>'k';
     if k = 'sticker' then
-      if coalesce(p_att->>'e', '') !~ '^[0-9a-f-]{2,60}$' then raise exception 'Invalid sticker'; end if;
-      a := jsonb_build_object('k', 'sticker', 'e', p_att->>'e');
+      if coalesce(p_att->>'e', '') ~ '^[0-9a-f-]{2,60}$' then
+        a := jsonb_build_object('k', 'sticker', 'e', p_att->>'e');
+      elsif coalesce(p_att->>'p', '') like me::text || '/%' then
+        -- own sticker (photo, GIF or short video) kept in the sender's folder
+        a := jsonb_build_object('k', 'sticker', 'p', p_att->>'p', 't', left(coalesce(p_att->>'t', ''), 120));
+      else raise exception 'Invalid sticker'; end if;
     elsif k in ('voice', 'img', 'file') then
       if coalesce(p_att->>'p', '') not like me::text || '/%' then raise exception 'Invalid file'; end if;
       a := jsonb_build_object('k', k, 'p', p_att->>'p', 't', left(coalesce(p_att->>'t', ''), 120), 'n', left(coalesce(p_att->>'n', ''), 80),
