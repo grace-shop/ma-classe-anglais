@@ -15673,6 +15673,10 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
 .v4panel .v4grid.stk .zz-mstk{border:0;background:rgba(255,255,255,.04);border-radius:16px;padding:4px;cursor:pointer;min-height:72px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
 .v4panel .v4grid.stk .zz-mstk img,.v4panel .v4grid.stk .zz-mstk video{pointer-events:none;-webkit-user-drag:none}
 .v4panel .v4grid.stk .zz-mstk img,.v4panel .v4grid.stk .zz-mstk video{width:100%;height:100%;object-fit:contain;display:block;border-radius:12px}
+/* every tile of the grid is the same square: a tall photo is fitted inside it */
+.v4panel .v4grid.stk > .zz-mnew,.v4panel .v4grid.stk > .zz-mstk{aspect-ratio:1/1;min-height:0;height:auto;position:relative;overflow:hidden;box-sizing:border-box}
+.v4panel .v4grid.stk .zz-mstk img,.v4panel .v4grid.stk .zz-mstk video{position:absolute;left:6px;top:6px;width:calc(100% - 12px);height:calc(100% - 12px);object-fit:contain;border-radius:12px}
+.v4panel .v4grid.stk > button:not(.zz-mstk):not(.zz-mnew){aspect-ratio:1/1;min-height:0}
 img.zz-stki,video.zz-stkv{width:150px;max-width:55vw;height:auto;display:block;background:transparent}
 img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
 #zzStk{position:fixed;inset:0;z-index:10002;font:600 .95rem system-ui,sans-serif;color:#EDEEF3}
