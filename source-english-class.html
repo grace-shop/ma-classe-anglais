@@ -14676,6 +14676,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
       else if (o.t === "text") {
         ctx.font = "700 " + o.size + "px " + FONTS[o.font].f;
         ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
         ctx.lineWidth = Math.max(2, o.size / 9);
         ctx.strokeStyle = "rgba(0,0,0,.55)";
         ctx.strokeText(o.text, o.x, o.y);
@@ -14684,6 +14685,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
       } else if (o.t === "sticker") {
         ctx.font = o.size + "px serif";
         ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
         ctx.fillText(o.e, o.x, o.y);
       }
     });
@@ -14725,10 +14727,20 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     return [(e.clientX - r.left) * ed.W / r.width, (e.clientY - r.top) * ed.H / r.height];
   }
 
+  // the width of a text as it is drawn (for a finger to grab the whole text)
+  function textWidth(o) {
+    ed.ctx.font = "700 " + o.size + "px " + FONTS[o.font].f;
+    return ed.ctx.measureText(o.text).width;
+  }
+
   function hit(p) {
+    var pad = 30;
     for (var i = ed.objs.length - 1; i >= 0; i--) {
       var o = ed.objs[i];
-      if (o.t === "text" || o.t === "sticker") {
+      if (o.t === "text") {
+        var half = textWidth(o) / 2;
+        if (Math.abs(p[0] - o.x) <= half + pad && Math.abs(p[1] - o.y) <= o.size * 0.7 + pad) return i;
+      } else if (o.t === "sticker") {
         var d = Math.hypot(p[0] - o.x, p[1] - o.y);
         if (d < Math.max(40, o.size * 0.8)) return i;
       }
@@ -15525,6 +15537,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     var b = t.closest(".zz-mstk");
     if (b) {
       e.preventDefault(); e.stopPropagation();
+      if (lpFired) { lpFired = false; return; }   // it was a long press: the menu is open
       var it = store().list().filter(function (x) { return x.id === b.dataset.zzid; })[0];
       if (it) sendSticker(it);
       return;
@@ -15535,6 +15548,50 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
       stickerMenu(s);
     }
+  }, true);
+
+  // ---- a long press on one of my stickers: delete or edit it ----
+  async function ownMenu(it, btn) {
+    var isVid = /^video\//.test(it.t || "");
+    var actions = [{ key: "del", label: "Supprimer de mes stickers", danger: true }];
+    if (!isVid) actions.push({ key: "edit", label: "Modifier" });
+    var go = await ask("Ton sticker", "", actions);
+    if (!go) return;
+    if (go === "del") {
+      store().save(store().list().filter(function (x) { return x.id !== it.id; }));
+      if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+      toast("Sticker retiré de ta collection", "check");
+    } else if (go === "edit") {
+      if (typeof srcBlob !== "function" || !window.__zzPhotoEdit) return;
+      try {
+        var blob = await srcBlob({ k: "m", id: it.p, t: it.t });
+        window.__zzPhotoEdit.open(URL.createObjectURL(blob), function (edited) { makeSticker(edited); });
+      } catch (e) { toast("Sticker impossible à modifier.", "x"); }
+    }
+  }
+
+  var lpTimer = null, lpFired = false, lpX = 0, lpY = 0;
+  document.addEventListener("pointerdown", function (e) {
+    var b = e.target && e.target.closest && e.target.closest(".v4panel .zz-mstk");
+    lpFired = false;
+    clearTimeout(lpTimer); lpTimer = null;
+    if (!b) return;
+    lpX = e.clientX; lpY = e.clientY;
+    lpTimer = setTimeout(function () {
+      lpTimer = null;
+      lpFired = true;
+      var it = store().list().filter(function (x) { return x.id === b.dataset.zzid; })[0];
+      if (it) ownMenu(it, b);
+    }, 450);
+  }, true);
+  document.addEventListener("pointermove", function (e) {
+    if (lpTimer && Math.hypot(e.clientX - lpX, e.clientY - lpY) > 12) { clearTimeout(lpTimer); lpTimer = null; }
+  }, true);
+  document.addEventListener("pointerup", function () { clearTimeout(lpTimer); lpTimer = null; }, true);
+  document.addEventListener("pointercancel", function () { clearTimeout(lpTimer); lpTimer = null; }, true);
+  // no phone "save image" menu on a long press
+  document.addEventListener("contextmenu", function (e) {
+    if (e.target && e.target.closest && e.target.closest(".zz-mstk")) e.preventDefault();
   }, true);
 
   var raf = 0;
