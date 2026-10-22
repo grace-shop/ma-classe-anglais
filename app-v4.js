@@ -404,7 +404,8 @@ function natEmo(s){return segG(String(s||"")).map(g=>/\p{Extended_Pictographic}/
 const onlyEmoji=t=>{const s=String(t||"").trim();if(!s||s.length>16)return false;try{return/^(\p{Extended_Pictographic}|\p{Emoji_Component}|‍|️|\s)+$/u.test(s)}catch(e){return false}};
 function voiceHTML(a){const on=V4.playing===a.p;return`<div class="v4voice${on?" on":""}"><button type="button" data-v4="play" data-p="${esc(a.p)}" data-t="${esc(a.t||"audio/webm")}" aria-label="${on?"Pause":"Listen to the voice message"}">${ic(on?"pause":"play")}</button><span class="v4bars" aria-hidden="true">${[5,9,14,8,18,11,6,15,20,9,13,7,16,10,5,12].map(h=>`<span class="v4b" style="height:${h}px"></span>`).join("")}</span><small>${fmtDur(a.d)}</small></div>`}
 function msgBodyHTML(text,a){let h="";
-  if(a&&typeof a==="object"){if(a.k==="sticker")h+=`<img class="v4stk" src="img/${esc(a.e)}.webp" alt="Sticker" loading="lazy" draggable="false">`;
+  if(a&&typeof a==="object"){if(a.k==="sticker"&&a.p){const vid=/^video\//.test(a.t||"");h+=vid?`<video class="v4stk zz-stkv" data-zzp="${esc(a.p)}" data-zzt="${esc(a.t||"video/mp4")}" muted loop playsinline autoplay></video>`:`<img class="v4stk zz-stki" data-zzp="${esc(a.p)}" data-zzt="${esc(a.t||"image/webp")}" alt="Sticker" loading="lazy" draggable="false">`}
+    else if(a.k==="sticker")h+=`<img class="v4stk" src="img/${esc(a.e)}.webp" alt="Sticker" loading="lazy" draggable="false">`;
     else if(a.k==="voice")h+=voiceHTML(a);
     else if(a.k==="img"){const u=V4.obj[a.p];h+=`<button type="button" class="v4img" data-v4="doc" data-k="m" data-id="${esc(a.p)}" data-t="${esc(a.t||"image/jpeg")}" data-n="${esc(a.n||"photo.jpg")}" aria-label="See the photo"><img ${u?`src="${u}"`:`data-chatp="${esc(a.p)}" data-t="${esc(a.t||"")}"`} alt="Photo"></button>`}
     else if(a.p)h+=`<button type="button" class="v4file" data-v4="doc" data-k="m" data-id="${esc(a.p)}" data-t="${esc(a.t||"")}" data-n="${esc(a.n||"file")}">${ic(/word/.test(a.t||"")?"word":"file")}<span><b>${esc(a.n||"File")}</b><small>${fmtSize(a.s)}${V4.cached.has("m:"+a.p)?" · offline":""}</small></span></button>`}
@@ -437,7 +438,7 @@ function v4Bar(kind,target,ph){const inId=V4IN(kind),files=!!window.__chatFiles,
   <button class="btn" type="submit" aria-label="Send" ${busy?"disabled":""}>${ic("send")}</button></form>`}
 async function v4Deliver(kind,target,text,att,meta){
   if(kind==="staff")return staffSend(target,text,att,meta);
-  if(kind==="peer"){const id=await window.__peer.send(target,text||"",att||null,meta||null);PR.inbox.unshift({id:id||("tmp"+Date.now()),sender:S.uid,receiver:target,body:text||"",att:att||null,meta:meta||null,created_at:new Date().toISOString(),read_at:null});render();return}
+  if(kind==="peer"){const id=await window.__peer.send(target,text||"",att||null,meta||null);PR.inbox=PR.inbox.filter(x=>!id||x.id!==id);PR.inbox.unshift({id:id||("tmp"+Date.now()),sender:S.uid,receiver:target,body:text||"",att:att||null,meta:meta||null,created_at:new Date().toISOString(),read_at:null});render();return}
   const at=Date.now(),from=S.mode==="teacher"?"teacher":"student",pv=(v4Plain(text)||attLabel(att)).slice(0,80);
   await write(()=>S.db.collection("students/"+target+"/msgs").add({from,text:text||"",at,...(att?{att}:{}),...(meta&&meta.re?{re:meta.re}:{})}));
   await write(()=>S.db.doc("students/"+target).update(from==="teacher"?{lastMsgAt:at,lastMsgFrom:"teacher",lastMsgText:pv,teacherReadAt:at}:{lastMsgAt:at,lastMsgFrom:"student",lastMsgText:pv,studentReadAt:at,lastActive:at,activity:"Wrote to the teacher"}));
