@@ -144,8 +144,21 @@
     var to = targets();
     if (!to.length) { toast(allSel ? "Pas encore d'autres joueurs dans la bataille. Choisis un ami." : "Choisis une personne.", "x"); return; }
     var meta = { room: BT.room.id };
+    // show it at once as sent (a sending message is not sent a second time)
     to.forEach(function (u) {
-      Promise.resolve(window.__peer && __peer.send(u, txt, null, meta)).catch(function () {});
+      var tmpId = "tmp" + Date.now() + Math.random().toString(36).slice(2, 6);
+      PR.inbox.unshift({ id: tmpId, sender: me(), receiver: u, body: txt, att: null, meta: meta,
+        created_at: new Date().toISOString(), read_at: null, pending: true });
+      Promise.resolve(window.__peer && __peer.send(u, txt, null, meta)).then(function (msgId) {
+        PR.inbox = PR.inbox.filter(function (x) { return x.id !== tmpId && x.id !== msgId; });
+        if (msgId) PR.inbox.unshift({ id: msgId, sender: me(), receiver: u, body: txt, att: null, meta: meta,
+          created_at: new Date().toISOString(), read_at: null });
+        paintList();
+      }).catch(function () {
+        PR.inbox = PR.inbox.filter(function (x) { return x.id !== tmpId; });
+        toast("Message non envoyé. Réessaie.", "x");
+        paintList();
+      });
     });
     paintList();
   }
