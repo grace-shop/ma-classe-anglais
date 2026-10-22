@@ -176,6 +176,53 @@
     Promise.resolve(v4Deliver(k, t, text, null, null)).catch(function () { toast("Envoi impossible.", "x"); });
   }
 
+  // ---- Contact: send someone of the app (a classmate), so the other person can message them ----
+  var mp = null;
+  function membersList() {
+    var me = (typeof S !== "undefined" && S.uid) || "";
+    var list = (typeof PR !== "undefined" && PR && PR.dir) || [];
+    return list.filter(function (x) { return x && x.uid && x.uid !== me; })
+      .sort(function (a, b) { return String(a.name || "").localeCompare(String(b.name || "")); });
+  }
+  function isFriend(uid) { return typeof frState === "function" && frState(uid) === "friends"; }
+  function sendMember(u) {
+    var k = ctx && ctx.kind, t = ctx && ctx.target;
+    closeMembers();
+    if (!k || !t || !window.__zzPoll) return;
+    var name = String(u.name || "Camarade").replace(/[:\n\r]/g, " ").slice(0, 60);
+    var text = "👤 Contact : " + name + window.__zzPoll.enc("C:" + u.uid + ":" + name);
+    Promise.resolve(v4Deliver(k, t, text, null, null)).catch(function () { toast("Envoi impossible.", "x"); });
+  }
+  function paintMembers(q) {
+    if (!mp) return;
+    var query = String(q || "").trim().toLowerCase();
+    var rows = membersList().filter(function (x) { return !query || String(x.name || "").toLowerCase().indexOf(query) >= 0; });
+    var box = mp.querySelector(".zz-mpl");
+    box.innerHTML = rows.length ? rows.map(function (x, i) {
+      var f = isFriend(x.uid);
+      return '<button type="button" class="zz-mpi" data-i="' + i + '"><span class="zz-mpa">' + String(x.name || "?").trim().charAt(0).toUpperCase() + '</span><span class="zz-mpn">' + String(x.name || "Camarade").replace(/[<>&]/g, "") + '</span><small>' + (f ? "Ami" : "Pas encore ami") + '</small></button>';
+    }).join("") : '<p class="zz-mpe">' + (membersList().length ? "Aucun camarade trouvé." : "Personne pour l’instant : ajoute des camarades en ami d’abord.") + '</p>';
+    box._rows = rows;
+  }
+  function openMembers() {
+    closeMembers();
+    mp = document.createElement("div");
+    mp.id = "zzMp";
+    mp.innerHTML = '<div class="zz-mpb" data-x="1"></div><div class="zz-mps"><div class="zz-mpg"></div>' +
+      '<div class="zz-mph">Partager un camarade</div><p class="zz-mpt">Envoie son compte : la personne pourra lui écrire.</p>' +
+      '<input class="zz-mpq" type="search" placeholder="Chercher un nom…" aria-label="Chercher un nom">' +
+      '<div class="zz-mpl"></div><button type="button" class="zz-mpc" data-x="1">Annuler</button></div>';
+    document.body.appendChild(mp);
+    paintMembers("");
+    mp.querySelector(".zz-mpq").addEventListener("input", function () { paintMembers(this.value); });
+    mp.addEventListener("click", function (e) {
+      if (e.target.dataset && e.target.dataset.x) return closeMembers();
+      var b = e.target.closest && e.target.closest(".zz-mpi");
+      if (b) { var rows = mp.querySelector(".zz-mpl")._rows || []; sendMember(rows[+b.dataset.i]); }
+    });
+  }
+  function closeMembers() { if (mp) { mp.remove(); mp = null; } }
+
   function onSheet(e) {
     var t = e.target;
     if (t.dataset && t.dataset.x) { close(); return; }
@@ -187,7 +234,8 @@
     else if (a === "camera") pick("image/*", true);
     else if (a === "doc") pick("application/pdf,audio/*,.doc,.docx,.ppt,.pptx,.txt");
     else if (a === "loc") sendLocation();
-    else if (a === "event" || a === "contact" || a === "poll" || a === "ai") openForm(a);
+    else if (a === "contact") openMembers();
+    else if (a === "event" || a === "poll" || a === "ai") openForm(a);
     else toast("Bientôt disponible.", "x");
   }
 
@@ -206,6 +254,25 @@
 
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") { close(); closeForm(); } });
 
+  var mpst = document.createElement("style");
+  mpst.id = "zzzzzpMembers";
+  mpst.textContent = `
+#zzMp{position:fixed;inset:0;z-index:10000;font:600 .95rem system-ui,sans-serif;color:#EDEEF3}
+#zzMp .zz-mpb{position:absolute;inset:0;background:rgba(0,0,0,.5)}
+#zzMp .zz-mps{position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;background:#1B1D24;border-radius:22px 22px 0 0;padding:10px 14px calc(16px + env(safe-area-inset-bottom,0px));max-height:78vh;display:flex;flex-direction:column;gap:8px}
+#zzMp .zz-mpg{width:44px;height:5px;border-radius:99px;background:rgba(255,255,255,.28);margin:2px auto 4px}
+#zzMp .zz-mph{font:700 1.05rem system-ui,sans-serif}
+#zzMp .zz-mpt{margin:0;opacity:.7;font-weight:500;font-size:.85rem}
+#zzMp .zz-mpq{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:14px;color:#fff;padding:10px 12px;font:600 .95rem system-ui,sans-serif;outline:none}
+#zzMp .zz-mpl{overflow-y:auto;display:flex;flex-direction:column;gap:6px;min-height:80px}
+#zzMp .zz-mpi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:9px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:inherit;cursor:pointer;font:600 .95rem system-ui,sans-serif}
+#zzMp .zz-mpa{width:38px;height:38px;border-radius:50%;background:#A78BFA;color:#0B0D18;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+#zzMp .zz-mpn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#zzMp .zz-mpi small{opacity:.65;font-weight:600;font-size:.75rem;flex:none}
+#zzMp .zz-mpe{opacity:.7;text-align:center;padding:16px 0}
+#zzMp .zz-mpc{border:1px solid rgba(255,255,255,.2);background:transparent;color:#EDEEF3;border-radius:14px;padding:11px;font:700 .95rem system-ui,sans-serif;cursor:pointer}
+`;
+  document.head.appendChild(mpst);
   var st = document.createElement("style");
   st.id = "zzzzzpAttach";
   st.textContent = `
