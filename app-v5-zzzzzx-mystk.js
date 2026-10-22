@@ -227,6 +227,7 @@
     var b = t.closest(".zz-mstk");
     if (b) {
       e.preventDefault(); e.stopPropagation();
+      if (lpFired) { lpFired = false; return; }   // it was a long press: the menu is open
       var it = store().list().filter(function (x) { return x.id === b.dataset.zzid; })[0];
       if (it) sendSticker(it);
       return;
@@ -237,6 +238,50 @@
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
       stickerMenu(s);
     }
+  }, true);
+
+  // ---- a long press on one of my stickers: delete or edit it ----
+  async function ownMenu(it, btn) {
+    var isVid = /^video\//.test(it.t || "");
+    var actions = [{ key: "del", label: "Supprimer de mes stickers", danger: true }];
+    if (!isVid) actions.push({ key: "edit", label: "Modifier" });
+    var go = await ask("Ton sticker", "", actions);
+    if (!go) return;
+    if (go === "del") {
+      store().save(store().list().filter(function (x) { return x.id !== it.id; }));
+      if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+      toast("Sticker retiré de ta collection", "check");
+    } else if (go === "edit") {
+      if (typeof srcBlob !== "function" || !window.__zzPhotoEdit) return;
+      try {
+        var blob = await srcBlob({ k: "m", id: it.p, t: it.t });
+        window.__zzPhotoEdit.open(URL.createObjectURL(blob), function (edited) { makeSticker(edited); });
+      } catch (e) { toast("Sticker impossible à modifier.", "x"); }
+    }
+  }
+
+  var lpTimer = null, lpFired = false, lpX = 0, lpY = 0;
+  document.addEventListener("pointerdown", function (e) {
+    var b = e.target && e.target.closest && e.target.closest(".v4panel .zz-mstk");
+    lpFired = false;
+    clearTimeout(lpTimer); lpTimer = null;
+    if (!b) return;
+    lpX = e.clientX; lpY = e.clientY;
+    lpTimer = setTimeout(function () {
+      lpTimer = null;
+      lpFired = true;
+      var it = store().list().filter(function (x) { return x.id === b.dataset.zzid; })[0];
+      if (it) ownMenu(it, b);
+    }, 450);
+  }, true);
+  document.addEventListener("pointermove", function (e) {
+    if (lpTimer && Math.hypot(e.clientX - lpX, e.clientY - lpY) > 12) { clearTimeout(lpTimer); lpTimer = null; }
+  }, true);
+  document.addEventListener("pointerup", function () { clearTimeout(lpTimer); lpTimer = null; }, true);
+  document.addEventListener("pointercancel", function () { clearTimeout(lpTimer); lpTimer = null; }, true);
+  // no phone "save image" menu on a long press
+  document.addEventListener("contextmenu", function (e) {
+    if (e.target && e.target.closest && e.target.closest(".zz-mstk")) e.preventDefault();
   }, true);
 
   var raf = 0;

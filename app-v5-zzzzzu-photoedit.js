@@ -57,6 +57,7 @@
       else if (o.t === "text") {
         ctx.font = "700 " + o.size + "px " + FONTS[o.font].f;
         ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
         ctx.lineWidth = Math.max(2, o.size / 9);
         ctx.strokeStyle = "rgba(0,0,0,.55)";
         ctx.strokeText(o.text, o.x, o.y);
@@ -65,6 +66,7 @@
       } else if (o.t === "sticker") {
         ctx.font = o.size + "px serif";
         ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
         ctx.fillText(o.e, o.x, o.y);
       }
     });
@@ -106,10 +108,20 @@
     return [(e.clientX - r.left) * ed.W / r.width, (e.clientY - r.top) * ed.H / r.height];
   }
 
+  // the width of a text as it is drawn (for a finger to grab the whole text)
+  function textWidth(o) {
+    ed.ctx.font = "700 " + o.size + "px " + FONTS[o.font].f;
+    return ed.ctx.measureText(o.text).width;
+  }
+
   function hit(p) {
+    var pad = 30;
     for (var i = ed.objs.length - 1; i >= 0; i--) {
       var o = ed.objs[i];
-      if (o.t === "text" || o.t === "sticker") {
+      if (o.t === "text") {
+        var half = textWidth(o) / 2;
+        if (Math.abs(p[0] - o.x) <= half + pad && Math.abs(p[1] - o.y) <= o.size * 0.7 + pad) return i;
+      } else if (o.t === "sticker") {
         var d = Math.hypot(p[0] - o.x, p[1] - o.y);
         if (d < Math.max(40, o.size * 0.8)) return i;
       }
