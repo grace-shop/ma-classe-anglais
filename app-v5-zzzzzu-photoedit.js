@@ -81,6 +81,15 @@
       ctx.strokeStyle = "#fff";
       ctx.lineWidth = Math.max(2, W / 400);
       ctx.strokeRect(c.x, c.y, c.w, c.h);
+      var hl = Math.max(28, W / 14);
+      ctx.lineCap = "round";
+      ctx.lineWidth = Math.max(5, W / 120);
+      ctx.beginPath();
+      ctx.moveTo(c.x + c.w / 2 - hl / 2, c.y); ctx.lineTo(c.x + c.w / 2 + hl / 2, c.y);
+      ctx.moveTo(c.x + c.w / 2 - hl / 2, c.y + c.h); ctx.lineTo(c.x + c.w / 2 + hl / 2, c.y + c.h);
+      ctx.moveTo(c.x, c.y + c.h / 2 - hl / 2); ctx.lineTo(c.x, c.y + c.h / 2 + hl / 2);
+      ctx.moveTo(c.x + c.w, c.y + c.h / 2 - hl / 2); ctx.lineTo(c.x + c.w, c.y + c.h / 2 + hl / 2);
+      ctx.stroke();
       ctx.restore();
     }
   }
@@ -146,10 +155,18 @@
     return -1;
   }
 
+  // what a finger on the crop frame grabs: a corner (tl, tr, bl, br), an edge
+  // (t, b, l, r), the inside (in: moves the frame), or nothing ("")
   function cornerHit(p) {
-    var c = ed.crop, r = Math.max(40, ed.W / 12);
+    var c = ed.crop, r = Math.max(44, ed.W / 10);
     var pts = [[c.x, c.y, "tl"], [c.x + c.w, c.y, "tr"], [c.x, c.y + c.h, "bl"], [c.x + c.w, c.y + c.h, "br"]];
     for (var i = 0; i < pts.length; i++) if (Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]) < r) return pts[i][2];
+    var inX = p[0] >= c.x - r && p[0] <= c.x + c.w + r, inY = p[1] >= c.y - r && p[1] <= c.y + c.h + r;
+    if (inY && Math.abs(p[0] - c.x) < r) return "l";
+    if (inY && Math.abs(p[0] - (c.x + c.w)) < r) return "r";
+    if (inX && Math.abs(p[1] - c.y) < r) return "t";
+    if (inX && Math.abs(p[1] - (c.y + c.h)) < r) return "b";
+    if (p[0] > c.x && p[0] < c.x + c.w && p[1] > c.y && p[1] < c.y + c.h) return "in";
     return "";
   }
 
@@ -169,7 +186,8 @@
     ed.cv.setPointerCapture && ed.cv.setPointerCapture(e.pointerId);
     if (ed.tool === "crop") {
       var k = cornerHit(p);
-      ed.drag = k ? { kind: "corner", k: k } : null;
+      if (k === "in") ed.drag = { kind: "shift", sx: p[0], sy: p[1], c0: { x: ed.crop.x, y: ed.crop.y, w: ed.crop.w, h: ed.crop.h } };
+      else ed.drag = k ? { kind: "corner", k: k } : null;
       return;
     }
     if (ed.tool === "stroke" || ed.tool === "blur") {
@@ -194,6 +212,14 @@
       var o = ed.objs[d.i];
       o.x = p[0] - d.dx; o.y = p[1] - d.dy;
       setBin(binCorner(o));
+      redraw();
+      return;
+    }
+    if (d.kind === "shift") {
+      var nx = d.c0.x + (p[0] - d.sx), ny = d.c0.y + (p[1] - d.sy);
+      nx = Math.max(0, Math.min(nx, ed.W - d.c0.w));
+      ny = Math.max(0, Math.min(ny, ed.H - d.c0.h));
+      ed.crop = { x: nx, y: ny, w: d.c0.w, h: d.c0.h };
       redraw();
       return;
     }

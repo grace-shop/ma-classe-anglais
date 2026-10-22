@@ -170,7 +170,7 @@
       head.type = "button";
       head.className = "zz-mnew";
       head.setAttribute("aria-label", "Créer un sticker");
-      head.innerHTML = '<span class="zz-mplus">+</span><span class="zz-mtxt">Créer un sticker</span>';
+      head.innerHTML = '<div class="zz-sq"><div class="zz-sqin"><span class="zz-mplus">+</span><span class="zz-mtxt">Créer un sticker</span></div></div>';
       grid.insertBefore(head, grid.firstChild);
       list.forEach(function (it) {
         var b = document.createElement("button");
@@ -178,9 +178,9 @@
         b.className = "zz-mstk";
         b.dataset.zzid = it.id;
         var isVid = /^video\//.test(it.t || "");
-        b.innerHTML = isVid
+        b.innerHTML = '<div class="zz-sq">' + (isVid
           ? '<video data-zzp="' + it.p + '" data-zzt="' + it.t + '" muted loop playsinline autoplay></video>'
-          : '<img data-zzp="' + it.p + '" data-zzt="' + it.t + '" alt="Mon sticker" draggable="false">';
+          : '<img data-zzp="' + it.p + '" data-zzt="' + it.t + '" alt="Mon sticker" draggable="false">') + '</div>';
         grid.insertBefore(b, head.nextSibling);
       });
     });
@@ -304,14 +304,16 @@
   st.id = "zzzzzxMystk";
   st.textContent = `
 .v4panel .v4grid.stk .zz-mnew{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1px dashed rgba(255,255,255,.35);border-radius:16px;background:rgba(255,255,255,.05);color:inherit;cursor:pointer;min-height:72px;padding:8px;font:700 .72rem/1.1 system-ui,sans-serif}
-.v4panel .v4grid.stk .zz-mplus{font-size:1.6rem;line-height:1}
-.v4panel .v4grid.stk .zz-mstk{border:0;background:rgba(255,255,255,.04);border-radius:16px;padding:4px;cursor:pointer;min-height:72px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
+.v4panel .v4grid.stk .zz-mplus{font-size:1.15rem;line-height:1}
+.v4panel .v4grid.stk .zz-mstk{border:0;background:rgba(255,255,255,.04);border-radius:16px;padding:4px;cursor:pointer;min-height:0;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
 .v4panel .v4grid.stk .zz-mstk img,.v4panel .v4grid.stk .zz-mstk video{pointer-events:none;-webkit-user-drag:none}
 .v4panel .v4grid.stk .zz-mstk img,.v4panel .v4grid.stk .zz-mstk video{width:100%;height:100%;object-fit:contain;display:block;border-radius:12px}
-/* every tile of the grid is the same square: a tall photo is fitted inside it */
-.v4panel .v4grid.stk > .zz-mnew,.v4panel .v4grid.stk > .zz-mstk{aspect-ratio:1/1;min-height:0;height:auto;position:relative;overflow:hidden;box-sizing:border-box}
-.v4panel .v4grid.stk .zz-mstk img,.v4panel .v4grid.stk .zz-mstk video{position:absolute;left:6px;top:6px;width:calc(100% - 12px);height:calc(100% - 12px);object-fit:contain;border-radius:12px}
-.v4panel .v4grid.stk > button:not(.zz-mstk):not(.zz-mnew){aspect-ratio:1/1;min-height:0}
+/* every tile is the same square (padding trick: works on older WebViews too) */
+.v4panel .v4grid.stk .zz-mnew,.v4panel .v4grid.stk .zz-mstk{min-height:0;width:100%;box-sizing:border-box;margin:0}
+.v4panel .v4grid.stk .zz-sq{position:relative;width:100%;height:0;padding-bottom:100%;border-radius:12px;overflow:hidden}
+.v4panel .v4grid.stk .zz-sq>img,.v4panel .v4grid.stk .zz-sq>video{position:absolute;left:0;top:0;width:100%;height:100%;padding:6px;box-sizing:border-box;object-fit:contain;display:block;max-width:none;border-radius:0}
+.v4panel .v4grid.stk .zz-sqin{position:absolute;left:0;top:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center}
+.v4panel .v4grid.stk>button:not(.zz-mstk):not(.zz-mnew){position:relative;height:auto}
 img.zz-stki,video.zz-stkv{width:150px;max-width:55vw;height:auto;display:block;background:transparent}
 img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
 #zzStk{position:fixed;inset:0;z-index:10002;font:600 .95rem system-ui,sans-serif;color:#EDEEF3}

@@ -243,8 +243,10 @@
     panel.querySelector(".zz-bcf").addEventListener("submit", function (e) {
       e.preventDefault();
       var i = panel.querySelector("#zzBci");
-      send(i.value);
-      i.value = "";
+      var said = i.value;
+      i.value = "";                       // cleared at once, so it can not be sent twice
+      send(said);
+      setTimeout(function () { if (i.value === said) i.value = ""; }, 0);
     });
     return panel;
   }
