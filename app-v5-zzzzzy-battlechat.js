@@ -230,7 +230,7 @@
         '<button type="button" class="zz-bcto-btn"><span>À</span><b>Toute la bataille</b><i aria-hidden="true">▾</i></button>' +
         '<div class="zz-bcto">Tu écris à toute la bataille</div>' +
         '<div class="zz-bcl"></div>' +
-        '<form class="zz-bcf"><input id="zzBci" maxlength="300" autocomplete="off" placeholder="Écris ton message…" aria-label="Message"><button type="submit">Envoyer</button></form>' +
+        '<form class="zz-bcf"><input id="zzBci" maxlength="300" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Écris ton message…" aria-label="Message"><button type="submit">Envoyer</button></form>' +
       '</div>';
     document.body.appendChild(panel);
     panel.querySelector(".zz-bct").addEventListener("click", function () {
@@ -240,6 +240,7 @@
       if (open) { paintTo(); paintList(); }
     });
     panel.querySelector(".zz-bcto-btn").addEventListener("click", openSheet);
+    var lastSaid = "";
     panel.querySelector(".zz-bcf").addEventListener("submit", function (e) {
       e.preventDefault();
       var i = panel.querySelector("#zzBci");
@@ -252,14 +253,19 @@
       fresh.value = "";
       i.parentNode.replaceChild(fresh, i);
       send(said);
-      // the keyboard can write the sent text back a moment later: clear it again
-      // for a short while, but only while it is exactly the sent text
+      // the keyboard writes the sent text back into the field: keep it empty
+      // while it is exactly the sent text (typing something else is never touched)
+      lastSaid = said;
       var tries = 0;
       var scrub = setInterval(function () {
         var el = document.getElementById("zzBci");
-        if (el && said && el.value === said) el.value = "";
-        if (++tries > 16) clearInterval(scrub);
+        if (el && lastSaid && el.value === lastSaid) el.value = "";
+        if (++tries > 80) clearInterval(scrub);
       }, 50);
+    });
+    panel.addEventListener("input", function (e) {
+      var el = e.target;
+      if (el && el.id === "zzBci" && lastSaid && el.value === lastSaid) el.value = "";
     });
     return panel;
   }
