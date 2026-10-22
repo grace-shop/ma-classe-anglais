@@ -108,6 +108,23 @@
     return [(e.clientX - r.left) * ed.W / r.width, (e.clientY - r.top) * ed.H / r.height];
   }
 
+  // a corner of the photo where a dragged text or sticker is thrown away
+  function binCorner(o) {
+    var zx = ed.W * 0.22, zy = ed.H * 0.16;
+    var l = o.x < zx, r = o.x > ed.W - zx, t = o.y < zy, b = o.y > ed.H - zy;
+    if (!(l || r) || !(t || b)) return "";
+    return (t ? "t" : "b") + (l ? "l" : "r");
+  }
+
+  // show the red bin in that corner (or hide it when "")
+  function setBin(c) {
+    ed.binCorner = c;
+    var el = ed.root && ed.root.querySelector(".zz-pebin");
+    if (!el) return;
+    el.hidden = !c;
+    if (c) el.dataset.c = c; else delete el.dataset.c;
+  }
+
   // the width of a text as it is drawn (for a finger to grab the whole text)
   function textWidth(o) {
     ed.ctx.font = "700 " + o.size + "px " + FONTS[o.font].f;
@@ -176,6 +193,7 @@
       if (!d.started) { d.started = true; }
       var o = ed.objs[d.i];
       o.x = p[0] - d.dx; o.y = p[1] - d.dy;
+      setBin(binCorner(o));
       redraw();
       return;
     }
@@ -203,11 +221,16 @@
     var d = ed.drag;
     ed.drag = null;
     if (d.kind === "paint") redraw();
+    if (d.kind === "move") {
+      // released over the red bin: the text or sticker is removed
+      if (ed.binCorner && ed.objs[d.i]) { ed.objs.splice(d.i, 1); redraw(); }
+      setBin("");
+    }
     // crop changes are not undone: they are a frame, not a mark
   }
 
   // ---- the editor screen ----
-  function open(url, done) {
+  function open(url, done, tool) {
     close();
     var img = new Image();
     img.onload = function () {
@@ -217,7 +240,7 @@
       base.width = Math.max(1, Math.round(img.naturalWidth * sc));
       base.height = Math.max(1, Math.round(img.naturalHeight * sc));
       base.getContext("2d").drawImage(img, 0, 0, base.width, base.height);
-      ed = { img: base, W: base.width, H: base.height, objs: [], undo: [], tool: "text", color: "#FFFFFF", font: 1, size: 1, crop: null, ratio: null, drag: null, done: done };
+      ed = { img: base, W: base.width, H: base.height, objs: [], undo: [], tool: "text", initTool: tool || "text", color: "#FFFFFF", font: 1, size: 1, crop: null, ratio: null, drag: null, done: done };
       ed.crop = { x: 0, y: 0, w: ed.W, h: ed.H };
       build();
       redraw();
@@ -236,7 +259,7 @@
     root.id = "zzPe";
     root.innerHTML =
       '<div class="zz-pebar"><button type="button" data-a="cancel">Annuler</button><b>Modifier la photo</b><button type="button" data-a="undo" aria-label="Annuler la dernière modification">↶</button><button type="button" class="ok" data-a="ok">Valider</button></div>' +
-      '<div class="zz-pestage"><canvas></canvas></div>' +
+      '<div class="zz-pestage"><canvas></canvas><div class="zz-pebin" hidden aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></div></div>' +
       '<div class="zz-petools">' +
         '<button type="button" data-rot="-1" aria-label="Tourner à gauche">Tourner ↺</button>' +
         '<button type="button" data-rot="1" aria-label="Tourner à droite">Tourner ↻</button>' +
@@ -274,7 +297,7 @@
     root.addEventListener("click", function (e) { e.stopPropagation(); onClick(e); });
     markColor();
     root.querySelector('#zzPeT').addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addText(); } });
-    showTool("text");
+    showTool(ed.initTool || "text");
   }
 
   function markColor() {
@@ -371,6 +394,21 @@
     }, "image/jpeg", 0.92);
   }
 
+  // open the editor on the photo of the preview sheet, with one tool ready
+  function editPre(tool) {
+    var P = (typeof V4 !== "undefined") && V4.pre;
+    if (!P) return;
+    open(P.url, function (file) {
+      var cur = (typeof V4 !== "undefined") && V4.pre;
+      if (!cur) return;
+      try { URL.revokeObjectURL(cur.url); } catch (x) {}
+      cur.file = file;
+      cur.url = URL.createObjectURL(file);
+      cur.edited = true;
+      if (typeof render === "function") render();
+    }, tool);
+  }
+
   // open the editor from the preview sheet
   document.addEventListener("click", function (e) {
     var t = e.target;
@@ -391,6 +429,8 @@
       });
       return;
     }
+    var pt = t.closest('[data-v4="preTool"]');
+    if (pt) { e.preventDefault(); e.stopImmediatePropagation(); editPre(pt.dataset.tool); return; }
     var h = t.closest('[data-v4="preHd"]');
     if (h) {
       e.preventDefault(); e.stopImmediatePropagation();
@@ -409,6 +449,13 @@
 #zzPe .zz-pebar .ok{background:#A78BFA;color:#0B0D18}
 #zzPe .zz-pestage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden}
 #zzPe canvas{max-width:100%;max-height:100%;width:auto;height:auto;touch-action:none;border-radius:8px}
+#zzPe .zz-pestage{position:relative}
+#zzPe .zz-pebin{position:absolute;width:58px;height:58px;border-radius:50%;background:#E5484D;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(229,72,77,.45);pointer-events:none;z-index:2}
+#zzPe .zz-pebin[hidden]{display:none}
+#zzPe .zz-pebin[data-c="tl"]{top:12px;left:12px}
+#zzPe .zz-pebin[data-c="tr"]{top:12px;right:12px}
+#zzPe .zz-pebin[data-c="bl"]{bottom:12px;left:12px}
+#zzPe .zz-pebin[data-c="br"]{bottom:12px;right:12px}
 #zzPe .zz-petools{display:flex;gap:6px;justify-content:center;padding:8px;background:#11131F;flex-wrap:wrap}
 #zzPe .zz-petools button{border:1px solid rgba(255,255,255,.2);background:transparent;color:#EDEEF3;border-radius:999px;padding:8px 12px;font:700 .8rem system-ui,sans-serif;cursor:pointer}
 #zzPe .zz-petools button.on{background:#A78BFA;color:#0B0D18;border-color:#A78BFA}

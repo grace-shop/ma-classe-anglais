@@ -3169,7 +3169,7 @@ function v4Target(kind){const f=document.querySelector(`form.v4bar[data-f="${V4F
 async function v4SendFile(kind,target,file,name,k,dur,opt){opt=opt||{};if(!window.__chatFiles){toast("Sending files is not available here.","x");return}
   if(!navigator.onLine){toast("No network: try again when you are connected.","x");return}
   if(!target)return;if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");return}
-  let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type))f=await shrinkImg(f,1280,.72);
+  let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type)&&!opt.hd)f=await shrinkImg(f,1280,.72);
   const kk=k||(/^image\//.test(f.type)?"img":"file");V4.sending=true;V4.upl=kind;render();
   try{const up=await window.__chatFiles.upload(f,name||f.name||"file");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{}),...(opt.once&&(kk==="img"||kk==="voice")?{o:true}:{})};
     if(kk!=="file"&&!opt.once){V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f)}
@@ -3767,7 +3767,8 @@ function v4ActSheet(kind,list,c){const raw=list.find(x=>x.id===V4.act.id);if(!ra
   <button type="button" data-v4="delMe">${ic("trash")}Delete for me</button>
   ${m.mine&&!m.del?`<button type="button" class="danger" data-v4="delAll">${ic("trash")}Delete for everyone</button>`:""}
   <button type="button" class="v4cancel" data-v4="actClose">Cancel</button></div>`}
-function v4PreSheet(){const P=V4.pre;return`<div class="v4sheet-bg" data-v4="preX"></div><div class="v4sheet v4pre" role="dialog" aria-label="Send a photo">
+function v4PreSheet(){const P=V4.pre;const tb=(tool,label,svg)=>`<button type="button" class="v4pt" data-v4="preTool" data-tool="${tool}" aria-label="${label}" title="${label}">${svg}</button>`;const I={x:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',dl:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>',crop:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 2v14h14M2 6h14v14"/></svg>',stk:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14c1 1.5 2.2 2.2 3.5 2.2s2.5-.7 3.5-2.2M9 9.5h.01M15 9.5h.01"/></svg>',pen:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4zM14 6l3 3"/></svg>'};const fn=esc(P.file&&P.file.name||"photo.jpg");return`<div class="v4sheet-bg" data-v4="preX"></div><div class="v4sheet v4pre" role="dialog" aria-label="Send a photo">
+  <div class="v4pre-tools"><button type="button" class="v4pt" data-v4="preX" aria-label="Close" title="Close">${I.x}</button><a class="v4pt" href="${P.url}" download="${fn}" aria-label="Download" title="Download">${I.dl}</a><button type="button" class="v4pt v4hd${P.hd?" on":""}" data-v4="preHd" aria-pressed="${!!P.hd}" aria-label="HD" title="Send in full quality">HD</button>${tb("crop","Crop",I.crop)}${tb("sticker","Sticker",I.stk)}${tb("text","Text",'<b class="v4aa">Aa</b>')}${tb("stroke","Pencil",I.pen)}</div>
   <img src="${P.url}" alt="Photo to send">
   <div class="v4pre-row"><input id="v4cap" placeholder="${P.once?"No caption for view once photos":"Add a caption…"}" maxlength="1000" ${P.once?"disabled":""} value="${esc(P.cap||"")}" autocomplete="off">
   <button type="button" class="v4onebtn${P.once?" on":""}" data-v4="preOnce" aria-pressed="${P.once}" title="View once" aria-label="View once"><i class="v4one">1</i></button>
@@ -3809,7 +3810,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"jump":{const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
   case"preX":if(V4.pre)URL.revokeObjectURL(V4.pre.url);V4.pre=null;render();return;
   case"preOnce":if(V4.pre){V4.pre.cap=(document.getElementById("v4cap")||{}).value||V4.pre.cap||"";V4.pre.once=!V4.pre.once;render()}return;
-  case"preSend":{const P=V4.pre;if(!P)return;const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,"img",null,{once:P.once,caption:cap});return}
+  case"preSend":{const P=V4.pre;if(!P)return;const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
   }},true);
 /* option sheets live outside the chat box (so nothing clips them) */
 function v4SyncSheets(){let host=document.getElementById("v4sheets");if(!host){host=document.createElement("div");host.id="v4sheets";document.body.appendChild(host)}
@@ -14734,6 +14735,23 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     return [(e.clientX - r.left) * ed.W / r.width, (e.clientY - r.top) * ed.H / r.height];
   }
 
+  // a corner of the photo where a dragged text or sticker is thrown away
+  function binCorner(o) {
+    var zx = ed.W * 0.22, zy = ed.H * 0.16;
+    var l = o.x < zx, r = o.x > ed.W - zx, t = o.y < zy, b = o.y > ed.H - zy;
+    if (!(l || r) || !(t || b)) return "";
+    return (t ? "t" : "b") + (l ? "l" : "r");
+  }
+
+  // show the red bin in that corner (or hide it when "")
+  function setBin(c) {
+    ed.binCorner = c;
+    var el = ed.root && ed.root.querySelector(".zz-pebin");
+    if (!el) return;
+    el.hidden = !c;
+    if (c) el.dataset.c = c; else delete el.dataset.c;
+  }
+
   // the width of a text as it is drawn (for a finger to grab the whole text)
   function textWidth(o) {
     ed.ctx.font = "700 " + o.size + "px " + FONTS[o.font].f;
@@ -14802,6 +14820,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
       if (!d.started) { d.started = true; }
       var o = ed.objs[d.i];
       o.x = p[0] - d.dx; o.y = p[1] - d.dy;
+      setBin(binCorner(o));
       redraw();
       return;
     }
@@ -14829,11 +14848,16 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     var d = ed.drag;
     ed.drag = null;
     if (d.kind === "paint") redraw();
+    if (d.kind === "move") {
+      // released over the red bin: the text or sticker is removed
+      if (ed.binCorner && ed.objs[d.i]) { ed.objs.splice(d.i, 1); redraw(); }
+      setBin("");
+    }
     // crop changes are not undone: they are a frame, not a mark
   }
 
   // ---- the editor screen ----
-  function open(url, done) {
+  function open(url, done, tool) {
     close();
     var img = new Image();
     img.onload = function () {
@@ -14843,7 +14867,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
       base.width = Math.max(1, Math.round(img.naturalWidth * sc));
       base.height = Math.max(1, Math.round(img.naturalHeight * sc));
       base.getContext("2d").drawImage(img, 0, 0, base.width, base.height);
-      ed = { img: base, W: base.width, H: base.height, objs: [], undo: [], tool: "text", color: "#FFFFFF", font: 1, size: 1, crop: null, ratio: null, drag: null, done: done };
+      ed = { img: base, W: base.width, H: base.height, objs: [], undo: [], tool: "text", initTool: tool || "text", color: "#FFFFFF", font: 1, size: 1, crop: null, ratio: null, drag: null, done: done };
       ed.crop = { x: 0, y: 0, w: ed.W, h: ed.H };
       build();
       redraw();
@@ -14862,7 +14886,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     root.id = "zzPe";
     root.innerHTML =
       '<div class="zz-pebar"><button type="button" data-a="cancel">Annuler</button><b>Modifier la photo</b><button type="button" data-a="undo" aria-label="Annuler la dernière modification">↶</button><button type="button" class="ok" data-a="ok">Valider</button></div>' +
-      '<div class="zz-pestage"><canvas></canvas></div>' +
+      '<div class="zz-pestage"><canvas></canvas><div class="zz-pebin" hidden aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></div></div>' +
       '<div class="zz-petools">' +
         '<button type="button" data-rot="-1" aria-label="Tourner à gauche">Tourner ↺</button>' +
         '<button type="button" data-rot="1" aria-label="Tourner à droite">Tourner ↻</button>' +
@@ -14900,7 +14924,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     root.addEventListener("click", function (e) { e.stopPropagation(); onClick(e); });
     markColor();
     root.querySelector('#zzPeT').addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addText(); } });
-    showTool("text");
+    showTool(ed.initTool || "text");
   }
 
   function markColor() {
@@ -14997,6 +15021,21 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     }, "image/jpeg", 0.92);
   }
 
+  // open the editor on the photo of the preview sheet, with one tool ready
+  function editPre(tool) {
+    var P = (typeof V4 !== "undefined") && V4.pre;
+    if (!P) return;
+    open(P.url, function (file) {
+      var cur = (typeof V4 !== "undefined") && V4.pre;
+      if (!cur) return;
+      try { URL.revokeObjectURL(cur.url); } catch (x) {}
+      cur.file = file;
+      cur.url = URL.createObjectURL(file);
+      cur.edited = true;
+      if (typeof render === "function") render();
+    }, tool);
+  }
+
   // open the editor from the preview sheet
   document.addEventListener("click", function (e) {
     var t = e.target;
@@ -15017,6 +15056,8 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
       });
       return;
     }
+    var pt = t.closest('[data-v4="preTool"]');
+    if (pt) { e.preventDefault(); e.stopImmediatePropagation(); editPre(pt.dataset.tool); return; }
     var h = t.closest('[data-v4="preHd"]');
     if (h) {
       e.preventDefault(); e.stopImmediatePropagation();
@@ -15035,6 +15076,13 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
 #zzPe .zz-pebar .ok{background:#A78BFA;color:#0B0D18}
 #zzPe .zz-pestage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden}
 #zzPe canvas{max-width:100%;max-height:100%;width:auto;height:auto;touch-action:none;border-radius:8px}
+#zzPe .zz-pestage{position:relative}
+#zzPe .zz-pebin{position:absolute;width:58px;height:58px;border-radius:50%;background:#E5484D;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(229,72,77,.45);pointer-events:none;z-index:2}
+#zzPe .zz-pebin[hidden]{display:none}
+#zzPe .zz-pebin[data-c="tl"]{top:12px;left:12px}
+#zzPe .zz-pebin[data-c="tr"]{top:12px;right:12px}
+#zzPe .zz-pebin[data-c="bl"]{bottom:12px;left:12px}
+#zzPe .zz-pebin[data-c="br"]{bottom:12px;right:12px}
 #zzPe .zz-petools{display:flex;gap:6px;justify-content:center;padding:8px;background:#11131F;flex-wrap:wrap}
 #zzPe .zz-petools button{border:1px solid rgba(255,255,255,.2);background:transparent;color:#EDEEF3;border-radius:999px;padding:8px 12px;font:700 .8rem system-ui,sans-serif;cursor:pointer}
 #zzPe .zz-petools button.on{background:#A78BFA;color:#0B0D18;border-color:#A78BFA}
@@ -15788,8 +15836,21 @@ img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
     var to = targets();
     if (!to.length) { toast(allSel ? "Pas encore d'autres joueurs dans la bataille. Choisis un ami." : "Choisis une personne.", "x"); return; }
     var meta = { room: BT.room.id };
+    // show it at once as sent (a sending message is not sent a second time)
     to.forEach(function (u) {
-      Promise.resolve(window.__peer && __peer.send(u, txt, null, meta)).catch(function () {});
+      var tmpId = "tmp" + Date.now() + Math.random().toString(36).slice(2, 6);
+      PR.inbox.unshift({ id: tmpId, sender: me(), receiver: u, body: txt, att: null, meta: meta,
+        created_at: new Date().toISOString(), read_at: null, pending: true });
+      Promise.resolve(window.__peer && __peer.send(u, txt, null, meta)).then(function (msgId) {
+        PR.inbox = PR.inbox.filter(function (x) { return x.id !== tmpId && x.id !== msgId; });
+        if (msgId) PR.inbox.unshift({ id: msgId, sender: me(), receiver: u, body: txt, att: null, meta: meta,
+          created_at: new Date().toISOString(), read_at: null });
+        paintList();
+      }).catch(function () {
+        PR.inbox = PR.inbox.filter(function (x) { return x.id !== tmpId; });
+        toast("Message non envoyé. Réessaie.", "x");
+        paintList();
+      });
     });
     paintList();
   }
@@ -16064,6 +16125,30 @@ img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
     return o;
   };
 }
+
+/* ---- app-v5-zzzzzzc-bubbles.js ---- */
+/* =====================================================================
+   v5 · Bulles d'emojis et barre de la photo à envoyer.
+   - Une bulle qui contient des emojis prend la largeur de son texte (au
+     lieu de se resserrer et d'empiler les emojis en colonne).
+   - La barre au-dessus de la photo à envoyer : fermer, télécharger,
+     HD, rogner, sticker, texte, crayon.
+   ===================================================================== */
+(function () {
+  var st = document.createElement("style");
+  st.id = "zzzzzzcBub";
+  st.textContent = `
+/* the bubble rule ".msg span" (time stamp) also caught each emoji: they were
+   block-level, small and faded, one per line */
+.msg .emo-nat{display:inline-block;font-size:inherit;opacity:1;margin:0}
+.msg:has(.emo-nat){width:max-content;max-width:78%}
+.v4pre-tools{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 2px 10px;flex-wrap:wrap}
+.v4pt{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 10px;border-radius:999px;border:0;background:rgba(255,255,255,.12);color:inherit;text-decoration:none;font:700 .95rem system-ui,sans-serif;cursor:pointer}
+.v4pt.v4hd.on{background:#A78BFA;color:#0B0D18}
+.v4aa{font-size:1rem;font-weight:800}
+`;
+  document.head.appendChild(st);
+})();
 
 /* ==== v4 END ==== */
 render();

@@ -447,7 +447,7 @@ function v4Target(kind){const f=document.querySelector(`form.v4bar[data-f="${V4F
 async function v4SendFile(kind,target,file,name,k,dur,opt){opt=opt||{};if(!window.__chatFiles){toast("Sending files is not available here.","x");return}
   if(!navigator.onLine){toast("No network: try again when you are connected.","x");return}
   if(!target)return;if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");return}
-  let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type))f=await shrinkImg(f,1280,.72);
+  let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type)&&!opt.hd)f=await shrinkImg(f,1280,.72);
   const kk=k||(/^image\//.test(f.type)?"img":"file");V4.sending=true;V4.upl=kind;render();
   try{const up=await window.__chatFiles.upload(f,name||f.name||"file");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{}),...(opt.once&&(kk==="img"||kk==="voice")?{o:true}:{})};
     if(kk!=="file"&&!opt.once){V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f)}
@@ -1045,7 +1045,8 @@ function v4ActSheet(kind,list,c){const raw=list.find(x=>x.id===V4.act.id);if(!ra
   <button type="button" data-v4="delMe">${ic("trash")}Delete for me</button>
   ${m.mine&&!m.del?`<button type="button" class="danger" data-v4="delAll">${ic("trash")}Delete for everyone</button>`:""}
   <button type="button" class="v4cancel" data-v4="actClose">Cancel</button></div>`}
-function v4PreSheet(){const P=V4.pre;return`<div class="v4sheet-bg" data-v4="preX"></div><div class="v4sheet v4pre" role="dialog" aria-label="Send a photo">
+function v4PreSheet(){const P=V4.pre;const tb=(tool,label,svg)=>`<button type="button" class="v4pt" data-v4="preTool" data-tool="${tool}" aria-label="${label}" title="${label}">${svg}</button>`;const I={x:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',dl:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>',crop:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 2v14h14M2 6h14v14"/></svg>',stk:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14c1 1.5 2.2 2.2 3.5 2.2s2.5-.7 3.5-2.2M9 9.5h.01M15 9.5h.01"/></svg>',pen:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4zM14 6l3 3"/></svg>'};const fn=esc(P.file&&P.file.name||"photo.jpg");return`<div class="v4sheet-bg" data-v4="preX"></div><div class="v4sheet v4pre" role="dialog" aria-label="Send a photo">
+  <div class="v4pre-tools"><button type="button" class="v4pt" data-v4="preX" aria-label="Close" title="Close">${I.x}</button><a class="v4pt" href="${P.url}" download="${fn}" aria-label="Download" title="Download">${I.dl}</a><button type="button" class="v4pt v4hd${P.hd?" on":""}" data-v4="preHd" aria-pressed="${!!P.hd}" aria-label="HD" title="Send in full quality">HD</button>${tb("crop","Crop",I.crop)}${tb("sticker","Sticker",I.stk)}${tb("text","Text",'<b class="v4aa">Aa</b>')}${tb("stroke","Pencil",I.pen)}</div>
   <img src="${P.url}" alt="Photo to send">
   <div class="v4pre-row"><input id="v4cap" placeholder="${P.once?"No caption for view once photos":"Add a caption…"}" maxlength="1000" ${P.once?"disabled":""} value="${esc(P.cap||"")}" autocomplete="off">
   <button type="button" class="v4onebtn${P.once?" on":""}" data-v4="preOnce" aria-pressed="${P.once}" title="View once" aria-label="View once"><i class="v4one">1</i></button>
@@ -1087,7 +1088,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"jump":{const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
   case"preX":if(V4.pre)URL.revokeObjectURL(V4.pre.url);V4.pre=null;render();return;
   case"preOnce":if(V4.pre){V4.pre.cap=(document.getElementById("v4cap")||{}).value||V4.pre.cap||"";V4.pre.once=!V4.pre.once;render()}return;
-  case"preSend":{const P=V4.pre;if(!P)return;const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,"img",null,{once:P.once,caption:cap});return}
+  case"preSend":{const P=V4.pre;if(!P)return;const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
   }},true);
 /* option sheets live outside the chat box (so nothing clips them) */
 function v4SyncSheets(){let host=document.getElementById("v4sheets");if(!host){host=document.createElement("div");host.id="v4sheets";document.body.appendChild(host)}

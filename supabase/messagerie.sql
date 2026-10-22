@@ -148,8 +148,16 @@ begin
   end if;
   if char_length(b) < 1 and a is null then raise exception 'Empty message'; end if;
   if char_length(b) > 4000 then raise exception 'Message too long (4000 characters maximum)'; end if;
-  if p_meta is not null and jsonb_typeof(p_meta) = 'object' and jsonb_typeof(p_meta->'re') = 'object' then
-    mt := jsonb_build_object('re', jsonb_build_object('id', left(coalesce(p_meta->'re'->>'id', ''), 40), 't', left(coalesce(p_meta->'re'->>'t', ''), 140), 'w', left(coalesce(p_meta->'re'->>'w', ''), 40)));
+  if p_meta is not null and jsonb_typeof(p_meta) = 'object' then
+    mt := '{}'::jsonb;
+    if jsonb_typeof(p_meta->'re') = 'object' then
+      mt := mt || jsonb_build_object('re', jsonb_build_object('id', left(coalesce(p_meta->'re'->>'id', ''), 40), 't', left(coalesce(p_meta->'re'->>'t', ''), 140), 'w', left(coalesce(p_meta->'re'->>'w', ''), 40)));
+    end if;
+    -- the battle room this message belongs to (the discussion of the arena)
+    if coalesce(p_meta->>'room', '') <> '' then
+      mt := mt || jsonb_build_object('room', left(p_meta->>'room', 40));
+    end if;
+    if mt = '{}'::jsonb then mt := null; end if;
   end if;
   select count(*) into n from peer_messages where sender = me and created_at > now() - interval '1 minute';
   if n >= 40 then raise exception 'You are writing too fast: wait one minute'; end if;
