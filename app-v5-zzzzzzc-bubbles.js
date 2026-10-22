@@ -17,6 +17,7 @@
 .v4pt{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 10px;border-radius:999px;border:0;background:rgba(255,255,255,.12);color:inherit;text-decoration:none;font:700 .95rem system-ui,sans-serif;cursor:pointer}
 .v4pt.v4hd.on{background:#A78BFA;color:#0B0D18}
 .v4aa{font-size:1rem;font-weight:800}
+.v4pre-vid{width:100%;max-height:52vh;border-radius:14px;background:#000;display:block}
 `;
   document.head.appendChild(st);
 })();
