@@ -244,8 +244,13 @@
       e.preventDefault();
       var i = panel.querySelector("#zzBci");
       var said = i.value;
-      i.value = "";                       // cleared at once, so it can not be sent twice
+      var had = document.activeElement === i;
+      // leaving the field first ends the phone keyboard's "writing" state,
+      // otherwise the text stays on screen after it is cleared
+      i.blur();
+      i.value = "";
       send(said);
+      if (had) { try { i.focus(); } catch (x) {} }
       setTimeout(function () { if (i.value === said) i.value = ""; }, 0);
     });
     return panel;

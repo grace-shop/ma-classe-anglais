@@ -15705,6 +15705,15 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
 .v4panel .v4grid.stk .zz-sq>img,.v4panel .v4grid.stk .zz-sq>video{position:absolute;left:0;top:0;width:100%;height:100%;padding:6px;box-sizing:border-box;object-fit:contain;display:block;max-width:none;border-radius:0}
 .v4panel .v4grid.stk .zz-sqin{position:absolute;left:0;top:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center}
 .v4panel .v4grid.stk>button:not(.zz-mstk):not(.zz-mnew){position:relative;height:auto}
+/* the sticker panel as a clean grid: 4 equal square cells, pictures fill them */
+.v4panel .v4grid.stk{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:2px}
+.v4panel .v4grid.stk>button{position:relative;width:100%;min-width:0;margin:0;border:0;border-radius:16px;background:rgba(255,255,255,.06);overflow:hidden;box-sizing:border-box;height:0 !important;padding:0 0 100% 0 !important;min-height:0}
+.v4panel .v4grid.stk .zz-sq{position:absolute;left:0;top:0;right:0;bottom:0;width:auto;height:auto;padding:0;border-radius:0;overflow:hidden}
+.v4panel .v4grid.stk .zz-sq>img,.v4panel .v4grid.stk .zz-sq>video{position:absolute;left:0;top:0;width:100%;height:100%;padding:0;object-fit:cover;border-radius:0}
+.v4panel .v4grid.stk .zz-sqin{padding:6px}
+.v4panel .v4grid.stk>.zz-mnew{border:0;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4);background:rgba(255,255,255,.04)}
+.v4panel .v4grid.stk>button:not(.zz-mstk):not(.zz-mnew)>img{position:absolute;left:14%;top:14%;width:72%;height:72%;object-fit:contain;max-width:none}
+.v4panel .v4grid.stk>button:not(.zz-mstk):not(.zz-mnew)>img.lock{opacity:.5}
 img.zz-stki,video.zz-stkv{width:150px;max-width:55vw;height:auto;display:block;background:transparent}
 img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
 #zzStk{position:fixed;inset:0;z-index:10002;font:600 .95rem system-ui,sans-serif;color:#EDEEF3}
@@ -15968,8 +15977,13 @@ img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
       e.preventDefault();
       var i = panel.querySelector("#zzBci");
       var said = i.value;
-      i.value = "";                       // cleared at once, so it can not be sent twice
+      var had = document.activeElement === i;
+      // leaving the field first ends the phone keyboard's "writing" state,
+      // otherwise the text stays on screen after it is cleared
+      i.blur();
+      i.value = "";
       send(said);
+      if (had) { try { i.focus(); } catch (x) {} }
       setTimeout(function () { if (i.value === said) i.value = ""; }, 0);
     });
     return panel;
