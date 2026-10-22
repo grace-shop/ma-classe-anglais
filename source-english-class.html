@@ -14701,6 +14701,15 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
       ctx.strokeStyle = "#fff";
       ctx.lineWidth = Math.max(2, W / 400);
       ctx.strokeRect(c.x, c.y, c.w, c.h);
+      var hl = Math.max(28, W / 14);
+      ctx.lineCap = "round";
+      ctx.lineWidth = Math.max(5, W / 120);
+      ctx.beginPath();
+      ctx.moveTo(c.x + c.w / 2 - hl / 2, c.y); ctx.lineTo(c.x + c.w / 2 + hl / 2, c.y);
+      ctx.moveTo(c.x + c.w / 2 - hl / 2, c.y + c.h); ctx.lineTo(c.x + c.w / 2 + hl / 2, c.y + c.h);
+      ctx.moveTo(c.x, c.y + c.h / 2 - hl / 2); ctx.lineTo(c.x, c.y + c.h / 2 + hl / 2);
+      ctx.moveTo(c.x + c.w, c.y + c.h / 2 - hl / 2); ctx.lineTo(c.x + c.w, c.y + c.h / 2 + hl / 2);
+      ctx.stroke();
       ctx.restore();
     }
   }
@@ -14766,10 +14775,18 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     return -1;
   }
 
+  // what a finger on the crop frame grabs: a corner (tl, tr, bl, br), an edge
+  // (t, b, l, r), the inside (in: moves the frame), or nothing ("")
   function cornerHit(p) {
-    var c = ed.crop, r = Math.max(40, ed.W / 12);
+    var c = ed.crop, r = Math.max(44, ed.W / 10);
     var pts = [[c.x, c.y, "tl"], [c.x + c.w, c.y, "tr"], [c.x, c.y + c.h, "bl"], [c.x + c.w, c.y + c.h, "br"]];
     for (var i = 0; i < pts.length; i++) if (Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]) < r) return pts[i][2];
+    var inX = p[0] >= c.x - r && p[0] <= c.x + c.w + r, inY = p[1] >= c.y - r && p[1] <= c.y + c.h + r;
+    if (inY && Math.abs(p[0] - c.x) < r) return "l";
+    if (inY && Math.abs(p[0] - (c.x + c.w)) < r) return "r";
+    if (inX && Math.abs(p[1] - c.y) < r) return "t";
+    if (inX && Math.abs(p[1] - (c.y + c.h)) < r) return "b";
+    if (p[0] > c.x && p[0] < c.x + c.w && p[1] > c.y && p[1] < c.y + c.h) return "in";
     return "";
   }
 
@@ -14789,7 +14806,8 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     ed.cv.setPointerCapture && ed.cv.setPointerCapture(e.pointerId);
     if (ed.tool === "crop") {
       var k = cornerHit(p);
-      ed.drag = k ? { kind: "corner", k: k } : null;
+      if (k === "in") ed.drag = { kind: "shift", sx: p[0], sy: p[1], c0: { x: ed.crop.x, y: ed.crop.y, w: ed.crop.w, h: ed.crop.h } };
+      else ed.drag = k ? { kind: "corner", k: k } : null;
       return;
     }
     if (ed.tool === "stroke" || ed.tool === "blur") {
@@ -14814,6 +14832,14 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
       var o = ed.objs[d.i];
       o.x = p[0] - d.dx; o.y = p[1] - d.dy;
       setBin(binCorner(o));
+      redraw();
+      return;
+    }
+    if (d.kind === "shift") {
+      var nx = d.c0.x + (p[0] - d.sx), ny = d.c0.y + (p[1] - d.sy);
+      nx = Math.max(0, Math.min(nx, ed.W - d.c0.w));
+      ny = Math.max(0, Math.min(ny, ed.H - d.c0.h));
+      ed.crop = { x: nx, y: ny, w: d.c0.w, h: d.c0.h };
       redraw();
       return;
     }
@@ -15528,7 +15554,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
       head.type = "button";
       head.className = "zz-mnew";
       head.setAttribute("aria-label", "Créer un sticker");
-      head.innerHTML = '<span class="zz-mplus">+</span><span class="zz-mtxt">Créer un sticker</span>';
+      head.innerHTML = '<div class="zz-sq"><div class="zz-sqin"><span class="zz-mplus">+</span><span class="zz-mtxt">Créer un sticker</span></div></div>';
       grid.insertBefore(head, grid.firstChild);
       list.forEach(function (it) {
         var b = document.createElement("button");
@@ -15536,9 +15562,9 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
         b.className = "zz-mstk";
         b.dataset.zzid = it.id;
         var isVid = /^video\//.test(it.t || "");
-        b.innerHTML = isVid
+        b.innerHTML = '<div class="zz-sq">' + (isVid
           ? '<video data-zzp="' + it.p + '" data-zzt="' + it.t + '" muted loop playsinline autoplay></video>'
-          : '<img data-zzp="' + it.p + '" data-zzt="' + it.t + '" alt="Mon sticker" draggable="false">';
+          : '<img data-zzp="' + it.p + '" data-zzt="' + it.t + '" alt="Mon sticker" draggable="false">') + '</div>';
         grid.insertBefore(b, head.nextSibling);
       });
     });
@@ -15662,14 +15688,16 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
   st.id = "zzzzzxMystk";
   st.textContent = `
 .v4panel .v4grid.stk .zz-mnew{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1px dashed rgba(255,255,255,.35);border-radius:16px;background:rgba(255,255,255,.05);color:inherit;cursor:pointer;min-height:72px;padding:8px;font:700 .72rem/1.1 system-ui,sans-serif}
-.v4panel .v4grid.stk .zz-mplus{font-size:1.6rem;line-height:1}
-.v4panel .v4grid.stk .zz-mstk{border:0;background:rgba(255,255,255,.04);border-radius:16px;padding:4px;cursor:pointer;min-height:72px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
+.v4panel .v4grid.stk .zz-mplus{font-size:1.15rem;line-height:1}
+.v4panel .v4grid.stk .zz-mstk{border:0;background:rgba(255,255,255,.04);border-radius:16px;padding:4px;cursor:pointer;min-height:0;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
 .v4panel .v4grid.stk .zz-mstk img,.v4panel .v4grid.stk .zz-mstk video{pointer-events:none;-webkit-user-drag:none}
 .v4panel .v4grid.stk .zz-mstk img,.v4panel .v4grid.stk .zz-mstk video{width:100%;height:100%;object-fit:contain;display:block;border-radius:12px}
-/* every tile of the grid is the same square: a tall photo is fitted inside it */
-.v4panel .v4grid.stk > .zz-mnew,.v4panel .v4grid.stk > .zz-mstk{aspect-ratio:1/1;min-height:0;height:auto;position:relative;overflow:hidden;box-sizing:border-box}
-.v4panel .v4grid.stk .zz-mstk img,.v4panel .v4grid.stk .zz-mstk video{position:absolute;left:6px;top:6px;width:calc(100% - 12px);height:calc(100% - 12px);object-fit:contain;border-radius:12px}
-.v4panel .v4grid.stk > button:not(.zz-mstk):not(.zz-mnew){aspect-ratio:1/1;min-height:0}
+/* every tile is the same square (padding trick: works on older WebViews too) */
+.v4panel .v4grid.stk .zz-mnew,.v4panel .v4grid.stk .zz-mstk{min-height:0;width:100%;box-sizing:border-box;margin:0}
+.v4panel .v4grid.stk .zz-sq{position:relative;width:100%;height:0;padding-bottom:100%;border-radius:12px;overflow:hidden}
+.v4panel .v4grid.stk .zz-sq>img,.v4panel .v4grid.stk .zz-sq>video{position:absolute;left:0;top:0;width:100%;height:100%;padding:6px;box-sizing:border-box;object-fit:contain;display:block;max-width:none;border-radius:0}
+.v4panel .v4grid.stk .zz-sqin{position:absolute;left:0;top:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center}
+.v4panel .v4grid.stk>button:not(.zz-mstk):not(.zz-mnew){position:relative;height:auto}
 img.zz-stki,video.zz-stkv{width:150px;max-width:55vw;height:auto;display:block;background:transparent}
 img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
 #zzStk{position:fixed;inset:0;z-index:10002;font:600 .95rem system-ui,sans-serif;color:#EDEEF3}
@@ -15932,8 +15960,10 @@ img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
     panel.querySelector(".zz-bcf").addEventListener("submit", function (e) {
       e.preventDefault();
       var i = panel.querySelector("#zzBci");
-      send(i.value);
-      i.value = "";
+      var said = i.value;
+      i.value = "";                       // cleared at once, so it can not be sent twice
+      send(said);
+      setTimeout(function () { if (i.value === said) i.value = ""; }, 0);
     });
     return panel;
   }
