@@ -382,6 +382,9 @@
 `;
   document.head.appendChild(st);
 
+  // other files (the stickers) can open the editor too
+  window.__zzPhotoEdit = { open: open };
+
   // drag: the canvas gets the pointer events above
   window.addEventListener("resize", function () { if (ed) redraw(); });
 })();
