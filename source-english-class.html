@@ -16028,15 +16028,16 @@ img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
     panel.querySelector(".zz-bcf").addEventListener("submit", function (e) {
       e.preventDefault();
       var i = panel.querySelector("#zzBci");
+      if (!i) return;
       var said = i.value;
       var had = document.activeElement === i;
-      // leaving the field first ends the phone keyboard's "writing" state,
-      // otherwise the text stays on screen after it is cleared
-      i.blur();
-      i.value = "";
+      // a new, empty field replaces the old one: the phone keyboard can not put
+      // the text back (clearing the same field let it reappear)
+      var fresh = i.cloneNode(false);
+      fresh.value = "";
+      i.parentNode.replaceChild(fresh, i);
       send(said);
-      if (had) { try { i.focus(); } catch (x) {} }
-      setTimeout(function () { if (i.value === said) i.value = ""; }, 0);
+      if (had) { try { fresh.focus(); } catch (x) {} }
     });
     return panel;
   }
