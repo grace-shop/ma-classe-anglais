@@ -15517,6 +15517,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
 
   // ---- send ----
   function sendSticker(item) {
+    recordRecent("own:" + item.id);
     var k = ((typeof V4 !== "undefined" ? V4 : undefined) && V4.panel && V4.panel.kind) || "peer";
     var t = (typeof v4Target === "function" && v4Target(k)) || (V4.panel && V4.panel.target) || "";
     V4.panel = null;
@@ -15545,28 +15546,83 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     });
   }
 
+  // ---- the stickers used lately: kept 24 hours, shown first ----
+  var DAY = 24 * 60 * 60 * 1000;
+  function rkey() {
+    var uid = ((typeof S !== "undefined" ? S : undefined) && S.uid) || "anon";
+    return "mca_stk_recent_" + uid;
+  }
+  function readRecent() {
+    try {
+      var cut = Date.now() - DAY;
+      return JSON.parse(localStorage.getItem(rkey()) || "[]")
+        .filter(function (x) { return x && x.at > cut; })
+        .sort(function (a, b) { return b.at - a.at; });
+    } catch (e) { return []; }
+  }
+  // key: "own:<id>" for my stickers, "bi:<name>" for the built-in ones
+  function recordRecent(key) {
+    try {
+      var cut = Date.now() - DAY;
+      var all = JSON.parse(localStorage.getItem(rkey()) || "[]")
+        .filter(function (x) { return x && x.at > cut && x.k !== key; });
+      all.unshift({ k: key, at: Date.now() });
+      localStorage.setItem(rkey(), JSON.stringify(all.slice(0, 40)));
+    } catch (e) {}
+  }
+
+  function ownTile(it) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "zz-mstk";
+    b.dataset.zzid = it.id;
+    var isVid = /^video\//.test(it.t || "");
+    b.innerHTML = '<div class="zz-sq">' + (isVid
+      ? '<video data-zzp="' + it.p + '" data-zzt="' + it.t + '" muted loop playsinline autoplay></video>'
+      : '<img data-zzp="' + it.p + '" data-zzt="' + it.t + '" alt="Mon sticker" draggable="false">') + '</div>';
+    return b;
+  }
+
+  function sectionTitle(text) {
+    var h = document.createElement("div");
+    h.className = "zz-shdr";
+    h.textContent = text;
+    return h;
+  }
+
   function panelTiles() {
     document.querySelectorAll(".v4panel .v4grid.stk").forEach(function (grid) {
       if (grid.dataset.zzmy === "1") return;
       grid.dataset.zzmy = "1";
       var list = store().list();
+      var seq = [];
+      // 1 · recently used (24 h)
+      var recent = [];
+      readRecent().forEach(function (r) {
+        if (recent.length >= 12) return;
+        if (r.k.indexOf("own:") === 0) {
+          var it = list.filter(function (x) { return x.id === r.k.slice(4); })[0];
+          if (it) recent.push(ownTile(it));
+        } else if (r.k.indexOf("bi:") === 0) {
+          var src = grid.querySelector('button[data-v4="stk"][data-e="' + r.k.slice(3) + '"]');
+          if (src) { var c = src.cloneNode(true); c.classList.add("zz-rb"); recent.push(c); }
+        }
+      });
+      if (recent.length) {
+        seq.push(sectionTitle("Récents · 24 h"));
+        seq = seq.concat(recent);
+        seq.push(sectionTitle("Tous les stickers"));
+      }
+      // 2 · everything: create one, then my stickers (the built-in ones follow)
       var head = document.createElement("button");
       head.type = "button";
       head.className = "zz-mnew";
       head.setAttribute("aria-label", "Créer un sticker");
       head.innerHTML = '<div class="zz-sq"><div class="zz-sqin"><span class="zz-mplus">+</span><span class="zz-mtxt">Créer un sticker</span></div></div>';
-      grid.insertBefore(head, grid.firstChild);
-      list.forEach(function (it) {
-        var b = document.createElement("button");
-        b.type = "button";
-        b.className = "zz-mstk";
-        b.dataset.zzid = it.id;
-        var isVid = /^video\//.test(it.t || "");
-        b.innerHTML = '<div class="zz-sq">' + (isVid
-          ? '<video data-zzp="' + it.p + '" data-zzt="' + it.t + '" muted loop playsinline autoplay></video>'
-          : '<img data-zzp="' + it.p + '" data-zzt="' + it.t + '" alt="Mon sticker" draggable="false">') + '</div>';
-        grid.insertBefore(b, head.nextSibling);
-      });
+      seq.push(head);
+      list.forEach(function (it) { seq.push(ownTile(it)); });
+      var ref = grid.firstChild;
+      seq.forEach(function (n) { grid.insertBefore(n, ref); });
     });
   }
 
@@ -15608,6 +15664,8 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
     var t = e.target;
     if (!t || !t.closest) return;
     if (t.closest(".zz-mnew")) { e.preventDefault(); e.stopPropagation(); openPicker(); return; }
+    var bi = t.closest(".v4panel button[data-v4=\"stk\"]");
+    if (bi && bi.dataset.e) recordRecent("bi:" + bi.dataset.e);
     var b = t.closest(".zz-mstk");
     if (b) {
       e.preventDefault(); e.stopPropagation();
@@ -15707,6 +15765,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
 .v4panel .v4grid.stk>.zz-mnew{border:0;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4);background:rgba(255,255,255,.04)}
 .v4panel .v4grid.stk>button:not(.zz-mstk):not(.zz-mnew)>img{position:absolute;left:14%;top:14%;width:72%;height:72%;object-fit:contain;max-width:none}
 .v4panel .v4grid.stk>button:not(.zz-mstk):not(.zz-mnew)>img.lock{opacity:.5}
+.v4panel .v4grid.stk .zz-shdr{grid-column:1/-1;font:700 .74rem system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;opacity:.7;padding:8px 2px 0;color:inherit}
 img.zz-stki,video.zz-stkv{width:150px;max-width:55vw;height:auto;display:block;background:transparent}
 img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
 #zzStk{position:fixed;inset:0;z-index:10002;font:600 .95rem system-ui,sans-serif;color:#EDEEF3}
