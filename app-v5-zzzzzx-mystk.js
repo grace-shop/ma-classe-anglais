@@ -93,7 +93,7 @@
     if (isVideo(file)) return makeSticker(file);
     if (isGif(file)) return makeSticker(file);
     var go = await ask("Ton sticker", "Tu veux le modifier avant de le créer ? (rogner, texte, flou, stickers…)", [
-      { key: "edit", label: "✏️ Modifier", primary: true },
+      { key: "edit", label: "Modifier", primary: true },
       { key: "as", label: "Créer tel quel" }
     ]);
     if (!go) return;
@@ -198,9 +198,9 @@
     var isVid = /^video\//.test(t);
     var have = mine(path);
     var actions = have
-      ? [{ key: "del", label: "🗑️ Supprimer de mes stickers", danger: true }]
+      ? [{ key: "del", label: "Supprimer de mes stickers", danger: true }]
       : [{ key: "save", label: "⭐ Enregistrer dans mes stickers", primary: true }];
-    if (!isVid) actions.push({ key: "edit", label: "✏️ Modifier" });
+    if (!isVid) actions.push({ key: "edit", label: "Modifier" });
     var go = await ask("Sticker", have ? "Il est dans ta collection." : "Ajoute-le à ta collection pour le réutiliser.", actions);
     if (!go) return;
     if (go === "del") {
