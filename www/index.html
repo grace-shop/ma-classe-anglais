@@ -15406,7 +15406,7 @@ img.zz-stki,video.zz-stkv{width:150px;max-width:55vw;height:auto;display:block;b
     if (!txt || !BT.room) return;
     var st = BT.st || {};
     var others = (st.players || []).map(function (p) { return p.uid; }).filter(function (u) { return u && u !== S.uid; });
-    if (!others.length) { toast("Pas encore d'autres joueurs dans la bataille.", "x"); return; }
+    if (!others.length) { toast("Pas encore d'autres joueurs dans la bataille. Réessaie dans un instant.", "x"); if (typeof btSync === "function") btSync(); return; }
     var meta = { room: BT.room.id };
     others.forEach(function (u) {
       Promise.resolve(window.__peer && __peer.send(u, txt, null, meta)).catch(function () {});
@@ -15444,9 +15444,15 @@ img.zz-stki,video.zz-stkv{width:150px;max-width:55vw;height:auto;display:block;b
 
   function syncPanel() {
     var ar = document.getElementById("arena");
-    var show = isRoyale() && !!ar && !ar.hidden;   // only while the arena is open
+    // shown while the arena is open and a battle is yours (in the battle or on its menu)
+    var active = !!((typeof BT !== "undefined" ? BT : undefined) && BT.room && BT.room.id);
+    var show = active && !!ar && !ar.hidden;
+    if (show && !BT.st && typeof btSync === "function" && !BT.syncing) { try { btSync(); } catch (e) {} }
     if (!show) { if (panel) panel.style.display = "none"; return; }
-    ensurePanel().style.display = "";
+    var pn = ensurePanel();
+    // inside the open arena, so no other layer can cover it
+    if (pn.parentNode !== ar) ar.appendChild(pn);
+    pn.style.display = "";
     if (open) paintList();
   }
 
