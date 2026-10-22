@@ -226,6 +226,8 @@
       '<div class="zz-pebar"><button type="button" data-a="cancel">Annuler</button><b>Modifier la photo</b><button type="button" data-a="undo" aria-label="Annuler la dernière modification">↶</button><button type="button" class="ok" data-a="ok">Valider</button></div>' +
       '<div class="zz-pestage"><canvas></canvas></div>' +
       '<div class="zz-petools">' +
+        '<button type="button" data-rot="-1" aria-label="Tourner à gauche">Tourner ↺</button>' +
+        '<button type="button" data-rot="1" aria-label="Tourner à droite">Tourner ↻</button>' +
         '<button type="button" data-t="crop">Rogner</button>' +
         '<button type="button" data-t="text">Texte</button>' +
         '<button type="button" data-t="blur">Flou</button>' +
@@ -292,6 +294,7 @@
     if (b.dataset.a === "ok") return finish();
     if (b.dataset.a === "addtext") return addText();
     if (b.dataset.a === "cropok") { showTool("text"); return; }
+    if (b.dataset.rot) return turn(+b.dataset.rot);
     if (b.dataset.t) return showTool(b.dataset.t);
     if (b.dataset.r) {
       ed.ratio = b.dataset.r === "free" ? null : b.dataset.r.split(":").map(Number);
@@ -306,6 +309,35 @@
       redraw();
       return;
     }
+  }
+
+  // ---- turn the photo by a quarter turn (dir 1 = clockwise, -1 = counter-clockwise) ----
+  function turnOnce() {
+    var oldW = ed.W, oldH = ed.H;
+    var rc = document.createElement("canvas");
+    rc.width = oldH; rc.height = oldW;
+    var g = rc.getContext("2d");
+    g.translate(oldH, 0); g.rotate(Math.PI / 2); g.drawImage(ed.img, 0, 0);
+    // a point (x, y) of the old photo is (oldH - y, x) after a clockwise turn
+    function mp(p) { return [oldH - p[1], p[0]]; }
+    function fix(list) {
+      list.forEach(function (o) {
+        if (o.pts) o.pts = o.pts.map(mp);
+        else if (typeof o.x === "number") { var q = mp([o.x, o.y]); o.x = q[0]; o.y = q[1]; }
+      });
+    }
+    fix(ed.objs);
+    ed.undo.forEach(fix);
+    ed.img = rc; ed.W = oldH; ed.H = oldW;
+    ed.cv.width = ed.W; ed.cv.height = ed.H;
+    ed.crop = { x: 0, y: 0, w: ed.W, h: ed.H };
+    if (ed.ratio) applyRatio();
+  }
+
+  function turn(dir) {
+    var n = dir < 0 ? 3 : 1;   // counter-clockwise = three clockwise turns
+    for (var i = 0; i < n; i++) turnOnce();
+    redraw();
   }
 
   // ---- finish: the new photo replaces the preview ----
