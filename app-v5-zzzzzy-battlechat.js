@@ -149,7 +149,6 @@
     var meta = { room: BT.room.id };
     targets.forEach(function (u) {
       Promise.resolve(window.__peer && __peer.send(u, txt, null, meta)).catch(function () {});
-      if (typeof PR !== "undefined") PR.inbox.unshift({ id: "tmp" + Date.now() + u, sender: me(), receiver: u, body: txt, meta: meta, created_at: new Date().toISOString() });
     });
     paintList();
   }
