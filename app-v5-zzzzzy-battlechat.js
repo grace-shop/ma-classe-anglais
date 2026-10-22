@@ -245,14 +245,13 @@
       var i = panel.querySelector("#zzBci");
       if (!i) return;
       var said = i.value;
-      var had = document.activeElement === i;
-      // a new, empty field replaces the old one: the phone keyboard can not put
-      // the text back (clearing the same field let it reappear)
+      // leave the field and replace it by an empty one: the phone keyboard
+      // puts back the text it was writing when the same field keeps the focus
+      try { i.blur(); } catch (x) {}
       var fresh = i.cloneNode(false);
       fresh.value = "";
       i.parentNode.replaceChild(fresh, i);
       send(said);
-      if (had) { try { fresh.focus(); } catch (x) {} }
     });
     return panel;
   }
