@@ -252,6 +252,14 @@
       fresh.value = "";
       i.parentNode.replaceChild(fresh, i);
       send(said);
+      // the keyboard can write the sent text back a moment later: clear it again
+      // for a short while, but only while it is exactly the sent text
+      var tries = 0;
+      var scrub = setInterval(function () {
+        var el = document.getElementById("zzBci");
+        if (el && said && el.value === said) el.value = "";
+        if (++tries > 16) clearInterval(scrub);
+      }, 50);
     });
     return panel;
   }
