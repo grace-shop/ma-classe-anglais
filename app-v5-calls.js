@@ -364,15 +364,13 @@ function callHideIncoming(){const el=document.getElementById("callIn");if(el)el.
 function callRing(on){
   clearInterval(CALL.ringT);CALL.ringT=null;
   if(!on)return;
-  callTone();CALL.ringT=setInterval(callTone,1500);
+  callTone();CALL.ringT=setInterval(callTone,rtCallPeriod());
 }
 let CALL_AC=null;
 function callTone(){
   try{CALL_AC=CALL_AC||new (window.AudioContext||window.webkitAudioContext)();
-    const o=CALL_AC.createOscillator(),g=CALL_AC.createGain(),t=CALL_AC.currentTime;
-    o.frequency.value=880;o.connect(g);g.connect(CALL_AC.destination);
-    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.25,t+0.05);g.gain.exponentialRampToValueAtTime(0.0001,t+0.6);
-    o.start(t);o.stop(t+0.65)}catch(e){}
+    if(CALL_AC.state==="suspended")CALL_AC.resume();
+    rtCallPlay(CALL_AC,CALL_AC.currentTime+0.02)}catch(e){}
 }
 
 /* ---- buttons: one listener for every call button ---- */
