@@ -1037,12 +1037,12 @@ function v4MsgHTML(kind,m,c){const a=m.att,once=!!(a&&a.o)&&!m.del,stk=a&&a.k===
   const re=m.re&&!m.del?`<div class="v4quote" data-v4="jump" data-id="${esc(m.re.id||"")}"><div class="v4q-w">${esc(v4Who(kind,m.re.w,c))}</div><div class="v4q-t">${esc(m.re.t||"")}</div></div>`:"";
   const rx=Object.values(m.react||{}).filter(Boolean),rxh=rx.length&&!m.del?`<div class="v4rx">${[...new Set(rx)].map(e=>`<span class="v4emo">${e}</span>`).join("")}${rx.length>1?`<b>${rx.length}</b>`:""}</div>`:"";
   const tick=m.mine&&!m.del&&kind!=="x"?`<i class="v4tick${m.read?" rd":""}" aria-label="${m.read?"Read":"Sent"}">${m.read?"✓✓":"✓"}</i>`:"";
-  return`<div class="msg ${m.mine?"mine":""}${stk?" stk":""}${m.del?" del":""}${rxh?" hasrx":""}" data-mid="${esc(m.id)}" data-k="${kind}" id="m-${esc(m.id)}">${re}${body}<span>${fmtTime(m.at)}${tick}</span>${rxh}</div>`}
+  return`<div class="msg ${m.pin?"zz-pn ":""}${m.mine?"mine":""}${stk?" stk":""}${m.del?" del":""}${rxh?" hasrx":""}" data-mid="${esc(m.id)}" data-k="${kind}" id="m-${esc(m.id)}">${re}${body}<span>${fmtTime(m.at)}${tick}</span>${rxh}</div>`}
 function v4ActSheet(kind,list,c){const raw=list.find(x=>x.id===V4.act.id);if(!raw)return"";const m=v4Norm(kind,raw,c),txt=v4Plain(m.text);
   return`<div class="v4sheet-bg" data-v4="actClose"></div><div class="v4sheet" role="dialog" aria-label="Message options">
   ${!m.del?`<div class="v4rxrow">${V4RE.map(e=>`<button type="button" data-v4="react" data-e="${e}" aria-pressed="${(m.react||{})[S.uid]===e}" aria-label="React ${e}"><span class="v4emo">${e}</span></button>`).join("")}</div>`:""}
   ${!m.del?`<button type="button" data-v4="reply">${ic("left")}Reply</button>`:""}
-  ${!m.del?`<button type="button" data-v4="fwdOne">${ic("send")}Forward</button><button type="button" data-v4="pinOne">${ic("spark")}${zzIsPinned(raw.id)?"Unpin":"Pin"}</button>`:""}
+  ${!m.del?`<button type="button" data-v4="fwdOne">${ic("send")}Forward</button><button type="button" data-v4="pinOne">${ic("spark")}${m.pin?"Unpin":"Pin"}</button>`:""}
   ${!m.del&&txt?`<button type="button" data-v4="copy">${ic("copy")}Copy</button>`:""}
   <button type="button" data-v4="delMe">${ic("trash")}Delete for me</button>
   ${m.mine&&!m.del?`<button type="button" class="danger" data-v4="delAll">${ic("trash")}Delete for everyone</button>`:""}
