@@ -1,6 +1,7 @@
 /* v5 · Vidéo : rognage, texte, dessin et autocollants.
-   L'éditeur de photo travaille sur une image extraite de la vidéo ; à l'envoi,
-   la vidéo est réencodée image par image avec les mêmes modifications. */
+   L'éditeur de photo travaille sur une image extraite de la vidéo. La vidéo
+   d'origine part telle quelle ; les modifications voyagent avec le message et
+   sont dessinées par-dessus pendant la lecture (rien n'est réencodé). */
 function zzVidPoster(file){
   return new Promise(function (resolve, reject) {
     var v = document.createElement("video");
@@ -33,60 +34,36 @@ function zzVidEdit(tool){
     }, tool);
   }).catch(function (e) { toast((e && e.message) || "Vidéo illisible.", "x"); });
 }
-// renders the video with the edit: crop, then the same objects on every frame
-function zzVidRender(file, edit){
-  return new Promise(function (resolve, reject) {
-    var v = document.createElement("video");
-    var url = URL.createObjectURL(file);
-    v.playsInline = true; v.preload = "auto"; v.volume = 0;
-    v.onerror = function () { reject(new Error("Vidéo illisible.")); };
-    v.onloadedmetadata = function () {
-      var c = edit.crop;
-      var sx = v.videoWidth / edit.W, sy = v.videoHeight / edit.H;
-      var k = Math.min(1, 720 / (c.w * sx));
-      var outW = Math.max(2, Math.round(c.w * sx * k / 2) * 2);
-      var outH = Math.max(2, Math.round(c.h * sy * k / 2) * 2);
-      var kx = outW / c.w, ky = outH / c.h;
-      var out = document.createElement("canvas"); out.width = outW; out.height = outH;
-      var octx = out.getContext("2d");
-      var full = document.createElement("canvas"); full.width = edit.W; full.height = edit.H;
-      var mime = ["video/webm;codecs=vp8,opus", "video/webm", "video/mp4"].find(function (t) {
-        try { return MediaRecorder.isTypeSupported(t); } catch (e) { return false; }
-      }) || "";
-      var tracks = out.captureStream(30).getVideoTracks().slice();
-      try {
-        var ast = v.captureStream ? v.captureStream() : v.mozCaptureStream();
-        ast.getAudioTracks().forEach(function (t) { tracks.push(t); });
-      } catch (e) {}
-      var rec;
-      try { rec = new MediaRecorder(new MediaStream(tracks), mime ? { mimeType: mime } : undefined); }
-      catch (e) { URL.revokeObjectURL(url); reject(new Error("Modification de vidéo impossible sur cet appareil.")); return; }
-      var chunks = [];
-      rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
-      rec.onstop = function () {
-        URL.revokeObjectURL(url);
-        resolve(new Blob(chunks, { type: (mime || "video/webm").split(";")[0] }));
-      };
-      function draw() {
-        window.__zzPaintTo(full, v, edit.W, edit.H, edit.objs);
-        octx.clearRect(0, 0, outW, outH);
-        octx.drawImage(full, -c.x * kx, -c.y * ky, edit.W * kx, edit.H * ky);
-      }
-      function loop() { draw(); if (!v.ended && !v.paused) requestAnimationFrame(loop); }
-      v.onended = function () { draw(); setTimeout(function () { try { rec.stop(); } catch (e) {} }, 150); };
-      v.play().then(function () { rec.start(250); loop(); })
-        .catch(function () { URL.revokeObjectURL(url); reject(new Error("Vidéo illisible.")); });
-    };
-    v.src = url;
+function zzVidEditParse(s){try{var o=JSON.parse(s);return o&&o.crop?o:null}catch(x){return null}}
+// plays the original video; the crop and the objects are drawn over it, frame by frame
+function zzVidPlayEdited(p,t,edit){
+  var ov=document.getElementById("vplayer");if(ov)ov.remove();
+  ov=document.createElement("div");ov.id="vplayer";ov.className="v4onceview";
+  ov.innerHTML='<div class="v4spin"></div><button type="button" class="iconbtn" aria-label="Close">'+ic("x")+'</button>';
+  document.body.appendChild(ov);
+  var v=null,raf=0;
+  var close=function(){cancelAnimationFrame(raf);if(v){v.pause();v.removeAttribute("src");v.load()}ov.remove()};
+  ov.querySelector("button").onclick=close;
+  srcURL({k:"m",id:p,t:t}).then(function(u){
+    v=document.createElement("video");v.playsInline=true;v.preload="auto";v.src=u;v.style.display="none";
+    var cv=document.createElement("canvas");
+    cv.style.cssText="max-width:100vw;max-height:86vh;width:100%;background:#000;object-fit:contain";
+    var c=edit.crop,full=document.createElement("canvas");full.width=edit.W;full.height=edit.H;
+    var octx=cv.getContext("2d"),kx=1,ky=1,outW=2,outH=2;
+    function fit(){var sx=v.videoWidth/edit.W,sy=v.videoHeight/edit.H;var k=Math.min(1,720/(c.w*sx));
+      outW=Math.max(2,Math.round(c.w*sx*k));outH=Math.max(2,Math.round(c.h*sy*k));cv.width=outW;cv.height=outH;kx=outW/c.w;ky=outH/c.h}
+    function draw(){window.__zzPaintTo(full,v,edit.W,edit.H,edit.objs);octx.clearRect(0,0,outW,outH);octx.drawImage(full,-c.x*kx,-c.y*ky,edit.W*kx,edit.H*ky)}
+    function loop(){draw();if(!v.paused&&!v.ended)raf=requestAnimationFrame(loop)}
+    v.onloadedmetadata=function(){fit();draw()};
+    v.onseeked=function(){draw()};
+    v.onplay=function(){cancelAnimationFrame(raf);loop()};
+    v.onpause=function(){cancelAnimationFrame(raf);draw()};
+    v.onended=function(){cancelAnimationFrame(raf);draw()};
+    cv.onclick=function(){if(v.paused||v.ended){if(v.ended)v.currentTime=0;v.play().catch(function(){})}else v.pause()};
+    ov.querySelector(".v4spin").replaceWith(cv);
+    ov.appendChild(v);
+    v.play().catch(function(){});
+  }).catch(function(){
+    ov.querySelector(".v4spin").replaceWith(Object.assign(document.createElement("p"),{textContent:navigator.onLine?"Cannot play this video.":"No network: the video needs internet."}));
   });
-}
-async function zzSendEditedVideo(P, cap){
-  toast("Préparation de la vidéo…", "check");
-  try {
-    var blob = await zzVidRender(P.file, P.edit);
-    var type = (blob.type || "video/webm");
-    var ext = /mp4/.test(type) ? "mp4" : "webm";
-    var f = new File([blob], "video-modifiee." + ext, { type: type });
-    await v4SendFile(P.kind, P.target, f, f.name, undefined, null, { caption: cap });
-  } catch (e) { toast((e && e.message) || "Vidéo non envoyée.", "x"); }
 }
