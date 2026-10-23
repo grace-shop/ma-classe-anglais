@@ -48,6 +48,7 @@
   function pick(accept, withCamera) {
     var inp = ctx.input;
     inp.setAttribute("accept", accept);
+    inp.multiple = accept === "image/*,video/*";   // the gallery allows several photos and videos
     if (withCamera) inp.setAttribute("capture", "environment");
     else inp.removeAttribute("capture");
     inp.click();

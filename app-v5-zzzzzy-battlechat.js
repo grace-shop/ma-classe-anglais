@@ -278,13 +278,12 @@
     var el = document.getElementById("zzBci");
     if (el && el.value.trim() === lastSaid.trim()) el.value = "";
   }
-  setInterval(guardField, 200);
-  document.addEventListener("focusin", function (e) {
-    if (e.target && e.target.id === "zzBci") guardField();
-  }, true);
-  document.addEventListener("input", function (e) {
-    if (e.target && e.target.id === "zzBci") guardField();
-  }, true);
+  setInterval(guardField, 50);
+  ["focusin", "input", "keyup", "compositionupdate", "compositionend", "pointerup"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      if (e.target && e.target.id === "zzBci") guardField();
+    }, true);
+  });
 
   // ---- timers: save the room, refresh the panel ----
   setInterval(function () {
