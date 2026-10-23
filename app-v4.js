@@ -1042,6 +1042,7 @@ function v4ActSheet(kind,list,c){const raw=list.find(x=>x.id===V4.act.id);if(!ra
   return`<div class="v4sheet-bg" data-v4="actClose"></div><div class="v4sheet" role="dialog" aria-label="Message options">
   ${!m.del?`<div class="v4rxrow">${V4RE.map(e=>`<button type="button" data-v4="react" data-e="${e}" aria-pressed="${(m.react||{})[S.uid]===e}" aria-label="React ${e}"><span class="v4emo">${e}</span></button>`).join("")}</div>`:""}
   ${!m.del?`<button type="button" data-v4="reply">${ic("left")}Reply</button>`:""}
+  ${!m.del?`<button type="button" data-v4="fwdOne">${ic("send")}Forward</button><button type="button" data-v4="pinOne">${ic("spark")}${zzIsPinned(raw.id)?"Unpin":"Pin"}</button>`:""}
   ${!m.del&&txt?`<button type="button" data-v4="copy">${ic("copy")}Copy</button>`:""}
   <button type="button" data-v4="delMe">${ic("trash")}Delete for me</button>
   ${m.mine&&!m.del?`<button type="button" class="danger" data-v4="delAll">${ic("trash")}Delete for everyone</button>`:""}
