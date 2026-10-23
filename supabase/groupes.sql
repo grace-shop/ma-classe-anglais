@@ -299,7 +299,7 @@ begin
         raise exception 'Invalid file';
       end if;
       a := jsonb_build_object('k', 'album', 'items', (select jsonb_agg(jsonb_build_object('k', x->>'k', 'p', x->>'p', 't', left(coalesce(x->>'t', ''), 120),
-                              'n', left(coalesce(x->>'n', ''), 80), 's', coalesce((x->>'s')::bigint, 0))) from jsonb_array_elements(p_att->'items') x));
+                              'n', left(coalesce(x->>'n', ''), 80), 's', coalesce((x->>'s')::bigint, 0), 'e', case when jsonb_typeof(x->'e') = 'object' and length(x->>'e') < 60000 then x->'e' end)) from jsonb_array_elements(p_att->'items') x));
     elsif k in ('voice', 'img', 'file') then
       if coalesce(p_att->>'p', '') not like me::text || '/%' then raise exception 'Invalid file'; end if;
       a := jsonb_build_object('k', k, 'p', p_att->>'p', 't', left(coalesce(p_att->>'t', ''), 120), 'n', left(coalesce(p_att->>'n', ''), 80),

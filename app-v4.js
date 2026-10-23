@@ -165,6 +165,7 @@ async function openDoc(src,label){closeDoc();const name=fileNameOf(label,src.t);
   let b;try{b=await srcBlob(src)}catch(e){const body=document.getElementById("docvBody");if(body)body.innerHTML=`<div class="docv-msg">${ic("wifi")}<p>${navigator.onLine?"This file cannot be opened right now. Try again in a moment.":"No connection, and this file is not saved on this device yet.<br>Open it once with Internet: then it will stay available <b>offline</b>."}</p></div>`;return}
   if(!document.getElementById("docv"))return;V4.doc={blob:b,name};render();
   const body=document.getElementById("docvBody"),t=b.type||src.t||"";
+  if(/^video\//.test(t)||(!/^(image|audio)\//.test(t)&&/\.(mp4|webm|mov|3gp|m4v)$/i.test(name))){const u=URL.createObjectURL(b);V4.docUrl=u;body.innerHTML=`<video class="docv-vid" src="${u}" controls playsinline autoplay style="width:100%;max-height:86vh;background:#000"></video>`;return}
   if(/^image\//.test(t)){const u=URL.createObjectURL(b);V4.docUrl=u;body.innerHTML=`<img class="docv-img" src="${u}" alt="${esc(name)}">`;return}
   if(/^audio\//.test(t)){const u=URL.createObjectURL(b);V4.docUrl=u;body.innerHTML=`<div class="docv-msg"><audio controls src="${u}" style="width:min(420px,90vw)"></audio></div>`;return}
   if(t==="application/pdf"||/\.pdf$/i.test(name)){try{const lib=await loadPdfJs();const doc=await lib.getDocument({data:new Uint8Array(await b.arrayBuffer()),isEvalSupported:false}).promise;if(!document.getElementById("docv"))return;V4.pdf={doc,zoom:1};drawPdf()}
@@ -447,7 +448,7 @@ function v4Target(kind){const f=document.querySelector(`form.v4bar[data-f="${V4F
 async function v4SendFile(kind,target,file,name,k,dur,opt){opt=opt||{};if(!window.__chatFiles){toast("Sending files is not available here.","x");return}
   if(!navigator.onLine){toast("No network: try again when you are connected.","x");return}
   if(!target)return;if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");return}
-  let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type)&&!opt.hd)f=await shrinkImg(f,1280,.72);
+  let f=zzFileOf(file,name);if(/^image\//.test(f.type)&&!/gif/.test(f.type)&&!opt.hd)f=await shrinkImg(f,1280,.72);
   const kk=k||(/^image\//.test(f.type)?"img":"file");V4.sending=true;V4.upl=kind;render();
   try{const up=await window.__chatFiles.upload(f,name||f.name||"file");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{}),...(opt.once&&(kk==="img"||kk==="voice")?{o:true}:{}),...(opt.edit?{e:opt.edit}:{})};
     if(kk!=="file"&&!opt.once){V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f)}
@@ -918,7 +919,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches("[data-v4][tabindex]")){e.preventDefault();e.target.click()}});
 document.addEventListener("change",e=>{const el=e.target;if(!el||!el.id)return;
-  if(el.id.startsWith("v4f_")){const kind=el.id.slice(4),files=[...(el.files||[])],t=el.closest("form")?.dataset.s;el.value="";if(files.length>1&&t){const media=files.filter(f=>/^(image|video)\//.test(f.type)&&!/gif/.test(f.type));if(media.length>1&&media.length===files.length)v4SendAlbum(kind,t,media);else(async()=>{for(const f of files){try{await v4SendFile(kind,t,f,f.name)}catch(x){}}})()}else{const file=files[0];if(file&&t){if(/^video\//.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false,video:true};render()}else if(/^image\//.test(file.type)&&!/gif/.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false};render()}else v4SendFile(kind,t,file,file.name)}}e.stopPropagation();return}
+  if(el.id.startsWith("v4f_")){const kind=el.id.slice(4),files=[...(el.files||[])],t=el.closest("form")?.dataset.s;el.value="";if(files.length>1&&t){const media=files.filter(f=>/^(image|video)\//.test(f.type)&&!/gif/.test(f.type));if(media.length>1&&media.length===files.length)zzReviewOpen(kind,t,media);else(async()=>{for(const f of files){try{await v4SendFile(kind,t,f,f.name)}catch(x){}}})()}else{const file=files[0];if(file&&t){if(/^video\//.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false,video:true};render()}else if(/^image\//.test(file.type)&&!/gif/.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false};render()}else v4SendFile(kind,t,file,file.name)}}e.stopPropagation();return}
   if(el.id==="v4hwf"){const fl=[...(el.files||[])];el.value="";for(const f of fl){if(V4.hwFiles.length>=5){toast("5 files maximum.","x");break}if(f.size>20*1024*1024){toast(f.name+": too big (20 MB maximum).","x");continue}V4.hwFiles.push(f)}render();e.stopPropagation()}},true);
 document.addEventListener("input",e=>{const el=e.target;if(el&&el.id==="fq_msgs"){S.drafts.fq_msgs=el.value;S.v4msgLim=40;render()}});
 document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset)return;
