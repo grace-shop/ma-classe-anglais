@@ -449,7 +449,7 @@ async function v4SendFile(kind,target,file,name,k,dur,opt){opt=opt||{};if(!windo
   if(!target)return;if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");return}
   let f=file;if(/^image\//.test(f.type)&&!/gif/.test(f.type)&&!opt.hd)f=await shrinkImg(f,1280,.72);
   const kk=k||(/^image\//.test(f.type)?"img":"file");V4.sending=true;V4.upl=kind;render();
-  try{const up=await window.__chatFiles.upload(f,name||f.name||"file");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{}),...(opt.once&&(kk==="img"||kk==="voice")?{o:true}:{})};
+  try{const up=await window.__chatFiles.upload(f,name||f.name||"file");const att={k:kk,p:up.p,t:up.t,n:up.n,s:up.s,...(dur?{d:dur}:{}),...(opt.once&&(kk==="img"||kk==="voice")?{o:true}:{}),...(opt.edit?{e:opt.edit}:{})};
     if(kk!=="file"&&!opt.once){V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f)}
     let text="";if(opt.caption!=null)text=opt.once?"":String(opt.caption).trim();else if(kk!=="voice"){const inp=document.getElementById(V4IN(kind));text=(inp&&inp.value||"").trim();if(inp){inp.value="";delete S.drafts[inp.id]}}
     if(text&&v4NeedFix(text)){const r=await v4Check(text);if(r)text=v4Pack(text,r.en,r.k)}
@@ -1088,7 +1088,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"jump":{const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
   case"preX":if(V4.pre)URL.revokeObjectURL(V4.pre.url);V4.pre=null;render();return;
   case"preOnce":if(V4.pre){V4.pre.cap=(document.getElementById("v4cap")||{}).value||V4.pre.cap||"";V4.pre.once=!V4.pre.once;render()}return;
-  case"preSend":{const P=V4.pre;if(!P)return;if(P.video&&P.edit){const capV=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;render();zzSendEditedVideo(P,capV);return}const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,P.video?undefined:"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
+  case"preSend":{const P=V4.pre;if(!P)return;if(P.video&&P.edit){const capV=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;render();v4SendFile(P.kind,P.target,P.file,P.file.name,undefined,null,{caption:capV,edit:P.edit});return}const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,P.video?undefined:"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
   }},true);
 /* option sheets live outside the chat box (so nothing clips them) */
 function v4SyncSheets(){let host=document.getElementById("v4sheets");if(!host){host=document.createElement("div");host.id="v4sheets";document.body.appendChild(host)}
@@ -1341,7 +1341,7 @@ const BELL=`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="
 const SITE_URL=()=>location.protocol.startsWith("http")&&!/localhost|127\.0\.0\.1/.test(location.host)?location.origin+location.pathname.replace(/index\.html$/,""):"https://grace-shop.github.io/ma-classe-anglais/";
 const fIsVid=s=>!!(s&&s.media&&/^video\//.test(s.media.t||""));
 const fSdur=s=>fIsVid(s)?Math.min(60,Math.max(3,s.media.d||15)):(s&&s.dur)||(s&&s.media?6:5);
-function fVidTile(m){return`<button type="button" class="fvid" data-v4="vplay" data-p="${esc(m.p)}" data-t="${esc(m.t||"video/mp4")}" aria-label="Play the video">${m.poster?`<img data-chatp="${esc(m.poster.p)}" data-t="${esc(m.poster.t||"image/jpeg")}" alt="">`:""}<span class="fplay">▶</span>${m.d?`<small>${fmtDur(m.d)}</small>`:""}</button>`}
+function fVidTile(m){return`<button type="button" class="fvid" data-v4="vplay" data-p="${esc(m.p)}" data-t="${esc(m.t||"video/mp4")}"${m.e?` data-e="${esc(JSON.stringify(m.e))}"`:""} aria-label="Play the video">${m.poster?`<img data-chatp="${esc(m.poster.p)}" data-t="${esc(m.poster.t||"image/jpeg")}" alt="">`:""}<span class="fplay">▶</span>${m.d?`<small>${fmtDur(m.d)}</small>`:""}</button>`}
 function fMediaHTML(media){media=Array.isArray(media)?media:[];if(!media.length)return"";
   return`<div class="fmedia n${Math.min(media.length,4)}">${media.slice(0,4).map((m,i)=>/^video\//.test(m.t||"")?fVidTile(m):`<button type="button" class="v4img" data-v4="doc" data-k="m" data-id="${esc(m.p)}" data-t="${esc(m.t||"image/jpeg")}" data-n="photo-${i+1}.jpg" aria-label="See the photo"><img data-chatp="${esc(m.p)}" data-t="${esc(m.t||"")}" alt="Photo"></button>`).join("")}</div>`}
 function fSharedHTML(sh){return`<div class="fshared" data-v4="fJump" data-id="${esc(sh.id||"")}"><header>${whoAva(sh.who,sh.author,28)}<b>${esc(sh.who?.name||"Student")}</b><small>${sh.at?ago(+new Date(sh.at)):""}</small></header>${sh.body?fText(sh.body):""}${fMediaHTML(sh.media)}</div>`}
@@ -1355,7 +1355,7 @@ function fPoster(f){return new Promise((res,rej)=>{const v=document.createElemen
   v.onloadeddata=()=>{try{v.currentTime=Math.min(0.6,(v.duration||1)/3)}catch(e){fin(null)}};
   v.onseeked=()=>{try{const w=Math.min(720,v.videoWidth||640),h=Math.round(w*(v.videoHeight||360)/(v.videoWidth||640));const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(v,0,0,w,h);c.toBlob(b=>fin(b),"image/jpeg",.72)}catch(e){fin(null)}};
   v.onerror=()=>fin(null);setTimeout(()=>fin(null),10000);v.src=u})}
-async function vPlay(p,t){let ov=document.getElementById("vplayer");if(ov)ov.remove();ov=document.createElement("div");ov.id="vplayer";ov.className="v4onceview";
+async function vPlay(p,t,e){const zzEd=e&&zzVidEditParse(e);if(zzEd)return zzVidPlayEdited(p,t,zzEd);let ov=document.getElementById("vplayer");if(ov)ov.remove();ov=document.createElement("div");ov.id="vplayer";ov.className="v4onceview";
   ov.innerHTML=`<div class="v4spin"></div><button type="button" class="iconbtn" aria-label="Close">${ic("x")}</button>`;document.body.appendChild(ov);
   const close=()=>{const v=ov.querySelector("video");if(v){v.pause();v.removeAttribute("src");v.load()}ov.remove()};ov.querySelector("button").onclick=close;
   try{const u=await srcURL({k:"m",id:p,t});const v=document.createElement("video");v.controls=true;v.autoplay=true;v.playsInline=true;v.src=u;v.className="vplayer-v";ov.querySelector(".v4spin").replaceWith(v);v.play().catch(()=>{})}
@@ -1401,7 +1401,7 @@ async function fShareOut(){const it=fShareItem();if(!it)return;const text=`${it.
     if(navigator.share){await navigator.share({title:"English Classes",text,url});return}
     await navigator.clipboard.writeText(text+"\n"+url);toast("Copied: paste it where you want","copy")}catch(e){if(e&&e.name!=="AbortError")toast("Sharing is not available here.","x")}}
 /* chat: videos too */
-{const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img")return fVidTile({p:a.p,t:a.t,d:a.d})+_mb(text,null);return _mb(text,a)}}
+{const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img")return fVidTile({p:a.p,t:a.t,d:a.d,e:a.e})+_mb(text,null);return _mb(text,a)}}
 /* ---------------- notifications ---------------- */
 const N={list:[],loaded:false,un:null,uid:null,at:0,markT:null};
 const nOn=()=>!!window.__notif&&!!S.uid&&(S.mode==="teacher"?!!(S.isOwner||S.isStaff):!!S.me);
@@ -1456,7 +1456,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"fJump":{const t=document.getElementById("p-"+id);if(t){t.scrollIntoView({block:"start",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
   case"fSvLike":fSvLike(el.dataset.e);return;
   case"fSvSnd":{F.svMute=false;const v=document.getElementById("fsvVid");if(v){v.muted=false;v.play().catch(()=>{})}const h=document.getElementById("fsvhost");const b=h&&h.querySelector(".fsv-snd");if(b)b.remove();return}
-  case"vplay":vPlay(el.dataset.p,el.dataset.t);return;
+  case"vplay":vPlay(el.dataset.p,el.dataset.t,el.dataset.e);return;
   case"nOpen":S.view={type:"notifs"};S.animate=true;scrollTo(0,0);render();return;
   case"nGo":nGo(id);return;
   case"nPerm":nAskPerm();return;
