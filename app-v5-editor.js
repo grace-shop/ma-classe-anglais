@@ -61,15 +61,18 @@ function ed5Open(file,kind,targetId){
 }
 function ed5Close(deliverOriginal){
   const h=document.getElementById("edt5");if(h)h.hidden=true;
+  if(!deliverOriginal)ED5.cb=null;
   if(ED5.vid){try{ED5.vid.pause()}catch(e){}ED5.vid=null}
   if(ED5.url){try{URL.revokeObjectURL(ED5.url)}catch(e){}}
   const f=ED5.file;ED5.open=false;ED5.file=null;ED5.img=null;ED5.url=null;
   if(deliverOriginal&&f)ed5Deliver(f);
 }
 function ed5Deliver(file){
-  const el=document.getElementById(ED5.target||"");
   const h=document.getElementById("edt5");if(h)h.hidden=true;
   ED5.open=false;
+  // a caller that is not an input (the chat preview) takes the result itself
+  if(ED5.cb){const cb=ED5.cb;ED5.cb=null;if(file)cb(file);return}
+  const el=document.getElementById(ED5.target||"");
   if(!el||!file)return;
   const dt=new DataTransfer();dt.items.add(file);
   el.files=dt.files;
