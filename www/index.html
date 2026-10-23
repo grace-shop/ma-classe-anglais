@@ -3768,8 +3768,8 @@ function v4ActSheet(kind,list,c){const raw=list.find(x=>x.id===V4.act.id);if(!ra
   ${m.mine&&!m.del?`<button type="button" class="danger" data-v4="delAll">${ic("trash")}Delete for everyone</button>`:""}
   <button type="button" class="v4cancel" data-v4="actClose">Cancel</button></div>`}
 function v4PreSheet(){const P=V4.pre;const tb=(tool,label,svg)=>`<button type="button" class="v4pt" data-v4="preTool" data-tool="${tool}" aria-label="${label}" title="${label}">${svg}</button>`;const I={x:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',dl:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>',crop:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 2v14h14M2 6h14v14"/></svg>',stk:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14c1 1.5 2.2 2.2 3.5 2.2s2.5-.7 3.5-2.2M9 9.5h.01M15 9.5h.01"/></svg>',pen:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4zM14 6l3 3"/></svg>'};const fn=esc(P.file&&P.file.name||"photo.jpg");return`<div class="v4sheet-bg" data-v4="preX"></div><div class="v4sheet v4pre" role="dialog" aria-label="Send a photo">
-  <div class="v4pre-tools"><button type="button" class="v4pt" data-v4="preX" aria-label="Close" title="Close">${I.x}</button><a class="v4pt" href="${P.url}" download="${fn}" aria-label="Download" title="Download">${I.dl}</a>${P.video?"":`<button type="button" class="v4pt v4hd${P.hd?" on":""}" data-v4="preHd" aria-pressed="${!!P.hd}" aria-label="HD" title="Send in full quality">HD</button>${tb("crop","Crop",I.crop)}${tb("sticker","Sticker",I.stk)}${tb("text","Text",'<b class="v4aa">Aa</b>')}${tb("stroke","Pencil",I.pen)}`}</div>
-  ${P.video?`<video class="v4pre-vid" src="${P.url}" controls playsinline preload="metadata"></video>`:`<img src="${P.url}" alt="Photo to send">`}
+  <div class="v4pre-tools"><button type="button" class="v4pt" data-v4="preX" aria-label="Close" title="Close">${I.x}</button><a class="v4pt" href="${P.url}" download="${fn}" aria-label="Download" title="Download">${I.dl}</a>${P.video?"":`<button type="button" class="v4pt v4hd${P.hd?" on":""}" data-v4="preHd" aria-pressed="${!!P.hd}" aria-label="HD" title="Send in full quality">HD</button>`}${tb("crop","Crop",I.crop)}${tb("sticker","Sticker",I.stk)}${tb("text","Text",'<b class="v4aa">Aa</b>')}${tb("stroke","Pencil",I.pen)}</div>
+  ${P.video&&!P.editUrl?`<video class="v4pre-vid" src="${P.url}" controls playsinline preload="metadata"></video>`:`<img src="${P.editUrl||P.url}" alt="Photo to send">`}
   <div class="v4pre-row"><input id="v4cap" placeholder="${P.once?"No caption for view once photos":"Add a caption…"}" maxlength="1000" ${P.once?"disabled":""} value="${esc(P.cap||"")}" autocomplete="off">
   <button type="button" class="v4onebtn${P.once?" on":""}" data-v4="preOnce" aria-pressed="${P.once}" title="View once" aria-label="View once"><i class="v4one">1</i></button>
   <button type="button" class="btn" data-v4="preSend" aria-label="Send">${ic("send")}</button></div>
@@ -3810,7 +3810,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"jump":{const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
   case"preX":if(V4.pre)URL.revokeObjectURL(V4.pre.url);V4.pre=null;render();return;
   case"preOnce":if(V4.pre){V4.pre.cap=(document.getElementById("v4cap")||{}).value||V4.pre.cap||"";V4.pre.once=!V4.pre.once;render()}return;
-  case"preSend":{const P=V4.pre;if(!P)return;const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,P.video?undefined:"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
+  case"preSend":{const P=V4.pre;if(!P)return;if(P.video&&P.edit){const capV=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;render();zzSendEditedVideo(P,capV);return}const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,P.video?undefined:"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
   }},true);
 /* option sheets live outside the chat box (so nothing clips them) */
 function v4SyncSheets(){let host=document.getElementById("v4sheets");if(!host){host=document.createElement("div");host.id="v4sheets";document.body.appendChild(host)}
@@ -14694,6 +14694,100 @@ async function v4SendAlbum(kind,target,files){
   document.head.appendChild(st);
 }
 
+/* ---- app-v5-zzzzzs-videdit.js ---- */
+/* v5 · Vidéo : rognage, texte, dessin et autocollants.
+   L'éditeur de photo travaille sur une image extraite de la vidéo ; à l'envoi,
+   la vidéo est réencodée image par image avec les mêmes modifications. */
+function zzVidPoster(file){
+  return new Promise(function (resolve, reject) {
+    var v = document.createElement("video");
+    var url = URL.createObjectURL(file);
+    v.muted = true; v.playsInline = true; v.preload = "auto";
+    v.onerror = function () { reject(new Error("Vidéo illisible.")); };
+    v.onloadedmetadata = function () { v.currentTime = Math.min(0.1, (v.duration || 0) / 2); };
+    v.onseeked = function () {
+      var cv = document.createElement("canvas");
+      cv.width = v.videoWidth; cv.height = v.videoHeight;
+      cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
+      cv.toBlob(function (b) { URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error("Image non créée.")); }, "image/jpeg", 0.92);
+    };
+    v.src = url;
+  });
+}
+// the editor opens on a frame of the video; its result is kept as the video's edit
+function zzVidEdit(tool){
+  var P = V4.pre;
+  if (!P || !P.video) return;
+  zzVidPoster(P.file).then(function (blob) {
+    var url = URL.createObjectURL(blob);
+    window.__zzPhotoEdit.open(url, function (still) {
+      var cur = V4.pre;
+      if (!cur) return;
+      window.__zzLastEdit && (cur.edit = JSON.parse(JSON.stringify(window.__zzLastEdit)));
+      if (cur.editUrl) { try { URL.revokeObjectURL(cur.editUrl); } catch (x) {} }
+      cur.editUrl = URL.createObjectURL(still);
+      render();
+    }, tool);
+  }).catch(function (e) { toast((e && e.message) || "Vidéo illisible.", "x"); });
+}
+// renders the video with the edit: crop, then the same objects on every frame
+function zzVidRender(file, edit){
+  return new Promise(function (resolve, reject) {
+    var v = document.createElement("video");
+    var url = URL.createObjectURL(file);
+    v.playsInline = true; v.preload = "auto"; v.volume = 0;
+    v.onerror = function () { reject(new Error("Vidéo illisible.")); };
+    v.onloadedmetadata = function () {
+      var c = edit.crop;
+      var sx = v.videoWidth / edit.W, sy = v.videoHeight / edit.H;
+      var k = Math.min(1, 720 / (c.w * sx));
+      var outW = Math.max(2, Math.round(c.w * sx * k / 2) * 2);
+      var outH = Math.max(2, Math.round(c.h * sy * k / 2) * 2);
+      var kx = outW / c.w, ky = outH / c.h;
+      var out = document.createElement("canvas"); out.width = outW; out.height = outH;
+      var octx = out.getContext("2d");
+      var full = document.createElement("canvas"); full.width = edit.W; full.height = edit.H;
+      var mime = ["video/webm;codecs=vp8,opus", "video/webm", "video/mp4"].find(function (t) {
+        try { return MediaRecorder.isTypeSupported(t); } catch (e) { return false; }
+      }) || "";
+      var tracks = out.captureStream(30).getVideoTracks().slice();
+      try {
+        var ast = v.captureStream ? v.captureStream() : v.mozCaptureStream();
+        ast.getAudioTracks().forEach(function (t) { tracks.push(t); });
+      } catch (e) {}
+      var rec;
+      try { rec = new MediaRecorder(new MediaStream(tracks), mime ? { mimeType: mime } : undefined); }
+      catch (e) { URL.revokeObjectURL(url); reject(new Error("Modification de vidéo impossible sur cet appareil.")); return; }
+      var chunks = [];
+      rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      rec.onstop = function () {
+        URL.revokeObjectURL(url);
+        resolve(new Blob(chunks, { type: (mime || "video/webm").split(";")[0] }));
+      };
+      function draw() {
+        window.__zzPaintTo(full, v, edit.W, edit.H, edit.objs);
+        octx.clearRect(0, 0, outW, outH);
+        octx.drawImage(full, -c.x * kx, -c.y * ky, edit.W * kx, edit.H * ky);
+      }
+      function loop() { draw(); if (!v.ended && !v.paused) requestAnimationFrame(loop); }
+      v.onended = function () { draw(); setTimeout(function () { try { rec.stop(); } catch (e) {} }, 150); };
+      v.play().then(function () { rec.start(250); loop(); })
+        .catch(function () { URL.revokeObjectURL(url); reject(new Error("Vidéo illisible.")); });
+    };
+    v.src = url;
+  });
+}
+async function zzSendEditedVideo(P, cap){
+  toast("Préparation de la vidéo…", "check");
+  try {
+    var blob = await zzVidRender(P.file, P.edit);
+    var type = (blob.type || "video/webm");
+    var ext = /mp4/.test(type) ? "mp4" : "webm";
+    var f = new File([blob], "video-modifiee." + ext, { type: type });
+    await v4SendFile(P.kind, P.target, f, f.name, undefined, null, { caption: cap });
+  } catch (e) { toast((e && e.message) || "Vidéo non envoyée.", "x"); }
+}
+
 /* ---- app-v5-zzzzzu-photoedit.js ---- */
 /* =====================================================================
    v5 · Photo editor, before you send a photo.
@@ -15108,6 +15202,7 @@ async function v4SendAlbum(kind,target,files){
     full.width = ed.W; full.height = ed.H;
     paint(full.getContext("2d"), false);
     octx.drawImage(full, -c.x, -c.y);
+    window.__zzLastEdit = { W: ed.W, H: ed.H, crop: { x: c.x, y: c.y, w: c.w, h: c.h }, objs: clone(ed.objs) };
     out.toBlob(function (blob) {
       if (!blob) { toast("Photo non enregistrée.", "x"); return; }
       var file = new File([blob], "photo-modifiee.jpg", { type: "image/jpeg" });
@@ -15121,6 +15216,7 @@ async function v4SendAlbum(kind,target,files){
   function editPre(tool) {
     var P = (typeof V4 !== "undefined") && V4.pre;
     if (!P) return;
+    if (P.video && typeof zzVidEdit === "function") { zzVidEdit(tool); return; }
     open(P.url, function (file) {
       var cur = (typeof V4 !== "undefined") && V4.pre;
       if (!cur) return;
@@ -15198,6 +15294,12 @@ async function v4SendAlbum(kind,target,files){
 
   // other files (the stickers) can open the editor too
   window.__zzPhotoEdit = { open: open };
+  // draws src (a frame, at W x H) with the objects, onto canvas; nothing of the open editor changes
+  window.__zzPaintTo = function (canvas, src, W, H, objs) {
+    var keep = ed;
+    ed = { img: src, W: W, H: H, objs: objs };
+    try { paint(canvas.getContext("2d"), false); } finally { ed = keep; }
+  };
 
   // drag: the canvas gets the pointer events above
   window.addEventListener("resize", function () { if (ed) redraw(); });

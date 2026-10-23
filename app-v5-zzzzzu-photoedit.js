@@ -411,6 +411,7 @@
     full.width = ed.W; full.height = ed.H;
     paint(full.getContext("2d"), false);
     octx.drawImage(full, -c.x, -c.y);
+    window.__zzLastEdit = { W: ed.W, H: ed.H, crop: { x: c.x, y: c.y, w: c.w, h: c.h }, objs: clone(ed.objs) };
     out.toBlob(function (blob) {
       if (!blob) { toast("Photo non enregistrée.", "x"); return; }
       var file = new File([blob], "photo-modifiee.jpg", { type: "image/jpeg" });
@@ -424,6 +425,7 @@
   function editPre(tool) {
     var P = (typeof V4 !== "undefined") && V4.pre;
     if (!P) return;
+    if (P.video && typeof zzVidEdit === "function") { zzVidEdit(tool); return; }
     open(P.url, function (file) {
       var cur = (typeof V4 !== "undefined") && V4.pre;
       if (!cur) return;
@@ -501,6 +503,12 @@
 
   // other files (the stickers) can open the editor too
   window.__zzPhotoEdit = { open: open };
+  // draws src (a frame, at W x H) with the objects, onto canvas; nothing of the open editor changes
+  window.__zzPaintTo = function (canvas, src, W, H, objs) {
+    var keep = ed;
+    ed = { img: src, W: W, H: H, objs: objs };
+    try { paint(canvas.getContext("2d"), false); } finally { ed = keep; }
+  };
 
   // drag: the canvas gets the pointer events above
   window.addEventListener("resize", function () { if (ed) redraw(); });
