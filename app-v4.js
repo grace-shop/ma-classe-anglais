@@ -1505,9 +1505,8 @@ function nTone(ctx,f,t0,len,vol){const o=ctx.createOscillator(),g=ctx.createGain
 function nSound(kind,soft){if(nPref("vib")&&!soft&&navigator.vibrate){try{navigator.vibrate(/msg|story_reply|staff/.test(kind)?[70,50,70]:90)}catch(e){}}
   if(!nPref("sound"))return;const ctx=nAudio();if(!ctx)return;const t=ctx.currentTime+0.02;
   if(soft){nTone(ctx,1046,t,0.12,0.08);return}
-  if(/msg|story_reply|staff/.test(kind)){nTone(ctx,880,t,0.16,0.22);nTone(ctx,1318,t+0.13,0.22,0.2)}       // message: two quick notes
-  else if(kind==="report"){nTone(ctx,660,t,0.2,0.22);nTone(ctx,660,t+0.25,0.2,0.22)}
-  else{nTone(ctx,1174,t,0.28,0.16);nTone(ctx,1568,t+0.06,0.32,0.08)}}                                  // reactions, comments: soft chime
+  if(kind==="report"){nTone(ctx,660,t,0.2,0.22);nTone(ctx,660,t+0.25,0.2,0.22)}                        // reports for teachers: two low beeps
+  else rtNotifPlay(ctx,t)}                                                                             // everything else: the chosen notification sound (app-v5-ringtones.js)
 {const _na=nArrive;nArrive=function(n){try{nSound(n.kind,nViewing(n))}catch(e){}return _na(n)}}
 {const _t=nTitle,_b=nBody;nTitle=n=>n.kind==="report"?(nName(n)+" reported something"):_t(n);nBody=n=>n.kind==="report"?(`Reason: ${n.body||"—"} · tap to check`):_b(n)}
 {const _g=nGo;nGo=function(id){const n=N.list.find(x=>String(x.id)===String(id));if(n&&String(n.ref||"").startsWith("report:")&&S.mode==="teacher"){if(!n.read_at){n.read_at=new Date().toISOString();window.__notif.read([n.id]).catch(()=>{})}S.view=null;S.tab="msgs";S.msgsTab="community";SF.rep=null;scrollTo(0,0);render();return}return _g(id)}}
@@ -1583,6 +1582,7 @@ function secView(){const A=window.__account?window.__account.info():{},me=S.mode
     <button type="button" class="btn ghost sm" data-v4="secOthers">${ic("x")}Log out of all other devices</button></div>
   <div class="glass card sec"><h3>${BELL} Notifications</h3>
     ${swHTML("sound",nPref("sound"),"Sound","Play a sound for new messages and activity")}
+    ${rtPickersHTML()}
     ${swHTML("vib",nPref("vib"),"Vibration","The phone vibrates for new messages")}
     ${perm==="unsupported"?"":perm==="granted"?swHTML("push",nPref("push"),"Phone notifications","Show notifications when the app is in the background"):`<div class="secrow"><div><b>Phone notifications</b><small>${perm==="denied"?"Blocked: allow them in your phone or browser settings.":"Get notified even when you use another app."}</small></div>${perm==="denied"?"":`<button type="button" class="btn sm" data-v4="nPerm">Turn on</button>`}</div>`}
     <button type="button" class="btn ghost sm" data-v4="secTest">${ic("speaker")}Test the sound</button></div>
