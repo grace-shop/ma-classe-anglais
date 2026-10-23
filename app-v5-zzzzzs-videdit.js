@@ -6,15 +6,20 @@ function zzVidPoster(file){
   return new Promise(function (resolve, reject) {
     var v = document.createElement("video");
     var url = URL.createObjectURL(file);
+    var done = false;
+    function fail(m){ if(done)return; done = true; URL.revokeObjectURL(url); reject(new Error(m)); }
     v.muted = true; v.playsInline = true; v.preload = "auto";
-    v.onerror = function () { reject(new Error("Vidéo illisible.")); };
-    v.onloadedmetadata = function () { v.currentTime = Math.min(0.1, (v.duration || 0) / 2); };
-    v.onseeked = function () {
+    v.onerror = function () { fail("Vidéo illisible."); };
+    // the first frame is enough: no seeking (seeking is slow on phones)
+    v.onloadeddata = function () {
+      if (done || !v.videoWidth) return;
       var cv = document.createElement("canvas");
       cv.width = v.videoWidth; cv.height = v.videoHeight;
       cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
-      cv.toBlob(function (b) { URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error("Image non créée.")); }, "image/jpeg", 0.92);
+      done = true;
+      cv.toBlob(function (b) { URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error("Image non créée.")); }, "image/jpeg", 0.9);
     };
+    setTimeout(function () { fail("Vidéo trop longue à ouvrir."); }, 10000);
     v.src = url;
   });
 }
