@@ -67,3 +67,17 @@ function zzVidPlayEdited(p,t,edit){
     ov.querySelector(".v4spin").replaceWith(Object.assign(document.createElement("p"),{textContent:navigator.onLine?"Cannot play this video.":"No network: the video needs internet."}));
   });
 }
+
+// plays a video with its edits inside an element; plays until the element is removed
+function zzVidLive(el,url,edit){
+  var v=document.createElement("video");v.muted=true;v.loop=true;v.playsInline=true;v.src=url;v.style.display="none";
+  var cv=document.createElement("canvas");cv.style.cssText="width:100%;height:100%;object-fit:contain;display:block;background:#000";
+  el.innerHTML="";el.appendChild(cv);el.appendChild(v);
+  var c=edit.crop,full=document.createElement("canvas");full.width=edit.W;full.height=edit.H;var octx=cv.getContext("2d");
+  var kx=1,ky=1,outW=2,outH=2;
+  function fit(){var sx=v.videoWidth/edit.W,sy=v.videoHeight/edit.H;var k=Math.min(1,540/(c.w*sx));
+    outW=Math.max(2,Math.round(c.w*sx*k));outH=Math.max(2,Math.round(c.h*sy*k));cv.width=outW;cv.height=outH;kx=outW/c.w;ky=outH/c.h}
+  function draw(){window.__zzPaintTo(full,v,edit.W,edit.H,edit.objs);octx.clearRect(0,0,outW,outH);octx.drawImage(full,-c.x*kx,-c.y*ky,edit.W*kx,edit.H*ky)}
+  function loop(){if(!el.isConnected){try{v.pause()}catch(x){}return}draw();requestAnimationFrame(loop)}
+  v.onloadedmetadata=function(){fit();v.play().catch(function(){});loop()};
+}

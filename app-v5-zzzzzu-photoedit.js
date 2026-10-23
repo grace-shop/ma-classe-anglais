@@ -28,6 +28,29 @@
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
+  // stored stickers (images): loaded once, drawn at their size, keep their ratio
+  var SIMG = {};
+  function simgLoad(o) {
+    var key = o.p;
+    if (SIMG[key]) return SIMG[key];
+    var rec = { im: null, ok: false };
+    SIMG[key] = rec;
+    if (typeof srcBlob === "function") {
+      srcBlob({ k: "m", id: o.p, t: o.mt }).then(function (b) {
+        var im = new Image();
+        im.onload = function () { rec.im = im; rec.ok = true; try { if (ed && ed.ctx) redraw(); } catch (x) {} };
+        im.src = URL.createObjectURL(b);
+      }).catch(function () {});
+    }
+    return rec;
+  }
+  function simgPaint(ctx, o) {
+    var rec = simgLoad(o);
+    if (!rec.ok) return;
+    var w = o.size, h = o.size * rec.im.naturalHeight / rec.im.naturalWidth;
+    ctx.drawImage(rec.im, o.x - w / 2, o.y - h / 2, w, h);
+  }
+
   function snap() { ed.undo.push(clone(ed.objs)); if (ed.undo.length > 40) ed.undo.shift(); }
 
   // ---- drawing (in image coordinates) ----
@@ -63,6 +86,8 @@
         ctx.strokeText(o.text, o.x, o.y);
         ctx.fillStyle = o.color;
         ctx.fillText(o.text, o.x, o.y);
+      } else if (o.t === "simg") {
+        simgPaint(ctx, o);
       } else if (o.t === "sticker") {
         ctx.font = o.size + "px serif";
         ctx.textBaseline = "middle";
@@ -147,6 +172,8 @@
       if (o.t === "text") {
         var half = textWidth(o) / 2;
         if (Math.abs(p[0] - o.x) <= half + pad && Math.abs(p[1] - o.y) <= o.size * 0.7 + pad) return i;
+      } else if (o.t === "simg") {
+        if (Math.abs(p[0] - o.x) <= o.size / 2 + pad && Math.abs(p[1] - o.y) <= o.size / 2 + pad) return i;
       } else if (o.t === "sticker") {
         var d = Math.hypot(p[0] - o.x, p[1] - o.y);
         if (d < Math.max(40, o.size * 0.8)) return i;
@@ -310,7 +337,9 @@
         '<div class="zz-pesz"><button type="button" data-s="1">Fin</button><button type="button" data-s="2">Épais</button></div>' +
       '</div>' +
       '<div class="zz-peopt" data-opt="blur" hidden><p>Passe le doigt sur ce qu\'il faut cacher : il devient flou.</p><div class="zz-pesz"><button type="button" data-s="1">Petit</button><button type="button" data-s="2">Grand</button></div></div>' +
-      '<div class="zz-peopt" data-opt="sticker" hidden><div class="zz-peemo">' + EMOJI.map(function (e) { return '<button type="button" data-e="' + e + '">' + e + '</button>'; }).join("") + '</div></div>';
+      '<div class="zz-peopt" data-opt="sticker" hidden><div class="zz-pestab"><button type="button" data-tab="emo" aria-pressed="true">Emojis</button><button type="button" data-tab="mine" aria-pressed="false">Mes stickers</button></div>' +
+        '<div class="zz-peemo" data-pane="emo">' + EMOJI.map(function (e) { return '<button type="button" data-e="' + e + '">' + e + '</button>'; }).join("") + '</div>' +
+        '<div class="zz-peemo" data-pane="mine" hidden></div></div>';
     document.body.appendChild(root);
     ed.root = root;
     ed.cv = root.querySelector("canvas");
@@ -364,6 +393,22 @@
     if (b.dataset.f !== undefined) { ed.font = +b.dataset.f; return; }
     if (b.dataset.c) { ed.color = b.dataset.c; markColor(); return; }
     if (b.dataset.s) { ed.size = +b.dataset.s; return; }
+    if (b.dataset.tab) {
+      var rt = b.closest(".zz-peopt");
+      rt.querySelectorAll("[data-pane]").forEach(function (p) { p.hidden = p.getAttribute("data-pane") !== b.dataset.tab; });
+      rt.querySelectorAll("[data-tab]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      if (b.dataset.tab === "mine") fillMine(rt);
+      return;
+    }
+    if (b.dataset.simg !== undefined) {
+      var st = simgList()[+b.dataset.simg];
+      if (st) {
+        snap();
+        ed.objs.push({ t: "simg", p: st.p, mt: st.t, x: ed.W / 2, y: ed.H / 2, size: Math.round(ed.W / 4) });
+        redraw();
+      }
+      return;
+    }
     if (b.dataset.e) {
       snap();
       ed.objs.push({ t: "sticker", e: b.dataset.e, x: ed.W / 2, y: ed.H / 2, size: Math.round(ed.W / 9) });
@@ -502,6 +547,27 @@
   document.head.appendChild(st);
 
   // other files (the stickers) can open the editor too
+  // the stored image stickers (videos are not used as stickers in the editor)
+  function simgList() {
+    return (window.zzMyStickers ? window.zzMyStickers() : []).filter(function (x) { return !/^video\//.test(x.t || ""); });
+  }
+  function fillMine(rt) {
+    var pane = rt.querySelector('[data-pane="mine"]');
+    if (!pane) return;
+    var list = simgList();
+    if (!list.length) { pane.innerHTML = '<p class="zz-pemp">Aucun sticker enregistré. Crée-en un depuis les stickers du chat.</p>'; return; }
+    pane.innerHTML = list.map(function (x, i) {
+      return '<button type="button" data-simg="' + i + '" aria-label="Sticker"><img data-zzsp="' + x.p + '" data-zzst="' + x.t + '" alt=""></button>';
+    }).join("");
+    pane.querySelectorAll("img[data-zzsp]").forEach(function (im) {
+      if (typeof srcBlob !== "function") return;
+      srcBlob({ k: "m", id: im.dataset.zzsp, t: im.dataset.zzst }).then(function (b) { im.src = URL.createObjectURL(b); }).catch(function () {});
+    });
+  }
+  var zzPeSt = document.createElement("style");
+  zzPeSt.id = "zzPeStickers";
+  zzPeSt.textContent = ".zz-pestab{display:flex;gap:8px;margin-bottom:8px}.zz-pestab button{flex:1;padding:8px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font:700 .9rem system-ui,sans-serif;cursor:pointer}.zz-pestab button[aria-pressed=true]{background:#A78BFA;color:#0B0D18;border-color:transparent}.zz-peemo[data-pane=mine] button{padding:4px;aspect-ratio:auto}.zz-peemo[data-pane=mine] img{width:100%;height:auto;display:block;object-fit:contain}.zz-pemp{grid-column:1/-1;opacity:.7;text-align:center;margin:8px 0}";
+  document.head.appendChild(zzPeSt);
   window.__zzPhotoEdit = { open: open };
   // draws src (a frame, at W x H) with the objects, onto canvas; nothing of the open editor changes
   window.__zzPaintTo = function (canvas, src, W, H, objs) {
