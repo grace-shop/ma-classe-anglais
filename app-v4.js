@@ -1090,7 +1090,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"jump":{const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
   case"preX":if(V4.pre)URL.revokeObjectURL(V4.pre.url);V4.pre=null;render();return;
   case"preOnce":if(V4.pre){V4.pre.cap=(document.getElementById("v4cap")||{}).value||V4.pre.cap||"";V4.pre.once=!V4.pre.once;render()}return;
-  case"preSend":{const P=V4.pre;if(!P)return;if(P.video&&P.edit){const capV=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;render();v4SendFile(P.kind,P.target,P.file,P.file.name,undefined,null,{caption:capV,edit:P.edit});return}const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,P.video?undefined:"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
+  case"preSend":{const P=V4.pre;if(!P)return;if(P.video&&P.edit){const capV=(document.getElementById("v4cap")||{}).value||"";zzBakeThenSend(P,capV);return}const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,P.video?undefined:"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
   }},true);
 /* option sheets live outside the chat box (so nothing clips them) */
 function v4SyncSheets(){let host=document.getElementById("v4sheets");if(!host){host=document.createElement("div");host.id="v4sheets";document.body.appendChild(host)}

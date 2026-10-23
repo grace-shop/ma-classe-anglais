@@ -184,7 +184,7 @@ function zzReviewSend(){
   if(R.kind==="story"){zzStorySend();return}
   var entries=R.items.map(function(it){return{file:it.file,edit:it.video?it.edit:null}});
   var ov=document.getElementById("zzrv");if(ov)ov.remove();ZZR=null;
-  v4SendAlbumItems(R.kind,R.target,entries,R.reply);
+  zzBakeEntries(entries).then(function(es){v4SendAlbumItems(R.kind,R.target,es,R.reply)});
 }
 {
   const st=document.createElement("style");st.id="zzzzzrAlbum";
