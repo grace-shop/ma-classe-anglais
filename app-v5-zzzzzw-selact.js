@@ -2,9 +2,13 @@
    Répondre (un seul message), Transférer (vers un camarade, les fichiers sont
    ré-envoyés), Supprimer (ses propres messages). */
 (function () {
+  // the chat on screen: a classmate (PR.inbox) or a group (GR.msgs)
+  function inGroup() { return !!(S.view && S.view.type === "group" && typeof GR !== "undefined"); }
   function rowOf(id) {
-    return (PR.inbox || []).find(function (x) { return String(x.id) === String(id); }) || null;
+    var list = inGroup() ? (GR.msgs[S.view.id] || []) : (PR.inbox || []);
+    return list.find(function (x) { return String(x.id) === String(id); }) || null;
   }
+  function authorOf(r) { return inGroup() ? r.from : r.sender; }
   function textOfRow(r) { return String((r && r.body) || "").trim(); }
 
   function toastSafe(msg, icon) { try { toast(msg, icon || "check"); } catch (e) {} }
@@ -14,20 +18,25 @@
     var r = rowOf(ids[0]);
     if (!r) return toastSafe("Ce message ne peut pas être cité.", "x");
     var t = textOfRow(r) || (r.att && r.att.k === "album" ? "Photos et vidéos" : (r.att && r.att.k === "img" ? "Photo" : "Message"));
-    V4.reply = { kind: "peer", id: r.id, t: t.slice(0, 140), w: r.sender };
+    V4.reply = { kind: inGroup() ? "group" : "peer", id: r.id, t: t.slice(0, 140), w: authorOf(r) };
     window.zzSelClear && window.zzSelClear();
     render();
   }
 
   // ---- delete the own messages selected ----
   async function doDelete(ids) {
-    var mine = ids.map(rowOf).filter(function (r) { return r && r.sender === S.uid && !r.deleted_at; });
+    var mine = ids.map(rowOf).filter(function (r) { return r && authorOf(r) === S.uid && !r.deleted_at; });
     if (!mine.length) return toastSafe("Vous ne pouvez supprimer que vos messages.", "x");
     window.zzSelClear && window.zzSelClear();
     for (var i = 0; i < mine.length; i++) {
       var r = mine[i];
       try {
-        await window.__peer.del(r.id);
+        if (inGroup()) {
+          var g = await grSB().rpc("delete_group_message", { p_id: r.id });
+          if (g.error) throw grErr(g.error, "Could not delete");
+        } else {
+          await window.__peer.del(r.id);
+        }
         r.deleted_at = new Date().toISOString(); r.body = ""; r.att = null; r.meta = null;
       } catch (e) { toastSafe((e && e.message) || "Suppression impossible.", "x"); }
     }
