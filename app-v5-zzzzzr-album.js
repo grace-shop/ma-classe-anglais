@@ -31,7 +31,7 @@ function zzAlbumOpen(items,start){
       var u=URL.createObjectURL(b);urls.push(u);
       w.innerHTML=it.k==="vid"?'<video src="'+u+'" controls playsinline autoplay></video>':'<img src="'+u+'" alt="">';
       ov.querySelectorAll(".zzdl").forEach(function(n){n.remove()});
-      if(it.k==="vid")ov.querySelector(".zzal-top").insertAdjacentHTML("beforeend",zzDlBtn(it.p,it.t));
+      ov.querySelector(".zzal-top").insertAdjacentHTML("beforeend",zzDlBtn(it.p,it.t));
     }).catch(function(){if(mine===cur)w.innerHTML='<p class="zzal-err">Cannot open this item.</p>'});
   }
   ov.querySelector(".zzal-x").onclick=close;
@@ -135,7 +135,7 @@ function zzReviewPaint(){
       var media=it.video&&it.edit?'<div class="zzvp" data-i="'+i+'"></div>':it.video?'<video src="'+src+'#t=0.1" muted playsinline preload="metadata"></video>':'<img src="'+src+'" alt="">';
       return'<div class="zzrv-t"><button type="button" class="zzrv-e" data-zzrv="edit" data-i="'+i+'" aria-label="Edit">'+media+(it.video?'<span class="zzrv-play">▶</span>':'')+(it.edit||it.edited?'<i class="zzrv-ed">Modifié</i>':'')+'</button>'+(it.video?'<button type="button" class="zzrv-cut" data-zzrv="cut" data-i="'+i+'" aria-label="Cut">'+ic("scissors")+'</button>':'')+'<button type="button" class="zzrv-rm" data-zzrv="rm" data-i="'+i+'" aria-label="Remove">×</button></div>';
     }).join('')+'</div>'+
-    '<div class="zzrv-foot"><button type="button" class="zzrv-go" data-zzrv="send">Envoyer ('+ZZR.items.length+')</button></div>';
+    '<div class="zzrv-foot"><button type="button" class="zzrv-go" data-zzrv="send">'+(ZZR.kind==="story"?'Partager ':'Envoyer ')+'('+ZZR.items.length+')</button></div>';
 }
 // cut a video of the selection with the same cutter as the story
 function zzReviewCut(i){
@@ -147,6 +147,7 @@ function zzReviewCut(i){
     if(!ZZR||ZZR.items[i]!==it||!f||f===it.file)return;
     try{URL.revokeObjectURL(it.url)}catch(x){}
     it.file=f;it.url=URL.createObjectURL(f);
+    if(ZZR.kind==="story")fVideoCheck(f,60).then(function(c){if(c)it.d=c.d}).catch(function(){});
     it.posterP=zzVidPoster(f).then(function(b){return URL.createObjectURL(b)}).catch(function(){return null});
     zzReviewPaint();
   };
@@ -154,6 +155,8 @@ function zzReviewCut(i){
 }
 function zzReviewEdit(i){
   var it=ZZR&&ZZR.items[i];if(!it||!window.__zzPhotoEdit)return;
+  // a story keeps the video as it is: only the cut applies to a video
+  if(ZZR.kind==="story"&&it.video){zzReviewCut(i);return}
   var ov=document.getElementById("zzrv");if(ov)ov.style.display="none";
   var back=setInterval(function(){if(!document.getElementById("zzPe")){clearInterval(back);var o=document.getElementById("zzrv");if(o)o.style.display=""}},300);
   function fail(){clearInterval(back);var o=document.getElementById("zzrv");if(o)o.style.display="";toast("Cette vidéo ne peut pas être modifiée.","x")}
@@ -178,6 +181,7 @@ function zzReviewClose(){var ov=document.getElementById("zzrv");if(ov)ov.remove(
   if(ZZR){ZZR.items.forEach(function(it){try{URL.revokeObjectURL(it.url)}catch(e){}});ZZR=null}}
 function zzReviewSend(){
   var R=ZZR;if(!R)return;
+  if(R.kind==="story"){zzStorySend();return}
   var entries=R.items.map(function(it){return{file:it.file,edit:it.video?it.edit:null}});
   var ov=document.getElementById("zzrv");if(ov)ov.remove();ZZR=null;
   v4SendAlbumItems(R.kind,R.target,entries,R.reply);
