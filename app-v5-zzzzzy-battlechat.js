@@ -240,32 +240,19 @@
       if (open) { paintTo(); paintList(); }
     });
     panel.querySelector(".zz-bcto-btn").addEventListener("click", openSheet);
-    var lastSaid = "";
     panel.querySelector(".zz-bcf").addEventListener("submit", function (e) {
       e.preventDefault();
       var i = panel.querySelector("#zzBci");
       if (!i) return;
       var said = i.value;
-      // leave the field and replace it by an empty one: the phone keyboard
-      // puts back the text it was writing when the same field keeps the focus
+      lastSaid = said;
+      i.value = "";
       try { i.blur(); } catch (x) {}
       var fresh = i.cloneNode(false);
       fresh.value = "";
       i.parentNode.replaceChild(fresh, i);
       send(said);
-      // the keyboard writes the sent text back into the field: keep it empty
-      // while it is exactly the sent text (typing something else is never touched)
-      lastSaid = said;
-      var tries = 0;
-      var scrub = setInterval(function () {
-        var el = document.getElementById("zzBci");
-        if (el && lastSaid && el.value === lastSaid) el.value = "";
-        if (++tries > 80) clearInterval(scrub);
-      }, 50);
-    });
-    panel.addEventListener("input", function (e) {
-      var el = e.target;
-      if (el && el.id === "zzBci" && lastSaid && el.value === lastSaid) el.value = "";
+      guardField();
     });
     return panel;
   }
@@ -281,6 +268,23 @@
     pn.style.display = "";
     if (open) { paintTo(); paintList(); }
   }
+
+  // ---- the text just sent must not come back in the field ----
+  // the phone keyboard can write the sent text back into the field (on tap or later);
+  // while the field holds exactly that text it is emptied. Any other text is left alone.
+  var lastSaid = "";
+  function guardField() {
+    if (!lastSaid) return;
+    var el = document.getElementById("zzBci");
+    if (el && el.value.trim() === lastSaid.trim()) el.value = "";
+  }
+  setInterval(guardField, 200);
+  document.addEventListener("focusin", function (e) {
+    if (e.target && e.target.id === "zzBci") guardField();
+  }, true);
+  document.addEventListener("input", function (e) {
+    if (e.target && e.target.id === "zzBci") guardField();
+  }, true);
 
   // ---- timers: save the room, refresh the panel ----
   setInterval(function () {
