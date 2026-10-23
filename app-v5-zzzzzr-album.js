@@ -47,6 +47,12 @@ document.addEventListener("click",function(e){
   var box=b.closest(".v4album"),items=[];try{items=JSON.parse(box.getAttribute("data-zzitems")||"[]")}catch(x){}
   zzAlbumOpen(items,+b.getAttribute("data-zzal")||0);
 },true);
+// live video previews: the video plays with its edits (preview sheet and review tiles)
+setInterval(function(){document.querySelectorAll(".zzvp:not([data-ok])").forEach(function(el){
+  el.setAttribute("data-ok","1");
+  var src=el.closest("#zzrv")?(ZZR&&ZZR.items[+el.getAttribute("data-i")]):V4.pre;
+  if(src&&src.edit&&src.url)zzVidLive(el,src.url,src.edit);
+})},300);
 // video tiles show their first frame
 setInterval(function(){document.querySelectorAll("video[data-zzvid]:not([data-ok])").forEach(function(v){
   v.setAttribute("data-ok","1");
@@ -121,8 +127,8 @@ function zzReviewPaint(){
     '<p class="zzrv-h">Touchez un élément pour le modifier. × pour le retirer.</p>'+
     '<div class="zzrv-g">'+ZZR.items.map(function(it,i){
       var src=it.editUrl||it.url;
-      var media=it.video&&!it.editUrl?'<video src="'+src+'#t=0.1" muted playsinline preload="metadata"></video>':'<img src="'+src+'" alt="">';
-      return'<div class="zzrv-t"><button type="button" class="zzrv-e" data-zzrv="edit" data-i="'+i+'" aria-label="Edit">'+media+(it.video&&!it.editUrl?'<span class="zzrv-play">▶</span>':'')+(it.edit||it.edited?'<i class="zzrv-ed">Modifié</i>':'')+'</button><button type="button" class="zzrv-rm" data-zzrv="rm" data-i="'+i+'" aria-label="Remove">×</button></div>';
+      var media=it.video&&it.edit?'<div class="zzvp" data-i="'+i+'"></div>':it.video?'<video src="'+src+'#t=0.1" muted playsinline preload="metadata"></video>':'<img src="'+src+'" alt="">';
+      return'<div class="zzrv-t"><button type="button" class="zzrv-e" data-zzrv="edit" data-i="'+i+'" aria-label="Edit">'+media+(it.video?'<span class="zzrv-play">▶</span>':'')+(it.edit||it.edited?'<i class="zzrv-ed">Modifié</i>':'')+'</button><button type="button" class="zzrv-rm" data-zzrv="rm" data-i="'+i+'" aria-label="Remove">×</button></div>';
     }).join('')+'</div>'+
     '<div class="zzrv-foot"><button type="button" class="zzrv-go" data-zzrv="send">Envoyer ('+ZZR.items.length+')</button></div>';
 }

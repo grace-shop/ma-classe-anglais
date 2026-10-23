@@ -187,6 +187,7 @@
     } catch (e) {}
   }
 
+  window.zzMyStickers = function () { try { return store().list(); } catch (e) { return []; } };
   function ownTile(it) {
     var b = document.createElement("button");
     b.type = "button";

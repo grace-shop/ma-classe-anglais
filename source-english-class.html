@@ -3763,7 +3763,7 @@ function v4ActSheet(kind,list,c){const raw=list.find(x=>x.id===V4.act.id);if(!ra
   <button type="button" class="v4cancel" data-v4="actClose">Cancel</button></div>`}
 function v4PreSheet(){const P=V4.pre;const tb=(tool,label,svg)=>`<button type="button" class="v4pt" data-v4="preTool" data-tool="${tool}" aria-label="${label}" title="${label}">${svg}</button>`;const I={x:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',dl:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>',crop:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 2v14h14M2 6h14v14"/></svg>',stk:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14c1 1.5 2.2 2.2 3.5 2.2s2.5-.7 3.5-2.2M9 9.5h.01M15 9.5h.01"/></svg>',pen:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4zM14 6l3 3"/></svg>'};const fn=esc(P.file&&P.file.name||"photo.jpg");return`<div class="v4sheet-bg" data-v4="preX"></div><div class="v4sheet v4pre" role="dialog" aria-label="Send a photo">
   <div class="v4pre-tools"><button type="button" class="v4pt" data-v4="preX" aria-label="Close" title="Close">${I.x}</button><a class="v4pt" href="${P.url}" download="${fn}" aria-label="Download" title="Download">${I.dl}</a>${P.video?"":`<button type="button" class="v4pt v4hd${P.hd?" on":""}" data-v4="preHd" aria-pressed="${!!P.hd}" aria-label="HD" title="Send in full quality">HD</button>`}${tb("crop","Crop",I.crop)}${tb("sticker","Sticker",I.stk)}${tb("text","Text",'<b class="v4aa">Aa</b>')}${tb("stroke","Pencil",I.pen)}</div>
-  ${P.video&&!P.editUrl?`<video class="v4pre-vid" src="${P.url}" controls playsinline preload="metadata"></video>`:`<img src="${P.editUrl||P.url}" alt="Photo to send">`}
+  ${P.video?(P.edit?`<div class="zzvp"></div>`:`<video class="v4pre-vid" src="${P.url}" controls playsinline preload="metadata"></video>`):`<img src="${P.url}" alt="Photo to send">`}
   <div class="v4pre-row"><input id="v4cap" placeholder="${P.once?"No caption for view once photos":"Add a caption…"}" maxlength="1000" ${P.once?"disabled":""} value="${esc(P.cap||"")}" autocomplete="off">
   <button type="button" class="v4onebtn${P.once?" on":""}" data-v4="preOnce" aria-pressed="${P.once}" title="View once" aria-label="View once"><i class="v4one">1</i></button>
   <button type="button" class="btn" data-v4="preSend" aria-label="Send">${ic("send")}</button></div>
@@ -14703,6 +14703,12 @@ document.addEventListener("click",function(e){
   var box=b.closest(".v4album"),items=[];try{items=JSON.parse(box.getAttribute("data-zzitems")||"[]")}catch(x){}
   zzAlbumOpen(items,+b.getAttribute("data-zzal")||0);
 },true);
+// live video previews: the video plays with its edits (preview sheet and review tiles)
+setInterval(function(){document.querySelectorAll(".zzvp:not([data-ok])").forEach(function(el){
+  el.setAttribute("data-ok","1");
+  var src=el.closest("#zzrv")?(ZZR&&ZZR.items[+el.getAttribute("data-i")]):V4.pre;
+  if(src&&src.edit&&src.url)zzVidLive(el,src.url,src.edit);
+})},300);
 // video tiles show their first frame
 setInterval(function(){document.querySelectorAll("video[data-zzvid]:not([data-ok])").forEach(function(v){
   v.setAttribute("data-ok","1");
@@ -14777,8 +14783,8 @@ function zzReviewPaint(){
     '<p class="zzrv-h">Touchez un élément pour le modifier. × pour le retirer.</p>'+
     '<div class="zzrv-g">'+ZZR.items.map(function(it,i){
       var src=it.editUrl||it.url;
-      var media=it.video&&!it.editUrl?'<video src="'+src+'#t=0.1" muted playsinline preload="metadata"></video>':'<img src="'+src+'" alt="">';
-      return'<div class="zzrv-t"><button type="button" class="zzrv-e" data-zzrv="edit" data-i="'+i+'" aria-label="Edit">'+media+(it.video&&!it.editUrl?'<span class="zzrv-play">▶</span>':'')+(it.edit||it.edited?'<i class="zzrv-ed">Modifié</i>':'')+'</button><button type="button" class="zzrv-rm" data-zzrv="rm" data-i="'+i+'" aria-label="Remove">×</button></div>';
+      var media=it.video&&it.edit?'<div class="zzvp" data-i="'+i+'"></div>':it.video?'<video src="'+src+'#t=0.1" muted playsinline preload="metadata"></video>':'<img src="'+src+'" alt="">';
+      return'<div class="zzrv-t"><button type="button" class="zzrv-e" data-zzrv="edit" data-i="'+i+'" aria-label="Edit">'+media+(it.video?'<span class="zzrv-play">▶</span>':'')+(it.edit||it.edited?'<i class="zzrv-ed">Modifié</i>':'')+'</button><button type="button" class="zzrv-rm" data-zzrv="rm" data-i="'+i+'" aria-label="Remove">×</button></div>';
     }).join('')+'</div>'+
     '<div class="zzrv-foot"><button type="button" class="zzrv-go" data-zzrv="send">Envoyer ('+ZZR.items.length+')</button></div>';
 }
@@ -14922,6 +14928,20 @@ function zzVidPlayEdited(p,t,edit){
   });
 }
 
+// plays a video with its edits inside an element; plays until the element is removed
+function zzVidLive(el,url,edit){
+  var v=document.createElement("video");v.muted=true;v.loop=true;v.playsInline=true;v.src=url;v.style.display="none";
+  var cv=document.createElement("canvas");cv.style.cssText="width:100%;height:100%;object-fit:contain;display:block;background:#000";
+  el.innerHTML="";el.appendChild(cv);el.appendChild(v);
+  var c=edit.crop,full=document.createElement("canvas");full.width=edit.W;full.height=edit.H;var octx=cv.getContext("2d");
+  var kx=1,ky=1,outW=2,outH=2;
+  function fit(){var sx=v.videoWidth/edit.W,sy=v.videoHeight/edit.H;var k=Math.min(1,540/(c.w*sx));
+    outW=Math.max(2,Math.round(c.w*sx*k));outH=Math.max(2,Math.round(c.h*sy*k));cv.width=outW;cv.height=outH;kx=outW/c.w;ky=outH/c.h}
+  function draw(){window.__zzPaintTo(full,v,edit.W,edit.H,edit.objs);octx.clearRect(0,0,outW,outH);octx.drawImage(full,-c.x*kx,-c.y*ky,edit.W*kx,edit.H*ky)}
+  function loop(){if(!el.isConnected){try{v.pause()}catch(x){}return}draw();requestAnimationFrame(loop)}
+  v.onloadedmetadata=function(){fit();v.play().catch(function(){});loop()};
+}
+
 /* ---- app-v5-zzzzzu-photoedit.js ---- */
 /* =====================================================================
    v5 · Photo editor, before you send a photo.
@@ -14952,6 +14972,29 @@ function zzVidPlayEdited(p,t,edit){
   var ed = null; // { img, W, H, objs:[], undo:[], tool, color, font, size, crop:{x,y,w,h}, ratio, drag, root, cv, ctx, scale }
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  // stored stickers (images): loaded once, drawn at their size, keep their ratio
+  var SIMG = {};
+  function simgLoad(o) {
+    var key = o.p;
+    if (SIMG[key]) return SIMG[key];
+    var rec = { im: null, ok: false };
+    SIMG[key] = rec;
+    if (typeof srcBlob === "function") {
+      srcBlob({ k: "m", id: o.p, t: o.mt }).then(function (b) {
+        var im = new Image();
+        im.onload = function () { rec.im = im; rec.ok = true; try { if (ed && ed.ctx) redraw(); } catch (x) {} };
+        im.src = URL.createObjectURL(b);
+      }).catch(function () {});
+    }
+    return rec;
+  }
+  function simgPaint(ctx, o) {
+    var rec = simgLoad(o);
+    if (!rec.ok) return;
+    var w = o.size, h = o.size * rec.im.naturalHeight / rec.im.naturalWidth;
+    ctx.drawImage(rec.im, o.x - w / 2, o.y - h / 2, w, h);
+  }
 
   function snap() { ed.undo.push(clone(ed.objs)); if (ed.undo.length > 40) ed.undo.shift(); }
 
@@ -14988,6 +15031,8 @@ function zzVidPlayEdited(p,t,edit){
         ctx.strokeText(o.text, o.x, o.y);
         ctx.fillStyle = o.color;
         ctx.fillText(o.text, o.x, o.y);
+      } else if (o.t === "simg") {
+        simgPaint(ctx, o);
       } else if (o.t === "sticker") {
         ctx.font = o.size + "px serif";
         ctx.textBaseline = "middle";
@@ -15072,6 +15117,8 @@ function zzVidPlayEdited(p,t,edit){
       if (o.t === "text") {
         var half = textWidth(o) / 2;
         if (Math.abs(p[0] - o.x) <= half + pad && Math.abs(p[1] - o.y) <= o.size * 0.7 + pad) return i;
+      } else if (o.t === "simg") {
+        if (Math.abs(p[0] - o.x) <= o.size / 2 + pad && Math.abs(p[1] - o.y) <= o.size / 2 + pad) return i;
       } else if (o.t === "sticker") {
         var d = Math.hypot(p[0] - o.x, p[1] - o.y);
         if (d < Math.max(40, o.size * 0.8)) return i;
@@ -15235,7 +15282,9 @@ function zzVidPlayEdited(p,t,edit){
         '<div class="zz-pesz"><button type="button" data-s="1">Fin</button><button type="button" data-s="2">Épais</button></div>' +
       '</div>' +
       '<div class="zz-peopt" data-opt="blur" hidden><p>Passe le doigt sur ce qu\'il faut cacher : il devient flou.</p><div class="zz-pesz"><button type="button" data-s="1">Petit</button><button type="button" data-s="2">Grand</button></div></div>' +
-      '<div class="zz-peopt" data-opt="sticker" hidden><div class="zz-peemo">' + EMOJI.map(function (e) { return '<button type="button" data-e="' + e + '">' + e + '</button>'; }).join("") + '</div></div>';
+      '<div class="zz-peopt" data-opt="sticker" hidden><div class="zz-pestab"><button type="button" data-tab="emo" aria-pressed="true">Emojis</button><button type="button" data-tab="mine" aria-pressed="false">Mes stickers</button></div>' +
+        '<div class="zz-peemo" data-pane="emo">' + EMOJI.map(function (e) { return '<button type="button" data-e="' + e + '">' + e + '</button>'; }).join("") + '</div>' +
+        '<div class="zz-peemo" data-pane="mine" hidden></div></div>';
     document.body.appendChild(root);
     ed.root = root;
     ed.cv = root.querySelector("canvas");
@@ -15289,6 +15338,22 @@ function zzVidPlayEdited(p,t,edit){
     if (b.dataset.f !== undefined) { ed.font = +b.dataset.f; return; }
     if (b.dataset.c) { ed.color = b.dataset.c; markColor(); return; }
     if (b.dataset.s) { ed.size = +b.dataset.s; return; }
+    if (b.dataset.tab) {
+      var rt = b.closest(".zz-peopt");
+      rt.querySelectorAll("[data-pane]").forEach(function (p) { p.hidden = p.getAttribute("data-pane") !== b.dataset.tab; });
+      rt.querySelectorAll("[data-tab]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      if (b.dataset.tab === "mine") fillMine(rt);
+      return;
+    }
+    if (b.dataset.simg !== undefined) {
+      var st = simgList()[+b.dataset.simg];
+      if (st) {
+        snap();
+        ed.objs.push({ t: "simg", p: st.p, mt: st.t, x: ed.W / 2, y: ed.H / 2, size: Math.round(ed.W / 4) });
+        redraw();
+      }
+      return;
+    }
     if (b.dataset.e) {
       snap();
       ed.objs.push({ t: "sticker", e: b.dataset.e, x: ed.W / 2, y: ed.H / 2, size: Math.round(ed.W / 9) });
@@ -15427,6 +15492,27 @@ function zzVidPlayEdited(p,t,edit){
   document.head.appendChild(st);
 
   // other files (the stickers) can open the editor too
+  // the stored image stickers (videos are not used as stickers in the editor)
+  function simgList() {
+    return (window.zzMyStickers ? window.zzMyStickers() : []).filter(function (x) { return !/^video\//.test(x.t || ""); });
+  }
+  function fillMine(rt) {
+    var pane = rt.querySelector('[data-pane="mine"]');
+    if (!pane) return;
+    var list = simgList();
+    if (!list.length) { pane.innerHTML = '<p class="zz-pemp">Aucun sticker enregistré. Crée-en un depuis les stickers du chat.</p>'; return; }
+    pane.innerHTML = list.map(function (x, i) {
+      return '<button type="button" data-simg="' + i + '" aria-label="Sticker"><img data-zzsp="' + x.p + '" data-zzst="' + x.t + '" alt=""></button>';
+    }).join("");
+    pane.querySelectorAll("img[data-zzsp]").forEach(function (im) {
+      if (typeof srcBlob !== "function") return;
+      srcBlob({ k: "m", id: im.dataset.zzsp, t: im.dataset.zzst }).then(function (b) { im.src = URL.createObjectURL(b); }).catch(function () {});
+    });
+  }
+  var zzPeSt = document.createElement("style");
+  zzPeSt.id = "zzPeStickers";
+  zzPeSt.textContent = ".zz-pestab{display:flex;gap:8px;margin-bottom:8px}.zz-pestab button{flex:1;padding:8px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font:700 .9rem system-ui,sans-serif;cursor:pointer}.zz-pestab button[aria-pressed=true]{background:#A78BFA;color:#0B0D18;border-color:transparent}.zz-peemo[data-pane=mine] button{padding:4px;aspect-ratio:auto}.zz-peemo[data-pane=mine] img{width:100%;height:auto;display:block;object-fit:contain}.zz-pemp{grid-column:1/-1;opacity:.7;text-align:center;margin:8px 0}";
+  document.head.appendChild(zzPeSt);
   window.__zzPhotoEdit = { open: open };
   // draws src (a frame, at W x H) with the objects, onto canvas; nothing of the open editor changes
   window.__zzPaintTo = function (canvas, src, W, H, objs) {
@@ -16033,6 +16119,7 @@ function zzVidPlayEdited(p,t,edit){
     } catch (e) {}
   }
 
+  window.zzMyStickers = function () { try { return store().list(); } catch (e) { return []; } };
   function ownTile(it) {
     var b = document.createElement("button");
     b.type = "button";
