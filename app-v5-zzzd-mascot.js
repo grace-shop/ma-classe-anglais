@@ -32,7 +32,10 @@ const MAS_LOOKS=["","look-2","look-3"];
 function masLook(){try{return +(localStorage.getItem("ec_mas_look")||0)%MAS_LOOKS.length}catch(e){return 0}}
 function masApplyLook(box){box.classList.remove("look-2","look-3");const c=MAS_LOOKS[masLook()];if(c)box.classList.add(c)}
 /* L'avatar n'est caché que si l'élève a choisi lui-même l'économie d'énergie (pas quand elle s'active toute seule). */
-function masHidden(){try{return LITE&&LITE_SRC==="user"}catch(e){return false}}
+/* Sakura reste visible, y compris en mode économie d'énergie. */
+function masHidden(){return false}
+/* rien dans les discussions : un message d'un camarade (« Correct! ») ne la fait pas réagir */
+function masInChat(n){return !!(n&&n.closest&&n.closest(".msg,.glass.chat,.pt-body,.v4bar,#zzBc,.zz-bcl"))}
 function masShow(text,mood){if(masHidden()){const b=document.getElementById("mas");if(b)b.remove();return}
   if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
   let box=document.getElementById("mas");
@@ -64,6 +67,7 @@ function masQuizFeedback(n){
   if(q(".choice:not(.right):not(.wrong),.answer-input:not(.right):not(.wrong)").length)MAS.sig="";
   return false}
 new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){if(n.nodeType!==1)continue;
+  if(masInChat(n))continue;
   if(masQuizFeedback(n))continue;
   const hit=(n.matches&&n.matches(".ar-note.good"))||(n.querySelector&&n.querySelector(".ar-note.good"));
   const txt=(n.textContent||"").trim();

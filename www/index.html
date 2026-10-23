@@ -9118,7 +9118,10 @@ const MAS_LOOKS=["","look-2","look-3"];
 function masLook(){try{return +(localStorage.getItem("ec_mas_look")||0)%MAS_LOOKS.length}catch(e){return 0}}
 function masApplyLook(box){box.classList.remove("look-2","look-3");const c=MAS_LOOKS[masLook()];if(c)box.classList.add(c)}
 /* L'avatar n'est caché que si l'élève a choisi lui-même l'économie d'énergie (pas quand elle s'active toute seule). */
-function masHidden(){try{return LITE&&LITE_SRC==="user"}catch(e){return false}}
+/* Sakura reste visible, y compris en mode économie d'énergie. */
+function masHidden(){return false}
+/* rien dans les discussions : un message d'un camarade (« Correct! ») ne la fait pas réagir */
+function masInChat(n){return !!(n&&n.closest&&n.closest(".msg,.glass.chat,.pt-body,.v4bar,#zzBc,.zz-bcl"))}
 function masShow(text,mood){if(masHidden()){const b=document.getElementById("mas");if(b)b.remove();return}
   if(MAS.off||Date.now()-MAS.last<2500)return;MAS.last=Date.now();
   let box=document.getElementById("mas");
@@ -9150,6 +9153,7 @@ function masQuizFeedback(n){
   if(q(".choice:not(.right):not(.wrong),.answer-input:not(.right):not(.wrong)").length)MAS.sig="";
   return false}
 new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){if(n.nodeType!==1)continue;
+  if(masInChat(n))continue;
   if(masQuizFeedback(n))continue;
   const hit=(n.matches&&n.matches(".ar-note.good"))||(n.querySelector&&n.querySelector(".ar-note.good"));
   const txt=(n.textContent||"").trim();
@@ -9417,6 +9421,8 @@ document.addEventListener("click",e=>{
    ===================================================================== */
 {let lastKey="";
   function masCheck(){
+    // not in the chats: a classmate writing « Correct! » does not make her cheer
+    if(document.querySelector(".glass.chat,.pt-body,.msg"))return;
     const bad=document.querySelector(".answer-input.wrong,.choice.wrong");
     const good=!bad&&document.querySelector(".answer-input.right,.choice.right");
     if(!bad&&!good){lastKey="";return}
@@ -14660,19 +14666,21 @@ async function v4SendAlbum(kind,target,files){
   if(!window.__chatFiles){toast("Sending files is not available here.","x");return}
   if(!navigator.onLine){toast("No network: try again when you are connected.","x");return}
   if(!target)return;
-  const items=[];V4.sending=true;V4.upl=kind;render();
+  V4.sending=true;V4.upl=kind;render();
   try{
-    for(const file of files){
-      if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");continue}
+    // all files go up at the same time; the order of the album is kept
+    const done=await Promise.all(files.map(async function(file){
+      if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");return null}
       try{
         let f=file;const isImg=/^image\//.test(f.type);
         if(isImg)f=await shrinkImg(f,1280,.72);
         const up=await window.__chatFiles.upload(f,file.name||(isImg?"photo.jpg":"video.mp4"));
         const k=isImg?"img":"vid";
-        items.push({k,p:up.p,t:up.t,n:up.n,s:up.s});
         V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f);
-      }catch(e){toast((e&&e.message)||"Cannot send this file.","x")}
-    }
+        return {k,p:up.p,t:up.t,n:up.n,s:up.s};
+      }catch(e){toast((e&&e.message)||"Cannot send this file.","x");return null}
+    }));
+    const items=done.filter(Boolean);
     if(items.length){
       const inp=document.getElementById(V4IN(kind));let text=(inp&&inp.value||"").trim();if(inp){inp.value="";delete S.drafts[inp.id]}
       await v4Deliver(kind,target,text,{k:"album",items},v4TakeReply(kind));
