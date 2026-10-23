@@ -295,3 +295,15 @@ do $$ begin
       using (bucket_id = 'avatars' and ((storage.foldername(name))[1] = auth.uid()::text or public.my_level() >= 3));
   end if;
 end $$;
+
+-- Épingler un message entre camarades : visible par les deux personnes (v99)
+alter table public.peer_messages add column if not exists pinned_at timestamptz;
+create or replace function public.pin_peer_message(p_id uuid, p_on boolean) returns void
+language plpgsql security definer set search_path = public as $$
+declare m peer_messages; me uuid := auth.uid();
+begin
+  select * into m from peer_messages where id = p_id;
+  if m.id is null or m.deleted_at is not null or me is null or me not in (m.sender, m.receiver) then raise exception 'Access denied'; end if;
+  update peer_messages set pinned_at = case when p_on then now() else null end where id = p_id;
+end $$;
+grant execute on function public.pin_peer_message(uuid, boolean) to authenticated;

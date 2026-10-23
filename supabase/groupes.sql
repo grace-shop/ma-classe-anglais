@@ -435,3 +435,16 @@ do $$ begin
     begin alter publication supabase_realtime add table public.group_members; exception when duplicate_object then null; end;
   end if;
 end $$;
+
+-- Épingler un message de groupe : visible par tous les membres (v99)
+alter table public.group_messages add column if not exists pinned_at timestamptz;
+create or replace function public.pin_group_message(p_id uuid, p_on boolean) returns void
+language plpgsql security definer set search_path = public as $$
+declare m group_messages; me uuid := auth.uid();
+begin
+  select * into m from group_messages where id = p_id;
+  if m.id is null or m.deleted_at is not null or coalesce(m.meta ? 'sys', false) or public.my_level() < 2
+     or not exists (select 1 from group_members where group_id = m.group_id and uid = me) then raise exception 'Access denied'; end if;
+  update group_messages set pinned_at = case when p_on then now() else null end where id = p_id;
+end $$;
+grant execute on function public.pin_group_message(uuid, boolean) to authenticated;
