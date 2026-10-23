@@ -30,6 +30,8 @@ function zzAlbumOpen(items,start){
       if(mine!==cur||!document.getElementById("zzal"))return;
       var u=URL.createObjectURL(b);urls.push(u);
       w.innerHTML=it.k==="vid"?'<video src="'+u+'" controls playsinline autoplay></video>':'<img src="'+u+'" alt="">';
+      ov.querySelectorAll(".zzdl").forEach(function(n){n.remove()});
+      if(it.k==="vid")ov.querySelector(".zzal-top").insertAdjacentHTML("beforeend",zzDlBtn(it.p,it.t));
     }).catch(function(){if(mine===cur)w.innerHTML='<p class="zzal-err">Cannot open this item.</p>'});
   }
   ov.querySelector(".zzal-x").onclick=close;
@@ -119,6 +121,7 @@ function zzReviewOpen(kind,target,files){
     if(a==="cancel")zzReviewClose();
     else if(a==="rm"){ZZR.items.splice(i,1);if(!ZZR.items.length)zzReviewClose();else zzReviewPaint()}
     else if(a==="edit")zzReviewEdit(i);
+    else if(a==="cut")zzReviewCut(i);
     else if(a==="send")zzReviewSend();
   });
   document.body.appendChild(ov);zzReviewPaint();
@@ -130,9 +133,24 @@ function zzReviewPaint(){
     '<div class="zzrv-g">'+ZZR.items.map(function(it,i){
       var src=it.editUrl||it.url;
       var media=it.video&&it.edit?'<div class="zzvp" data-i="'+i+'"></div>':it.video?'<video src="'+src+'#t=0.1" muted playsinline preload="metadata"></video>':'<img src="'+src+'" alt="">';
-      return'<div class="zzrv-t"><button type="button" class="zzrv-e" data-zzrv="edit" data-i="'+i+'" aria-label="Edit">'+media+(it.video?'<span class="zzrv-play">▶</span>':'')+(it.edit||it.edited?'<i class="zzrv-ed">Modifié</i>':'')+'</button><button type="button" class="zzrv-rm" data-zzrv="rm" data-i="'+i+'" aria-label="Remove">×</button></div>';
+      return'<div class="zzrv-t"><button type="button" class="zzrv-e" data-zzrv="edit" data-i="'+i+'" aria-label="Edit">'+media+(it.video?'<span class="zzrv-play">▶</span>':'')+(it.edit||it.edited?'<i class="zzrv-ed">Modifié</i>':'')+'</button>'+(it.video?'<button type="button" class="zzrv-cut" data-zzrv="cut" data-i="'+i+'" aria-label="Cut">'+ic("scissors")+'</button>':'')+'<button type="button" class="zzrv-rm" data-zzrv="rm" data-i="'+i+'" aria-label="Remove">×</button></div>';
     }).join('')+'</div>'+
     '<div class="zzrv-foot"><button type="button" class="zzrv-go" data-zzrv="send">Envoyer ('+ZZR.items.length+')</button></div>';
+}
+// cut a video of the selection with the same cutter as the story
+function zzReviewCut(i){
+  var it=ZZR&&ZZR.items[i];if(!it||!it.video||!window.ed5Open)return;
+  var ov=document.getElementById("zzrv");if(ov)ov.style.display="none";
+  var back=setInterval(function(){if(!ED5.open){clearInterval(back);var o=document.getElementById("zzrv");if(o)o.style.display=""}},300);
+  ED5.cb=function(f){
+    clearInterval(back);var o=document.getElementById("zzrv");if(o)o.style.display="";
+    if(!ZZR||ZZR.items[i]!==it||!f||f===it.file)return;
+    try{URL.revokeObjectURL(it.url)}catch(x){}
+    it.file=f;it.url=URL.createObjectURL(f);
+    it.posterP=zzVidPoster(f).then(function(b){return URL.createObjectURL(b)}).catch(function(){return null});
+    zzReviewPaint();
+  };
+  ed5Open(it.file,"video",null);
 }
 function zzReviewEdit(i){
   var it=ZZR&&ZZR.items[i];if(!it||!window.__zzPhotoEdit)return;
@@ -190,6 +208,8 @@ function zzReviewSend(){
 .zzrv-t img,.zzrv-t video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .zzrv-play{position:absolute;inset:0;display:grid;place-items:center;font-size:26px;text-shadow:0 2px 8px rgba(0,0,0,.6)}
 .zzrv-ed{position:absolute;left:6px;bottom:6px;font:700 11px system-ui,sans-serif;background:rgba(0,0,0,.6);padding:2px 6px;border-radius:8px;font-style:normal}
+.zzrv-cut{position:absolute;left:6px;bottom:6px;z-index:2;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;display:grid;place-items:center;padding:0;cursor:pointer}
+.zzrv-cut svg{width:16px;height:16px}
 .zzrv-rm{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:18px;line-height:24px;cursor:pointer;z-index:2}
 .zzrv-foot{position:fixed;left:0;right:0;bottom:0;padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px));background:#0B0D12}
 .zzrv-go{width:100%;padding:14px;border-radius:16px;border:0;background:#A78BFA;color:#0B0D12;font:800 16px system-ui,sans-serif;cursor:pointer}

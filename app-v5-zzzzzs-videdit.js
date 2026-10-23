@@ -46,6 +46,7 @@ function zzVidPlayEdited(p,t,edit){
   ov=document.createElement("div");ov.id="vplayer";ov.className="v4onceview";
   ov.innerHTML='<div class="v4spin"></div><button type="button" class="iconbtn" aria-label="Close">'+ic("x")+'</button>';
   document.body.appendChild(ov);
+  ov.insertAdjacentHTML("beforeend",zzDlBtn(p,t));
   var v=null,raf=0;
   var close=function(){cancelAnimationFrame(raf);if(v){v.pause();v.removeAttribute("src");v.load()}ov.remove()};
   ov.querySelector("button").onclick=close;
