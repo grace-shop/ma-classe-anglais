@@ -3633,7 +3633,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches("[data-v4][tabindex]")){e.preventDefault();e.target.click()}});
 document.addEventListener("change",e=>{const el=e.target;if(!el||!el.id)return;
-  if(el.id.startsWith("v4f_")){const kind=el.id.slice(4),file=el.files&&el.files[0],t=el.closest("form")?.dataset.s;el.value="";if(file&&t){if(/^video\//.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false,video:true};render()}else if(/^image\//.test(file.type)&&!/gif/.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false};render()}else v4SendFile(kind,t,file,file.name)}e.stopPropagation();return}
+  if(el.id.startsWith("v4f_")){const kind=el.id.slice(4),files=[...(el.files||[])],t=el.closest("form")?.dataset.s;el.value="";if(files.length>1&&t){(async()=>{for(const f of files){try{await v4SendFile(kind,t,f,f.name)}catch(x){}}})()}else{const file=files[0];if(file&&t){if(/^video\//.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false,video:true};render()}else if(/^image\//.test(file.type)&&!/gif/.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false};render()}else v4SendFile(kind,t,file,file.name)}}e.stopPropagation();return}
   if(el.id==="v4hwf"){const fl=[...(el.files||[])];el.value="";for(const f of fl){if(V4.hwFiles.length>=5){toast("5 files maximum.","x");break}if(f.size>20*1024*1024){toast(f.name+": too big (20 MB maximum).","x");continue}V4.hwFiles.push(f)}render();e.stopPropagation()}},true);
 document.addEventListener("input",e=>{const el=e.target;if(el&&el.id==="fq_msgs"){S.drafts.fq_msgs=el.value;S.v4msgLim=40;render()}});
 document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset)return;
@@ -14123,6 +14123,7 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
   function pick(accept, withCamera) {
     var inp = ctx.input;
     inp.setAttribute("accept", accept);
+    inp.multiple = accept === "image/*,video/*";   // the gallery allows several photos and videos
     if (withCamera) inp.setAttribute("capture", "environment");
     else inp.removeAttribute("capture");
     inp.click();
@@ -14379,6 +14380,24 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
 #zzAttach .zz-al{font:600 .8rem/1.2 system-ui,sans-serif;color:#D8DAE4;text-align:center;white-space:nowrap}
 `;
   document.head.appendChild(st);
+})();
+
+/* ---- app-v5-zzzzzq-chatback.js ---- */
+/* v5 · « Back » sur la liste des discussions : ramène à l'accueil.
+   Écouté sur window (avant le retour par historique) ; les autres pages gardent leur retour. */
+(function () {
+  window.addEventListener("click", function (e) {
+    if (!e.isTrusted || typeof S === "undefined" || typeof render !== "function") return;
+    var b = e.target && e.target.closest && e.target.closest(".back, [data-a='back']");
+    if (!b) return;
+    if (S.tab !== "msgs" || S.view) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    S.tab = "home";
+    S.animate = true;
+    render();
+    window.scrollTo(0, 0);
+  }, true);
 })();
 
 /* ---- app-v5-zzzzzq-poll.js ---- */
@@ -16063,13 +16082,12 @@ img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
     var el = document.getElementById("zzBci");
     if (el && el.value.trim() === lastSaid.trim()) el.value = "";
   }
-  setInterval(guardField, 200);
-  document.addEventListener("focusin", function (e) {
-    if (e.target && e.target.id === "zzBci") guardField();
-  }, true);
-  document.addEventListener("input", function (e) {
-    if (e.target && e.target.id === "zzBci") guardField();
-  }, true);
+  setInterval(guardField, 50);
+  ["focusin", "input", "keyup", "compositionupdate", "compositionend", "pointerup"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      if (e.target && e.target.id === "zzBci") guardField();
+    }, true);
+  });
 
   // ---- timers: save the room, refresh the panel ----
   setInterval(function () {
