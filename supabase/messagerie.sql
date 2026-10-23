@@ -139,11 +139,21 @@ begin
         -- own sticker (photo, GIF or short video) kept in the sender's folder
         a := jsonb_build_object('k', 'sticker', 'p', p_att->>'p', 't', left(coalesce(p_att->>'t', ''), 120));
       else raise exception 'Invalid sticker'; end if;
+    elsif k = 'album' then
+      -- several photos and videos in one message, each in the sender's own folder
+      if jsonb_typeof(p_att->'items') <> 'array' or jsonb_array_length(p_att->'items') not between 1 and 40 then raise exception 'Invalid album'; end if;
+      if exists (select 1 from jsonb_array_elements(p_att->'items') x where coalesce(x->>'p', '') not like me::text || '/%' or coalesce(x->>'k', '') not in ('img', 'vid')) then
+        raise exception 'Invalid file';
+      end if;
+      a := jsonb_build_object('k', 'album', 'items', (select jsonb_agg(jsonb_build_object('k', x->>'k', 'p', x->>'p', 't', left(coalesce(x->>'t', ''), 120),
+                              'n', left(coalesce(x->>'n', ''), 80), 's', coalesce((x->>'s')::bigint, 0))) from jsonb_array_elements(p_att->'items') x));
     elsif k in ('voice', 'img', 'file') then
       if coalesce(p_att->>'p', '') not like me::text || '/%' then raise exception 'Invalid file'; end if;
       a := jsonb_build_object('k', k, 'p', p_att->>'p', 't', left(coalesce(p_att->>'t', ''), 120), 'n', left(coalesce(p_att->>'n', ''), 80),
                               's', coalesce((p_att->>'s')::bigint, 0), 'd', coalesce((p_att->>'d')::int, 0));
       if k = 'img' and coalesce(p_att->>'o', '') in ('true', '1') then a := a || jsonb_build_object('o', true); end if;
+      -- a video sent with its edit (crop, texts, strokes, stickers): kept as is, size-limited
+      if k = 'file' and jsonb_typeof(p_att->'e') = 'object' and length(p_att->>'e') < 60000 then a := a || jsonb_build_object('e', p_att->'e'); end if;
     else raise exception 'Invalid attachment'; end if;
   end if;
   if char_length(b) < 1 and a is null then raise exception 'Empty message'; end if;

@@ -5,6 +5,8 @@
    ===================================================================== */
 {let lastKey="";
   function masCheck(){
+    // not in the chats: a classmate writing « Correct! » does not make her cheer
+    if(document.querySelector(".glass.chat,.pt-body,.msg"))return;
     const bad=document.querySelector(".answer-input.wrong,.choice.wrong");
     const good=!bad&&document.querySelector(".answer-input.right,.choice.right");
     if(!bad&&!good){lastKey="";return}

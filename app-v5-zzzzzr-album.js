@@ -14,19 +14,21 @@ async function v4SendAlbum(kind,target,files){
   if(!window.__chatFiles){toast("Sending files is not available here.","x");return}
   if(!navigator.onLine){toast("No network: try again when you are connected.","x");return}
   if(!target)return;
-  const items=[];V4.sending=true;V4.upl=kind;render();
+  V4.sending=true;V4.upl=kind;render();
   try{
-    for(const file of files){
-      if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");continue}
+    // all files go up at the same time; the order of the album is kept
+    const done=await Promise.all(files.map(async function(file){
+      if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");return null}
       try{
         let f=file;const isImg=/^image\//.test(f.type);
         if(isImg)f=await shrinkImg(f,1280,.72);
         const up=await window.__chatFiles.upload(f,file.name||(isImg?"photo.jpg":"video.mp4"));
         const k=isImg?"img":"vid";
-        items.push({k,p:up.p,t:up.t,n:up.n,s:up.s});
         V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f);
-      }catch(e){toast((e&&e.message)||"Cannot send this file.","x")}
-    }
+        return {k,p:up.p,t:up.t,n:up.n,s:up.s};
+      }catch(e){toast((e&&e.message)||"Cannot send this file.","x");return null}
+    }));
+    const items=done.filter(Boolean);
     if(items.length){
       const inp=document.getElementById(V4IN(kind));let text=(inp&&inp.value||"").trim();if(inp){inp.value="";delete S.drafts[inp.id]}
       await v4Deliver(kind,target,text,{k:"album",items},v4TakeReply(kind));
