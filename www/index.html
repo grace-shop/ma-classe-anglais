@@ -3121,12 +3121,12 @@ setTimeout(v4Prefetch,9000);setInterval(v4Prefetch,60000);addEventListener("onli
    ===================================================================== */
 const V4EMO="😀 😁 😂 🤣 😊 😍 😘 😎 🤩 🥳 😇 🙂 😉 😢 😭 😡 😱 🤔 🙄 😴 🤗 🤭 😅 👍 👎 👏 🙏 💪 👋 ✌️ 🤝 👌 ❤️ 💙 💚 💛 💜 🔥 ⭐ ✨ 🎉 🎂 🎁 📚 ✏️ 📝 ✅ ❌ 💯 🏆 ⚽ 🎵 ☀️ 🌧️ 🍕 🍚 🥭 🇹🇬".split(" ");
 const V4STK=["1f600","1f602","1f60d","1f929","1f60c","1f622","1f62d","1f621","1f914","1f633","1f632","1f634","1f971","1f629","1f62c","1f44f","1f44b","1f64f","1f4aa","1f91d","2764","1f525","2b50","1f388","1f381","1f3c6","1f393","1f4da","1f4dd","2705","1f680","1f916","1f47d","1f431","1f436","1f981","1f98b","26bd","1f355","1f366","2600","1f308"].filter(c=>{try{return EMO_SET.has(c)}catch(e){return false}});
-function attLabel(a){if(!a)return"";return a.k==="voice"?"🎤 Voice message":a.k==="img"?"📷 Photo":a.k==="sticker"?"Sticker":"📎 "+(a.n||"File")}
+function attLabel(a){if(!a)return"";if(a.k==="album")return albumLabel(a);return a.k==="voice"?"🎤 Voice message":a.k==="img"?"📷 Photo":a.k==="sticker"?"Sticker":"📎 "+(a.n||"File")}
 function natEmo(s){return segG(String(s||"")).map(g=>/\p{Extended_Pictographic}/u.test(g)?`<span class="emo-nat">${esc(g)}</span>`:esc(g)).join("")}
 const onlyEmoji=t=>{const s=String(t||"").trim();if(!s||s.length>16)return false;try{return/^(\p{Extended_Pictographic}|\p{Emoji_Component}|‍|️|\s)+$/u.test(s)}catch(e){return false}};
 function voiceHTML(a){const on=V4.playing===a.p;return`<div class="v4voice${on?" on":""}"><button type="button" data-v4="play" data-p="${esc(a.p)}" data-t="${esc(a.t||"audio/webm")}" aria-label="${on?"Pause":"Listen to the voice message"}">${ic(on?"pause":"play")}</button><span class="v4bars" aria-hidden="true">${[5,9,14,8,18,11,6,15,20,9,13,7,16,10,5,12].map(h=>`<span class="v4b" style="height:${h}px"></span>`).join("")}</span><small>${fmtDur(a.d)}</small></div>`}
 function msgBodyHTML(text,a){let h="";
-  if(a&&typeof a==="object"){if(a.k==="sticker"&&a.p){const vid=/^video\//.test(a.t||"");h+=vid?`<video class="v4stk zz-stkv" data-zzp="${esc(a.p)}" data-zzt="${esc(a.t||"video/mp4")}" muted loop playsinline autoplay></video>`:`<img class="v4stk zz-stki" data-zzp="${esc(a.p)}" data-zzt="${esc(a.t||"image/webp")}" alt="Sticker" loading="lazy" draggable="false">`}
+  if(a&&typeof a==="object"){if(a.k==="album")h+=albumHTML(a);else if(a.k==="sticker"&&a.p){const vid=/^video\//.test(a.t||"");h+=vid?`<video class="v4stk zz-stkv" data-zzp="${esc(a.p)}" data-zzt="${esc(a.t||"video/mp4")}" muted loop playsinline autoplay></video>`:`<img class="v4stk zz-stki" data-zzp="${esc(a.p)}" data-zzt="${esc(a.t||"image/webp")}" alt="Sticker" loading="lazy" draggable="false">`}
     else if(a.k==="sticker")h+=`<img class="v4stk" src="img/${esc(a.e)}.webp" alt="Sticker" loading="lazy" draggable="false">`;
     else if(a.k==="voice")h+=voiceHTML(a);
     else if(a.k==="img"){const u=V4.obj[a.p];h+=`<button type="button" class="v4img" data-v4="doc" data-k="m" data-id="${esc(a.p)}" data-t="${esc(a.t||"image/jpeg")}" data-n="${esc(a.n||"photo.jpg")}" aria-label="See the photo"><img ${u?`src="${u}"`:`data-chatp="${esc(a.p)}" data-t="${esc(a.t||"")}"`} alt="Photo"></button>`}
@@ -3640,7 +3640,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest('[data-a="v4msgMore"]');if(el){e.stopPropagation();S.v4msgLim=(S.v4msgLim||40)+40;render()}},true);
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches("[data-v4][tabindex]")){e.preventDefault();e.target.click()}});
 document.addEventListener("change",e=>{const el=e.target;if(!el||!el.id)return;
-  if(el.id.startsWith("v4f_")){const kind=el.id.slice(4),files=[...(el.files||[])],t=el.closest("form")?.dataset.s;el.value="";if(files.length>1&&t){(async()=>{for(const f of files){try{await v4SendFile(kind,t,f,f.name)}catch(x){}}})()}else{const file=files[0];if(file&&t){if(/^video\//.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false,video:true};render()}else if(/^image\//.test(file.type)&&!/gif/.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false};render()}else v4SendFile(kind,t,file,file.name)}}e.stopPropagation();return}
+  if(el.id.startsWith("v4f_")){const kind=el.id.slice(4),files=[...(el.files||[])],t=el.closest("form")?.dataset.s;el.value="";if(files.length>1&&t){const media=files.filter(f=>/^(image|video)\//.test(f.type)&&!/gif/.test(f.type));if(media.length>1&&media.length===files.length)v4SendAlbum(kind,t,media);else(async()=>{for(const f of files){try{await v4SendFile(kind,t,f,f.name)}catch(x){}}})()}else{const file=files[0];if(file&&t){if(/^video\//.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false,video:true};render()}else if(/^image\//.test(file.type)&&!/gif/.test(file.type)){V4.pre={kind,target:t,file,url:URL.createObjectURL(file),once:false};render()}else v4SendFile(kind,t,file,file.name)}}e.stopPropagation();return}
   if(el.id==="v4hwf"){const fl=[...(el.files||[])];el.value="";for(const f of fl){if(V4.hwFiles.length>=5){toast("5 files maximum.","x");break}if(f.size>20*1024*1024){toast(f.name+": too big (20 MB maximum).","x");continue}V4.hwFiles.push(f)}render();e.stopPropagation()}},true);
 document.addEventListener("input",e=>{const el=e.target;if(el&&el.id==="fq_msgs"){S.drafts.fq_msgs=el.value;S.v4msgLim=40;render()}});
 document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset)return;
@@ -14642,6 +14642,57 @@ html body .glass.chat.zz-framed > .chatbar.v4bar{background:rgba(58,38,110,.55)!
   document.head.appendChild(st);
   try { scan(); } catch (e) {}
 })();
+
+/* ---- app-v5-zzzzzr-album.js ---- */
+/* v5 · Plusieurs photos et vidéos envoyées ensemble : un seul message,
+   affiché en grille (2 × 2, « +N » s'il y en a plus de 4). */
+function albumParts(a){const items=((a&&a.items)||[]).filter(x=>x&&x.p);
+  return {items,ni:items.filter(x=>x.k==="img").length,nv:items.filter(x=>x.k==="vid").length}}
+function albumLabel(a){const {ni,nv}=albumParts(a);const b=[];
+  if(ni)b.push(ni+(ni>1?" photos":" photo"));if(nv)b.push(nv+(nv>1?" vidéos":" vidéo"));return "📷 "+(b.join(", ")||"Médias")}
+function albumHTML(a){const {items}=albumParts(a);const n=items.length;if(!n)return"";
+  const show=items.slice(0,4),more=n-4;
+  return`<div class="v4album n${Math.min(n,4)}">${show.map((x,i)=>{const isV=x.k==="vid";const u=V4.obj[x.p];
+    const inner=isV?`<span class="v4al-play" aria-hidden="true">▶</span>`:(u?`<img src="${u}" alt="">`:`<img data-chatp="${esc(x.p)}" data-t="${esc(x.t||"image/jpeg")}" alt="">`);
+    return`<button type="button" class="v4al-t${isV?" vid":""}" data-v4="doc" data-k="m" data-id="${esc(x.p)}" data-t="${esc(x.t||(isV?"video/mp4":"image/jpeg"))}" data-n="${esc(x.n||(isV?"video.mp4":"photo.jpg"))}" aria-label="${isV?"Open the video":"Open the photo"}">${inner}${i===3&&more>0?`<span class="v4al-more">+${more}</span>`:""}</button>`}).join("")}</div>`}
+// sends the selected media in order as ONE message
+async function v4SendAlbum(kind,target,files){
+  if(!window.__chatFiles){toast("Sending files is not available here.","x");return}
+  if(!navigator.onLine){toast("No network: try again when you are connected.","x");return}
+  if(!target)return;
+  const items=[];V4.sending=true;V4.upl=kind;render();
+  try{
+    for(const file of files){
+      if(file.size>50*1024*1024){toast("File too big (50 MB maximum).","x");continue}
+      try{
+        let f=file;const isImg=/^image\//.test(f.type);
+        if(isImg)f=await shrinkImg(f,1280,.72);
+        const up=await window.__chatFiles.upload(f,file.name||(isImg?"photo.jpg":"video.mp4"));
+        const k=isImg?"img":"vid";
+        items.push({k,p:up.p,t:up.t,n:up.n,s:up.s});
+        V4.obj[up.p]=URL.createObjectURL(f);fcPut("m:"+up.p,f);
+      }catch(e){toast((e&&e.message)||"Cannot send this file.","x")}
+    }
+    if(items.length){
+      const inp=document.getElementById(V4IN(kind));let text=(inp&&inp.value||"").trim();if(inp){inp.value="";delete S.drafts[inp.id]}
+      await v4Deliver(kind,target,text,{k:"album",items},v4TakeReply(kind));
+    }
+  }catch(e){toast((e&&e.message)||"Cannot send right now.","x")}
+  V4.sending=false;V4.upl=null;render()}
+{
+  const st=document.createElement("style");st.id="zzzzzrAlbum";
+  st.textContent=`
+.v4album{display:grid;grid-template-columns:1fr 1fr;gap:2px;width:min(260px,70vw);border-radius:14px;overflow:hidden;margin:2px 0 4px}
+.v4album.n1{grid-template-columns:1fr}
+.v4al-t{position:relative;display:block;width:100%;height:0;padding:0 0 100% 0;margin:0;border:0;background:#2a2a33;cursor:pointer;overflow:hidden}
+.v4album.n1 .v4al-t{padding-bottom:75%}
+.v4al-t img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;display:block}
+.v4al-t.vid{background:#15161b}
+.v4al-play{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:30px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.v4al-more{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff;font:700 28px system-ui,sans-serif}
+.msg .v4album{white-space:normal}`;
+  document.head.appendChild(st);
+}
 
 /* ---- app-v5-zzzzzu-photoedit.js ---- */
 /* =====================================================================
