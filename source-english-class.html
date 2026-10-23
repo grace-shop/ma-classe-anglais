@@ -14676,7 +14676,17 @@ async function v4SendAlbum(kind,target,files){
     const items=done.filter(Boolean);
     if(items.length){
       const inp=document.getElementById(V4IN(kind));let text=(inp&&inp.value||"").trim();if(inp){inp.value="";delete S.drafts[inp.id]}
-      await v4Deliver(kind,target,text,{k:"album",items},v4TakeReply(kind));
+      try{
+        const rp=v4TakeReply(kind);
+        await v4Deliver(kind,target,text,{k:"album",items},rp);
+      }catch(e){
+        // the server does not know albums yet: the photos go one by one, the text with the first
+        if(!/Invalid (attachment|album)/i.test((e&&e.message)||""))throw e;
+        for(let i=0;i<items.length;i++){
+          const it=items[i];
+          await v4Deliver(kind,target,i===0?text:"",{k:it.k==="img"?"img":"file",p:it.p,t:it.t,n:it.n,s:it.s},i===0?rp:null);
+        }
+      }
     }
   }catch(e){toast((e&&e.message)||"Cannot send right now.","x")}
   V4.sending=false;V4.upl=null;render()}
