@@ -15695,47 +15695,67 @@ function zzVidPlayEdited(p,t,edit){
 })();
 
 /* ---- app-v5-zzzzzw-selact.js ---- */
-/* v5 · Actions sur les messages sélectionnés (discussion entre camarades) :
-   Répondre (un seul message), Transférer (vers un camarade, les fichiers sont
-   ré-envoyés), Supprimer (ses propres messages). */
+/* v5 · Actions sur les messages sélectionnés, dans les trois discussions :
+   - entre camarades (peer), groupes (group) et avec l'enseignante (chat).
+   Répondre (un seul message) · Transférer (vers un camarade ; les fichiers sont
+   ré-envoyés ; seuls vos propres messages sont transférés) · Supprimer (vos messages). */
 (function () {
-  // the chat on screen: a classmate (PR.inbox) or a group (GR.msgs)
-  function inGroup() { return !!(S.view && S.view.type === "group" && typeof GR !== "undefined"); }
-  function rowOf(id) {
-    var list = inGroup() ? (GR.msgs[S.view.id] || []) : (PR.inbox || []);
-    return list.find(function (x) { return String(x.id) === String(id); }) || null;
+  // which chat a selected bubble belongs to, read from the bubble itself
+  function kindOf(id) {
+    var el = document.querySelector('.msg[data-mid="' + String(id).replace(/"/g, '') + '"]');
+    return el ? (el.getAttribute("data-k") || "") : "";
   }
-  function authorOf(r) { return inGroup() ? r.from : r.sender; }
-  function textOfRow(r) { return String((r && r.body) || "").trim(); }
-
-  function toastSafe(msg, icon) { try { toast(msg, icon || "check"); } catch (e) {} }
+  function listOf(kind) {
+    if (kind === "peer") return PR.inbox || [];
+    if (kind === "group") return (S.view && S.view.type === "group" && typeof GR !== "undefined") ? (GR.msgs[S.view.id] || []) : [];
+    if (kind === "chat") return (V4.ctx && V4.ctx.chat && V4.ctx.chat.list()) || [];
+    return [];
+  }
+  function rowOf(id) {
+    var kind = kindOf(id);
+    var r = listOf(kind).find(function (x) { return String(x.id) === String(id); }) || null;
+    return r ? { kind: kind, row: r } : null;
+  }
+  function textOf(r) { return String(r.body != null ? r.body : (r.text || "")).trim(); }
+  function authorOf(e) { return e.kind === "peer" ? e.row.sender : e.row.from; }
+  function mineOf(e) {
+    if (e.kind === "chat") { try { return v4Norm("chat", e.row, V4.ctx.chat).mine; } catch (x) { return false; } }
+    return authorOf(e) === S.uid;
+  }
+  function toastSafe(msg, icon) { try { toast(msg, icon || "check"); } catch (x) {} }
+  function clearSel() { window.zzSelClear && window.zzSelClear(); }
 
   // ---- reply to the one message selected ----
   function doReply(ids) {
-    var r = rowOf(ids[0]);
-    if (!r) return toastSafe("Ce message ne peut pas être cité.", "x");
-    var t = textOfRow(r) || (r.att && r.att.k === "album" ? "Photos et vidéos" : (r.att && r.att.k === "img" ? "Photo" : "Message"));
-    V4.reply = { kind: inGroup() ? "group" : "peer", id: r.id, t: t.slice(0, 140), w: authorOf(r) };
-    window.zzSelClear && window.zzSelClear();
+    var e = rowOf(ids[0]);
+    if (!e) return toastSafe("Ce message ne peut pas être cité.", "x");
+    var t = textOf(e.row) || (e.row.att && e.row.att.k === "album" ? "Photos et vidéos" : (e.row.att && e.row.att.k === "img" ? "Photo" : "Message"));
+    V4.reply = { kind: e.kind, id: e.row.id, t: t.slice(0, 140), w: authorOf(e) };
+    clearSel();
     render();
   }
 
   // ---- delete the own messages selected ----
   async function doDelete(ids) {
-    var mine = ids.map(rowOf).filter(function (r) { return r && authorOf(r) === S.uid && !r.deleted_at; });
+    var mine = ids.map(rowOf).filter(function (e) { return e && mineOf(e) && !e.row.deleted_at && !e.row.del; });
     if (!mine.length) return toastSafe("Vous ne pouvez supprimer que vos messages.", "x");
-    window.zzSelClear && window.zzSelClear();
+    clearSel();
     for (var i = 0; i < mine.length; i++) {
-      var r = mine[i];
+      var e = mine[i], r = e.row;
       try {
-        if (inGroup()) {
+        if (e.kind === "peer") {
+          await window.__peer.del(r.id);
+          r.deleted_at = new Date().toISOString(); r.body = ""; r.att = null; r.meta = null;
+        } else if (e.kind === "group") {
           var g = await grSB().rpc("delete_group_message", { p_id: r.id });
           if (g.error) throw grErr(g.error, "Could not delete");
+          r.deleted_at = new Date().toISOString(); r.body = ""; r.att = null; r.meta = null; r.react = null;
         } else {
-          await window.__peer.del(r.id);
+          // same path as the delete of one message in the teacher chat
+          V4.act = { kind: "chat", id: r.id };
+          await v4DelAll();
         }
-        r.deleted_at = new Date().toISOString(); r.body = ""; r.att = null; r.meta = null;
-      } catch (e) { toastSafe((e && e.message) || "Suppression impossible.", "x"); }
+      } catch (x) { toastSafe((x && x.message) || "Suppression impossible.", "x"); }
     }
     render();
   }
@@ -15746,16 +15766,15 @@ function zzVidPlayEdited(p,t,edit){
     var up = await window.__chatFiles.upload(b, a.n || "file");
     return { k: a.k, p: up.p, t: up.t, n: up.n, s: up.s, ...(a.e ? { e: a.e } : {}), ...(a.d ? { d: a.d } : {}) };
   }
-  async function sendForward(to, r) {
-    var a = r.att || null;
-    var body = textOfRow(r);
+  async function sendForward(to, e) {
+    var r = e.row, a = r.att || null, body = textOf(r);
     if (!a) return window.__peer.send(to, body, null, null);
     if (a.k === "album") {
       var items = [];
       for (var i = 0; i < a.items.length; i++) items.push(await copyFile(a.items[i]));
       try { return await window.__peer.send(to, body, { k: "album", items: items }, null); }
-      catch (e) {
-        if (!/Invalid (attachment|album)/i.test((e && e.message) || "")) throw e;
+      catch (x) {
+        if (!/Invalid (attachment|album)/i.test((x && x.message) || "")) throw x;
         var first = true;
         for (var j = 0; j < items.length; j++) {
           await window.__peer.send(to, first ? body : "", { k: items[j].k === "img" ? "img" : "file", p: items[j].p, t: items[j].t, n: items[j].n, s: items[j].s, ...(items[j].e ? { e: items[j].e } : {}) }, null);
@@ -15770,13 +15789,15 @@ function zzVidPlayEdited(p,t,edit){
   }
 
   async function doForward(ids, to) {
-    var rows = ids.map(rowOf).filter(Boolean);
-    if (!rows.length) return toastSafe("Rien à transférer.", "x");
+    var all = ids.map(rowOf).filter(Boolean);
+    var rows = all.filter(function (e) { return mineOf(e); });
+    if (!rows.length) return toastSafe("Seuls vos propres messages peuvent être transférés.", "x");
+    if (rows.length < all.length) toastSafe("Les messages de l'enseignante ne sont pas transférés.", "clock");
     toastSafe("Transfert en cours…", "clock");
     try {
       for (var i = 0; i < rows.length; i++) await sendForward(to, rows[i]);
       toastSafe("Transféré", "check");
-    } catch (e) { toastSafe((e && e.message) || "Transfert impossible.", "x"); }
+    } catch (x) { toastSafe((x && x.message) || "Transfert impossible.", "x"); }
   }
 
   function pickFriend(ids) {
@@ -15795,7 +15816,7 @@ function zzVidPlayEdited(p,t,edit){
       var b = t.closest && t.closest(".zzfw-i");
       if (!b) return;
       ov.remove();
-      window.zzSelClear && window.zzSelClear();
+      clearSel();
       doForward(ids, b.dataset.uid);
     });
   }
