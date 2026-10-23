@@ -41,6 +41,10 @@
   try{
     const App=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
     if(App&&App.addListener)App.addListener("backButton",()=>{
+      const dv=document.getElementById("docv"),vp=document.getElementById("vplayer"),za=document.getElementById("zzal");
+      if(za){za.remove();return}
+      if(dv){if(typeof closeDoc==="function")closeDoc();else dv.remove();return}
+      if(vp){vp.remove();return}
       if(typeof F!=="undefined"&&F.sv){fCloseStory();return}
       const r=document.getElementById("arena");
       if(r&&!r.hidden){if(AR.mode||BT.on)arHome();else arClose();return}

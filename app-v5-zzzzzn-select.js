@@ -19,7 +19,7 @@
     bar = document.createElement("div");
     bar.id = "zzSelBar";
     bar.hidden = true;
-    bar.innerHTML = '<span class="zz-sn"></span><button type="button" class="zz-scopy">Copier</button><button type="button" class="zz-sx" aria-label="Annuler">✕</button>';
+    bar.innerHTML = '<span class="zz-sn"></span><button type="button" class="zz-sreply">Répondre</button><button type="button" class="zz-sfwd">Transférer</button><button type="button" class="zz-sdel">Supprimer</button><button type="button" class="zz-scopy">Copier</button><button type="button" class="zz-sx" aria-label="Annuler">✕</button>';
     var cs = f.querySelector(":scope > #chatScroll");
     f.insertBefore(bar, cs || f.firstChild);
     return bar;
@@ -32,8 +32,11 @@
     var n = sel.size;
     b.hidden = n === 0;
     b.querySelector(".zz-sn").textContent = n + (n > 1 ? " messages sélectionnés" : " message sélectionné");
+    b.querySelector(".zz-sreply").hidden = n !== 1;
   }
 
+  function mids() { var a = []; sel.forEach(function (m) { a.push(String(m.dataset.mid || "")); }); return a; }
+  window.zzSelClear = function () { clear(); };
   function clear() {
     sel.forEach(function (m) { m.classList.remove("zz-sel"); });
     sel.clear();
@@ -90,6 +93,9 @@
     if (t.closest("#zzSelBar")) {
       if (t.closest(".zz-scopy")) copySel();
       else if (t.closest(".zz-sx")) clear();
+      else if (t.closest(".zz-sreply")) window.zzSelAct && window.zzSelAct("reply", mids());
+      else if (t.closest(".zz-sfwd")) window.zzSelAct && window.zzSelAct("fwd", mids());
+      else if (t.closest(".zz-sdel")) window.zzSelAct && window.zzSelAct("del", mids());
       return;
     }
   });
