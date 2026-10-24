@@ -328,6 +328,7 @@ function arHome(){arStopT();AR.mode=null;
     <div class="ar-hero"><p class="ar-kicker">Practise · Play · Progress</p><h1>The English Arena</h1><p>Eight ways to train your English. Beat the clock and climb the board.</p></div>
     <div class="ar-grid">${cards}</div>
     <button class="ar-go bt-entry" data-ar="bt-hub">Battles · duels, group battles, royale, daily challenge</button>
+    <button class="ar-go" data-ar="games">Games · chess, ludo, three men's morris · vs the computer</button>
     <div class="ar-tools">
       <div class="ar-seg" role="group" aria-label="Level">${["easy","medium","hard"].map(l=>`<button class="${AR.level===l?"on":""}" data-ar="level" data-l="${l}" aria-pressed="${AR.level===l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join("")}</div>
       <button class="ar-go" data-ar="board">Class board</button>
