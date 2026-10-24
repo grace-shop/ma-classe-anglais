@@ -50,7 +50,7 @@ function btHub(){btStop();BT.on=false;BT.inHub=true;BT.key="";BTNAV.view="hub";B
   arSet(arTop("Battles","")+`<div class="ar-hero"><p class="ar-kicker">Compete · Win · Climb</p><h1>Battles</h1>
       <p>Play live with your classmates. Pick a battle type, or join with a code.</p></div>
     ${live?`<button class="ar-go bt-entry" data-ar="bt-back">Back to my battle</button>`:""}
-    <button class="ar-go" data-ar="games-battle">Games · chess, ludo, three men's morris · here or by invitation</button>
+    <div class="ar-round-wrap"><button class="ar-round" data-ar="games-battle" aria-label="Game">Game</button></div>
     <div class="ar-grid">${cards}</div>
     ${btJoinBox()}${btErr()}`);
   BT.err=""}
