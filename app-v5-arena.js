@@ -246,6 +246,9 @@ try{AR.best=JSON.parse(localStorage.getItem("ar_best")||"{}")||{};AR.level=local
 .ar-go{height:52px;padding:0 22px;border:0;border-radius:18px;font:inherit;font-weight:900;font-size:1rem;color:#06201C;cursor:pointer;background:linear-gradient(120deg,#5EEAD4,#B8FFF2 40%,#818CF8);background-size:200% 100%;box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 16px 26px -14px rgba(94,234,212,.95);transition:transform .2s,filter .2s}
 .ar-go:hover{transform:translateY(-1px);filter:brightness(1.05)}
 .ar-go:active{transform:translateY(2px)}
+.ar-round-wrap{display:flex;justify-content:center;margin:8px 0}
+.ar-round{width:112px;height:112px;border-radius:50%;border:0;font:inherit;font-weight:900;font-size:1.15rem;color:#06201C;cursor:pointer;background:radial-gradient(circle at 35% 30%,#E9FFFA,#5EEAD4 45%,#818CF8);box-shadow:0 8px 0 #2b3a8f,0 16px 26px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.6)}
+.ar-round:active{transform:translateY(5px);box-shadow:0 3px 0 #2b3a8f,0 6px 10px rgba(0,0,0,.35)}
 .ar-go.ghost{background:rgba(255,255,255,.08);color:#EAF0FF;box-shadow:inset 0 1px 0 rgba(255,255,255,.15);border:1px solid rgba(160,172,255,.25)}
 .ar-inrow{display:flex;gap:10px;align-items:center}
 .ar-in{flex:1;min-width:0;height:52px;padding:0 16px;border-radius:18px;border:1px solid rgba(160,172,255,.35);background:rgba(8,10,28,.7);color:#fff;font:inherit;font-size:1.05rem;font-weight:700;outline:none;box-shadow:inset 0 2px 8px rgba(0,0,0,.4)}
@@ -328,7 +331,7 @@ function arHome(){arStopT();AR.mode=null;
     <div class="ar-hero"><p class="ar-kicker">Practise · Play · Progress</p><h1>The English Arena</h1><p>Eight ways to train your English. Beat the clock and climb the board.</p></div>
     <div class="ar-grid">${cards}</div>
     <button class="ar-go bt-entry" data-ar="bt-hub">Battles · duels, group battles, royale, daily challenge</button>
-    <button class="ar-go" data-ar="games">Games · chess, ludo, three men's morris · vs the computer</button>
+    <div class="ar-round-wrap"><button class="ar-round" data-ar="games" aria-label="Game">Game</button></div>
     <div class="ar-tools">
       <div class="ar-seg" role="group" aria-label="Level">${["easy","medium","hard"].map(l=>`<button class="${AR.level===l?"on":""}" data-ar="level" data-l="${l}" aria-pressed="${AR.level===l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join("")}</div>
       <button class="ar-go" data-ar="board">Class board</button>
