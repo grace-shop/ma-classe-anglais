@@ -130,6 +130,7 @@ function callPeer(uid,answering){
     else{P.stream=P.stream||new MediaStream();P.stream.addTrack(e.track)}
     const again=()=>callScreenSync();
     e.track.onmute=again;e.track.onunmute=again;e.track.onended=again;
+    if(e.track.kind==="audio")callRemoteAudio(uid,P.stream);
     callScreenSync();
   };
   pc.onconnectionstatechange=()=>{P.state=pc.connectionState;if(P.state==="failed")toast("The connection with "+callName(uid)+" was lost","x");callScreenSync()};
@@ -142,7 +143,7 @@ function callAttachLocal(P){
   P.ta.sender.replaceTrack(a).catch(()=>{});
   P.tv.sender.replaceTrack(v).catch(()=>{});
 }
-function callDropPeer(uid){const P=CALL.peers[uid];if(P){try{P.pc.close()}catch(e){}}delete CALL.peers[uid];CALL.others=CALL.others.filter(x=>x!==uid);callScreenSync()}
+function callDropPeer(uid){const P=CALL.peers[uid];callRemoteAudioEnd(uid);if(P){try{P.pc.close()}catch(e){}}delete CALL.peers[uid];CALL.others=CALL.others.filter(x=>x!==uid);callScreenSync()}
 async function callOffer(uid){
   const P=callPeer(uid);
   try{const off=await P.pc.createOffer();await P.pc.setLocalDescription(off);callSendTo(CALL.id,uid,"offer",{sdp:P.pc.localDescription.sdp})}catch(e){console.warn(e)}
@@ -181,7 +182,18 @@ async function callMedia(video){
 }
 function callSetLocal(st){
   CALL.local=st;CALL.micOn=true;CALL.camOn=st.getVideoTracks().length>0;
+  // people who came before the microphone was ready get it now (otherwise they hear nothing from this phone)
+  Object.values(CALL.peers).forEach(function(P){callAttachLocal(P)});
 }
+// the other person's voice plays through its own audio element (a video tile can be blocked from playing sound)
+function callRemoteAudio(uid,stream){
+  let a=document.getElementById("callAud-"+uid);
+  if(!a){a=document.createElement("audio");a.id="callAud-"+uid;a.autoplay=true;a.setAttribute("playsinline","");a.style.display="none";document.body.appendChild(a)}
+  if(a.srcObject!==stream)a.srcObject=stream;
+  a.play().catch(function(){});
+  if(!a.dataset.zz){a.dataset.zz="1";document.addEventListener("pointerdown",function(){if(a.isConnected&&a.paused&&a.srcObject)a.play().catch(function(){})},true)}
+}
+function callRemoteAudioEnd(uid){const a=document.getElementById("callAud-"+uid);if(a){try{a.pause();a.srcObject=null}catch(e){}a.remove()}}
 async function callToggleMic(){
   if(!CALL.local)return;
   CALL.micOn=!CALL.micOn;CALL.local.getAudioTracks().forEach(t=>t.enabled=CALL.micOn);callScreenSync();
@@ -244,7 +256,7 @@ async function callLeave(){
 }
 function callCleanup(){
   clearTimeout(CALL.timer);
-  for(const u of Object.keys(CALL.peers)){try{CALL.peers[u].pc.close()}catch(e){}}
+  for(const u of Object.keys(CALL.peers)){callRemoteAudioEnd(u);try{CALL.peers[u].pc.close()}catch(e){}}
   CALL.peers={};
   if(CALL.local)CALL.local.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
   CALL.local=null;CALL.id=null;CALL.joined=false;CALL.others=[];CALL.host=null;CALL.pick=new Set();CALL.cands=null;
@@ -303,7 +315,7 @@ function callTileEl(grid,key,label){
   if(!t){
     t=document.createElement("div");t.className="call-tile";t.dataset.u=key;
     const ini=(label||"?").trim().charAt(0).toUpperCase()||"?";
-    t.innerHTML=`<video autoplay playsinline ${key==="me"?"muted":""}></video><div class="call-av">${ini}</div><span class="call-nm"></span>`;
+    t.innerHTML=`<video autoplay playsinline muted></video><div class="call-av">${ini}</div><span class="call-nm"></span>`;
     grid.appendChild(t);
   }
   t.querySelector(".call-nm").textContent=key==="me"?"You":label;
