@@ -363,3 +363,55 @@
 
   ZG.chess = CH; ZG.ludo = LU; ZG.morris = MO;
 })();
+
+/* ---- tic-tac-toe (morpion) : pure rules + computer ---- */
+(function () {
+  var ZG = window.ZG = window.ZG || {};
+  var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  function check(b) {
+    for (var k = 0; k < LINES.length; k++) {
+      var L = LINES[k], p = b[L[0]];
+      if (p && p === b[L[1]] && p === b[L[2]]) return { p: p, line: L };
+    }
+    if (b.every(function (x) { return x; })) return { p: 0, draw: true };
+    return null;
+  }
+  function start() { return { b: [0,0,0,0,0,0,0,0,0], turn: 1, win: null }; }
+  function moves(st) {
+    if (st.win) return [];
+    var out = []; for (var i = 0; i < 9; i++) if (!st.b[i]) out.push({ at: i });
+    return out;
+  }
+  function apply(st, m) {
+    var b = st.b.slice(); b[m.at] = st.turn;
+    return { b: b, turn: st.turn === 1 ? 2 : 1, win: check(b) };
+  }
+  // best score for the side to move: +1 win, 0 draw, -1 loss
+  function negamax(b, turn) {
+    var w = check(b);
+    if (w) return w.draw ? 0 : (w.p === turn ? 1 : -1);
+    var best = -2;
+    for (var i = 0; i < 9; i++) if (!b[i]) {
+      b[i] = turn;
+      var s = -negamax(b, turn === 1 ? 2 : 1);
+      b[i] = 0;
+      if (s > best) best = s;
+    }
+    return best;
+  }
+  // level: 0 easy (random), 1 medium (sometimes random), 2 hard (perfect)
+  function best(st, level) {
+    var ms = moves(st);
+    if (!ms.length) return null;
+    if (level === 0 || (level === 1 && Math.random() < 0.35)) return ms[Math.floor(Math.random() * ms.length)];
+    var b = st.b.slice(), bestM = ms[0], bestS = -2;
+    ms.forEach(function (m) {
+      b[m.at] = st.turn;
+      var s = -negamax(b, st.turn === 1 ? 2 : 1);
+      b[m.at] = 0;
+      if (s > bestS) { bestS = s; bestM = m; }
+    });
+    return bestM;
+  }
+  ZG.ttt = { LINES: LINES, start: start, moves: moves, apply: apply, best: best, check: check };
+})();
