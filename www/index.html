@@ -5027,6 +5027,7 @@ function arHome(){arStopT();AR.mode=null;
     <div class="ar-hero"><p class="ar-kicker">Practise · Play · Progress</p><h1>The English Arena</h1><p>Eight ways to train your English. Beat the clock and climb the board.</p></div>
     <div class="ar-grid">${cards}</div>
     <button class="ar-go bt-entry" data-ar="bt-hub">Battles · duels, group battles, royale, daily challenge</button>
+    <button class="ar-go" data-ar="games">Games · chess, ludo, three men's morris · vs the computer</button>
     <div class="ar-tools">
       <div class="ar-seg" role="group" aria-label="Level">${["easy","medium","hard"].map(l=>`<button class="${AR.level===l?"on":""}" data-ar="level" data-l="${l}" aria-pressed="${AR.level===l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join("")}</div>
       <button class="ar-go" data-ar="board">Class board</button>
@@ -10623,6 +10624,7 @@ function btHub(){btStop();BT.on=false;BT.inHub=true;BT.key="";BTNAV.view="hub";B
   arSet(arTop("Battles","")+`<div class="ar-hero"><p class="ar-kicker">Compete · Win · Climb</p><h1>Battles</h1>
       <p>Play live with your classmates. Pick a battle type, or join with a code.</p></div>
     ${live?`<button class="ar-go bt-entry" data-ar="bt-back">Back to my battle</button>`:""}
+    <button class="ar-go" data-ar="games-battle">Games · chess, ludo, three men's morris · here or by invitation</button>
     <div class="ar-grid">${cards}</div>
     ${btJoinBox()}${btErr()}`);
   BT.err=""}
@@ -17217,6 +17219,994 @@ async function zzBakeEntries(entries){
   }
   return out;
 }
+
+/* ---- app-v5-zzzzzzze-game-engines.js ---- */
+/* =====================================================================
+   v5 · Jeux : la logique (règles et IA), sans affichage.
+   · Échecs : coups légaux, roque, prise en passant, promotion, échec et mat,
+     pat, règle des 50 coups ; IA à recherche (minimax élagué) à 3 niveaux.
+   · Ludo : 2 à 4 joueurs, 6 pour sortir, captures, arrivée exacte ; IA gloutonne
+     avec évaluation.
+   · Moulin à 3 pions : placement puis déplacement, vol, moulin = retirer un pion adverse ;
+     IA à recherche complète (l'arbre est petit).
+   Tout est fonction pure : l'état est copié à chaque coup.
+   ===================================================================== */
+(function () {
+  var ZG = window.ZG = window.ZG || {};
+
+  /* ---------------- Échecs ---------------- */
+  var CH = {};
+  CH.start = function () {
+    var back = "RNBQKBNR".split("");
+    var b = new Array(64).fill("");
+    for (var c = 0; c < 8; c++) {
+      b[c] = back[c].toLowerCase(); b[8 + c] = "p";
+      b[48 + c] = "P"; b[56 + c] = back[c];
+    }
+    return { b: b, turn: "w", cr: { K: true, Q: true, k: true, q: true }, ep: -1, half: 0, full: 1 };
+  };
+  CH.white = function (p) { return p && p === p.toUpperCase(); };
+  CH.side = function (p) { return !p ? "" : (CH.white(p) ? "w" : "b"); };
+  var KN = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
+  var KG = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+  var DI = [[-1, -1], [-1, 1], [1, -1], [1, 1]], OR = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+  function rc(i) { return [i >> 3, i & 7]; }
+  function idx(r, c) { return r * 8 + c; }
+  function on(r, c) { return r >= 0 && r < 8 && c >= 0 && c < 8; }
+
+  // is square sq attacked by side s ("w" or "b")?
+  CH.attacked = function (st, sq, s) {
+    var r0 = rc(sq)[0], c0 = rc(sq)[1], i, r, c, p;
+    var pr = s === "w" ? 1 : -1; // a white pawn attacks upward (row - 1), so it sits one row below
+    for (i = 0; i < 2; i++) {
+      r = r0 + pr; c = c0 + (i ? 1 : -1);
+      if (on(r, c) && st.b[idx(r, c)] === (s === "w" ? "P" : "p")) return true;
+    }
+    for (i = 0; i < 8; i++) { r = r0 + KN[i][0]; c = c0 + KN[i][1]; if (on(r, c) && st.b[idx(r, c)] === (s === "w" ? "N" : "n")) return true; }
+    for (i = 0; i < 8; i++) { r = r0 + KG[i][0]; c = c0 + KG[i][1]; if (on(r, c) && st.b[idx(r, c)] === (s === "w" ? "K" : "k")) return true; }
+    var sl = function (dirs, types) {
+      for (var d = 0; d < dirs.length; d++) {
+        r = r0 + dirs[d][0]; c = c0 + dirs[d][1];
+        while (on(r, c)) {
+          p = st.b[idx(r, c)];
+          if (p) { if (CH.side(p) === s && types.indexOf(p.toLowerCase()) >= 0) return true; break; }
+          r += dirs[d][0]; c += dirs[d][1];
+        }
+      }
+      return false;
+    };
+    return sl(DI, ["b", "q"]) || sl(OR, ["r", "q"]);
+  };
+  CH.inCheck = function (st, s) {
+    var k = s === "w" ? "K" : "k", sq = st.b.indexOf(k);
+    return sq < 0 ? false : CH.attacked(st, sq, s === "w" ? "b" : "w");
+  };
+
+  // moves ignoring whether the king is left in check
+  CH.pseudo = function (st, s) {
+    var out = [], i, r, c, p, to, rr, cc, dir;
+    for (i = 0; i < 64; i++) {
+      p = st.b[i];
+      if (!p || CH.side(p) !== s) continue;
+      r = rc(i)[0]; c = rc(i)[1]; var t = p.toLowerCase();
+      if (t === "p") {
+        dir = s === "w" ? -1 : 1;
+        var start = s === "w" ? 6 : 1, last = s === "w" ? 0 : 7;
+        rr = r + dir;
+        if (on(rr, c) && !st.b[idx(rr, c)]) {
+          out.push({ f: i, t: idx(rr, c), p: p, c: "", promo: rr === last });
+          if (r === start && !st.b[idx(r + 2 * dir, c)]) out.push({ f: i, t: idx(r + 2 * dir, c), p: p, c: "" });
+        }
+        for (var d = -1; d <= 1; d += 2) {
+          cc = c + d; rr = r + dir;
+          if (!on(rr, cc)) continue;
+          to = idx(rr, cc);
+          if (st.b[to] && CH.side(st.b[to]) !== s) out.push({ f: i, t: to, p: p, c: st.b[to], promo: rr === last });
+          else if (to === st.ep) out.push({ f: i, t: to, p: p, c: s === "w" ? "p" : "P", ep: true });
+        }
+      } else if (t === "n") {
+        for (var k = 0; k < 8; k++) { rr = r + KN[k][0]; cc = c + KN[k][1]; if (!on(rr, cc)) continue; to = idx(rr, cc); if (CH.side(st.b[to]) !== s) out.push({ f: i, t: to, p: p, c: st.b[to] }); }
+      } else if (t === "k") {
+        for (var k2 = 0; k2 < 8; k2++) { rr = r + KG[k2][0]; cc = c + KG[k2][1]; if (!on(rr, cc)) continue; to = idx(rr, cc); if (CH.side(st.b[to]) !== s) out.push({ f: i, t: to, p: p, c: st.b[to] }); }
+        // castling
+        var row = s === "w" ? 7 : 0, kingHome = idx(row, 4);
+        if (i === kingHome && !CH.attacked(st, i, s === "w" ? "b" : "w")) {
+          var ks = s === "w" ? "K" : "k", qs = s === "w" ? "Q" : "q";
+          if (st.cr[ks] && !st.b[idx(row, 5)] && !st.b[idx(row, 6)] && st.b[idx(row, 7)] === (s === "w" ? "R" : "r") &&
+              !CH.attacked(st, idx(row, 5), s === "w" ? "b" : "w") && !CH.attacked(st, idx(row, 6), s === "w" ? "b" : "w"))
+            out.push({ f: i, t: idx(row, 6), p: p, c: "", castle: "k" });
+          if (st.cr[qs] && !st.b[idx(row, 1)] && !st.b[idx(row, 2)] && !st.b[idx(row, 3)] && st.b[idx(row, 0)] === (s === "w" ? "R" : "r") &&
+              !CH.attacked(st, idx(row, 3), s === "w" ? "b" : "w") && !CH.attacked(st, idx(row, 2), s === "w" ? "b" : "w"))
+            out.push({ f: i, t: idx(row, 2), p: p, c: "", castle: "q" });
+        }
+      } else {
+        var dirs = t === "b" ? DI : t === "r" ? OR : KG.filter(function (x) { return true; });
+        var rays = t === "q" ? DI.concat(OR) : dirs;
+        for (var e = 0; e < rays.length; e++) {
+          rr = r + rays[e][0]; cc = c + rays[e][1];
+          while (on(rr, cc)) {
+            to = idx(rr, cc);
+            if (!st.b[to]) out.push({ f: i, t: to, p: p, c: "" });
+            else { if (CH.side(st.b[to]) !== s) out.push({ f: i, t: to, p: p, c: st.b[to] }); break; }
+            rr += rays[e][0]; cc += rays[e][1];
+          }
+        }
+      }
+    }
+    return out;
+  };
+
+  CH.make = function (st, m) {
+    var b = st.b.slice(), s = CH.side(m.p), n = { b: b, turn: st.turn === "w" ? "b" : "w", cr: { K: st.cr.K, Q: st.cr.Q, k: st.cr.k, q: st.cr.q }, ep: -1, half: 0, full: st.full + (st.turn === "b" ? 1 : 0) };
+    var p = m.p;
+    if (m.ep) b[m.t + (s === "w" ? 8 : -8)] = "";
+    b[m.t] = p; b[m.f] = "";
+    if (m.castle) {
+      var row = s === "w" ? 7 : 0;
+      if (m.castle === "k") { b[idx(row, 5)] = b[idx(row, 7)]; b[idx(row, 7)] = ""; }
+      else { b[idx(row, 3)] = b[idx(row, 0)]; b[idx(row, 0)] = ""; }
+    }
+    if (m.promo) b[m.t] = s === "w" ? "Q" : "q";
+    if (p.toLowerCase() === "p" && Math.abs(m.t - m.f) === 16) n.ep = (m.t + m.f) / 2;
+    if (p.toLowerCase() === "p" || m.c) n.half = 0; else n.half = st.half + 1;
+    // castling rights
+    if (p === "K") { n.cr.K = false; n.cr.Q = false; }
+    if (p === "k") { n.cr.k = false; n.cr.q = false; }
+    var corner = { 0: "q", 7: "k", 56: "Q", 63: "K" };
+    if (corner[m.f]) n.cr[corner[m.f]] = false;
+    if (corner[m.t]) n.cr[corner[m.t]] = false;
+    return n;
+  };
+
+  CH.legal = function (st) {
+    var s = st.turn, ps = CH.pseudo(st, s), out = [];
+    for (var i = 0; i < ps.length; i++) {
+      var n = CH.make(st, ps[i]);
+      if (!CH.inCheck(n, s)) out.push(ps[i]);
+    }
+    return out;
+  };
+  // "play", "mate", "stale", "draw" (50 moves)
+  CH.status = function (st) {
+    var moves = CH.legal(st);
+    if (!moves.length) return CH.inCheck(st, st.turn) ? "mate" : "stale";
+    if (st.half >= 100) return "draw";
+    return "play";
+  };
+
+  var VAL = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
+  // piece-square bonuses (from white's side, rank 8 at the top)
+  var PST = {
+    p: [0,0,0,0,0,0,0,0, 50,50,50,50,50,50,50,50, 10,10,20,30,30,20,10,10, 5,5,10,25,25,10,5,5, 0,0,0,20,20,0,0,0, 5,-5,-10,0,0,-10,-5,5, 5,10,10,-20,-20,10,10,5, 0,0,0,0,0,0,0,0],
+    n: [-50,-40,-30,-30,-30,-30,-40,-50, -40,-20,0,0,0,0,-20,-40, -30,0,10,15,15,10,0,-30, -30,5,15,20,20,15,5,-30, -30,0,15,20,20,15,0,-30, -30,5,10,15,15,10,5,-30, -40,-20,0,5,5,0,-20,-40, -50,-40,-30,-30,-30,-30,-40,-50],
+    b: [-20,-10,-10,-10,-10,-10,-10,-20, -10,0,0,0,0,0,0,-10, -10,0,5,10,10,5,0,-10, -10,5,5,10,10,5,5,-10, -10,0,10,10,10,10,0,-10, -10,10,10,10,10,10,10,-10, -10,5,0,0,0,0,5,-10, -20,-10,-10,-10,-10,-10,-10,-20],
+    r: [0,0,0,0,0,0,0,0, 5,10,10,10,10,10,10,5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, -5,0,0,0,0,0,0,-5, 0,0,0,5,5,0,0,0],
+    q: [-20,-10,-10,-5,-5,-10,-10,-20, -10,0,0,0,0,0,0,-10, -10,0,5,5,5,5,0,-10, -5,0,5,5,5,5,0,-5, 0,0,5,5,5,5,0,-5, -10,5,5,5,5,5,0,-10, -10,0,5,0,0,0,0,-10, -20,-10,-10,-5,-5,-10,-10,-20],
+    k: [-30,-40,-40,-50,-50,-40,-40,-30, -30,-40,-40,-50,-50,-40,-40,-30, -30,-40,-40,-50,-50,-40,-40,-30, -30,-40,-40,-50,-50,-40,-40,-30, -20,-30,-30,-40,-40,-30,-30,-20, -10,-20,-20,-20,-20,-20,-20,-10, 20,20,0,0,0,0,20,20, 20,30,10,0,0,10,30,20]
+  };
+  CH.eval = function (st) {
+    var sc = 0;
+    for (var i = 0; i < 64; i++) {
+      var p = st.b[i]; if (!p) continue;
+      var t = p.toLowerCase(), w = CH.white(p);
+      var v = VAL[t] + PST[t][w ? i : 63 - i];
+      sc += w ? v : -v;
+    }
+    return sc;
+  };
+  // best move for the side to move, searching "depth" half-moves; returns null when there is no move
+  CH.best = function (st, depth) {
+    var moves = CH.legal(st);
+    if (!moves.length) return null;
+    var pri = function (m) { return (m.c ? VAL[m.c.toLowerCase()] * 10 : 0) + (m.promo ? 800 : 0); };
+    moves.sort(function (a, b) { return pri(b) - pri(a); });
+    var best = null, bestScore = -Infinity, sign = st.turn === "w" ? 1 : -1;
+    var nodes = 0;
+    function neg(s, d, alpha, beta) {
+      nodes++;
+      if (d === 0) return sign_of(s) * CH.eval(s);
+      var ms = CH.legal(s);
+      if (!ms.length) return CH.inCheck(s, s.turn) ? -100000 + (depth - d) : 0;
+      ms.sort(function (a, b) { return pri(b) - pri(a); });
+      var best2 = -Infinity;
+      for (var i = 0; i < ms.length; i++) {
+        var v = -neg(CH.make(s, ms[i]), d - 1, -beta, -alpha);
+        if (v > best2) best2 = v;
+        if (v > alpha) alpha = v;
+        if (alpha >= beta) break;
+      }
+      return best2;
+    }
+    function sign_of(s) { return s.turn === "w" ? 1 : -1; }
+    for (var i = 0; i < moves.length; i++) {
+      var n = CH.make(st, moves[i]);
+      var v = -neg(n, depth - 1, -Infinity, Infinity);
+      if (v > bestScore) { bestScore = v; best = moves[i]; }
+    }
+    return best;
+  };
+
+  /* ---------------- Ludo ---------------- */
+  // progress: -1 in the base, 0..50 on the track (0 = own start), 51..55 home column, 56 arrived
+  var LU = {};
+  LU.SAFE_OFF = [0]; // own start squares are safe
+  LU.start = function (n) {
+    var toks = [];
+    for (var k = 0; k < n; k++) toks.push([-1, -1, -1, -1]);
+    return { n: n, colors: ["red", "green", "yellow", "blue"].slice(0, n), tok: toks, turn: 0, dice: 0, rolled: false, sixes: 0, winner: -1, log: "" };
+  };
+  LU.global = function (k, p) { return (k * 13 + p) % 52; };
+  LU.moves = function (st, dice) {
+    var k = st.turn, out = [];
+    for (var t = 0; t < 4; t++) {
+      var p = st.tok[k][t];
+      if (p === 56) continue;
+      if (p === -1) { if (dice === 6) out.push({ t: t, to: 0 }); continue; }
+      if (p + dice <= 56) out.push({ t: t, to: p + dice });
+    }
+    return out;
+  };
+  LU.apply = function (st, mv) {
+    var s = JSON.parse(JSON.stringify(st)), k = s.turn, dice = s.dice;
+    var p = s.tok[k][mv.t];
+    s.tok[k][mv.t] = mv.to;
+    var info = { captured: false, finished: mv.to === 56, entered: p === -1 };
+    if (mv.to <= 50) {
+      var g = LU.global(k, mv.to);
+      // the start square of each colour is safe
+      var safe = mv.to === 0;
+      if (!safe) {
+        for (var o = 0; o < s.n; o++) {
+          if (o === k) continue;
+          for (var u = 0; u < 4; u++) {
+            var op = s.tok[o][u];
+            if (op >= 0 && op <= 50 && LU.global(o, op) === g) { s.tok[o][u] = -1; info.captured = true; }
+          }
+        }
+      }
+    }
+    if (info.finished && s.tok[k].every(function (x) { return x === 56; })) s.winner = k;
+    s.rolled = false;
+    // an extra turn after a six
+    var again = dice === 6 && s.winner < 0;
+    if (!again) s.turn = (s.turn + 1) % s.n;
+    s.dice = 0; s.extra = again;
+    s.last = info;
+    return s;
+  };
+  // no legal move: the turn passes
+  LU.pass = function (st) {
+    var s = JSON.parse(JSON.stringify(st));
+    s.turn = (s.turn + 1) % s.n; s.dice = 0; s.rolled = false; s.extra = false; s.last = null;
+    return s;
+  };
+  LU.roll = function (st, value) {
+    var s = JSON.parse(JSON.stringify(st));
+    s.dice = value; s.rolled = true;
+    return s;
+  };
+  // the best move for the side to move (dice already rolled)
+  LU.pick = function (st) {
+    var ms = LU.moves(st, st.dice);
+    if (!ms.length) return null;
+    var k = st.turn, best = null, bs = -Infinity;
+    ms.forEach(function (m) {
+      var n = LU.apply(st, m), sc = 0;
+      if (n.last.finished) sc += 1000;
+      if (n.last.captured) sc += 300;
+      if (st.tok[k][m.t] === -1) sc += 120;
+      if (m.to <= 50 && LU.global(k, m.to) % 13 === 0) sc += 15;
+      sc += m.to; // advancing
+      if (m.to === 56) sc += 500;
+      if (sc > bs) { bs = sc; best = m; }
+    });
+    return best;
+  };
+  LU.rollDice = function () { return 1 + Math.floor(Math.random() * 6); };
+
+  /* ---------------- Moulin à 3 pions ---------------- */
+  var MO = {};
+  MO.LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+  MO.ADJ = (function () {
+    var a = []; for (var i = 0; i < 9; i++) a.push([]);
+    MO.LINES.forEach(function (L) { for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) if (i !== j && a[L[i]].indexOf(L[j]) < 0) a[L[i]].push(L[j]); });
+    return a;
+  })();
+  MO.start = function () { return { b: [0, 0, 0, 0, 0, 0, 0, 0, 0], hand: [3, 3], turn: 1, pending: false, winner: 0 }; };
+  MO.mill = function (b, p, at) {
+    // does the piece p on point at complete a line?
+    return MO.LINES.some(function (L) { return L.indexOf(at) >= 0 && L.every(function (x) { return b[x] === p; }); });
+  };
+  MO.moves = function (st) {
+    var p = st.turn, out = [];
+    if (st.pending) {
+      var opp = 3 - p;
+      for (var i = 0; i < 9; i++) if (st.b[i] === opp) out.push({ rem: i });
+      // a piece in a mill is safe if another one can be taken
+      var safe = out.filter(function (m) { return !MO.inMill(st.b, m.rem); });
+      return safe.length ? safe : out;
+    }
+    var from = []; for (var j = 0; j < 9; j++) if (st.b[j] === p) from.push(j);
+    var empty = []; for (var e = 0; e < 9; e++) if (!st.b[e]) empty.push(e);
+    if (st.hand[p - 1] > 0) return empty.map(function (to) { return { to: to, from: -1 }; });
+    // three pieces left: they can fly
+    var flying = from.length === 3;
+    from.forEach(function (f) {
+      (flying ? empty : MO.ADJ[f].filter(function (x) { return !st.b[x]; })).forEach(function (to) { out.push({ from: f, to: to }); });
+    });
+    return out;
+  };
+  MO.inMill = function (b, at) { var p = b[at]; return p && MO.LINES.some(function (L) { return L.indexOf(at) >= 0 && L.every(function (x) { return b[x] === p; }); }); };
+  MO.apply = function (st, m) {
+    var s = { b: st.b.slice(), hand: st.hand.slice(), turn: st.turn, pending: false, winner: 0 };
+    var p = s.turn;
+    if (st.pending) {
+      s.b[m.rem] = 0;
+      s.turn = 3 - p;
+    } else {
+      if (m.from < 0) { s.hand[p - 1]--; s.b[m.to] = p; }
+      else { s.b[m.from] = 0; s.b[m.to] = p; }
+      if (MO.mill(s.b, p, m.to)) {
+        var opp = 3 - p;
+        var hasTake = s.b.some(function (x, i) { return x === opp; });
+        if (hasTake) { s.pending = true; return s; }
+      }
+      s.turn = 3 - p;
+    }
+    // a side with two pieces (and nothing in hand) has lost
+    // a side with fewer than three pieces (on the board and in hand) has lost
+    var counts = [0, 0, 0];
+    s.b.forEach(function (x) { if (x) counts[x]++; });
+    [1, 2].forEach(function (q) { if (counts[q] + s.hand[q - 1] < 3) s.winner = 3 - q; });
+    // the side to move with no move has lost
+    if (!s.winner && MO.moves(s).length === 0) s.winner = 3 - s.turn;
+    return s;
+  };
+  // minimax with alpha-beta; the search is complete enough for this small board
+  MO.score = function (st, depth) {
+    if (st.winner) return st.winner === 1 ? 1000 + depth : -1000 - depth;
+    if (depth === 0) return 0;
+    var ms = MO.moves(st), best = null;
+    if (!ms.length) return st.turn === 1 ? -1000 : 1000;
+    var sc = st.turn === 1 ? -Infinity : Infinity;
+    for (var i = 0; i < ms.length; i++) {
+      var v = MO.score(MO.apply(st, ms[i]), depth - 1);
+      if (st.turn === 1) sc = Math.max(sc, v); else sc = Math.min(sc, v);
+    }
+    return sc;
+  };
+  MO.best = function (st, depth) {
+    var ms = MO.moves(st), bestM = null, bs = st.turn === 1 ? -Infinity : Infinity;
+    for (var i = 0; i < ms.length; i++) {
+      var v = MO.score(MO.apply(st, ms[i]), depth - 1);
+      if (st.turn === 1 ? v > bs : v < bs) { bs = v; bestM = ms[i]; }
+    }
+    return bestM;
+  };
+
+  ZG.chess = CH; ZG.ludo = LU; ZG.morris = MO;
+})();
+
+/* ---- app-v5-zzzzzzzf-games-ui.js ---- */
+/* =====================================================================
+   v5 · Jeux : l'écran des jeux (échecs, ludo, moulin à 3 pions).
+   · Contre l'IA (hors ligne, dans l'Arena) · à deux sur cet appareil (hors ligne).
+   · À distance par invitation : voir le menu Battle Royale (game sessions).
+   Les règles et l'IA sont dans app-v5-zzzzzzze-game-engines.js.
+   ===================================================================== */
+(function () {
+  var ZG = window.ZG;
+  var G = null;               // the game being played
+  var TIMER = 0;
+
+  var PIECES = { K: "♚", Q: "♛", R: "♜", B: "♝", N: "♞", P: "♟", k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
+  var NAMES = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris" };
+  var DIFF = { easy: { chess: 1, morris: 1 }, medium: { chess: 2, morris: 3 }, hard: { chess: 3, morris: 5 } };
+  var LUDO_COL = { red: "#F87171", green: "#4ADE80", yellow: "#FACC15", blue: "#60A5FA" };
+
+  /* ---- the screen ---- */
+  function css() {
+    if (document.getElementById("zgcss")) return;
+    var st = document.createElement("style");
+    st.id = "zgcss";
+    st.textContent = `
+#zgame{position:fixed;inset:0;z-index:10070;background:#0B0D12;color:#fff;display:flex;flex-direction:column;font:600 15px system-ui,sans-serif;overflow:auto;-webkit-overflow-scrolling:touch}
+.zg-top{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 8px}
+.zg-top b{flex:1;font-size:1.05rem}
+.zg-x{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:20px;cursor:pointer}
+.zg-status{margin:4px 14px 10px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.08);text-align:center;font-weight:700}
+.zg-body{display:flex;flex-direction:column;align-items:center;gap:12px;padding:0 10px 24px}
+.zg-chess{display:grid;grid-template-columns:repeat(8,1fr);width:min(96vw,420px);aspect-ratio:1;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,.15)}
+.zg-chess button{border:0;padding:0;margin:0;font-size:clamp(22px,7vw,34px);line-height:1;display:grid;place-items:center;cursor:pointer;color:#111;aspect-ratio:1}
+.zg-chess button.l{background:#EDE3CF}.zg-chess button.d{background:#A77F5A}
+.zg-chess button.pc-w{color:#fff;text-shadow:0 0 3px #000,0 0 3px #000,0 1px 0 #000}
+.zg-chess button.pc-b{color:#111;text-shadow:0 0 2px rgba(255,255,255,.35)}
+.zg-chess button.sel{box-shadow:inset 0 0 0 4px #A78BFA}
+.zg-chess button.to::after{content:"";width:28%;height:28%;border-radius:50%;background:rgba(124,58,237,.55)}
+.zg-chess button.to.cap{box-shadow:inset 0 0 0 4px rgba(239,68,68,.7)}
+.zg-chess button.last{background-image:linear-gradient(rgba(250,204,21,.35),rgba(250,204,21,.35))}
+.zg-mo{position:relative;width:min(86vw,340px);aspect-ratio:1}
+.zg-mo svg{position:absolute;inset:0;width:100%;height:100%}
+.zg-mo button{position:absolute;width:24%;height:24%;margin:-12%;border-radius:50%;border:0;background:rgba(255,255,255,.08);cursor:pointer;display:grid;place-items:center;font-size:34px}
+.zg-mo button.pw{background:#F8FAFC;color:#111;box-shadow:0 4px 0 #94A3B8}
+.zg-mo button.pb{background:#7C3AED;color:#fff;box-shadow:0 4px 0 #4C1D95}
+.zg-mo button.sel{outline:3px solid #FACC15}
+.zg-mo button.to{outline:3px dashed #A78BFA}
+.zg-mo button.rem{outline:3px solid #EF4444}
+.zg-hand{display:flex;gap:18px;font-size:14px;opacity:.9}
+.zg-ludo{display:grid;grid-template-columns:repeat(15,1fr);grid-template-rows:repeat(15,1fr);width:min(96vw,460px);aspect-ratio:1;background:#111827;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.15);position:relative}
+.zg-ludo .c{position:absolute;inset:0;border:0.5px solid rgba(255,255,255,.08);background:#1F2937}
+.zg-ludo .c.t{background:#E5E7EB}
+.zg-ludo .c.h{background:var(--hc)}
+.zg-ludo .c.b{background:var(--bc)}
+.zg-ludo .c.safe::before{content:"★";position:absolute;inset:0;display:grid;place-items:center;font-size:10px;color:#6B7280}
+.zg-ludo .c.fin{background:#FFFFFF}
+.zg-ludo .tok{position:absolute;inset:8%;border-radius:50%;border:2px solid #111;background:var(--tc);cursor:pointer;z-index:2;box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.zg-ludo .tok.go{outline:3px solid #fff}
+.zg-ludo .tok.stack{inset:2%}
+.zg-players{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.zg-pl{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:13px}
+.zg-pl i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.zg-pl.on{outline:2px solid #FACC15}
+.zg-btn{padding:14px 20px;border-radius:16px;border:0;background:#A78BFA;color:#0B0D12;font:800 16px system-ui,sans-serif;cursor:pointer;min-width:180px}
+.zg-btn.ghost{background:rgba(255,255,255,.12);color:#fff}
+.zg-dice{width:56px;height:56px;border-radius:14px;background:#fff;color:#111;display:grid;place-items:center;font-size:30px;font-weight:900}
+.zg-info{font-size:13px;opacity:.8;text-align:center;max-width:460px;padding:0 10px}
+.zg-end{position:fixed;inset:0;z-index:10080;background:rgba(0,0,0,.6);display:grid;place-items:center}
+.zg-end div{background:#16181F;border-radius:20px;padding:22px;width:min(88vw,340px);text-align:center;display:grid;gap:12px}
+.zg-menu{position:fixed;inset:0;z-index:10075;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+.zg-menu .sheet{background:#16181F;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));width:100%;max-width:520px;display:grid;gap:10px;max-height:86vh;overflow:auto}
+.zg-menu h3{margin:0 0 4px;font-size:1.1rem}
+.zg-menu .opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.07);border:0;color:#fff;text-align:left;font:700 15px system-ui,sans-serif;cursor:pointer}
+.zg-menu .opt small{display:block;font-weight:500;opacity:.7;font-size:12px;margin-top:2px}
+.zg-menu .seg{display:flex;gap:6px}
+.zg-menu .seg button{flex:1;padding:10px;border-radius:12px;border:0;background:rgba(255,255,255,.08);color:#fff;font:700 13px system-ui,sans-serif;cursor:pointer}
+.zg-menu .seg button.on{background:#A78BFA;color:#0B0D12}
+`;
+    document.head.appendChild(st);
+  }
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  function host() {
+    var h = document.getElementById("zgame");
+    if (!h) { h = document.createElement("div"); h.id = "zgame"; document.body.appendChild(h); }
+    return h;
+  }
+  function close() {
+    clearTimeout(TIMER); TIMER = 0;
+    var h = document.getElementById("zgame"); if (h) h.remove();
+    var e = document.getElementById("zgend"); if (e) e.remove();
+    G = null;
+  }
+
+  /* ---- starting a game ---- */
+  // opts: { game, mode: "ai"|"local", players (ludo: 2..4), diff, you }
+  function open(opts) {
+    css();
+    G = { game: opts.game, mode: opts.mode, diff: opts.diff || "medium", you: opts.you == null ? 0 : opts.you, sel: null, busy: false, over: false,
+      id: opts.id || null, v: opts.v || 1, oppName: opts.oppName || "Classmate" };
+    if (opts.st) G.st = opts.st;
+    else if (opts.game === "chess") G.st = ZG.chess.start();
+    else if (opts.game === "morris") G.st = ZG.morris.start();
+    else if (opts.game === "ludo") { G.n = opts.players || 2; G.st = ZG.ludo.start(G.n); }
+    if (opts.game === "ludo" && !G.n) G.n = G.st.n;
+    G.started = Date.now();
+    paint();
+    schedule();
+  }
+
+  // whose turn it is, as a side index (0 = first player, white, player 1)
+  function sideOfTurn() {
+    if (G.game === "chess") return G.st.turn === "w" ? 0 : 1;
+    if (G.game === "morris") return G.st.turn - 1;
+    return G.st.turn;
+  }
+  function isMyTurn() {
+    if (G.mode === "online") return sideOfTurn() === G.you;
+    return !isAiTurn();
+  }
+  function isAiTurn() {
+    if (G.mode !== "ai") return false;
+    if (G.game === "chess") return G.st.turn !== (G.you === 0 ? "w" : "b");
+    if (G.game === "morris") return G.st.turn !== (G.you === 0 ? 1 : 2);
+    return G.st.turn !== G.you;
+  }
+
+  function schedule() {
+    clearTimeout(TIMER); TIMER = 0;
+    if (!G || G.over) return;
+    if (isAiTurn()) { TIMER = setTimeout(aiMove, 420); }
+  }
+
+  function aiMove() {
+    TIMER = 0;
+    if (!G || G.over) return;
+    var d = DIFF[G.diff] || DIFF.medium;
+    if (G.game === "chess") {
+      var m = ZG.chess.best(G.st, d.chess);
+      if (m) G.st = ZG.chess.make(G.st, m);
+    } else if (G.game === "morris") {
+      var mm = ZG.morris.best(G.st, d.morris);
+      if (mm) G.st = ZG.morris.apply(G.st, mm);
+    } else if (G.game === "ludo") {
+      if (!G.st.dice) { G.st = ZG.ludo.roll(G.st, ZG.ludo.rollDice()); paint(); TIMER = setTimeout(aiMove, 650); return; }
+      var lm = ZG.ludo.pick(G.st);
+      if (!lm) { G.st = ZG.ludo.pass(G.st); afterMove(); return; }
+      G.st = ZG.ludo.apply(G.st, lm);
+      afterMove();
+      return;
+    }
+    afterMove();
+  }
+
+  function afterMove() {
+    G.sel = null;
+    var end = endInfo();
+    if (end) { G.over = true; sendMove(); paint(); showEnd(end); return; }
+    sendMove(); paint(); schedule();
+  }
+  // online games: the new state goes to the other player
+  function sendMove() { if (G && G.mode === "online" && window.zgPush) window.zgPush(G); }
+  // the other player's move arrived
+  function adopt(st, v) {
+    if (!G) return;
+    G.st = st; G.v = v; G.sel = null;
+    var end = endInfo();
+    if (end) { G.over = true; paint(); showEnd(end); return; }
+    paint();
+  }
+
+  /* ---- results ---- */
+  function endInfo() {
+    if (G.game === "chess") {
+      var s = ZG.chess.status(G.st);
+      if (s === "play") return null;
+      if (s === "mate") { var loser = G.st.turn; return { winner: loser === "w" ? 1 : 0, text: "Checkmate" }; }
+      return { winner: -1, text: s === "stale" ? "Stalemate: a draw" : "Draw: 50 moves" };
+    }
+    if (G.game === "morris") {
+      if (!G.st.winner) return null;
+      return { winner: G.st.winner === 1 ? 0 : 1, text: "Three in the mill or no more moves" };
+    }
+    if (G.game === "ludo") {
+      if (G.st.winner < 0) return null;
+      return { winner: G.st.winner, text: "All four tokens home" };
+    }
+    return null;
+  }
+  function whoName(i) {
+    if (G.mode === "ai") return i === G.you ? "You" : "The computer";
+    return "Player " + (i + 1);
+  }
+  function showEnd(end) {
+    var old = document.getElementById("zgend"); if (old) old.remove();
+    var w = end.winner, msg;
+    if (w < 0) msg = "Draw";
+    else if (G.mode === "ai") msg = w === G.you ? "You win!" : "The computer wins";
+    else if (G.mode === "online") msg = w === G.you ? "You win!" : G.oppName + " wins";
+    else msg = whoName(w) + " wins!";
+    var el = document.createElement("div");
+    el.id = "zgend"; el.className = "zg-end";
+    el.innerHTML = '<div><b style="font-size:1.2rem">' + esc(msg) + '</b><small style="opacity:.75">' + esc(end.text) + '</small>' +
+      (G.mode === "online" ? '' : '<button class="zg-btn" data-zg="again">Play again</button>') + '<button class="zg-btn ghost" data-zg="close2">Close</button></div>';
+    document.body.appendChild(el);
+  }
+
+  /* ---- drawing ---- */
+  function paint() {
+    if (!G) return;
+    var h = host();
+    var status = statusText();
+    var body = G.game === "chess" ? chessHTML() : G.game === "morris" ? morrisHTML() : ludoHTML();
+    var sub = G.mode === "ai" ? "vs computer · " + esc(G.diff) : G.mode === "online" ? "vs " + esc(G.oppName) + " · online" : "2 players · this phone";
+    h.innerHTML = '<div class="zg-top"><button class="zg-x" data-zg="close" aria-label="Close">×</button><b>' + esc(NAMES[G.game]) + '</b>' +
+      '<span style="font-size:12px;opacity:.7">' + sub + '</span></div>' +
+      '<div class="zg-status">' + esc(status) + '</div><div class="zg-body">' + body + '</div>';
+  }
+
+  function statusText() {
+    if (G.over) return "Game over";
+    if (G.mode === "online" && !isMyTurn()) return "Waiting for " + G.oppName + "…";
+    if (G.game === "chess") {
+      var t = G.st.turn === "w" ? "White" : "Black";
+      if (ZG.chess.inCheck(G.st, G.st.turn)) return t + " is in check";
+      return (isAiTurn() ? "The computer is thinking…" : t + " to play");
+    }
+    if (G.game === "morris") {
+      var p = G.st.turn;
+      if (G.st.pending) return (isAiTurn() ? "The computer takes a piece" : "Mill! Tap a piece to take");
+      if (isAiTurn()) return "The computer is thinking…";
+      if (G.st.hand[p - 1] > 0) return "Place a piece (" + G.st.hand[p - 1] + " left)";
+      return "Move a piece" + (G.sel != null ? " — tap where it goes" : "");
+    }
+    if (isAiTurn()) return "The computer is playing…";
+    if (G.st.dice) return "Player " + (G.st.turn + 1) + ": choose a token";
+    return "Player " + (G.st.turn + 1) + ": roll the dice";
+  }
+
+  /* chess */
+  function chessHTML() {
+    var st = G.st, legal = ZG.chess.legal(st), human = !isAiTurn();
+    var targets = G.sel != null ? legal.filter(function (m) { return m.f === G.sel; }) : [];
+    var last = G.last || null;
+    var rows = "";
+    for (var r = 0; r < 8; r++) for (var c = 0; c < 8; c++) {
+      var i = r * 8 + c, p = st.b[i], cls = ((r + c) % 2 ? "d" : "l");
+      var tg = targets.filter(function (m) { return m.t === i; });
+      if (i === G.sel) cls += " sel";
+      if (tg.length) cls += " to" + (tg[0].c ? " cap" : "");
+      if (last && (last.f === i || last.t === i)) cls += " last";
+      if (p) cls += ZG.chess.white(p) ? " pc-w" : " pc-b";
+      rows += '<button class="' + cls + '" data-zgsq="' + i + '" aria-label="square ' + i + '">' + (p ? PIECES[p] : "") + '</button>';
+    }
+    return '<div class="zg-chess" style="' + (human ? "" : "opacity:.85") + '">' + rows + '</div>' +
+      '<div class="zg-info">Tap a piece, then tap where it goes. Castling, en passant and promotion (to a queen) are included.</div>' +
+      '<button class="zg-btn ghost" data-zg="again">New game</button>';
+  }
+
+  /* morris */
+  function morrisPoint(i) { return { x: 15 + (i % 3) * 35, y: 15 + Math.floor(i / 3) * 35 }; }
+  function morrisHTML() {
+    var st = G.st, human = !isAiTurn(), mv = ZG.morris.moves(st);
+    var lines = ZG.morris.LINES.map(function (L) {
+      var a = morrisPoint(L[0]), b = morrisPoint(L[2]);
+      return '<line x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '" stroke="rgba(255,255,255,.35)" stroke-width="1.6"/>';
+    }).join("");
+    var svg = '<svg viewBox="0 0 100 100" preserveAspectRatio="none">' + lines + '</svg>';
+    var pts = "";
+    for (var i = 0; i < 9; i++) {
+      var p = morrisPoint(i), v = st.b[i], cls = "";
+      if (v === 1) cls += " pw"; else if (v === 2) cls += " pb";
+      if (G.sel === i) cls += " sel";
+      if (human) {
+        if (st.pending) { if (mv.some(function (m) { return m.rem === i; })) cls += " rem"; }
+        else if (G.sel != null && mv.some(function (m) { return m.from === G.sel && m.to === i; })) cls += " to";
+      }
+      pts += '<button class="' + cls + '" style="left:' + p.x + '%;top:' + p.y + '%" data-zgsq="' + i + '" aria-label="point ' + i + '">' + (v ? "●" : "") + '</button>';
+    }
+    var hand = '<div class="zg-hand"><span>You: ' + st.hand[0] + ' to place</span><span>Computer: ' + st.hand[1] + ' to place</span></div>';
+    return '<div class="zg-mo">' + svg + pts + '</div>' + hand +
+      '<div class="zg-info">Place your pieces, then slide them along a line. Three in a line is a mill: take one of the other side\'s pieces. With three pieces you can fly to any empty point.</div>' +
+      '<button class="zg-btn ghost" data-zg="again">New game</button>';
+  }
+
+  /* ludo */
+  var LUDO_TRACK = [[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
+  var LUDO_HOME = [[7,1],[7,2],[7,3],[7,4],[7,5]], LUDO_HOME_COL = [[1,7],[2,7],[3,7],[4,7],[5,7]], LUDO_HOME_R = [[7,13],[7,12],[7,11],[7,10],[7,9]], LUDO_HOME_B = [[13,7],[12,7],[11,7],[10,7],[9,7]];
+  var LUDO_HOMES = [LUDO_HOME, LUDO_HOME_COL, LUDO_HOME_R, LUDO_HOME_B];
+  var LUDO_BASE = [[[2,2],[2,3],[3,2],[3,3]], [[2,11],[2,12],[3,11],[3,12]], [[11,11],[11,12],[12,11],[12,12]], [[11,2],[11,3],[12,2],[12,3]]];
+  var LUDO_COLOURS = ["red", "green", "yellow", "blue"];
+  var LUDO_SAFE = {}; [0, 13, 26, 39].forEach(function (g) { LUDO_SAFE[g] = 1; });
+  function ludoCell(k, p) { return p < 0 ? null : p <= 50 ? LUDO_TRACK[(k * 13 + p) % 52] : LUDO_HOMES[k][p - 51] || null; }
+  function ludoHTML() {
+    var st = G.st, n = G.n, human = !isAiTurn();
+    var moves = st.dice ? ZG.ludo.moves(st, st.dice) : [];
+    var grid = {};
+    function put(r, c, extra) { grid[r + "," + c] = (grid[r + "," + c] || "") + extra; }
+    LUDO_TRACK.forEach(function (rc, g) { put(rc[0], rc[1], '<div class="c t' + (LUDO_SAFE[g] ? " safe" : "") + '"></div>'); });
+    for (var k = 0; k < 4; k++) LUDO_HOMES[k].forEach(function (rc) { put(rc[0], rc[1], '<div class="c h" style="--hc:' + LUDO_COL[LUDO_COLOURS[k]] + '"></div>'); });
+    for (var b = 0; b < 4; b++) LUDO_BASE[b].forEach(function (rc) { put(rc[0], rc[1], '<div class="c b" style="--bc:' + LUDO_COL[LUDO_COLOURS[b]] + '"></div>'); });
+    put(7, 7, '<div class="c fin"></div>');
+    // tokens
+    for (var pl = 0; pl < n; pl++) for (var t = 0; t < 4; t++) {
+      var p = st.tok[pl][t], rc = p < 0 ? LUDO_BASE[pl][t] : ludoCell(pl, p);
+      if (!rc) continue;
+      var can = human && st.turn === pl && st.dice && moves.some(function (m) { return m.t === t; });
+      put(rc[0], rc[1], '<div class="tok' + (can ? " go" : "") + '" style="--tc:' + LUDO_COL[LUDO_COLOURS[pl]] + '" ' + (can ? 'data-zgtok="' + t + '"' : "") + '></div>');
+    }
+    var cells = "";
+    for (var r = 0; r < 15; r++) for (var c = 0; c < 15; c++) cells += '<div style="position:relative;grid-row:' + (r + 1) + ';grid-column:' + (c + 1) + '">' + (grid[r + "," + c] || "") + '</div>';
+    var board = '<div class="zg-ludo">' + cells + '</div>';
+    var players = '<div class="zg-players">' + LUDO_COLOURS.slice(0, n).map(function (cl, i) {
+      var home = st.tok[i].filter(function (x) { return x === 56; }).length;
+      return '<span class="zg-pl' + (st.turn === i && !G.over ? " on" : "") + '"><i style="background:' + LUD_COL(cl) + '"></i>' + (G.mode === "ai" ? (i === G.you ? "You" : "Computer") : "Player " + (i + 1)) + ' · ' + home + '/4</span>';
+    }).join("") + '</div>';
+    var dice = st.dice ? '<div class="zg-dice">' + st.dice + '</div>' : '<div class="zg-dice" style="opacity:.25">?</div>';
+    var action;
+    if (human && !st.dice) action = '<button class="zg-btn" data-zg="roll">Roll the dice</button>';
+    else if (human && st.dice && !moves.length) action = '<button class="zg-btn" data-zg="pass">No move — pass</button>';
+    else action = '<div class="zg-info">' + (isAiTurn() ? "" : "Tap a glowing token to move it.") + '</div>';
+    return board + '<div class="zg-row" style="display:flex;gap:14px;align-items:center">' + dice + action + '</div>' + players +
+      '<div class="zg-info">Roll a six to bring a token out. Land on an opponent to send it back. A six gives another turn. The start squares are safe.</div>' +
+      '<button class="zg-btn ghost" data-zg="again">New game</button>';
+  }
+  function LUD_COL(c) { return LUDO_COL[c]; }
+
+  /* ---- what a tap does ---- */
+  function humanTurn() { return G && !G.over && isMyTurn() && !G.busy; }
+
+  function chessTap(sq) {
+    var st = G.st, legal = ZG.chess.legal(st);
+    var p = st.b[sq], mine = p && (ZG.chess.white(p) ? "w" : "b") === st.turn;
+    if (G.sel != null) {
+      var m = legal.filter(function (x) { return x.f === G.sel && x.t === sq; })[0];
+      if (m) { G.last = { f: m.f, t: m.t }; G.st = ZG.chess.make(st, m); G.sel = null; afterMove(); return; }
+    }
+    G.sel = mine ? sq : null;
+    paint();
+  }
+  function morrisTap(i) {
+    var st = G.st, mv = ZG.morris.moves(st);
+    if (st.pending) {
+      var r = mv.filter(function (m) { return m.rem === i; })[0];
+      if (r) { G.st = ZG.morris.apply(st, r); afterMove(); }
+      return;
+    }
+    if (st.hand[st.turn - 1] > 0) {
+      var pl = mv.filter(function (m) { return m.to === i; })[0];
+      if (pl) { G.st = ZG.morris.apply(st, pl); afterMove(); }
+      return;
+    }
+    if (G.sel != null) {
+      var mo = mv.filter(function (m) { return m.from === G.sel && m.to === i; })[0];
+      if (mo) { G.st = ZG.morris.apply(st, mo); G.sel = null; afterMove(); return; }
+    }
+    G.sel = st.b[i] === st.turn ? i : null;
+    paint();
+  }
+  function ludoRoll() {
+    if (!humanTurn() || G.st.dice) return;
+    G.st = ZG.ludo.roll(G.st, ZG.ludo.rollDice());
+    sendMove();
+    ludoAfterRoll();
+  }
+  function ludoAfterRoll() {
+    var moves = ZG.ludo.moves(G.st, G.st.dice);
+    if (!moves.length) { setTimeout(function () { if (G && !G.over && G.st.dice && !ZG.ludo.moves(G.st, G.st.dice).length) { G.st = ZG.ludo.pass(G.st); afterMove(); } }, 900); }
+    else if (moves.length === 1) { setTimeout(function () { if (G && !G.over && G.st.dice && humanTurn()) ludoPlay(moves[0].t); }, 450); }
+    paint();
+    schedule();
+  }
+  function ludoPlay(t) {
+    var st = G.st, mv = ZG.ludo.moves(st, st.dice).filter(function (m) { return m.t === t; })[0];
+    if (!mv) return;
+    G.st = ZG.ludo.apply(st, mv);
+    afterMove();
+  }
+
+  /* ---- events ---- */
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var b = t.closest("[data-zg]");
+    if (b && G) {
+      e.preventDefault(); e.stopPropagation();
+      var a = b.getAttribute("data-zg");
+      if (a === "close" || a === "close2") { close(); return; }
+      if (a === "again" && G.mode === "online") { close(); return; }
+      if (a === "again") { var keep = { game: G.game, mode: G.mode, diff: G.diff, you: G.you, players: G.n }; close(); open(keep); return; }
+      if (a === "roll") { ludoRoll(); return; }
+      if (a === "pass") { G.st = ZG.ludo.pass(G.st); afterMove(); return; }
+      return;
+    }
+    var sq = t.closest && t.closest("[data-zgsq]");
+    if (sq && G && humanTurn()) {
+      e.preventDefault(); e.stopPropagation();
+      var i = +sq.getAttribute("data-zgsq");
+      if (G.game === "chess") chessTap(i); else if (G.game === "morris") morrisTap(i);
+      return;
+    }
+    var tk = t.closest && t.closest("[data-zgtok]");
+    if (tk && G && humanTurn()) { e.preventDefault(); e.stopPropagation(); ludoPlay(+tk.getAttribute("data-zgtok")); }
+  }, true);
+
+  /* ---- the menu: which game, which mode, which difficulty ---- */
+  function menu(place) {
+    css();
+    var old = document.getElementById("zgmenu"); if (old) old.remove();
+    var m = document.createElement("div");
+    m.id = "zgmenu"; m.className = "zg-menu";
+    var sel = { game: "chess", mode: "ai", diff: "medium", players: 2 };
+    var canOnline = place === "battle";
+    function html() {
+      return '<div class="sheet"><h3>Games · ' + (place === "battle" ? "Battle Royale" : "Arena") + '</h3>' +
+        '<div class="seg">' + [["chess", "Chess"], ["ludo", "Ludo"], ["morris", "Three men\'s morris"]].map(function (g) {
+          return '<button class="' + (sel.game === g[0] ? "on" : "") + '" data-zgm="game" data-v="' + g[0] + '">' + g[1] + '</button>';
+        }).join("") + '</div>' +
+        (sel.game === "ludo" ? '<div class="seg">' + [2, 3, 4].map(function (n) { return '<button class="' + (sel.players === n ? "on" : "") + '" data-zgm="players" data-v="' + n + '">' + n + ' players</button>'; }).join("") + '</div>' : "") +
+        '<div class="seg">' + [["easy", "Easy"], ["medium", "Medium"], ["hard", "Hard"]].map(function (d) {
+          return '<button class="' + (sel.diff === d[0] ? "on" : "") + '" data-zgm="diff" data-v="' + d[0] + '">' + d[1] + '</button>';
+        }).join("") + '</div>' +
+        '<button class="opt" data-zgm="start" data-mode="ai"><span>🤖</span><span>Play against the computer<small>Works offline · the computer searches the best moves</small></span></button>' +
+        '<button class="opt" data-zgm="start" data-mode="local"><span>👥</span><span>Two players on this phone<small>Works offline · pass the phone</small></span></button>' +
+        (canOnline ? '<button class="opt" data-zgm="online"><span>✉️</span><span>Play a classmate remotely<small>Send an invitation · they accept in Battle Royale</small></span></button>' : "") +
+        '<button class="opt" data-zgm="cancel"><span>✕</span><span>Cancel</span></button></div>';
+    }
+    function paintMenu() { m.innerHTML = html(); if (canOnline && window.zgInboxInto) window.zgInboxInto(m.querySelector(".sheet")); }
+    paintMenu();
+    document.body.appendChild(m);
+    m.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-zgm]");
+      if (!b) { if (e.target === m) m.remove(); return; }
+      e.preventDefault(); e.stopPropagation();
+      var a = b.getAttribute("data-zgm");
+      if (a === "game") sel.game = b.getAttribute("data-v");
+      else if (a === "diff") sel.diff = b.getAttribute("data-v");
+      else if (a === "players") sel.players = +b.getAttribute("data-v");
+      else if (a === "cancel") { m.remove(); return; }
+      else if (a === "start") { m.remove(); open({ game: sel.game, mode: b.getAttribute("data-mode"), diff: sel.diff, players: sel.players }); return; }
+      else if (a === "online") { m.remove(); if (window.zgOnlineStart) window.zgOnlineStart(sel); else toast("Online games are not ready yet.", "x"); return; }
+      paintMenu();
+    }, true);
+  }
+
+  // the Arena and Battle Royale entries
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest('[data-ar="games"],[data-ar="games-battle"]');
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    menu(b.getAttribute("data-ar") === "games-battle" ? "battle" : "arena");
+  }, true);
+
+  window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; } };
+})();
+
+/* ---- app-v5-zzzzzzzg-games-online.js ---- */
+/* =====================================================================
+   v5 · Jeux à distance : invitation d'un camarade (Battle Royale), puis
+   chaque coup est envoyé à la base (supabase/jeux.sql) et l'autre joueur
+   le reçoit en quelques secondes. Les invitations et parties en cours sont
+   listées dans le menu Jeux de Battle Royale.
+   ===================================================================== */
+(function () {
+  var ZGUI = window.ZGUI;
+  if (!ZGUI) return;
+  var ZG = window.ZG;
+  var POLL_MS = 1400;
+
+  function sb() { return window.__sb; }
+  function me() { return (typeof S !== "undefined" && S.uid) || ""; }
+  function nameOf(uid) {
+    var x = ((typeof PR !== "undefined" && PR.dir) || []).find(function (d) { return d.uid === uid; });
+    return x ? x.name : "Classmate";
+  }
+  function note(msg, icon) { try { toast(msg, icon || "check"); } catch (e) {} }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function fail(err) {
+    var m = (err && err.message) || "";
+    if (/game_matches|game_invite|game_play|game_list|game_respond|schema cache|does not exist/i.test(m)) return "The games need supabase/jeux.sql to be run in Supabase once.";
+    if (/classmate who accepts/i.test(m)) return "You can only play with a classmate who accepts messages.";
+    return m || "Could not connect. Try again.";
+  }
+
+  // a new game for two: the state every player will see
+  function initial(game) {
+    if (game === "chess") return { st: ZG.chess.start(), v: 1 };
+    if (game === "morris") return { st: ZG.morris.start(), v: 1 };
+    return { st: ZG.ludo.start(2), v: 1 };
+  }
+
+  /* ---- sending the moves of the game on screen ---- */
+  window.zgPush = async function (G) {
+    if (!G || !G.id || !sb()) return;
+    var next = (G.v || 1) + 1;
+    var r = await sb().rpc("game_play", { p_id: G.id, p_state: { st: G.st, v: next }, p_status: G.over ? "over" : "playing" });
+    if (r && r.error) { note("The move could not be sent. Check the connection.", "x"); return; }
+    G.v = next;
+  };
+
+  /* ---- reading the other player's moves while a game is open ---- */
+  var lastSeen = {};
+  setInterval(async function () {
+    var G = ZGUI.current && ZGUI.current();
+    if (!G || G.mode !== "online" || !G.id || !sb() || G.over) return;
+    try {
+      var r = await sb().from("game_matches").select("*").eq("id", G.id).single();
+      var row = r && r.data;
+      if (!row) return;
+      if (row.status === "over" && row.state && row.state.st) { if (!G.over) ZGUI.adopt(row.state.st, row.state.v); return; }
+      if (row.status === "declined") { note(G.oppName + " declined", "x"); ZGUI.close(); return; }
+      if (row.state && row.state.v > G.v) ZGUI.adopt(row.state.st, row.state.v);
+    } catch (e) {}
+  }, POLL_MS);
+
+  /* ---- waiting for the answer to my invitation ---- */
+  function waitCard(id, game, name) {
+    var old = document.getElementById("zgwait"); if (old) old.remove();
+    var el = document.createElement("div");
+    el.id = "zgwait"; el.className = "zg-end";
+    el.innerHTML = '<div><b>Invitation sent</b><small style="opacity:.75">Waiting for ' + esc(name) + ' to accept…</small><button class="zg-btn ghost" data-zgw="cancel">Cancel</button></div>';
+    document.body.appendChild(el);
+    var stop = false;
+    el.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest('[data-zgw="cancel"]')) { stop = true; el.remove(); }
+    });
+    (async function loop() {
+      while (!stop && document.getElementById("zgwait")) {
+        await new Promise(function (res) { setTimeout(res, 1500); });
+        if (stop || !document.getElementById("zgwait")) break;
+        try {
+          var r = await sb().from("game_matches").select("*").eq("id", id).single();
+          var row = r && r.data;
+          if (!row) continue;
+          if (row.status === "playing") {
+            el.remove();
+            ZGUI.open({ game: game, mode: "online", you: 0, id: id, v: row.state.v, st: row.state.st, oppName: name });
+            return;
+          }
+          if (row.status === "declined") { el.remove(); note(name + " declined the invitation", "x"); return; }
+        } catch (e) {}
+      }
+    })();
+  }
+
+  /* ---- choosing a classmate ---- */
+  window.zgOnlineStart = function (sel) {
+    var friends = ((typeof PR !== "undefined" && PR.dir) || []).filter(function (x) {
+      return typeof frState === "function" ? frState(x.uid) === "friends" : true;
+    });
+    var old = document.getElementById("zgpick"); if (old) old.remove();
+    var el = document.createElement("div");
+    el.id = "zgpick"; el.className = "zg-menu";
+    el.innerHTML = '<div class="sheet"><h3>Invite a classmate</h3>' +
+      (friends.length ? friends.map(function (f) {
+        return '<button class="opt" data-zgp="' + esc(f.uid) + '" data-n="' + esc(f.name) + '"><span>👤</span><span>' + esc(f.name) + '</span></button>';
+      }).join("") : '<p class="small" style="opacity:.8">Add a classmate as a friend first.</p>') +
+      '<button class="opt" data-zgp="" ><span>✕</span><span>Cancel</span></button></div>';
+    document.body.appendChild(el);
+    el.addEventListener("click", async function (e) {
+      var b = e.target.closest && e.target.closest("[data-zgp]");
+      if (!b) { if (e.target === el) el.remove(); return; }
+      e.preventDefault(); e.stopPropagation();
+      var uid = b.getAttribute("data-zgp");
+      if (!uid) { el.remove(); return; }
+      var name = b.getAttribute("data-n") || "Classmate";
+      el.remove();
+      if (!sb()) { note("Connect to play remotely.", "x"); return; }
+      var init = initial(sel.game);
+      var r = await sb().rpc("game_invite", { p_to: uid, p_kind: sel.game, p_state: init });
+      if (r.error) { note(fail(r.error), "x"); return; }
+      waitCard(r.data, sel.game, name);
+    }, true);
+  };
+
+  /* ---- invitations and games in progress (in the Battle Royale games menu) ---- */
+  window.zgInboxInto = async function (sheet) {
+    if (!sheet || !sb()) return;
+    var box = document.createElement("div");
+    box.id = "zgInbox"; box.style.display = "grid"; box.style.gap = "8px";
+    sheet.insertBefore(box, sheet.lastElementChild);
+    var r = await sb().rpc("game_list");
+    if (!r || r.error || !r.data || !r.data.length) { box.remove(); return; }
+    var uid = me();
+    var names = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris" };
+    box.innerHTML = '<h3 style="margin:6px 0 0;font-size:.95rem">Invitations and games</h3>' + r.data.map(function (g) {
+      var other = g.host === uid ? g.guest : g.host, nm = nameOf(other);
+      if (g.status === "invited" && g.guest === uid) {
+        return '<div class="opt" style="cursor:default"><span>📨</span><span>' + esc(nm) + ' invites you to ' + esc(names[g.kind]) +
+          '<small><button class="zg-btn" style="min-width:0;padding:8px 14px;margin-top:6px" data-zgi="accept" data-id="' + g.id + '">Accept</button> ' +
+          '<button class="zg-btn ghost" style="min-width:0;padding:8px 14px;margin-top:6px" data-zgi="decline" data-id="' + g.id + '">Decline</button></small></span></div>';
+      }
+      if (g.status === "invited") {
+        return '<div class="opt" style="cursor:default"><span>⏳</span><span>Waiting for ' + esc(nm) + ' · ' + esc(names[g.kind]) + '</span></div>';
+      }
+      return '<button class="opt" data-zgi="resume" data-id="' + g.id + '"><span>▶</span><span>' + esc(names[g.kind]) + ' with ' + esc(nm) + '<small>Your turn when the badge says so · tap to open</small></span></button>';
+    }).join("");
+    box.addEventListener("click", async function (e) {
+      var b = e.target.closest && e.target.closest("[data-zgi]");
+      if (!b) return;
+      e.preventDefault(); e.stopPropagation();
+      var a = b.getAttribute("data-zgi"), id = b.getAttribute("data-id");
+      var row = r.data.filter(function (g) { return g.id === id; })[0];
+      if (!row) return;
+      if (a === "decline") { var d = await sb().rpc("game_respond", { p_id: id, p_accept: false }); if (d.error) note(fail(d.error), "x"); else { note("Declined", "x"); box.remove(); } return; }
+      if (a === "accept") {
+        var ac = await sb().rpc("game_respond", { p_id: id, p_accept: true });
+        if (ac.error) { note(fail(ac.error), "x"); return; }
+        var sheetEl = document.getElementById("zgmenu"); if (sheetEl) sheetEl.remove();
+        ZGUI.open({ game: row.kind, mode: "online", you: 1, id: id, v: row.state.v, st: row.state.st, oppName: nameOf(row.host) });
+        return;
+      }
+      if (a === "resume") {
+        var sheetEl2 = document.getElementById("zgmenu"); if (sheetEl2) sheetEl2.remove();
+        var mine = row.host === uid ? 0 : 1;
+        ZGUI.open({ game: row.kind, mode: "online", you: mine, id: id, v: row.state.v, st: row.state.st, oppName: nameOf(other(row, uid)) });
+      }
+    }, true);
+    function other(row, u) { return row.host === u ? row.guest : row.host; }
+  };
+})();
 
 /* ==== v4 END ==== */
 render();
