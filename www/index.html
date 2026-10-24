@@ -4227,9 +4227,8 @@ function nTone(ctx,f,t0,len,vol){const o=ctx.createOscillator(),g=ctx.createGain
 function nSound(kind,soft){if(nPref("vib")&&!soft&&navigator.vibrate){try{navigator.vibrate(/msg|story_reply|staff/.test(kind)?[70,50,70]:90)}catch(e){}}
   if(!nPref("sound"))return;const ctx=nAudio();if(!ctx)return;const t=ctx.currentTime+0.02;
   if(soft){nTone(ctx,1046,t,0.12,0.08);return}
-  if(/msg|story_reply|staff/.test(kind)){nTone(ctx,880,t,0.16,0.22);nTone(ctx,1318,t+0.13,0.22,0.2)}       // message: two quick notes
-  else if(kind==="report"){nTone(ctx,660,t,0.2,0.22);nTone(ctx,660,t+0.25,0.2,0.22)}
-  else{nTone(ctx,1174,t,0.28,0.16);nTone(ctx,1568,t+0.06,0.32,0.08)}}                                  // reactions, comments: soft chime
+  if(kind==="report"){nTone(ctx,660,t,0.2,0.22);nTone(ctx,660,t+0.25,0.2,0.22)}                        // reports for teachers: two low beeps
+  else rtNotifPlay(ctx,t)}                                                                             // everything else: the chosen notification sound (app-v5-ringtones.js)
 {const _na=nArrive;nArrive=function(n){try{nSound(n.kind,nViewing(n))}catch(e){}return _na(n)}}
 {const _t=nTitle,_b=nBody;nTitle=n=>n.kind==="report"?(nName(n)+" reported something"):_t(n);nBody=n=>n.kind==="report"?(`Reason: ${n.body||"—"} · tap to check`):_b(n)}
 {const _g=nGo;nGo=function(id){const n=N.list.find(x=>String(x.id)===String(id));if(n&&String(n.ref||"").startsWith("report:")&&S.mode==="teacher"){if(!n.read_at){n.read_at=new Date().toISOString();window.__notif.read([n.id]).catch(()=>{})}S.view=null;S.tab="msgs";S.msgsTab="community";SF.rep=null;scrollTo(0,0);render();return}return _g(id)}}
@@ -4305,6 +4304,7 @@ function secView(){const A=window.__account?window.__account.info():{},me=S.mode
     <button type="button" class="btn ghost sm" data-v4="secOthers">${ic("x")}Log out of all other devices</button></div>
   <div class="glass card sec"><h3>${BELL} Notifications</h3>
     ${swHTML("sound",nPref("sound"),"Sound","Play a sound for new messages and activity")}
+    ${rtPickersHTML()}
     ${swHTML("vib",nPref("vib"),"Vibration","The phone vibrates for new messages")}
     ${perm==="unsupported"?"":perm==="granted"?swHTML("push",nPref("push"),"Phone notifications","Show notifications when the app is in the background"):`<div class="secrow"><div><b>Phone notifications</b><small>${perm==="denied"?"Blocked: allow them in your phone or browser settings.":"Get notified even when you use another app."}</small></div>${perm==="denied"?"":`<button type="button" class="btn sm" data-v4="nPerm">Turn on</button>`}</div>`}
     <button type="button" class="btn ghost sm" data-v4="secTest">${ic("speaker")}Test the sound</button></div>
@@ -5752,6 +5752,7 @@ function callPeer(uid,answering){
     else{P.stream=P.stream||new MediaStream();P.stream.addTrack(e.track)}
     const again=()=>callScreenSync();
     e.track.onmute=again;e.track.onunmute=again;e.track.onended=again;
+    if(e.track.kind==="audio")callRemoteAudio(uid,P.stream);
     callScreenSync();
   };
   pc.onconnectionstatechange=()=>{P.state=pc.connectionState;if(P.state==="failed")toast("The connection with "+callName(uid)+" was lost","x");callScreenSync()};
@@ -5764,7 +5765,7 @@ function callAttachLocal(P){
   P.ta.sender.replaceTrack(a).catch(()=>{});
   P.tv.sender.replaceTrack(v).catch(()=>{});
 }
-function callDropPeer(uid){const P=CALL.peers[uid];if(P){try{P.pc.close()}catch(e){}}delete CALL.peers[uid];CALL.others=CALL.others.filter(x=>x!==uid);callScreenSync()}
+function callDropPeer(uid){const P=CALL.peers[uid];callRemoteAudioEnd(uid);if(P){try{P.pc.close()}catch(e){}}delete CALL.peers[uid];CALL.others=CALL.others.filter(x=>x!==uid);callScreenSync()}
 async function callOffer(uid){
   const P=callPeer(uid);
   try{const off=await P.pc.createOffer();await P.pc.setLocalDescription(off);callSendTo(CALL.id,uid,"offer",{sdp:P.pc.localDescription.sdp})}catch(e){console.warn(e)}
@@ -5803,7 +5804,18 @@ async function callMedia(video){
 }
 function callSetLocal(st){
   CALL.local=st;CALL.micOn=true;CALL.camOn=st.getVideoTracks().length>0;
+  // people who came before the microphone was ready get it now (otherwise they hear nothing from this phone)
+  Object.values(CALL.peers).forEach(function(P){callAttachLocal(P)});
 }
+// the other person's voice plays through its own audio element (a video tile can be blocked from playing sound)
+function callRemoteAudio(uid,stream){
+  let a=document.getElementById("callAud-"+uid);
+  if(!a){a=document.createElement("audio");a.id="callAud-"+uid;a.autoplay=true;a.setAttribute("playsinline","");a.style.display="none";document.body.appendChild(a)}
+  if(a.srcObject!==stream)a.srcObject=stream;
+  a.play().catch(function(){});
+  if(!a.dataset.zz){a.dataset.zz="1";document.addEventListener("pointerdown",function(){if(a.isConnected&&a.paused&&a.srcObject)a.play().catch(function(){})},true)}
+}
+function callRemoteAudioEnd(uid){const a=document.getElementById("callAud-"+uid);if(a){try{a.pause();a.srcObject=null}catch(e){}a.remove()}}
 async function callToggleMic(){
   if(!CALL.local)return;
   CALL.micOn=!CALL.micOn;CALL.local.getAudioTracks().forEach(t=>t.enabled=CALL.micOn);callScreenSync();
@@ -5866,7 +5878,7 @@ async function callLeave(){
 }
 function callCleanup(){
   clearTimeout(CALL.timer);
-  for(const u of Object.keys(CALL.peers)){try{CALL.peers[u].pc.close()}catch(e){}}
+  for(const u of Object.keys(CALL.peers)){callRemoteAudioEnd(u);try{CALL.peers[u].pc.close()}catch(e){}}
   CALL.peers={};
   if(CALL.local)CALL.local.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
   CALL.local=null;CALL.id=null;CALL.joined=false;CALL.others=[];CALL.host=null;CALL.pick=new Set();CALL.cands=null;
@@ -5925,7 +5937,7 @@ function callTileEl(grid,key,label){
   if(!t){
     t=document.createElement("div");t.className="call-tile";t.dataset.u=key;
     const ini=(label||"?").trim().charAt(0).toUpperCase()||"?";
-    t.innerHTML=`<video autoplay playsinline ${key==="me"?"muted":""}></video><div class="call-av">${ini}</div><span class="call-nm"></span>`;
+    t.innerHTML=`<video autoplay playsinline muted></video><div class="call-av">${ini}</div><span class="call-nm"></span>`;
     grid.appendChild(t);
   }
   t.querySelector(".call-nm").textContent=key==="me"?"You":label;
@@ -5986,15 +5998,13 @@ function callHideIncoming(){const el=document.getElementById("callIn");if(el)el.
 function callRing(on){
   clearInterval(CALL.ringT);CALL.ringT=null;
   if(!on)return;
-  callTone();CALL.ringT=setInterval(callTone,1500);
+  callTone();CALL.ringT=setInterval(callTone,rtCallPeriod());
 }
 let CALL_AC=null;
 function callTone(){
   try{CALL_AC=CALL_AC||new (window.AudioContext||window.webkitAudioContext)();
-    const o=CALL_AC.createOscillator(),g=CALL_AC.createGain(),t=CALL_AC.currentTime;
-    o.frequency.value=880;o.connect(g);g.connect(CALL_AC.destination);
-    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.25,t+0.05);g.gain.exponentialRampToValueAtTime(0.0001,t+0.6);
-    o.start(t);o.stop(t+0.65)}catch(e){}
+    if(CALL_AC.state==="suspended")CALL_AC.resume();
+    rtCallPlay(CALL_AC,CALL_AC.currentTime+0.02)}catch(e){}
 }
 
 /* ---- buttons: one listener for every call button ---- */
@@ -7530,6 +7540,76 @@ async function pushSave(token){
 /* start once the person is signed in and the app is ready */
 {const _pv=peersView;peersView=function(){const h=_pv();if(S.mode==="student")pushStart();return h}}
 {const _cv=classView;classView=function(){pushStart();return _cv()}}
+
+/* ---- app-v5-ringtones.js ---- */
+/* =====================================================================
+   v5 · Ringtones. 5 call tones (repeating ring) and 5 notification
+   sounds (1 to 3 s), all made at runtime with the Web Audio API, so they
+   work offline and need no audio files. The choice is kept per device.
+   ===================================================================== */
+const RT_KEY={call:"ec_rt_call",notif:"ec_rt_notif"};
+const RT_DEF={call:"classic",notif:"two"};
+
+/* one note: an oscillator from f0 (to f1 if given) over len seconds, with a short attack and a smooth release */
+function rtNote(ctx,t0,f0,len,vol,opt){
+  opt=opt||{};
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type=opt.type||"sine";
+  o.frequency.setValueAtTime(f0,t0);
+  if(opt.f1)o.frequency.exponentialRampToValueAtTime(opt.f1,t0+len);
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(vol,t0+(opt.attack||0.012));
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+len);
+  o.connect(g).connect(ctx.destination);
+  o.start(t0);o.stop(t0+len+0.05)}
+
+/* call tones: play(ctx,t) schedules ONE ring starting at t; the ring repeats every `period` seconds */
+const RT_CALL=[
+  {id:"classic",name:"Classic",period:1.5,play(c,t){rtNote(c,t,880,0.6,0.25,{attack:0.05})}},
+  {id:"dual",name:"Phone ring",period:3,play(c,t){for(const s of[0,0.6]){rtNote(c,t+s,440,0.4,0.18);rtNote(c,t+s,480,0.4,0.18)}}},
+  {id:"rise",name:"Rising",period:2,play(c,t){[523,659,784,1047].forEach((f,i)=>rtNote(c,t+i*0.12,f,0.3,0.2,{type:"triangle"}))}},
+  {id:"chimes",name:"Chimes",period:2.6,play(c,t){for(const[s,f]of[[0,1397],[0.9,1319]]){rtNote(c,t+s,f,1,0.2);rtNote(c,t+s,f*2,0.5,0.05)}}},
+  {id:"pulse",name:"Pulse",period:1.4,play(c,t){for(const s of[0,0.14,0.28])rtNote(c,t+s,1200,0.09,0.08,{type:"square",attack:0.004})}}
+];
+
+/* notification sounds: play(ctx,t) plays one sound of 1 to 1.6 s */
+const RT_NOTIF=[
+  {id:"two",name:"Two notes",play(c,t){rtNote(c,t,880,0.5,0.22);rtNote(c,t+0.13,1318,0.9,0.2)}},
+  {id:"bubble",name:"Bubble",play(c,t){rtNote(c,t,400,0.35,0.22,{f1:1200});rtNote(c,t+0.3,600,0.7,0.2,{f1:1600})}},
+  {id:"ding",name:"Ding",play(c,t){rtNote(c,t,1760,1.4,0.22);rtNote(c,t,3520,0.6,0.05)}},
+  {id:"harp",name:"Harp",play(c,t){[1047,880,698,523].forEach((f,i)=>rtNote(c,t+i*0.1,f,0.9,0.18))}},
+  {id:"low",name:"Low tone",play(c,t){rtNote(c,t,330,0.5,0.25,{type:"triangle"});rtNote(c,t+0.45,262,0.9,0.25,{type:"triangle"})}}
+];
+const RT_LIST={call:RT_CALL,notif:RT_NOTIF};
+
+/* the saved choice (per device); falls back to the default if storage is blocked or the id is unknown */
+function rtGet(kind){
+  try{const v=localStorage.getItem(RT_KEY[kind]);if(v&&RT_LIST[kind].some(x=>x.id===v))return v}catch(e){}
+  return RT_DEF[kind]}
+function rtSet(kind,id){try{localStorage.setItem(RT_KEY[kind],id)}catch(e){}}
+function rtTone(kind){const id=rtGet(kind);return RT_LIST[kind].find(x=>x.id===id)||RT_LIST[kind][0]}
+
+/* used by the app: the ring of an incoming call, and a notification sound */
+function rtCallPlay(ctx,t){try{rtTone("call").play(ctx,t)}catch(e){}}
+function rtCallPeriod(){return rtTone("call").period*1000}
+function rtNotifPlay(ctx,t){try{rtTone("notif").play(ctx,t)}catch(e){}}
+
+/* settings: two pickers, each row with a preview button */
+function rtPickersHTML(){
+  const group=(kind,title)=>{const cur=rtGet(kind);
+    return `<div class="rt-group"><b class="small">${title}</b>`+RT_LIST[kind].map(t=>{const on=t.id===cur;
+      return `<div class="secrow rt-row"><button type="button" class="linkbtn rt-pick" data-rt-pick="${kind}" data-id="${t.id}" aria-pressed="${on}">${on?ic("check"):""}<span>${esc(t.name)}${on?" (selected)":""}</span></button><button type="button" class="btn ghost sm" data-rt-play="${kind}" data-id="${t.id}" aria-label="Preview ${esc(t.name)}">${ic("speaker")}Preview</button></div>`}).join("")+`</div>`};
+  return group("call","Call ringtone")+group("notif","Notification sound")}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest&&e.target.closest("[data-rt-pick],[data-rt-play]");if(!b)return;
+  e.preventDefault();
+  const kind=b.dataset.rtPick||b.dataset.rtPlay,id=b.dataset.id;
+  if(!RT_LIST[kind]||!RT_LIST[kind].some(x=>x.id===id))return;
+  if(b.dataset.rtPick){rtSet(kind,id);render();return}
+  /* preview: play one ring or one sound now, even if sound is off */
+  try{const ctx=nAudio();if(!ctx)return;const T=RT_LIST[kind].find(x=>x.id===id);T.play(ctx,ctx.currentTime+0.02)}catch(er){}
+},false);
 
 /* ---- app-v5-snap.js ---- */
 /* =====================================================================
@@ -16468,14 +16548,33 @@ img.zz-stkbad{width:120px;min-height:60px;opacity:.6;object-fit:contain}
     var id = BT.room && BT.room.id;
     if (!id || !(typeof PR !== "undefined" ? PR : undefined)) return [];
     var seen = {}, out = [];
+    // private messages between me and the players (or the people picked) count too, from the moment the room was first seen
+    var since = roomSince(id);
+    var others = ((BT.st && BT.st.players) || []).map(function (p) { return p.uid; }).concat(pick || []);
     (PR.inbox || []).forEach(function (m) {
-      if (!m || !m.meta || m.meta.room !== id) return;
+      if (!m) return;
+      var mineMsg = m.sender === me() || m.receiver === me();
+      var other = m.sender === me() ? m.receiver : m.sender;
+      var privateOk = mineMsg && others.indexOf(other) >= 0 && +new Date(m.created_at) >= since;
+      if (!privateOk && (!m.meta || m.meta.room !== id)) return;
       var k = m.sender + "|" + m.receiver + "|" + m.body + "|" + Math.floor(+new Date(m.created_at) / 2000);
       if (seen[k]) return;
       seen[k] = 1;
       out.push(m);
     });
     return out.sort(function (a, b) { return +new Date(a.created_at) - +new Date(b.created_at); });
+  }
+
+  // the first time this room is seen on this phone: messages from then on are shown
+  function roomSince(id) {
+    var k = "zzRoomSince:" + id;
+    try {
+      var v = +localStorage.getItem(k);
+      if (v) return v;
+      v = Date.now() - 86400000;
+      localStorage.setItem(k, String(v));
+      return v;
+    } catch (e) { return 0; }
   }
 
   // the conversation with the people chosen (or the whole battle)
@@ -16919,15 +17018,32 @@ window.addEventListener("click",function(e){
   ed5Open(P.file,"video",null);
 },true);
 
-/* ---------- long press on a photo or video: the message menu (the media is a button, so the app skipped it) ---------- */
-var zzLpAt=0;
+/* ---------- long press on a message (photo, video, text): the message menu ----------
+   A timer on the pointer decides, so it works on buttons (photos, videos) where the
+   phone does not always send its "menu" event. The press that opened the menu does not
+   also open the photo or video. */
+var zzLpAt=0,zzLpT=0,zzLpX=0,zzLpY=0;
+function zzLpCancel(){clearTimeout(zzLpT);zzLpT=0}
+window.addEventListener("pointerdown",function(e){
+  zzLpCancel();
+  const t=e.target;if(!t||!t.closest)return;
+  const m=t.closest(".msg[data-mid]");if(!m||String(m.dataset.mid).indexOf("tmp")===0)return;
+  if(t.closest("a,input,textarea,audio,.v4quote,[data-zzpj],[data-zzpu]"))return;
+  zzLpX=e.clientX;zzLpY=e.clientY;
+  zzLpT=setTimeout(function(){
+    zzLpT=0;zzLpAt=Date.now();
+    if(navigator.vibrate)try{navigator.vibrate(12)}catch(x){}
+    V4.act={kind:m.dataset.k,id:m.dataset.mid};render();
+  },480);
+},true);
+window.addEventListener("pointermove",function(e){if(zzLpT&&Math.hypot(e.clientX-zzLpX,e.clientY-zzLpY)>12)zzLpCancel()},true);
+window.addEventListener("pointerup",function(){zzLpCancel()},true);
+window.addEventListener("pointercancel",function(){zzLpCancel()},true);
 window.addEventListener("contextmenu",function(e){
   const t=e.target;if(!t||!t.closest)return;
   const m=t.closest(".msg[data-mid]");if(!m||String(m.dataset.mid).indexOf("tmp")===0)return;
-  if(!t.closest("button"))return;
   e.preventDefault();e.stopImmediatePropagation();
-  zzLpAt=Date.now();
-  V4.act={kind:m.dataset.k,id:m.dataset.mid};render();
+  zzLpAt=Date.now();V4.act={kind:m.dataset.k,id:m.dataset.mid};render();
 },true);
 window.addEventListener("click",function(e){
   if(Date.now()-zzLpAt>700)return;

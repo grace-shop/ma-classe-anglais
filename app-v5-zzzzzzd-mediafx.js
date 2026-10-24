@@ -50,15 +50,32 @@ window.addEventListener("click",function(e){
   ed5Open(P.file,"video",null);
 },true);
 
-/* ---------- long press on a photo or video: the message menu (the media is a button, so the app skipped it) ---------- */
-var zzLpAt=0;
+/* ---------- long press on a message (photo, video, text): the message menu ----------
+   A timer on the pointer decides, so it works on buttons (photos, videos) where the
+   phone does not always send its "menu" event. The press that opened the menu does not
+   also open the photo or video. */
+var zzLpAt=0,zzLpT=0,zzLpX=0,zzLpY=0;
+function zzLpCancel(){clearTimeout(zzLpT);zzLpT=0}
+window.addEventListener("pointerdown",function(e){
+  zzLpCancel();
+  const t=e.target;if(!t||!t.closest)return;
+  const m=t.closest(".msg[data-mid]");if(!m||String(m.dataset.mid).indexOf("tmp")===0)return;
+  if(t.closest("a,input,textarea,audio,.v4quote,[data-zzpj],[data-zzpu]"))return;
+  zzLpX=e.clientX;zzLpY=e.clientY;
+  zzLpT=setTimeout(function(){
+    zzLpT=0;zzLpAt=Date.now();
+    if(navigator.vibrate)try{navigator.vibrate(12)}catch(x){}
+    V4.act={kind:m.dataset.k,id:m.dataset.mid};render();
+  },480);
+},true);
+window.addEventListener("pointermove",function(e){if(zzLpT&&Math.hypot(e.clientX-zzLpX,e.clientY-zzLpY)>12)zzLpCancel()},true);
+window.addEventListener("pointerup",function(){zzLpCancel()},true);
+window.addEventListener("pointercancel",function(){zzLpCancel()},true);
 window.addEventListener("contextmenu",function(e){
   const t=e.target;if(!t||!t.closest)return;
   const m=t.closest(".msg[data-mid]");if(!m||String(m.dataset.mid).indexOf("tmp")===0)return;
-  if(!t.closest("button"))return;
   e.preventDefault();e.stopImmediatePropagation();
-  zzLpAt=Date.now();
-  V4.act={kind:m.dataset.k,id:m.dataset.mid};render();
+  zzLpAt=Date.now();V4.act={kind:m.dataset.k,id:m.dataset.mid};render();
 },true);
 window.addEventListener("click",function(e){
   if(Date.now()-zzLpAt>700)return;

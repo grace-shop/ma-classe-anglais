@@ -85,14 +85,33 @@
     var id = BT.room && BT.room.id;
     if (!id || !(typeof PR !== "undefined" ? PR : undefined)) return [];
     var seen = {}, out = [];
+    // private messages between me and the players (or the people picked) count too, from the moment the room was first seen
+    var since = roomSince(id);
+    var others = ((BT.st && BT.st.players) || []).map(function (p) { return p.uid; }).concat(pick || []);
     (PR.inbox || []).forEach(function (m) {
-      if (!m || !m.meta || m.meta.room !== id) return;
+      if (!m) return;
+      var mineMsg = m.sender === me() || m.receiver === me();
+      var other = m.sender === me() ? m.receiver : m.sender;
+      var privateOk = mineMsg && others.indexOf(other) >= 0 && +new Date(m.created_at) >= since;
+      if (!privateOk && (!m.meta || m.meta.room !== id)) return;
       var k = m.sender + "|" + m.receiver + "|" + m.body + "|" + Math.floor(+new Date(m.created_at) / 2000);
       if (seen[k]) return;
       seen[k] = 1;
       out.push(m);
     });
     return out.sort(function (a, b) { return +new Date(a.created_at) - +new Date(b.created_at); });
+  }
+
+  // the first time this room is seen on this phone: messages from then on are shown
+  function roomSince(id) {
+    var k = "zzRoomSince:" + id;
+    try {
+      var v = +localStorage.getItem(k);
+      if (v) return v;
+      v = Date.now() - 86400000;
+      localStorage.setItem(k, String(v));
+      return v;
+    } catch (e) { return 0; }
   }
 
   // the conversation with the people chosen (or the whole battle)
