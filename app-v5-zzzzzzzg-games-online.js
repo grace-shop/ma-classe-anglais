@@ -121,7 +121,7 @@
     if (!sheet || !sb()) return;
     var box = document.createElement("div");
     box.id = "zgInbox"; box.style.display = "grid"; box.style.gap = "8px";
-    sheet.insertBefore(box, sheet.lastElementChild);
+    sheet.appendChild(box);
     var r = await sb().rpc("game_list");
     if (!r || r.error || !r.data || !r.data.length) { box.remove(); return; }
     var uid = me();
