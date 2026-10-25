@@ -83,3 +83,11 @@ if (existsSync("android-extras/callkeeper")) {
   }
   console.log("✓ appel en arrière-plan (service de premier plan) ajouté");
 }
+
+// Sons de notification : fichiers WAV dans res/raw (un canal Android par son)
+import { readdirSync as rds, mkdirSync as mk2, copyFileSync as cp2 } from "node:fs";
+if (existsSync("android-extras/sounds")) {
+  mk2("android/app/src/main/res/raw", { recursive: true });
+  for (const f of rds("android-extras/sounds")) if (f.endsWith(".wav")) cp2("android-extras/sounds/" + f, "android/app/src/main/res/raw/" + f);
+  console.log("✓ sons de notification copiés");
+}
