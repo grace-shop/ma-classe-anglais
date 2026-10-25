@@ -4235,10 +4235,16 @@ function nSound(kind,soft){if(nPref("vib")&&!soft&&navigator.vibrate){try{naviga
 /* phone notifications with sound (Android app: its own "Messages" channel) */
 const isNat=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 async function nNativeInit(ask){const P=typeof LN==="function"?LN():null;if(!P)return"unsupported";try{let r=await P.checkPermissions();if(r.display!=="granted"&&ask)r=await P.requestPermissions();N.nperm=r.display;
-  if(r.display==="granted"&&!N.chan){N.chan=1;try{await P.createChannel({id:"messages",name:"Messages and activity",description:"Messages, comments and reactions",importance:5,visibility:1,vibration:true,lights:true})}catch(e){}}return r.display}catch(e){return"unsupported"}}
+  if(r.display==="granted"&&!N.chan){N.chan=1;try{await P.createChannel({id:"messages",name:"Messages and activity",description:"Messages, comments and reactions",importance:5,visibility:1,vibration:true,lights:true})}catch(e){}}
+  if(r.display==="granted")await nChanSound();return r.display}catch(e){return"unsupported"}}
+/* one Android channel per notification sound (a channel's sound cannot change later): raw file res/raw/notif_<id> */
+const NCH={};
+async function nChanSound(){const P=typeof LN==="function"?LN():null;if(!P)return"msg_two";let id="two";try{id=rtGet("notif")}catch(e){}
+  const cid="msg_"+id;if(NCH[cid])return cid;NCH[cid]=1;
+  try{await P.createChannel({id:cid,name:"Notification sound",description:"Messages, comments and reactions",importance:5,visibility:1,vibration:true,lights:true,sound:"notif_"+id})}catch(e){}return cid}
 if(isNat())setTimeout(()=>nNativeInit(false),3000);
 nSys=async function(title,body,tag){try{if(!nPref("push"))return;
-  if(isNat()){const P=LN();if(!P)return;if(N.nperm!=="granted")await nNativeInit(false);if(N.nperm!=="granted")return;await P.schedule({notifications:[{id:nid(tag+title+body+Date.now()),title,body,channelId:"messages",schedule:{at:new Date(Date.now()+300)}}]});return}
+  if(isNat()){const P=LN();if(!P)return;if(N.nperm!=="granted")await nNativeInit(false);if(N.nperm!=="granted")return;const cid=await nChanSound();await P.schedule({notifications:[{id:nid(tag+title+body+Date.now()),title,body,channelId:cid,schedule:{at:new Date(Date.now()+300)}}]});return}
   if(!("Notification" in window)||Notification.permission!=="granted")return;
   const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();const o={body,tag:"ec-"+tag,renotify:true,icon:"icons/icon-192.png",badge:"icons/icon-192.png",vibrate:nPref("vib")?[80,50,80]:undefined,silent:!nPref("sound")};
   if(r&&r.showNotification)r.showNotification(title,o);else new Notification(title,o)}catch(e){}};
