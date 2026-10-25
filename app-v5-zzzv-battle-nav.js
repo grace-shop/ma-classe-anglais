@@ -144,12 +144,12 @@ arClose=function(){BTNAV.view=null;return _btArClose()};
 {const st=document.createElement('style');st.id='gameRoundCss';st.textContent=`
 /* the Game button: a rectangle whose two sides bulge outwards, in the colours of the theme */
 .ar-round-wrap{display:flex;justify-content:center;margin:14px 0 6px;background:none!important;box-shadow:none!important}
-.ar-round{position:relative;width:230px;max-width:72vw;height:96px;border:0;padding:0;margin:0;cursor:pointer;font:inherit;color:var(--on-ink,#fff);box-shadow:none!important;border-radius:0!important;background-clip:border-box;
+.ar-round{position:relative;width:320px;max-width:88vw;height:118px;border:0;padding:0;margin:0;cursor:pointer;font:inherit;color:var(--on-ink,#fff);box-shadow:none!important;border-radius:0!important;background-clip:border-box;
   background:var(--grad,linear-gradient(135deg,#5EEAD4,#818CF8));
   clip-path:polygon(9% 0,91% 0,92.1% 5%,93.8% 10%,95.2% 20%,96.7% 30%,97.8% 40%,98.6% 45%,100% 50%,98.6% 55%,97.8% 60%,96.7% 70%,95.2% 80%,93.8% 90%,92.1% 95%,91% 100%,9% 100%,7.9% 95%,6.2% 90%,4.8% 80%,3.3% 70%,2.2% 60%,1.4% 55%,0 50%,1.4% 45%,2.2% 40%,3.3% 30%,4.8% 20%,6.2% 10%,7.9% 5%);
   transition:transform .18s ease,filter .2s}
 .ar-round::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0) 48%,rgba(0,0,0,.12));pointer-events:none}
-.ar-round span{position:relative;font-weight:900;font-size:1.3rem;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.ar-round span{position:relative;font-weight:900;font-size:1.6rem;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 0 rgba(255,255,255,.35)}
 .ar-round:active{transform:scale(.96)}
 .ar-round:focus-visible{outline:2px solid var(--fg,#fff);outline-offset:4px}
 `;document.head.appendChild(st)}

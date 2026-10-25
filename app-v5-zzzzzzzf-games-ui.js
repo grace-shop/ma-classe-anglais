@@ -653,8 +653,9 @@
     var toks = "", qdice = "";
     for (var qk = 0; qk < n; qk++) {
       var qc = st.corner[qk], qname = G.mode === "ai" ? (qk === G.you ? "You" : "Computer") : (G.mode === "online" ? (qk === G.you ? "You" : G.oppName) : "Player " + (qk + 1));
+      var inBase = st.tok[qk].filter(function (x) { return x < 0; }).length;
       var qdie = cubeHTML("q" + qk, st.dice && st.turn === qk && !G.rolling ? st.dice : G.lastDie[qk], "sm", st.turn === qk && human && !st.dice && !G.rolling);
-      qdice += '<div class="zgl-qdie zgl-q' + qc + '">' + qdie + '</div><div class="zgl-qlbl zgl-q' + qc + '" style="--c:' + CORNER[qc].hex + '">' + esc(qname) + '</div>';
+      qdice += '<div class="zgl-qdie zgl-q' + qc + '">' + qdie + '</div><div class="zgl-qlbl zgl-q' + qc + '" style="--c:' + CORNER[qc].hex + '">' + esc(qname) + ' · <b>' + inBase + '</b> in base</div>';
     }
     for (var k = 0; k < n; k++) {
       var c = st.corner[k];
@@ -724,7 +725,7 @@
   }
   // le dé tourne en 3D puis s'arrête sur sa face
   function runRollAnim(h, ra) {
-    var el = h.querySelector('[data-cube="d' + ra.p + '"]');
+    var el = h.querySelector('[data-cube="q' + ra.p + '"]');
     if (!el || !el.animate) return;
     var f = FINAL[ra.v];
     el.animate([
@@ -747,11 +748,12 @@
       var r = el.getBoundingClientRect(), dx = prev.x - r.left, dy = prev.y - r.top;
       if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
       if (el.animate) {
+        var lud = G && G.game === "ludo";
         var a = el.animate([
           { transform: "translate(" + dx + "px," + dy + "px)" },
           { transform: "translate(" + dx / 2 + "px," + (dy / 2 - 14) + "px)", offset: 0.5 },
           { transform: "translate(0,0)" }
-        ], { duration: 420, easing: "cubic-bezier(.3,.7,.4,1)" });
+        ], { duration: lud ? 240 : 420, easing: lud ? "ease-in-out" : "cubic-bezier(.3,.7,.4,1)" });
         a.onfinish = function () { SFX.tok(); };
       }
     });
@@ -810,7 +812,7 @@
       s2.tok[k][t] = path[i];
       G.st = s2; G.anim = true; paint(); SFX.move();
       i++;
-      if (i < path.length) { setTimeout(walk, 170); return; }
+      if (i < path.length) { setTimeout(walk, 250); return; }
       G.rolling = false;
       if (caps.length) SFX.capture();
       G.st = next; G.anim = true;
@@ -1189,6 +1191,11 @@
 .zgpw svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 .zgl-cell.safe::after,.zgl-cell.star::after{content:"☆";position:absolute;inset:0;display:grid;place-items:center;color:#1f2937;font-size:85%;font-weight:700;background:none}
 .zgl-cell.star{background:#fff}
+.zgpw::before{content:"";position:absolute;left:12%;right:12%;bottom:-6%;height:24%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,0));z-index:-1;pointer-events:none}
+.zgpw{filter:drop-shadow(0 3px 2px rgba(0,0,0,.35))}
+.zgl-qlbl b{font-weight:900;margin:0 1px}
+.zgl-qlbl{padding:3px 8px;box-shadow:0 2px 0 rgba(0,0,0,.25),0 0 0 1.5px rgba(255,255,255,.9)}
+.zgl-qdie .zgcube-wrap{box-shadow:0 6px 10px rgba(0,0,0,.35)}
 `;
 
   window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; }, pickFor: pickFor };
