@@ -4303,7 +4303,6 @@ function secView(){const A=window.__account?window.__account.info():{},me=S.mode
     <button type="button" class="btn ghost sm" data-v4="secOthers">${ic("x")}Log out of all other devices</button></div>
   <div class="glass card sec"><h3>${BELL} Notifications</h3>
     ${swHTML("sound",nPref("sound"),"Sound","Play a sound for new messages and activity")}
-    ${rtPickersHTML()}
     ${swHTML("vib",nPref("vib"),"Vibration","The phone vibrates for new messages")}
     ${perm==="unsupported"?"":perm==="granted"?swHTML("push",nPref("push"),"Phone notifications","Show notifications when the app is in the background"):`<div class="secrow"><div><b>Phone notifications</b><small>${perm==="denied"?"Blocked: allow them in your phone or browser settings.":"Get notified even when you use another app."}</small></div>${perm==="denied"?"":`<button type="button" class="btn sm" data-v4="nPerm">Turn on</button>`}</div>`}
     <button type="button" class="btn ghost sm" data-v4="secTest">${ic("speaker")}Test the sound</button></div>
@@ -7600,7 +7599,7 @@ function rtNotifPlay(ctx,t){try{rtTone("notif").play(ctx,t)}catch(e){}}
 function rtPickersHTML(){
   const group=(kind,title)=>{const cur=rtGet(kind);
     return `<div class="rt-group"><b class="small">${title}</b>`+RT_LIST[kind].map(t=>{const on=t.id===cur;
-      return `<div class="secrow rt-row"><button type="button" class="linkbtn rt-pick" data-rt-pick="${kind}" data-id="${t.id}" aria-pressed="${on}">${on?ic("check"):""}<span>${esc(t.name)}${on?" (selected)":""}</span></button><button type="button" class="btn ghost sm" data-rt-play="${kind}" data-id="${t.id}" aria-label="Preview ${esc(t.name)}">${ic("speaker")}Preview</button></div>`}).join("")+`</div>`};
+      return `<div class="secrow rt-row"><button type="button" class="linkbtn rt-pick" data-rt-pick="${kind}" data-id="${t.id}" aria-pressed="${on}">${on?ic("check"):""}<span>${esc(t.name)}${on?" (selected)":""}${t.id===RT_DEF[kind]?" · default":""}</span></button><button type="button" class="btn ghost sm" data-rt-play="${kind}" data-id="${t.id}" aria-label="Preview ${esc(t.name)}">${ic("speaker")}Preview</button></div>`}).join("")+`</div>`};
   return group("call","Call ringtone")+group("notif","Notification sound")}
 
 document.addEventListener("click",e=>{
@@ -17749,7 +17748,7 @@ async function zzBakeEntries(entries){
     Q: '<path d="M14 34 C15 27 16.5 23 16.5 20 L28.5 20 C28.5 23 30 27 31 34 Z"/><rect x="14.5" y="18" width="16" height="3" rx="1.5"/><path d="M14.5 18 L10 9 L15.5 13 L17.5 6 L22.5 11.5 L27.5 6 L29.5 13 L35 9 L30.5 18 Z"/><circle cx="10" cy="8.2" r="2"/><circle cx="17.5" cy="5.2" r="2"/><circle cx="22.5" cy="9.5" r="2.1"/><circle cx="27.5" cy="5.2" r="2"/><circle cx="35" cy="8.2" r="2"/>',
     B: '<path d="M12.5 34 C14 28 16.5 25 17.5 21.5 L27.5 21.5 C28.5 25 31 28 32.5 34 Z"/><rect x="15.5" y="19.5" width="14" height="3" rx="1.5"/><path d="M22.5 4 C28 8.5 28.5 13 25 17.5 L20 17.5 C16.5 13 17 8.5 22.5 4 Z"/><circle cx="22.5" cy="3" r="1.6"/><path class="slit" d="M20.8 12.5 L24.4 8.6" />',
     R: '<path d="M14.5 33 L13.5 17 L31.5 17 L30.5 33 Z"/><rect x="12" y="14" width="21" height="3.6" rx="1.2"/><path d="M12 14 L12 6.5 L16.5 6.5 L16.5 10 L20.5 10 L20.5 6.5 L24.5 6.5 L24.5 10 L28.5 10 L28.5 6.5 L33 6.5 L33 14 Z"/>',
-    N: '<path d="M9 36 C9.5 31 11 28.5 13.5 26 C13 25 11.8 24.2 10.5 23.6 C8.8 22.8 7.2 22.3 6.6 21.4 C6.1 20.6 6.4 19.6 7.4 18.8 C8.8 17.2 10.6 14.6 12.2 12.2 C13.4 10.6 14.2 9.2 15.6 7.2 L16.4 3.4 C18.6 5.2 20 6.6 21.6 7.4 C25.4 9.4 29.6 14.4 32 20.4 C34.2 25.5 35.4 31 35.6 36 Z"/><circle class="eye" cx="14.2" cy="15.6" r="1.15"/><path class="slit" d="M24.5 11.5 C27.5 15.5 29 19.5 29.2 25 M19.6 9.6 C21.6 12.6 22.6 15.6 22.4 19.8"/>',
+    N: '<path d="M12 34 C13 31 13.6 28.6 14.8 25.4 C13.6 24.8 11.4 24.4 9.8 23.6 C8.6 23 7.6 22.6 7 21.4 C6.4 20.3 6.2 19.2 6.4 18.3 C6.7 17.3 7.6 16.8 8.6 16.4 C10.2 15.6 12.4 14.2 14 11.8 C15 10.4 15.8 9.4 17.4 8.4 L19.2 3.6 C20.4 5.6 21.4 6.8 22.8 7 C24.6 7.2 25.2 8.6 25.6 9.4 C26.2 10.3 26.6 11.2 27.6 11.7 C28.3 12.2 29.4 12.6 29.6 13.5 C29.8 14.4 28.8 15.4 29.8 16 C30.8 16.6 32 17.6 32.4 19.4 C32.8 21.2 31.8 21.8 33 23.2 C34.4 24.8 35.2 27.6 35.2 31 L35.2 34 Z"/><circle class="eye" cx="14.6" cy="14.4" r="1.15"/><path class="slit" d="M22.4 11 C23.6 13 24.2 15.8 24 18.8 M18.6 15.4 C19.8 17.6 20.2 20 19.8 23"/>',
     P: '<circle cx="22.5" cy="13.5" r="5.2"/><rect x="16.5" y="19" width="12" height="3" rx="1.5"/><path d="M16 33 C16 27 18.5 23.5 19.5 22 L25.5 22 C26.5 23.5 29 27 29 33 Z"/>'
   };
   function chessPieceSVG(letter, white) {
@@ -17801,7 +17800,17 @@ async function zzBakeEntries(entries){
       return AC;
     } catch (e) { return null; }
   }
+  function muted() { try { return localStorage.getItem("ec_game_mute") === "1"; } catch (e) { return false; } }
+  function setMuted(v) { try { localStorage.setItem("ec_game_mute", v ? "1" : "0"); } catch (e) {} }
+  // speaker button in every game header: taps switch the game sounds off or on
+  function sndBtn() {
+    var off = muted();
+    return '<button class="zg-snd' + (off ? " off" : "") + '" data-zg="snd" aria-label="' + (off ? "Turn game sounds on" : "Turn game sounds off") + '" aria-pressed="' + off + '">' +
+      (off ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'
+           : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>') + '</button>';
+  }
   function noise(dur, type, freq, q, vol, when) {
+    if (muted()) return;
     var c = ac(); if (!c) return;
     var len = Math.max(1, Math.floor(c.sampleRate * dur)), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
     for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
@@ -17812,6 +17821,7 @@ async function zzBakeEntries(entries){
     src.start(c.currentTime + (when || 0));
   }
   function tone(freq, dur, type, vol, when, slideTo) {
+    if (muted()) return;
     var c = ac(); if (!c) return;
     var o = c.createOscillator(), g = c.createGain(), t0 = c.currentTime + (when || 0);
     o.type = type || "sine"; o.frequency.setValueAtTime(freq, t0);
@@ -17847,7 +17857,7 @@ async function zzBakeEntries(entries){
     var h = host();
     h.className = "zg-page hub";
     h.innerHTML =
-      '<div class="zg-head"><button class="zg-x" data-zg="close" aria-label="Close">Quitter</button><div><b>Games</b><small>' + (PLACE === "battle" ? "Battle Royale" : "Arena") + '</small></div></div>' +
+      '<div class="zg-head"><button class="zg-x" data-zg="close" aria-label="Close">Quitter</button><div><b>Games</b><small>' + (PLACE === "battle" ? "Battle Royale" : "Arena") + '</small></div>' + sndBtn() + '</div>' +
       '<div class="zg-hub">' +
         card("chess", "Chess", "Castling, en passant, promotion", '<div class="pv pv-chess"><i class="w"></i><i class="b"></i><i class="b"></i><i class="w"></i></div>') +
         card("ludo", "Ludo", "2 to 4 players", '<div class="pv pv-ludo"><i class="red"></i><i class="green"></i><i class="blue"></i><i class="yellow"></i></div>') +
@@ -17867,7 +17877,7 @@ async function zzBakeEntries(entries){
     var h = host(), battle = PLACE === "battle";
     h.className = "zg-page setup";
     h.innerHTML =
-      '<div class="zg-head"><button class="zg-x" data-zg="hub" aria-label="Back">‹ Back</button><div><b>' + esc(NAMES[game]) + '</b><small>' + (battle ? "Battle Royale" : "Arena") + '</small></div></div>' +
+      '<div class="zg-head"><button class="zg-x" data-zg="hub" aria-label="Back">‹ Back</button><div><b>' + esc(NAMES[game]) + '</b><small>' + (battle ? "Battle Royale" : "Arena") + '</small></div>' + sndBtn() + '</div>' +
       '<div class="zg-setup">' +
         (game === "ludo" ? '<div class="zg-label">Players on this phone</div><div class="seg">' + [2, 3, 4].map(function (n) { return '<button class="' + (SEL.players === n ? "on" : "") + '" data-zgs="players" data-v="' + n + '">' + n + '</button>'; }).join("") + '</div>' : "") +
         (game === "ttt" ? "" : '<div class="zg-label">Level</div><div class="seg">' + [["easy", "Easy"], ["medium", "Medium"], ["hard", "Hard"]].map(function (d) { return '<button class="' + (SEL.diff === d[0] ? "on" : "") + '" data-zgs="diff" data-v="' + d[0] + '">' + d[1] + '</button>'; }).join("") + '</div>') +
@@ -17884,7 +17894,7 @@ async function zzBakeEntries(entries){
     var h = host();
     h.className = "zg-page pick";
     h.innerHTML =
-      '<div class="zg-head"><button class="zg-x" data-zg="back-setup" aria-label="Back">‹ Back</button><div><b>' + esc(title) + '</b><small>' + esc(sub) + '</small></div></div>' +
+      '<div class="zg-head"><button class="zg-x" data-zg="back-setup" aria-label="Back">‹ Back</button><div><b>' + esc(title) + '</b><small>' + esc(sub) + '</small></div>' + sndBtn() + '</div>' +
       '<div class="zg-pick"><div class="zg-swatches">' + opts.map(function (o, i) {
         var off = taken.indexOf(o.id) >= 0;
         return '<button class="zg-sw" ' + (off ? "disabled" : "") + ' data-zgc="' + i + '" style="--c:' + o.hex + ';--d:' + o.dark + '"><span class="ball"></span>' + esc(o.name) + '</button>';
@@ -18171,7 +18181,7 @@ async function zzBakeEntries(entries){
       h.className = "zg-page game " + G.game;
       h.setAttribute("data-zgshown", G.game);
       h.innerHTML =
-        '<div class="zg-head"><button class="zg-x" data-zg="back" aria-label="Back">‹ Back</button><div><b>' + esc(NAMES[G.game]) + '</b><small>' + sub + '</small></div></div>' +
+        '<div class="zg-head"><button class="zg-x" data-zg="back" aria-label="Back">‹ Back</button><div><b>' + esc(NAMES[G.game]) + '</b><small>' + sub + '</small></div>' + sndBtn() + '</div>' +
         '<div class="zg-status">' + esc(statusText()) + '</div><div class="zg-body">' + body + '</div>';
     }
     if (old) flipRun(h, old);
@@ -18362,6 +18372,11 @@ async function zzBakeEntries(entries){
   function ludoHTML() {
     var st = G.st, n = st.n, human = !isAiTurn();
     var moves = st.dice && !G.rolling ? ZG.ludo.moves(st, st.dice) : [];
+    var holes = "";
+    for (var hc = 0; hc < 4; hc++) for (var ht = 0; ht < 4; ht++) {
+      var hp = homeDot(hc, ht);
+      holes += '<i class="zgl-hole" style="left:' + (hp[0] * CELL - HOLE / 2) + '%;top:' + (hp[1] * CELL - HOLE / 2) + '%;width:' + HOLE + '%;height:' + HOLE + '%;--c:' + CORNER[hc].hex + ';--d:' + CORNER[hc].dark + '"></i>';
+    }
     var quads = LUDO_QUAD.map(function (q, c) {
       return '<div class="zgl-quad" style="top:' + q[0] * CELL + '%;left:' + q[1] * CELL + '%;background:' + CORNER[c].hex + ';--c:' + CORNER[c].hex + '"><div class="zgl-in"></div></div>';
     }).join("");
@@ -18373,12 +18388,12 @@ async function zzBakeEntries(entries){
       cells += cellDiv(rc[0], rc[1], "track" + (LUDO_STAR[g] ? " star" : "") + start, col);
     });
     LUDO_HOMES.forEach(function (list, c) { list.forEach(function (rc) { cells += cellDiv(rc[0], rc[1], "home", CORNER[c].hex); }); });
-    var toks = "", pdice = [], inBaseOf = [];
+    var toks = "", qdice = "";
     for (var qk = 0; qk < n; qk++) {
       var qc = st.corner[qk], qname = G.mode === "ai" ? (qk === G.you ? "You" : "Computer") : (G.mode === "online" ? (qk === G.you ? "You" : G.oppName) : "Player " + (qk + 1));
       var inBase = st.tok[qk].filter(function (x) { return x < 0; }).length;
       var qdie = cubeHTML("q" + qk, st.dice && st.turn === qk && !G.rolling ? st.dice : G.lastDie[qk], "sm", st.turn === qk && human && !st.dice && !G.rolling);
-      pdice[qk] = qdie; inBaseOf[qk] = inBase;
+      qdice += '<div class="zgl-qdie zgl-q' + qc + '">' + qdie + '</div><div class="zgl-qlbl zgl-q' + qc + '" style="--c:' + CORNER[qc].hex + '">' + esc(qname) + ' · <b>' + inBase + '</b> in base</div>';
     }
     for (var k = 0; k < n; k++) {
       var c = st.corner[k];
@@ -18394,13 +18409,13 @@ async function zzBakeEntries(entries){
     }
     var turnK = st.turn, tc = st.corner[turnK];
     var arrow = !G.over ? '<div class="zgl-turn" style="' + arrowPos(tc) + '"></div>' : "";
-    var board = '<div class="zgl-frame"><div class="zgl-board">' + quads + cells + '<div class="zgl-center"></div>' + toks + arrow + '</div></div>';
+    var board = '<div class="zgl-frame"><div class="zgl-board">' + quads + cells + holes + '<div class="zgl-center"></div>' + toks + qdice + arrow + '</div></div>';
     var panels = '<div class="zgl-players">' + Array.from({ length: n }).map(function (_, k) {
       var c = st.corner[k], col = CORNER[c];
       var home = st.tok[k].filter(function (x) { return x === 56; }).length;
       var name = G.mode === "ai" ? (k === G.you ? "You" : "Computer") : (G.mode === "online" ? (k === G.you ? "You" : G.oppName) : "Player " + (k + 1));
       var on = st.turn === k && !G.over ? " on" : "";
-      return '<div class="zgl-pwrap">' + profCard(k, name, home + " / 4 home<br>" + inBaseOf[k] + " in base", col.hex) + '<div class="zgl-pdie">' + pdice[k] + '</div></div>';
+      return profCard(k, name, home + " / 4 home", col.hex);
     }).join("") + '</div>';
     var action;
     if (human && !st.dice && !G.rolling) action = '<button class="zg-big ludo-roll" data-zg="roll">Roll your dice</button>';
@@ -18414,7 +18429,7 @@ async function zzBakeEntries(entries){
     return pos[c][0];
   }
   // taille d'un pion (en % du plateau) : il tient dans une case et dans un trou de la maison
-  var PAW_W = 3.8, PAW_H = 5.4;
+  var PAW_W = 4.0, PAW_H = 5.6, HOLE = 6.2;
   // centre du triangle de chaque couleur au milieu du plateau (le carré central fait 3 cases)
   var CENTRE_SPOT = [[6.85, 7.5], [7.5, 6.85], [8.15, 7.5], [7.5, 8.15]];
   // où se trouve le pion, au centre exact de sa case (en unités de case)
@@ -18433,7 +18448,7 @@ async function zzBakeEntries(entries){
     return '<div class="zgl-cell ' + cls + '" style="top:' + r * CELL + '%;left:' + c * CELL + '%;width:' + CELL + '%;height:' + CELL + '%;' + (col ? "background:" + col : "") + '"></div>';
   }
   // pion en forme de goutte (comme sur la vidéo) : tête ronde + pied effilé, contour blanc
-  var PAWN_SVG = '<svg viewBox="0 0 20 28" aria-hidden="true"><path d="M10 2 A6.6 6.6 0 0 0 3.4 8.6 C3.4 12.6 6.6 14.2 7.6 17 C7.1 19.2 3.6 20.2 3.2 23.6 C2.8 26.6 6 27.6 10 27.6 C14 27.6 17.2 26.6 16.8 23.6 C16.4 20.2 12.9 19.2 12.4 17 C13.4 14.2 16.6 12.6 16.6 8.6 A6.6 6.6 0 0 0 10 2 Z" fill="var(--c)" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M6.2 22.6 C7 24.2 8.4 24.8 10 24.8" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="1.1" stroke-linecap="round"/><ellipse cx="7.2" cy="6.8" rx="2" ry="1.5" fill="rgba(255,255,255,.8)"/></svg>';
+  var PAWN_SVG = '<svg viewBox="0 0 20 28" aria-hidden="true"><path d="M7.4 13.2 C6.6 16.2 4.2 18.6 3.6 22.2 C3.1 25 4.6 26.6 7.4 26.6 L12.6 26.6 C15.4 26.6 16.9 25 16.4 22.2 C15.8 18.6 13.4 16.2 12.6 13.2 Z" fill="var(--c)" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/><circle cx="10" cy="8.2" r="6.3" fill="var(--c)" stroke="#fff" stroke-width="1.3"/><ellipse cx="7.6" cy="6" rx="1.9" ry="1.3" fill="#fff" opacity=".8"/><path d="M5.6 22.8 C6.4 23.4 7.4 23.8 8.4 23.9" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1" stroke-linecap="round"/></svg>';
   function pawnHTML(fid, col, left, top, goIdx) {
     return '<div class="zgpw' + (goIdx >= 0 ? " go" : "") + '" data-fid="' + fid + '" ' + (goIdx >= 0 ? 'data-zgtok="' + goIdx + '"' : "") +
       ' style="left:' + left + '%;top:' + top + '%;--c:' + col.hex + ';--d:' + col.dark + '">' + PAWN_SVG + '</div>';
@@ -18531,7 +18546,7 @@ async function zzBakeEntries(entries){
     if (p0 < 0) path.push(p1); else for (var q = p0 + 1; q <= p1; q++) path.push(q);
     if (path.length <= 1) {
       if (caps.length) SFX.capture();
-      if (p1 === 51 || p1 === 56) homeFx(k, t, p1);
+      stepFx(k, t, p0, p1);
       G.st = next; G.sel = null; G.anim = true;
       afterMove();
       return;
@@ -18544,7 +18559,7 @@ async function zzBakeEntries(entries){
       var s2 = JSON.parse(JSON.stringify(st));
       s2.tok[k][t] = path[i];
       G.st = s2; G.anim = true; paint(); SFX.move();
-      if (path[i] === 51 || path[i] === 56) homeFx(k, t, path[i]);
+      stepFx(k, t, i === 0 ? p0 : path[i - 1], path[i]);
       i++;
       if (i < path.length) { setTimeout(walk, 250); return; }
       G.rolling = false;
@@ -18554,13 +18569,20 @@ async function zzBakeEntries(entries){
     })();
   }
   // un pion qui rentre chez lui : un carillon et de petites étincelles qui brillent pendant 1 seconde
-  function homeFx(k, t, p) {
+  // a pawn leaves its base, lands on a safe square, or goes into its home lane: a sound and sparkles for 1 second
+  function stepFx(k, t, from, to) {
+    var st = G && G.st; if (!st) return;
+    if (from < 0 && to === 0) return fx(k, t, "out");
+    if (to === 51 || to === 56) return fx(k, t, "home");
+    if (to >= 0 && to <= 50) { var g = (st.corner[k] * 13 + to) % 52; if (LUDO_STAR[g] || g % 13 === 0) return fx(k, t, "safe"); }
+  }
+  function fx(k, t, kind) {
     try {
-      SFX.chime();
+      if (kind === "home") SFX.chime(); else if (kind === "safe") SFX.pop(); else SFX.tok();
       var el = document.querySelector('[data-fid="T' + k + t + '"]');
       if (!el || !el.parentNode) return;
       var x = parseFloat(el.style.left) + PAW_W / 2, y = parseFloat(el.style.top) + PAW_H / 2;
-      var col = el.style.getPropertyValue("--c") || "#fff";
+      var col = kind === "safe" ? "#FFD54A" : (el.style.getPropertyValue("--c") || "#fff");
       for (var i = 0; i < 12; i++) {
         var a = (i / 12) * Math.PI * 2, d = 6 + (i % 3) * 3;
         var sp = document.createElement("i");
@@ -18647,6 +18669,7 @@ async function zzBakeEntries(entries){
       e.preventDefault();
       var x = b.getAttribute("data-zg");
       if (x === "close") { close(); return; }
+      if (x === "snd") { setMuted(!muted()); if (G) paint(); else hub(PLACE || "arena"); return; }
       if (x === "hub") { hub(PLACE || "arena"); return; }
       if (x === "back-setup") { setup(SEL.game); return; }
       if (x === "back") { if (G && G.mode === "online") { close(); return; } back(); return; }
@@ -18803,7 +18826,7 @@ async function zzBakeEntries(entries){
 .zgl-cell.home{border-color:rgba(0,0,0,.12)}
 .zgl-cell.safe::after{content:"★";position:absolute;inset:0;display:grid;place-items:center;color:#7d8aa3;font-size:70%}
 .zgl-center{position:absolute;left:40%;top:40%;width:20%;height:20%;background:conic-gradient(from -45deg,#1FB35B 0 90deg,#F5C518 90deg 180deg,#1E88E5 180deg 270deg,#E5303A 270deg 360deg)}
-.zgpw{position:absolute;width:3.8%;height:5.4%;pointer-events:none;z-index:3;transform-origin:50% 100%}
+.zgpw{position:absolute;width:4%;height:5.6%;pointer-events:none;z-index:3;transform-origin:50% 100%}
 .zgpw .hd{position:absolute;left:18%;top:0;width:64%;height:56%;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fff 0 7%,var(--c) 28%,var(--c) 62%,var(--d) 100%);box-shadow:0 2px 2px rgba(0,0,0,.45)}
 .zgpw .bd{position:absolute;left:8%;bottom:0;width:84%;height:50%;border-radius:45% 45% 50% 50%/25% 25% 75% 75%;background:linear-gradient(90deg,var(--d),var(--c) 30%,#fff 44%,var(--c) 58%,var(--d));box-shadow:0 3px 3px rgba(0,0,0,.45)}
 .zgpw.go{pointer-events:auto;cursor:pointer;animation:zgbob 1s infinite}
@@ -18954,6 +18977,10 @@ async function zzBakeEntries(entries){
 .zgl-pwrap{position:relative}.zgl-players{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}.zgl-pwrap{min-width:0}.zgl-pwrap .zg-pl{padding-right:58px;min-width:0}.zgl-pwrap .zgpi{min-width:0}.zgl-pwrap .zgpi small{white-space:normal;line-height:1.35}.zgl-pwrap .zgpi b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .zgl-pdie{position:absolute;right:4px;top:50%;transform:translateY(-50%) scale(.5);transform-origin:center;pointer-events:auto;z-index:2}
 .zgl-pdie .zgcube-wrap{margin:0}
+.zgl-hole{position:absolute;border-radius:50%;background:radial-gradient(circle at 50% 45%,var(--d) 0 55%,#000 100%);box-shadow:inset 0 2px 3px rgba(0,0,0,.45),0 0 0 1.5px #fff;pointer-events:none;z-index:1}
+.zg-snd{width:40px;height:40px;flex:none;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;background:rgba(255,255,255,.14);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 4px 10px rgba(0,0,0,.25)}
+.zg-snd svg{width:20px;height:20px}.zg-snd.off{opacity:.6}
+.zg-head{display:flex;align-items:center;gap:12px}.zg-head>div:nth-child(2){flex:1;min-width:0}
 `;
 
   window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; }, pickFor: pickFor };
@@ -19213,6 +19240,19 @@ async function zzBakeEntries(entries){
     "#authGate input:focus{scroll-margin-top:24px;scroll-margin-bottom:120px}"
   ].join("");
   document.head.appendChild(st);
+})();
+
+/* ---- app-v5-zzzzzzzk-ringtone-page.js ---- */
+/* ---- the ringtones are at the top of "Settings & security": the call ringtone and the notification sound,
+   each with its default marked, and a preview for every one ---- */
+(function () {
+  if (typeof secView !== "function" || typeof rtPickersHTML !== "function") return;
+  var _sec = secView;
+  secView = function () {
+    var h = _sec();
+    var card = '<div class="glass card sec rt-top"><h3>Ringtones</h3><p class="small muted" style="margin:0">Choose the ringtone for calls and the sound for messages. The default is marked. Tap “Preview” to hear it.</p>' + rtPickersHTML() + '</div>';
+    return card + h;
+  };
 })();
 
 /* ==== v4 END ==== */
