@@ -19,17 +19,19 @@
   var NAMES = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", ttt: "Tic-tac-toe" };
   var GLYPH = { K: "♚", Q: "♛", R: "♜", B: "♝", N: "♞", P: "♟" };
   // pièces en SVG (style Staunton) : la couleur vient du CSS (.w clair / .b foncé)
+  // pièces classiques (silhouettes Staunton) sur 45 x 45 ; la couleur vient du CSS (.w / .b)
+  var BASE = '<rect class="pb" x="7" y="36" width="31" height="4" rx="1.5"/><rect class="pb" x="5" y="40" width="35" height="3" rx="1.5"/>';
   var CHESS_SHAPES = {
-    P: '<circle cx="22.5" cy="13" r="5"/><path d="M16 31c0-5 2.5-9 6.5-10.5 4 1.5 6.5 5.5 6.5 10.5z"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
-    R: '<path d="M13 8h4v4h3V8h4v4h3V8h4v7H13z"/><path d="M16 15h13l-1 16H17z"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
-    N: '<path d="M10 36 L10 31 C10 26 14 22 12 18 L9 21 C8 14 13 8 19 6 L22 9 C28 10 33 16 34 24 C34 28 33 32 35 36 Z"/><path d="M21 12 C24 14 26 17 27 20" class="slit"/><circle cx="16.5" cy="15" r="1.4" class="eye"/>',
-    B: '<path d="M22.5 5c4.5 4 5.5 9 1.5 13 4 2 6.5 6.5 3.5 12h-10c-3-5.5-.5-10 3.5-12-4-4-3-9 1.5-13z"/><path d="M19 22l7-6" class="slit"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
-    Q: '<path d="M11 33L9 13l6.5 8L22.5 9 29 21l6.5-8-2 20z"/><circle cx="9" cy="12" r="2.2"/><circle cx="22.5" cy="7.5" r="2.4"/><circle cx="36" cy="12" r="2.2"/><rect x="11" y="32" width="23" height="4" rx="1.2"/>',
-    K: '<path d="M13.5 34L11 17l5.5 5L22.5 15 28 22l5.5-5-2.5 17z"/><rect x="21" y="3.5" width="3" height="8"/><rect x="18" y="5.5" width="9" height="3"/><rect x="11" y="32" width="23" height="4" rx="1.2"/>'
+    K: '<path d="M16.5 33 C16.5 27 14.5 24 15.5 21 L29.5 21 C30.5 24 28.5 27 28.5 33 Z"/><rect x="15" y="19" width="15" height="3" rx="1.5"/><path d="M16.5 19 C16.5 13.5 19 11.5 22.5 11 C26 11.5 28.5 13.5 28.5 19 Z"/><rect x="21" y="3" width="3" height="7" rx=".6"/><rect x="18.5" y="5" width="8" height="2.4" rx=".6"/>',
+    Q: '<path d="M14 34 C15 27 16.5 23 16.5 20 L28.5 20 C28.5 23 30 27 31 34 Z"/><rect x="14.5" y="18" width="16" height="3" rx="1.5"/><path d="M14.5 18 L10 9 L15.5 13 L17.5 6 L22.5 11.5 L27.5 6 L29.5 13 L35 9 L30.5 18 Z"/><circle cx="10" cy="8.2" r="2"/><circle cx="17.5" cy="5.2" r="2"/><circle cx="22.5" cy="9.5" r="2.1"/><circle cx="27.5" cy="5.2" r="2"/><circle cx="35" cy="8.2" r="2"/>',
+    B: '<path d="M12.5 34 C14 28 16.5 25 17.5 21.5 L27.5 21.5 C28.5 25 31 28 32.5 34 Z"/><rect x="15.5" y="19.5" width="14" height="3" rx="1.5"/><path d="M22.5 4 C28 8.5 28.5 13 25 17.5 L20 17.5 C16.5 13 17 8.5 22.5 4 Z"/><circle cx="22.5" cy="3" r="1.6"/><path class="slit" d="M20.8 12.5 L24.4 8.6" />',
+    R: '<path d="M14.5 33 L13.5 17 L31.5 17 L30.5 33 Z"/><rect x="12" y="14" width="21" height="3.6" rx="1.2"/><path d="M12 14 L12 6.5 L16.5 6.5 L16.5 10 L20.5 10 L20.5 6.5 L24.5 6.5 L24.5 10 L28.5 10 L28.5 6.5 L33 6.5 L33 14 Z"/>',
+    N: '<path d="M11 34 L11 29.5 C11 25 13.5 22.5 14 19 C14.5 15.5 12.8 12.5 11 11 L14.5 8.5 C17.5 6.2 21.5 6 24.5 7.5 C29 9.8 31.5 14.5 31.8 21 C32 26 33.5 30 34 34 Z"/><circle class="eye" cx="17" cy="14.5" r="1.3"/><path class="slit" d="M22 13 C24.5 15 26 18 26.5 21"/>',
+    P: '<circle cx="22.5" cy="13.5" r="5.2"/><rect x="16.5" y="19" width="12" height="3" rx="1.5"/><path d="M16 33 C16 27 18.5 23.5 19.5 22 L25.5 22 C26.5 23.5 29 27 29 33 Z"/>'
   };
   function chessPieceSVG(letter, white) {
     var k = letter.toUpperCase();
-    return '<svg viewBox="0 0 45 45" aria-hidden="true">' + (CHESS_SHAPES[k] || '') + '<rect x="9" y="37" width="27" height="4" rx="1.5"/></svg>';
+    return '<svg viewBox="0 0 45 45" aria-hidden="true">' + (CHESS_SHAPES[k] || '') + BASE + '</svg>';
   }
   var DIFF = { easy: { chess: 1, morris: 1, ttt: 0 }, medium: { chess: 2, morris: 3, ttt: 1 }, hard: { chess: 3, morris: 5, ttt: 2 } };
   // couleurs de pions choisissables
@@ -219,6 +221,7 @@
     }
     if (opts.game === "ludo") G.n = G.st.n;
     host().className = "zg-page game " + opts.game;
+    host().removeAttribute("data-zgshown");
     paint();
     schedule();
   }
@@ -245,7 +248,7 @@
   function schedule() {
     clearTimeout(TIMER); TIMER = 0;
     if (!G || G.over) return;
-    if (isAiTurn()) TIMER = setTimeout(aiMove, G.game === "ttt" ? 120 : 520);
+    if (isAiTurn()) TIMER = setTimeout(aiMove, G.game === "ttt" ? 150 : 520);
   }
 
   // un coup est joué : on enregistre les captures, on joue le son, on rafraîchit
@@ -434,10 +437,20 @@
     var body = G.game === "chess" ? chessHTML(anim) : G.game === "morris" ? morrisHTML(anim) : G.game === "ttt" ? tttHTML(anim) : ludoHTML();
     var sub = G.mode === "ai" ? "vs computer · " + G.diff : G.mode === "online" ? "vs " + esc(G.oppName) + " · online" : (G.game === "ludo" ? G.n + " players · this phone" : "2 players · this phone");
     var old = flipSnapshot(h);
-    h.className = "zg-page game " + G.game;
-    h.innerHTML =
-      '<div class="zg-head"><button class="zg-x" data-zg="back" aria-label="Back">‹ Back</button><div><b>' + esc(NAMES[G.game]) + '</b><small>' + sub + '</small></div></div>' +
-      '<div class="zg-status">' + esc(statusText()) + '</div><div class="zg-body">' + body + '</div>';
+    var sameGame = h.getAttribute("data-zgshown") === G.game && h.querySelector(".zg-head") && h.querySelector(".zg-body");
+    if (sameGame) {
+      // même partie : on ne remplace que le statut et le plateau (pas de clignotement, réponse immédiate)
+      var st0 = h.querySelector(".zg-status"), sm = h.querySelector(".zg-head small");
+      if (st0) st0.textContent = statusText();
+      if (sm) sm.innerHTML = sub;
+      h.querySelector(".zg-body").innerHTML = body;
+    } else {
+      h.className = "zg-page game " + G.game;
+      h.setAttribute("data-zgshown", G.game);
+      h.innerHTML =
+        '<div class="zg-head"><button class="zg-x" data-zg="back" aria-label="Back">‹ Back</button><div><b>' + esc(NAMES[G.game]) + '</b><small>' + sub + '</small></div></div>' +
+        '<div class="zg-status">' + esc(statusText()) + '</div><div class="zg-body">' + body + '</div>';
+    }
     if (old) flipRun(h, old);
     if (G.game === "morris") morrisSlide(h);
     if (G.rollAnim) { runRollAnim(h, G.rollAnim); G.rollAnim = null; }
@@ -501,7 +514,8 @@
         var sty = mv ? ' style="--fx:' + ((last.f % 8) - c) * 100 + '%;--fy:' + (Math.floor(last.f / 8) - r) * 100 + '%"' : "";
         piece = '<span class="zgp ' + (w ? "w" : "b") + (mv ? " mv" : "") + '"' + sty + '>' + chessPieceSVG(p, w) + '</span>';
       }
-      rows += '<button class="' + cls + '" data-zgsq="' + i + '">' + piece + '</button>';
+      var co = (c === 0 ? '<em class="zgc-rk">' + (8 - r) + '</em>' : '') + (r === 7 ? '<em class="zgc-fl">' + "abcdefgh".charAt(c) + '</em>' : '');
+      rows += '<button class="' + cls + '" data-zgsq="' + i + '">' + co + piece + '</button>';
     }
     var mySide = G.mode === "ai" || G.mode === "online" ? G.you : 0;
     return '<div class="zgp-row">' + playerChip(1 - mySide, nameForSide(1 - mySide), "b") + '</div>' +
@@ -515,9 +529,34 @@
     if (G.game === "chess") { var p1 = G.cols && G.cols[0] === "b" ? 1 : 0; return "Player " + (side === p1 ? 1 : 2); }
     return "Player " + (side + 1);
   }
-  function playerChip(side, name, tag) {
+  // avatar du joueur : son personnage 3D (moi), un robot (ordinateur) ou son initiale
+  function avatarHTML(side, colHex) {
+    var isMe = (G.mode === "ai" || G.mode === "online") && side === G.you;
+    if (isMe) { try { return avtHTML((S.me && S.me.avt) || AV_DEF, 44, false); } catch (e) {} }
+    if (G.mode === "ai") return '<span class="zgpa-ini zgpa-bot" style="--c:' + colHex + '">🤖</span>';
+    var nm = nameForSide(side);
+    return '<span class="zgpa-ini" style="--c:' + colHex + '">' + esc(nm.charAt(0)) + '</span>';
+  }
+  // carte joueur : avatar, nom, un chiffre en direct, et les pièces prises
+  function profCard(side, name, stat, colHex) {
     var on = (sideOfTurn() === side && !G.over) ? " on" : "";
-    return '<div class="zg-pl' + on + '"><b>' + esc(name) + '</b>' + capsHTML(side) + '</div>';
+    return '<div class="zg-pl' + on + '" style="--c:' + colHex + '">' +
+      '<div class="zgpa">' + avatarHTML(side, colHex) + '</div>' +
+      '<div class="zgpi"><b>' + esc(name) + '</b><small>' + stat + '</small></div>' +
+      '<div class="zgpcap">' + capsHTML(side) + '</div></div>';
+  }
+  var MAT = { 1: 1, 2: 3, 3: 3, 4: 5, 5: 9, 6: 0 };
+  function chessStat(side) {
+    var mine = side === 0 ? "w" : "b", sc = 0;
+    G.st.b.forEach(function (p) { if (!p) return; var v = MAT[{ p: 1, n: 2, b: 3, r: 4, q: 5, k: 6 }[p.toLowerCase()]] || 0; sc += ZG.chess.white(p) === (mine === "w") ? v : -v; });
+    return sc > 0 ? "Material +" + sc : sc < 0 ? "Material " + sc : "Material even";
+  }
+  function playerChip(side, name, tag) {
+    var col = colourOf(side).hex, stat = "";
+    if (G.game === "chess") stat = chessStat(side);
+    else if (G.game === "morris") stat = G.st.b.filter(function (x) { return x === side + 1; }).length + " on board · " + G.st.hand[side] + " to place";
+    else if (G.game === "ttt") stat = side === 0 ? "plays ✕" : "plays ○";
+    return profCard(side, name, stat, col);
   }
 
   /* moulin à 3 pions */
@@ -582,7 +621,10 @@
       strike = '<svg class="zgt-strike" viewBox="0 0 100 100"><line pathLength="100" x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"/></svg>';
     }
     var grid = '<svg class="zgt-grid" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="33.3" y1="3" x2="33.3" y2="97"/><line x1="66.6" y1="3" x2="66.6" y2="97"/><line x1="3" y1="33.3" x2="97" y2="33.3"/><line x1="3" y1="66.6" x2="97" y2="66.6"/></svg>';
-    return '<div class="zgt-frame"><div class="zgt-board' + (human || st.win ? '' : ' thinking') + '">' + grid + cells + strike + '</div></div>' +
+    var mySide = G.mode === "ai" || G.mode === "online" ? G.you : 0;
+    return '<div class="zgp-row">' + playerChip(1 - mySide, nameForSide(1 - mySide), "") + '</div>' +
+      '<div class="zgt-frame"><div class="zgt-board' + (human || st.win ? '' : ' thinking') + '">' + grid + cells + strike + '</div></div>' +
+      '<div class="zgp-row">' + playerChip(mySide, nameForSide(mySide), "") + '</div>' +
       '<div class="zg-info">Get three of your marks in a row, across, down or diagonally.</div>' +
       '<button class="zg-big alt" data-zg="again">New game</button>';
   }
@@ -632,9 +674,7 @@
       var home = st.tok[k].filter(function (x) { return x === 56; }).length;
       var name = G.mode === "ai" ? (k === G.you ? "You" : "Computer") : (G.mode === "online" ? (k === G.you ? "You" : G.oppName) : "Player " + (k + 1));
       var on = st.turn === k && !G.over ? " on" : "";
-      return '<div class="zgl-card' + on + '" style="--c:' + col.hex + ';--d:' + col.dark + '">' +
-        '<div class="zgl-ct"><i></i><b>' + esc(name) + '</b><span>' + home + '/4</span></div>' +
-        '<div class="zgl-cc">' + capsHTML(k) + '</div></div>';
+      return profCard(k, name, home + " / 4 home", col.hex);
     }).join("") + '</div>';
     var action;
     if (human && !st.dice && !G.rolling) action = '<button class="zg-big ludo-roll" data-zg="roll">Roll your dice</button>';
@@ -1099,6 +1139,43 @@
 .zgl-qlbl.zgl-q2{top:61%;left:80%}.zgl-qlbl.zgl-q3{top:61%;left:20%}
 .zgl-cell.safe::after{content:"☆";color:#2b2b2b;font-size:80%;font-weight:700;background:none}
 .zgl-cell.start::after{content:"➤";font-size:70%}
+/* ---- échecs : pièces classiques et plateau comme la photo de référence ---- */
+.zgc-frame{background:linear-gradient(145deg,#5b2a14,#2e1408 55%,#6b3018);box-shadow:inset 0 0 0 1px rgba(255,220,170,.22),inset 0 0 0 4px #3e1b0b,inset 0 0 0 6px rgba(214,170,110,.45),0 18px 34px rgba(0,0,0,.55)}
+.zgc-sq.lt{background:#f0d9b5}
+.zgc-sq.dk{background:#b58863}
+.zgc-sq.lt .zgc-rk,.zgc-sq.lt .zgc-fl{color:#b58863}
+.zgc-sq.dk .zgc-rk,.zgc-sq.dk .zgc-fl{color:#f0d9b5}
+.zgc-rk,.zgc-fl{position:absolute;font:700 clamp(8px,2.4vw,10px)/1 system-ui,sans-serif;font-style:normal;z-index:2;pointer-events:none}
+.zgc-rk{left:3px;top:2px}.zgc-fl{right:3px;bottom:2px}
+.zgp{filter:drop-shadow(0 3px 2px rgba(0,0,0,.42))}
+.zgp svg *{stroke-linejoin:round;stroke-linecap:round;stroke-width:1.1}
+.zgp.w svg path,.zgp.w svg circle,.zgp.w svg rect{fill:#fdfbf6;stroke:#6e6256}
+.zgp.w svg .pb{fill:#ece4d0;stroke:#6e6256}
+.zgp.w svg .eye{fill:#3b3026;stroke:none}
+.zgp.w svg .slit{fill:none;stroke:#b7a68a;stroke-width:1.3}
+.zgp.b svg path,.zgp.b svg circle,.zgp.b svg rect{fill:#3b2d24;stroke:#0c0806}
+.zgp.b svg .pb{fill:#2a1f19;stroke:#0c0806}
+.zgp.b svg .eye{fill:#e2c99c;stroke:none}
+.zgp.b svg .slit{fill:none;stroke:#8a6d48;stroke-width:1.3}
+.zgcap .cg{width:34px;height:34px}
+.zgcap .cg.w svg path,.zgcap .cg.w svg circle,.zgcap .cg.w svg rect{fill:#fdfbf6;stroke:#6e6256}
+.zgcap .cg.b svg path,.zgcap .cg.b svg circle,.zgcap .cg.b svg rect{fill:#3b2d24;stroke:#0c0806}
+/* ---- cartes joueurs (avatar, nom, chiffre en direct, pièces prises) ---- */
+.zgp-row{width:100%;max-width:430px;display:flex;justify-content:center}
+.zg-pl{display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;gap:6px 12px;width:100%;max-width:430px;box-sizing:border-box;padding:10px 12px;border-radius:20px;color:#fff;background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.035));border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 26px rgba(0,0,0,.32);transition:box-shadow .25s,border-color .25s}
+.zg-pl.on{border-color:var(--c,#facc15);box-shadow:0 0 0 2px var(--c,#facc15),0 0 24px -4px var(--c,#facc15)}
+.zgpa{width:46px;height:46px;border-radius:50%;overflow:hidden;flex:none;background:#1a1d2e;box-shadow:0 0 0 2px var(--c,#888),0 5px 12px rgba(0,0,0,.45)}
+.zgpa svg{display:block}
+.zgpa-ini{display:grid;place-items:center;width:100%;height:100%;font-weight:800;font-size:18px;color:#fff;background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.55),transparent 42%),var(--c,#6366f1)}
+.zgpa-bot{font-size:24px;background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.5),transparent 42%),linear-gradient(145deg,#2b3150,#121528)}
+.zgpi{display:flex;flex-direction:column;min-width:0;flex:1}
+.zgpi b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zgpi small{font-size:12px;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zgpcap{flex-basis:100%;display:flex;justify-content:center;min-height:0}
+.zgpcap:empty{display:none}
+.zgpcap .zgcap{min-height:34px}
+.zgpcap .zgcap.empty{display:none}
+
 .zgpw svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 `;
 
