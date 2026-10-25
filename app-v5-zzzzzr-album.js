@@ -11,7 +11,7 @@ function albumHTML(a){const {items}=albumParts(a);const n=items.length;if(!n)ret
     const inner=isV?`<video data-zzvid="${esc(x.p)}" data-t="${esc(x.t||"video/mp4")}" muted playsinline preload="metadata"></video><span class="v4al-play" aria-hidden="true">▶</span>`:(u?`<img src="${u}" alt="">`:`<img data-chatp="${esc(x.p)}" data-t="${esc(x.t||"image/jpeg")}" alt="">`);
     return`<button type="button" class="v4al-t${isV?" vid":""}" data-zzal="${i}" aria-label="${isV?"Open the video":"Open the photo"}">${inner}${i===3&&more>0?`<span class="v4al-more">+${more}</span>`:""}</button>`}).join("")}</div>`}
 // the viewer follows the album: previous / next, swipe, one video at a time
-function zzAlbumOpen(items,start){
+function zzAlbumOpen(items,start,msg){
   var old=document.getElementById("zzal");if(old)old.remove();
   var ov=document.createElement("div");ov.id="zzal";ov.className="zzal";
   ov.innerHTML='<div class="zzal-top"><button type="button" class="zzal-x" aria-label="Close">'+ic("x")+'</button><b class="zzal-n"></b></div><div class="zzal-w"></div><button type="button" class="zzal-p" aria-label="Previous">‹</button><button type="button" class="zzal-nx" aria-label="Next">›</button>';
@@ -35,6 +35,18 @@ function zzAlbumOpen(items,start){
     }).catch(function(){if(mine===cur)w.innerHTML='<p class="zzal-err">Cannot open this item.</p>'});
   }
   ov.querySelector(".zzal-x").onclick=close;
+  // appui long sur la photo ou la vidéo : le même menu que sur un message (répondre, transférer, supprimer…)
+  if(msg&&msg.id){
+    var lpT=0,lpX=0,lpY=0;
+    var lpMenu=function(){lpT=0;if(navigator.vibrate)try{navigator.vibrate(12)}catch(x){};close();V4.act={kind:msg.k,id:msg.id};render()};
+    ov.addEventListener("pointerdown",function(e){
+      if(e.target.closest&&e.target.closest("button"))return;
+      clearTimeout(lpT);lpX=e.clientX;lpY=e.clientY;lpT=setTimeout(lpMenu,480);
+    });
+    ov.addEventListener("pointermove",function(e){if(lpT&&Math.hypot(e.clientX-lpX,e.clientY-lpY)>12){clearTimeout(lpT);lpT=0}});
+    ["pointerup","pointercancel","pointerleave"].forEach(function(ev){ov.addEventListener(ev,function(){clearTimeout(lpT);lpT=0})});
+    ov.addEventListener("contextmenu",function(e){e.preventDefault();clearTimeout(lpT);lpT=0;lpMenu()});
+  }
   ov.querySelector(".zzal-p").onclick=function(){if(cur>0){cur--;show()}};
   ov.querySelector(".zzal-nx").onclick=function(){if(cur<items.length-1){cur++;show()}};
   var x0=null;
@@ -47,7 +59,8 @@ document.addEventListener("click",function(e){
   var b=e.target&&e.target.closest&&e.target.closest("[data-zzal]");if(!b)return;
   e.preventDefault();e.stopPropagation();
   var box=b.closest(".v4album"),items=[];try{items=JSON.parse(box.getAttribute("data-zzitems")||"[]")}catch(x){}
-  zzAlbumOpen(items,+b.getAttribute("data-zzal")||0);
+  var mEl=box.closest(".msg[data-mid]"),msg=mEl&&String(mEl.dataset.mid).indexOf("tmp")!==0?{k:mEl.dataset.k,id:mEl.dataset.mid}:null;
+  zzAlbumOpen(items,+b.getAttribute("data-zzal")||0,msg);
 },true);
 // live video previews: the video plays with its edits (preview sheet and review tiles)
 setInterval(function(){document.querySelectorAll(".zzvp:not([data-ok])").forEach(function(el){
@@ -231,3 +244,36 @@ function zzReviewSend(){
 .msg .v4album{white-space:normal}`;
   document.head.appendChild(st);
 }
+
+/* ---------- long press on a photo or video opened full screen (the file viewer):
+   the same menu as a long press on its message (reply, forward, pin, delete…) ---------- */
+(function(){
+  var srcMsg=null;
+  document.addEventListener("click",function(e){
+    var b=e.target&&e.target.closest&&e.target.closest('[data-v4="doc"]');if(!b)return;
+    var m=b.closest(".msg[data-mid]");
+    srcMsg=m&&String(m.dataset.mid).indexOf("tmp")!==0?{k:m.dataset.k,id:m.dataset.mid}:null;
+  },true);
+  if(typeof openDoc!=="function")return;
+  var _od=openDoc;
+  openDoc=function(src,label){
+    var msg=srcMsg;srcMsg=null;
+    var r=_od(src,label);
+    var o=document.getElementById("docv");
+    if(o&&msg&&msg.id&&!o.dataset.lp){
+      o.dataset.lp="1";
+      var t=0,x0=0,y0=0;
+      var fire=function(){t=0;if(navigator.vibrate)try{navigator.vibrate(12)}catch(err){};
+        var close=document.querySelector('[data-v4="docClose"]');if(close)close.click();
+        V4.act={kind:msg.k,id:msg.id};render()};
+      o.addEventListener("pointerdown",function(e){
+        if(e.target.closest&&e.target.closest("button,a,input,audio,[data-v4]"))return;
+        clearTimeout(t);x0=e.clientX;y0=e.clientY;t=setTimeout(fire,480);
+      });
+      o.addEventListener("pointermove",function(e){if(t&&Math.hypot(e.clientX-x0,e.clientY-y0)>12){clearTimeout(t);t=0}});
+      ["pointerup","pointercancel","pointerleave"].forEach(function(ev){o.addEventListener(ev,function(){clearTimeout(t);t=0})});
+      o.addEventListener("contextmenu",function(e){e.preventDefault();clearTimeout(t);t=0;fire()});
+    }
+    return r;
+  };
+})();

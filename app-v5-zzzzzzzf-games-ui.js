@@ -55,7 +55,7 @@
   var LUDO_HOMES = [[[7,1],[7,2],[7,3],[7,4],[7,5]], [[1,7],[2,7],[3,7],[4,7],[5,7]], [[7,13],[7,12],[7,11],[7,10],[7,9]], [[13,7],[12,7],[11,7],[10,7],[9,7]]];
   var LUDO_BASE = [[[2,2],[2,3],[3,2],[3,3]], [[2,11],[2,12],[3,11],[3,12]], [[11,11],[11,12],[12,11],[12,12]], [[11,2],[11,3],[12,2],[12,3]]];
   var LUDO_QUAD = [[0,0],[0,9],[9,9],[9,0]];
-  var LUDO_SAFE = {}; [0, 13, 26, 39].forEach(function (g) { LUDO_SAFE[g] = 1; });
+  var LUDO_STAR = {}; [8, 21, 34, 47].forEach(function (g) { LUDO_STAR[g] = 1; });
   var CELL = 100 / 15;
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -647,7 +647,7 @@
       // case de départ de chaque couleur : pleine couleur avec une flèche ; étoile = case sûre
       var start = g % 13 === 0 ? " start" : "";
       var col = g % 13 === 0 ? CORNER[g / 13].hex : "";
-      cells += cellDiv(rc[0], rc[1], "track" + (LUDO_SAFE[g] ? " safe" : "") + start, col);
+      cells += cellDiv(rc[0], rc[1], "track" + (LUDO_STAR[g] ? " star" : "") + start, col);
     });
     LUDO_HOMES.forEach(function (list, c) { list.forEach(function (rc) { cells += cellDiv(rc[0], rc[1], "home", CORNER[c].hex); }); });
     var toks = "", qdice = "";
@@ -661,9 +661,12 @@
       for (var t = 0; t < 4; t++) {
         var p = st.tok[k][t], rc = p < 0 ? LUDO_BASE[c][t] : ludoCell(c, p);
         if (!rc) continue;
+        var pos = p < 0 ? homeDot(c, t) : null; // centre of a dot in the home square, in grid lines
         var can = human && st.turn === k && st.dice && !G.rolling && moves.some(function (m) { return m.t === t; });
         var off = p === 56 ? t * 1.3 - 2 : 0;
-        toks += pawnHTML("T" + k + t, CORNER[c], rc[1] * CELL + (CELL - 7) / 2 + off, rc[0] * CELL + (CELL - 7) / 2 + off, can ? t : -1);
+        var lft = pos ? pos[0] * CELL - 3.5 : rc[1] * CELL + (CELL - 7) / 2 + off;
+        var tp = pos ? pos[1] * CELL - 3.5 : rc[0] * CELL + (CELL - 7) / 2 + off;
+        toks += pawnHTML("T" + k + t, CORNER[c], lft, tp, can ? t : -1);
       }
     }
     var turnK = st.turn, tc = st.corner[turnK];
@@ -687,11 +690,17 @@
     var pos = [["top:3%;left:3%"], ["top:3%;left:91%"], ["top:91%;left:91%"], ["top:91%;left:3%"]];
     return pos[c][0];
   }
+  // les quatre points de chaque maison (carré blanc, un par pion) : x = colonne, y = ligne en lignes de grille
+  var HOME_DOTS = [[2, 2], [4, 2], [2, 4], [4, 4]];
+  function homeDot(c, t) {
+    var q = LUDO_QUAD[c], d = HOME_DOTS[t];
+    return [q[1] + d[0], q[0] + d[1]];
+  }
   function cellDiv(r, c, cls, col) {
     return '<div class="zgl-cell ' + cls + '" style="top:' + r * CELL + '%;left:' + c * CELL + '%;width:' + CELL + '%;height:' + CELL + '%;' + (col ? "background:" + col : "") + '"></div>';
   }
   // pion en forme de goutte (comme sur la vidéo) : tête ronde + pied effilé, contour blanc
-  var PAWN_SVG = '<svg viewBox="0 0 20 28" aria-hidden="true"><path d="M10 1.5 C5.2 1.5 2 5 2 9.6 C2 14.5 6.8 18.5 9 25.5 C9.4 26.8 10.6 26.8 11 25.5 C13.2 18.5 18 14.5 18 9.6 C18 5 14.8 1.5 10 1.5 Z" fill="var(--c)" stroke="#fff" stroke-width="1.6"/><ellipse cx="6.6" cy="7" rx="2.2" ry="1.6" fill="rgba(255,255,255,.75)"/><circle cx="10" cy="10" r="2.3" fill="var(--d)" stroke="#fff" stroke-width=".8"/></svg>';
+  var PAWN_SVG = '<svg viewBox="0 0 20 28" aria-hidden="true"><path d="M10 2 A6.6 6.6 0 0 0 3.4 8.6 C3.4 12.6 6.6 14.2 7.6 17 C7.1 19.2 3.6 20.2 3.2 23.6 C2.8 26.6 6 27.6 10 27.6 C14 27.6 17.2 26.6 16.8 23.6 C16.4 20.2 12.9 19.2 12.4 17 C13.4 14.2 16.6 12.6 16.6 8.6 A6.6 6.6 0 0 0 10 2 Z" fill="var(--c)" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M6.2 22.6 C7 24.2 8.4 24.8 10 24.8" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="1.1" stroke-linecap="round"/><ellipse cx="7.2" cy="6.8" rx="2" ry="1.5" fill="rgba(255,255,255,.8)"/></svg>';
   function pawnHTML(fid, col, left, top, goIdx) {
     return '<div class="zgpw' + (goIdx >= 0 ? " go" : "") + '" data-fid="' + fid + '" ' + (goIdx >= 0 ? 'data-zgtok="' + goIdx + '"' : "") +
       ' style="left:' + left + '%;top:' + top + '%;--c:' + col.hex + ';--d:' + col.dark + '">' + PAWN_SVG + '</div>';
@@ -719,10 +728,11 @@
     if (!el || !el.animate) return;
     var f = FINAL[ra.v];
     el.animate([
-      { transform: "rotateX(0deg) rotateY(0deg) translateY(0)" },
-      { transform: "rotateX(" + (f[0] + 540) + "deg) rotateY(" + (f[1] + 540) + "deg) translateY(-26px)", offset: 0.5 },
-      { transform: "rotateX(" + (f[0] + 1080) + "deg) rotateY(" + (f[1] + 1080) + "deg) translateY(0)" }
-    ], { duration: 900, easing: "cubic-bezier(.2,.6,.3,1)" });
+      { transform: "rotateX(" + (f[0] + 1080) + "deg) rotateY(" + (f[1] + 1080) + "deg) translateY(0)", easing: "cubic-bezier(.45,0,.9,.6)" },
+      { transform: "rotateX(" + (f[0] + 540) + "deg) rotateY(" + (f[1] + 540) + "deg) translateY(-22px)", offset: 0.55, easing: "cubic-bezier(.1,.7,.4,1)" },
+      { transform: "rotateX(" + (f[0] + 16) + "deg) rotateY(" + (f[1] - 12) + "deg) translateY(0)", offset: 0.85, easing: "ease-out" },
+      { transform: "rotateX(" + f[0] + "deg) rotateY(" + f[1] + "deg) translateY(0)" }
+    ], { duration: 950, easing: "linear" });
   }
 
   // le pion qui avance : petit saut et son à l'arrivée
@@ -1177,6 +1187,8 @@
 .zgpcap .zgcap.empty{display:none}
 
 .zgpw svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+.zgl-cell.safe::after,.zgl-cell.star::after{content:"☆";position:absolute;inset:0;display:grid;place-items:center;color:#1f2937;font-size:85%;font-weight:700;background:none}
+.zgl-cell.star{background:#fff}
 `;
 
   window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; }, pickFor: pickFor };

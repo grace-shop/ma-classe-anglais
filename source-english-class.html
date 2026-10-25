@@ -10712,8 +10712,8 @@ arClose=function(){BTNAV.view=null;return _btArClose()};
 /* the Game button style (theme colours) */
 {const st=document.createElement('style');st.id='gameRoundCss';st.textContent=`
 /* the Game button: a rectangle whose two sides bulge outwards, in the colours of the theme */
-.ar-round-wrap{display:flex;justify-content:center;margin:14px 0 6px;filter:drop-shadow(0 10px 14px var(--ink,rgba(99,102,241,.45)))}
-.ar-round{position:relative;width:230px;max-width:72vw;height:96px;border:0;padding:0;cursor:pointer;font:inherit;color:var(--on-ink,#fff);
+.ar-round-wrap{display:flex;justify-content:center;margin:14px 0 6px;background:none!important;box-shadow:none!important}
+.ar-round{position:relative;width:230px;max-width:72vw;height:96px;border:0;padding:0;margin:0;cursor:pointer;font:inherit;color:var(--on-ink,#fff);box-shadow:none!important;border-radius:0!important;background-clip:border-box;
   background:var(--grad,linear-gradient(135deg,#5EEAD4,#818CF8));
   clip-path:polygon(9% 0,91% 0,92.1% 5%,93.8% 10%,95.2% 20%,96.7% 30%,97.8% 40%,98.6% 45%,100% 50%,98.6% 55%,97.8% 60%,96.7% 70%,95.2% 80%,93.8% 90%,92.1% 95%,91% 100%,9% 100%,7.9% 95%,6.2% 90%,4.8% 80%,3.3% 70%,2.2% 60%,1.4% 55%,0 50%,1.4% 45%,2.2% 40%,3.3% 30%,4.8% 20%,6.2% 10%,7.9% 5%);
   transition:transform .18s ease,filter .2s}
@@ -14773,7 +14773,7 @@ function albumHTML(a){const {items}=albumParts(a);const n=items.length;if(!n)ret
     const inner=isV?`<video data-zzvid="${esc(x.p)}" data-t="${esc(x.t||"video/mp4")}" muted playsinline preload="metadata"></video><span class="v4al-play" aria-hidden="true">▶</span>`:(u?`<img src="${u}" alt="">`:`<img data-chatp="${esc(x.p)}" data-t="${esc(x.t||"image/jpeg")}" alt="">`);
     return`<button type="button" class="v4al-t${isV?" vid":""}" data-zzal="${i}" aria-label="${isV?"Open the video":"Open the photo"}">${inner}${i===3&&more>0?`<span class="v4al-more">+${more}</span>`:""}</button>`}).join("")}</div>`}
 // the viewer follows the album: previous / next, swipe, one video at a time
-function zzAlbumOpen(items,start){
+function zzAlbumOpen(items,start,msg){
   var old=document.getElementById("zzal");if(old)old.remove();
   var ov=document.createElement("div");ov.id="zzal";ov.className="zzal";
   ov.innerHTML='<div class="zzal-top"><button type="button" class="zzal-x" aria-label="Close">'+ic("x")+'</button><b class="zzal-n"></b></div><div class="zzal-w"></div><button type="button" class="zzal-p" aria-label="Previous">‹</button><button type="button" class="zzal-nx" aria-label="Next">›</button>';
@@ -14797,6 +14797,18 @@ function zzAlbumOpen(items,start){
     }).catch(function(){if(mine===cur)w.innerHTML='<p class="zzal-err">Cannot open this item.</p>'});
   }
   ov.querySelector(".zzal-x").onclick=close;
+  // appui long sur la photo ou la vidéo : le même menu que sur un message (répondre, transférer, supprimer…)
+  if(msg&&msg.id){
+    var lpT=0,lpX=0,lpY=0;
+    var lpMenu=function(){lpT=0;if(navigator.vibrate)try{navigator.vibrate(12)}catch(x){};close();V4.act={kind:msg.k,id:msg.id};render()};
+    ov.addEventListener("pointerdown",function(e){
+      if(e.target.closest&&e.target.closest("button"))return;
+      clearTimeout(lpT);lpX=e.clientX;lpY=e.clientY;lpT=setTimeout(lpMenu,480);
+    });
+    ov.addEventListener("pointermove",function(e){if(lpT&&Math.hypot(e.clientX-lpX,e.clientY-lpY)>12){clearTimeout(lpT);lpT=0}});
+    ["pointerup","pointercancel","pointerleave"].forEach(function(ev){ov.addEventListener(ev,function(){clearTimeout(lpT);lpT=0})});
+    ov.addEventListener("contextmenu",function(e){e.preventDefault();clearTimeout(lpT);lpT=0;lpMenu()});
+  }
   ov.querySelector(".zzal-p").onclick=function(){if(cur>0){cur--;show()}};
   ov.querySelector(".zzal-nx").onclick=function(){if(cur<items.length-1){cur++;show()}};
   var x0=null;
@@ -14809,7 +14821,8 @@ document.addEventListener("click",function(e){
   var b=e.target&&e.target.closest&&e.target.closest("[data-zzal]");if(!b)return;
   e.preventDefault();e.stopPropagation();
   var box=b.closest(".v4album"),items=[];try{items=JSON.parse(box.getAttribute("data-zzitems")||"[]")}catch(x){}
-  zzAlbumOpen(items,+b.getAttribute("data-zzal")||0);
+  var mEl=box.closest(".msg[data-mid]"),msg=mEl&&String(mEl.dataset.mid).indexOf("tmp")!==0?{k:mEl.dataset.k,id:mEl.dataset.mid}:null;
+  zzAlbumOpen(items,+b.getAttribute("data-zzal")||0,msg);
 },true);
 // live video previews: the video plays with its edits (preview sheet and review tiles)
 setInterval(function(){document.querySelectorAll(".zzvp:not([data-ok])").forEach(function(el){
@@ -14993,6 +15006,39 @@ function zzReviewSend(){
 .msg .v4album{white-space:normal}`;
   document.head.appendChild(st);
 }
+
+/* ---------- long press on a photo or video opened full screen (the file viewer):
+   the same menu as a long press on its message (reply, forward, pin, delete…) ---------- */
+(function(){
+  var srcMsg=null;
+  document.addEventListener("click",function(e){
+    var b=e.target&&e.target.closest&&e.target.closest('[data-v4="doc"]');if(!b)return;
+    var m=b.closest(".msg[data-mid]");
+    srcMsg=m&&String(m.dataset.mid).indexOf("tmp")!==0?{k:m.dataset.k,id:m.dataset.mid}:null;
+  },true);
+  if(typeof openDoc!=="function")return;
+  var _od=openDoc;
+  openDoc=function(src,label){
+    var msg=srcMsg;srcMsg=null;
+    var r=_od(src,label);
+    var o=document.getElementById("docv");
+    if(o&&msg&&msg.id&&!o.dataset.lp){
+      o.dataset.lp="1";
+      var t=0,x0=0,y0=0;
+      var fire=function(){t=0;if(navigator.vibrate)try{navigator.vibrate(12)}catch(err){};
+        var close=document.querySelector('[data-v4="docClose"]');if(close)close.click();
+        V4.act={kind:msg.k,id:msg.id};render()};
+      o.addEventListener("pointerdown",function(e){
+        if(e.target.closest&&e.target.closest("button,a,input,audio,[data-v4]"))return;
+        clearTimeout(t);x0=e.clientX;y0=e.clientY;t=setTimeout(fire,480);
+      });
+      o.addEventListener("pointermove",function(e){if(t&&Math.hypot(e.clientX-x0,e.clientY-y0)>12){clearTimeout(t);t=0}});
+      ["pointerup","pointercancel","pointerleave"].forEach(function(ev){o.addEventListener(ev,function(){clearTimeout(t);t=0})});
+      o.addEventListener("contextmenu",function(e){e.preventDefault();clearTimeout(t);t=0;fire()});
+    }
+    return r;
+  };
+})();
 
 /* ---- app-v5-zzzzzs-videdit.js ---- */
 /* v5 · Vidéo : rognage, texte, dessin et autocollants.
@@ -17720,7 +17766,7 @@ async function zzBakeEntries(entries){
   var LUDO_HOMES = [[[7,1],[7,2],[7,3],[7,4],[7,5]], [[1,7],[2,7],[3,7],[4,7],[5,7]], [[7,13],[7,12],[7,11],[7,10],[7,9]], [[13,7],[12,7],[11,7],[10,7],[9,7]]];
   var LUDO_BASE = [[[2,2],[2,3],[3,2],[3,3]], [[2,11],[2,12],[3,11],[3,12]], [[11,11],[11,12],[12,11],[12,12]], [[11,2],[11,3],[12,2],[12,3]]];
   var LUDO_QUAD = [[0,0],[0,9],[9,9],[9,0]];
-  var LUDO_SAFE = {}; [0, 13, 26, 39].forEach(function (g) { LUDO_SAFE[g] = 1; });
+  var LUDO_STAR = {}; [8, 21, 34, 47].forEach(function (g) { LUDO_STAR[g] = 1; });
   var CELL = 100 / 15;
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -18312,7 +18358,7 @@ async function zzBakeEntries(entries){
       // case de départ de chaque couleur : pleine couleur avec une flèche ; étoile = case sûre
       var start = g % 13 === 0 ? " start" : "";
       var col = g % 13 === 0 ? CORNER[g / 13].hex : "";
-      cells += cellDiv(rc[0], rc[1], "track" + (LUDO_SAFE[g] ? " safe" : "") + start, col);
+      cells += cellDiv(rc[0], rc[1], "track" + (LUDO_STAR[g] ? " star" : "") + start, col);
     });
     LUDO_HOMES.forEach(function (list, c) { list.forEach(function (rc) { cells += cellDiv(rc[0], rc[1], "home", CORNER[c].hex); }); });
     var toks = "", qdice = "";
@@ -18326,9 +18372,12 @@ async function zzBakeEntries(entries){
       for (var t = 0; t < 4; t++) {
         var p = st.tok[k][t], rc = p < 0 ? LUDO_BASE[c][t] : ludoCell(c, p);
         if (!rc) continue;
+        var pos = p < 0 ? homeDot(c, t) : null; // centre of a dot in the home square, in grid lines
         var can = human && st.turn === k && st.dice && !G.rolling && moves.some(function (m) { return m.t === t; });
         var off = p === 56 ? t * 1.3 - 2 : 0;
-        toks += pawnHTML("T" + k + t, CORNER[c], rc[1] * CELL + (CELL - 7) / 2 + off, rc[0] * CELL + (CELL - 7) / 2 + off, can ? t : -1);
+        var lft = pos ? pos[0] * CELL - 3.5 : rc[1] * CELL + (CELL - 7) / 2 + off;
+        var tp = pos ? pos[1] * CELL - 3.5 : rc[0] * CELL + (CELL - 7) / 2 + off;
+        toks += pawnHTML("T" + k + t, CORNER[c], lft, tp, can ? t : -1);
       }
     }
     var turnK = st.turn, tc = st.corner[turnK];
@@ -18352,11 +18401,17 @@ async function zzBakeEntries(entries){
     var pos = [["top:3%;left:3%"], ["top:3%;left:91%"], ["top:91%;left:91%"], ["top:91%;left:3%"]];
     return pos[c][0];
   }
+  // les quatre points de chaque maison (carré blanc, un par pion) : x = colonne, y = ligne en lignes de grille
+  var HOME_DOTS = [[2, 2], [4, 2], [2, 4], [4, 4]];
+  function homeDot(c, t) {
+    var q = LUDO_QUAD[c], d = HOME_DOTS[t];
+    return [q[1] + d[0], q[0] + d[1]];
+  }
   function cellDiv(r, c, cls, col) {
     return '<div class="zgl-cell ' + cls + '" style="top:' + r * CELL + '%;left:' + c * CELL + '%;width:' + CELL + '%;height:' + CELL + '%;' + (col ? "background:" + col : "") + '"></div>';
   }
   // pion en forme de goutte (comme sur la vidéo) : tête ronde + pied effilé, contour blanc
-  var PAWN_SVG = '<svg viewBox="0 0 20 28" aria-hidden="true"><path d="M10 1.5 C5.2 1.5 2 5 2 9.6 C2 14.5 6.8 18.5 9 25.5 C9.4 26.8 10.6 26.8 11 25.5 C13.2 18.5 18 14.5 18 9.6 C18 5 14.8 1.5 10 1.5 Z" fill="var(--c)" stroke="#fff" stroke-width="1.6"/><ellipse cx="6.6" cy="7" rx="2.2" ry="1.6" fill="rgba(255,255,255,.75)"/><circle cx="10" cy="10" r="2.3" fill="var(--d)" stroke="#fff" stroke-width=".8"/></svg>';
+  var PAWN_SVG = '<svg viewBox="0 0 20 28" aria-hidden="true"><path d="M10 2 A6.6 6.6 0 0 0 3.4 8.6 C3.4 12.6 6.6 14.2 7.6 17 C7.1 19.2 3.6 20.2 3.2 23.6 C2.8 26.6 6 27.6 10 27.6 C14 27.6 17.2 26.6 16.8 23.6 C16.4 20.2 12.9 19.2 12.4 17 C13.4 14.2 16.6 12.6 16.6 8.6 A6.6 6.6 0 0 0 10 2 Z" fill="var(--c)" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M6.2 22.6 C7 24.2 8.4 24.8 10 24.8" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="1.1" stroke-linecap="round"/><ellipse cx="7.2" cy="6.8" rx="2" ry="1.5" fill="rgba(255,255,255,.8)"/></svg>';
   function pawnHTML(fid, col, left, top, goIdx) {
     return '<div class="zgpw' + (goIdx >= 0 ? " go" : "") + '" data-fid="' + fid + '" ' + (goIdx >= 0 ? 'data-zgtok="' + goIdx + '"' : "") +
       ' style="left:' + left + '%;top:' + top + '%;--c:' + col.hex + ';--d:' + col.dark + '">' + PAWN_SVG + '</div>';
@@ -18384,10 +18439,11 @@ async function zzBakeEntries(entries){
     if (!el || !el.animate) return;
     var f = FINAL[ra.v];
     el.animate([
-      { transform: "rotateX(0deg) rotateY(0deg) translateY(0)" },
-      { transform: "rotateX(" + (f[0] + 540) + "deg) rotateY(" + (f[1] + 540) + "deg) translateY(-26px)", offset: 0.5 },
-      { transform: "rotateX(" + (f[0] + 1080) + "deg) rotateY(" + (f[1] + 1080) + "deg) translateY(0)" }
-    ], { duration: 900, easing: "cubic-bezier(.2,.6,.3,1)" });
+      { transform: "rotateX(" + (f[0] + 1080) + "deg) rotateY(" + (f[1] + 1080) + "deg) translateY(0)", easing: "cubic-bezier(.45,0,.9,.6)" },
+      { transform: "rotateX(" + (f[0] + 540) + "deg) rotateY(" + (f[1] + 540) + "deg) translateY(-22px)", offset: 0.55, easing: "cubic-bezier(.1,.7,.4,1)" },
+      { transform: "rotateX(" + (f[0] + 16) + "deg) rotateY(" + (f[1] - 12) + "deg) translateY(0)", offset: 0.85, easing: "ease-out" },
+      { transform: "rotateX(" + f[0] + "deg) rotateY(" + f[1] + "deg) translateY(0)" }
+    ], { duration: 950, easing: "linear" });
   }
 
   // le pion qui avance : petit saut et son à l'arrivée
@@ -18842,6 +18898,8 @@ async function zzBakeEntries(entries){
 .zgpcap .zgcap.empty{display:none}
 
 .zgpw svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+.zgl-cell.safe::after,.zgl-cell.star::after{content:"☆";position:absolute;inset:0;display:grid;place-items:center;color:#1f2937;font-size:85%;font-weight:700;background:none}
+.zgl-cell.star{background:#fff}
 `;
 
   window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; }, pickFor: pickFor };
