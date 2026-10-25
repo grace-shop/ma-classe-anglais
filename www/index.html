@@ -17557,7 +17557,12 @@ async function zzBakeEntries(entries){
       if (MO.mill(s.b, p, m.to)) {
         var opp = 3 - p;
         var hasTake = s.b.some(function (x, i) { return x === opp; });
-        if (hasTake) { s.pending = true; return s; }
+        if (hasTake) {
+          // si retirer un pion fait perdre l'adversaire, la victoire est annoncée tout de suite
+          var oppTotal = s.b.filter(function (x) { return x === opp; }).length + s.hand[opp - 1];
+          if (oppTotal - 1 >= 3) { s.pending = true; return s; }
+          for (var z = 0; z < 9; z++) if (s.b[z] === opp) { s.b[z] = 0; break; }
+        }
       }
       s.turn = 3 - p;
     }
@@ -17672,7 +17677,7 @@ async function zzBakeEntries(entries){
   var CHESS_SHAPES = {
     P: '<circle cx="22.5" cy="13" r="5"/><path d="M16 31c0-5 2.5-9 6.5-10.5 4 1.5 6.5 5.5 6.5 10.5z"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
     R: '<path d="M13 8h4v4h3V8h4v4h3V8h4v7H13z"/><path d="M16 15h13l-1 16H17z"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
-    N: '<path d="M14 34v-5c0-6-3-9-2-15 1-4 5-6 8-4l5-3c3 4 4 7 3 11-1 5 3 9 3 16z"/><circle cx="23" cy="14" r="1.1" class="eye"/><rect x="12" y="33" width="21" height="4" rx="1.2"/>',
+    N: '<path d="M11 33 L11 28 C11 22 15 20 17 16 C16 14 15 12 13 11 C17 7 22 5 26 7 C30 9 32 13 33 19 C34 25 34 29 34 33 Z"/><path d="M19 14 L13 19" class="slit"/><circle cx="23" cy="12.5" r="1.3" class="eye"/><rect x="9" y="33" width="27" height="4" rx="1.2"/>',
     B: '<path d="M22.5 5c4.5 4 5.5 9 1.5 13 4 2 6.5 6.5 3.5 12h-10c-3-5.5-.5-10 3.5-12-4-4-3-9 1.5-13z"/><path d="M19 22l7-6" class="slit"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
     Q: '<path d="M11 33L9 13l6.5 8L22.5 9 29 21l6.5-8-2 20z"/><circle cx="9" cy="12" r="2.2"/><circle cx="22.5" cy="7.5" r="2.4"/><circle cx="36" cy="12" r="2.2"/><rect x="11" y="32" width="23" height="4" rx="1.2"/>',
     K: '<path d="M13.5 34L11 17l5.5 5L22.5 15 28 22l5.5-5-2.5 17z"/><rect x="21" y="3.5" width="3" height="8"/><rect x="18" y="5.5" width="9" height="3"/><rect x="11" y="32" width="23" height="4" rx="1.2"/>'
@@ -17895,7 +17900,7 @@ async function zzBakeEntries(entries){
   function schedule() {
     clearTimeout(TIMER); TIMER = 0;
     if (!G || G.over) return;
-    if (isAiTurn()) TIMER = setTimeout(aiMove, G.game === "ttt" ? 280 : 520);
+    if (isAiTurn()) TIMER = setTimeout(aiMove, G.game === "ttt" ? 120 : 520);
   }
 
   // un coup est joué : on enregistre les captures, on joue le son, on rafraîchit
@@ -18258,7 +18263,12 @@ async function zzBakeEntries(entries){
       cells += cellDiv(rc[0], rc[1], "track" + (LUDO_SAFE[g] ? " safe" : "") + start, col);
     });
     LUDO_HOMES.forEach(function (list, c) { list.forEach(function (rc) { cells += cellDiv(rc[0], rc[1], "home", CORNER[c].hex); }); });
-    var toks = "";
+    var toks = "", qdice = "";
+    for (var qk = 0; qk < n; qk++) {
+      var qc = st.corner[qk], qname = G.mode === "ai" ? (qk === G.you ? "You" : "Computer") : (G.mode === "online" ? (qk === G.you ? "You" : G.oppName) : "Player " + (qk + 1));
+      var qdie = cubeHTML("q" + qk, st.dice && st.turn === qk && !G.rolling ? st.dice : G.lastDie[qk], "sm", st.turn === qk && human && !st.dice && !G.rolling);
+      qdice += '<div class="zgl-qdie zgl-q' + qc + '">' + qdie + '</div><div class="zgl-qlbl zgl-q' + qc + '" style="--c:' + CORNER[qc].hex + '">' + esc(qname) + '</div>';
+    }
     for (var k = 0; k < n; k++) {
       var c = st.corner[k];
       for (var t = 0; t < 4; t++) {
@@ -18271,16 +18281,14 @@ async function zzBakeEntries(entries){
     }
     var turnK = st.turn, tc = st.corner[turnK];
     var arrow = !G.over ? '<div class="zgl-turn" style="' + arrowPos(tc) + '"></div>' : "";
-    var board = '<div class="zgl-frame"><div class="zgl-board">' + quads + cells + '<div class="zgl-center"></div>' + toks + arrow + '</div></div>';
+    var board = '<div class="zgl-frame"><div class="zgl-board">' + quads + cells + '<div class="zgl-center"></div>' + toks + qdice + arrow + '</div></div>';
     var panels = '<div class="zgl-players">' + Array.from({ length: n }).map(function (_, k) {
       var c = st.corner[k], col = CORNER[c];
       var home = st.tok[k].filter(function (x) { return x === 56; }).length;
       var name = G.mode === "ai" ? (k === G.you ? "You" : "Computer") : (G.mode === "online" ? (k === G.you ? "You" : G.oppName) : "Player " + (k + 1));
       var on = st.turn === k && !G.over ? " on" : "";
-      var die = cubeHTML("d" + k, st.dice && st.turn === k && !G.rolling ? st.dice : G.lastDie[k], "sm", st.turn === k && human && !st.dice && !G.rolling);
       return '<div class="zgl-card' + on + '" style="--c:' + col.hex + ';--d:' + col.dark + '">' +
         '<div class="zgl-ct"><i></i><b>' + esc(name) + '</b><span>' + home + '/4</span></div>' +
-        '<div class="zgl-cr">' + die + '</div>' +
         '<div class="zgl-cc">' + capsHTML(k) + '</div></div>';
     }).join("") + '</div>';
     var action;
@@ -18387,9 +18395,30 @@ async function zzBakeEntries(entries){
     var next = ZG.ludo.apply(st, mv);
     var caps = diffCaps(st, next, mover);
     caps.forEach(function (c) { (G.caps[mover] = G.caps[mover] || []).push(c); });
-    if (caps.length) SFX.capture();
-    G.st = next; G.sel = null; G.anim = true;
-    afterMove();
+    var k = st.turn, p0 = st.tok[k][t], p1 = next.tok[k][t];
+    var path = [];
+    if (p0 < 0) path.push(p1); else for (var q = p0 + 1; q <= p1; q++) path.push(q);
+    if (path.length <= 1) {
+      if (caps.length) SFX.capture();
+      G.st = next; G.sel = null; G.anim = true;
+      afterMove();
+      return;
+    }
+    // le pion avance case par case (pas de saut)
+    G.rolling = true; G.sel = null;
+    var i = 0;
+    (function walk() {
+      if (!G || G.over) return;
+      var s2 = JSON.parse(JSON.stringify(st));
+      s2.tok[k][t] = path[i];
+      G.st = s2; G.anim = true; paint(); SFX.move();
+      i++;
+      if (i < path.length) { setTimeout(walk, 170); return; }
+      G.rolling = false;
+      if (caps.length) SFX.capture();
+      G.st = next; G.anim = true;
+      afterMove();
+    })();
   }
   function ludoPlay(t) { if (humanTurn() && G.st.dice && !G.rolling) ludoApply(t); }
 
@@ -18715,6 +18744,14 @@ async function zzBakeEntries(entries){
 .zgl-in::before,.zgl-in::after{display:none}
 .zgpw .hd{box-shadow:0 0 0 1.5px #fff,0 1px 3px rgba(0,0,0,.5)}
 .zgpw .bd{box-shadow:0 0 0 1.5px #fff,0 2px 3px rgba(0,0,0,.45)}
+.zgl-qdie{position:absolute;z-index:5;transform:scale(.74);transform-origin:center;pointer-events:auto}
+.zgl-qdie .zgcube-wrap{margin:0}
+.zgl-qdie.zgl-q0{top:1%;left:1%}.zgl-qdie.zgl-q1{top:1%;right:1%}.zgl-qdie.zgl-q2{bottom:1%;right:1%}.zgl-qdie.zgl-q3{bottom:1%;left:1%}
+.zgl-qlbl{position:absolute;z-index:5;font:700 9px/1.2 system-ui,sans-serif;color:#fff;background:var(--c);padding:2px 6px;border-radius:9px;white-space:nowrap;transform:translateX(-50%);box-shadow:0 1px 2px rgba(0,0,0,.4);pointer-events:none}
+.zgl-qlbl.zgl-q0{top:35%;left:20%}.zgl-qlbl.zgl-q1{top:35%;left:80%}
+.zgl-qlbl.zgl-q2{top:61%;left:80%}.zgl-qlbl.zgl-q3{top:61%;left:20%}
+.zgl-cell.safe::after{content:"☆";color:#2b2b2b;font-size:80%;font-weight:700;background:none}
+.zgl-cell.start::after{content:"➤";font-size:70%}
 `;
 
   window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; }, pickFor: pickFor };
