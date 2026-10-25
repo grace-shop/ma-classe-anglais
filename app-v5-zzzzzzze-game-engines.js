@@ -207,10 +207,13 @@
   // progress: -1 in the base, 0..50 on the track (0 = own start), 51..55 home column, 56 arrived
   var LU = {};
   LU.SAFE_OFF = [0]; // own start squares are safe
-  LU.start = function (n) {
+  // corners: which corner of the board each player uses (0 red, 1 green, 2 yellow, 3 blue)
+  LU.start = function (n, corners) {
     var toks = [];
     for (var k = 0; k < n; k++) toks.push([-1, -1, -1, -1]);
-    return { n: n, colors: ["red", "green", "yellow", "blue"].slice(0, n), tok: toks, turn: 0, dice: 0, rolled: false, sixes: 0, winner: -1, log: "" };
+    var cor = (corners && corners.length >= n) ? corners.slice(0, n) : [0, 1, 2, 3].slice(0, n);
+    var names = ["red", "green", "yellow", "blue"];
+    return { n: n, corner: cor, colors: cor.map(function (c) { return names[c]; }), tok: toks, turn: 0, dice: 0, rolled: false, sixes: 0, winner: -1, log: "" };
   };
   LU.global = function (k, p) { return (k * 13 + p) % 52; };
   LU.moves = function (st, dice) {
@@ -225,11 +228,12 @@
   };
   LU.apply = function (st, mv) {
     var s = JSON.parse(JSON.stringify(st)), k = s.turn, dice = s.dice;
+    delete s.last_captured;
     var p = s.tok[k][mv.t];
     s.tok[k][mv.t] = mv.to;
     var info = { captured: false, finished: mv.to === 56, entered: p === -1 };
     if (mv.to <= 50) {
-      var g = LU.global(k, mv.to);
+      var g = LU.global(s.corner[k], mv.to);
       // the start square of each colour is safe
       var safe = mv.to === 0;
       if (!safe) {
@@ -237,7 +241,7 @@
           if (o === k) continue;
           for (var u = 0; u < 4; u++) {
             var op = s.tok[o][u];
-            if (op >= 0 && op <= 50 && LU.global(o, op) === g) { s.tok[o][u] = -1; info.captured = true; }
+            if (op >= 0 && op <= 50 && LU.global(s.corner[o], op) === g) { s.tok[o][u] = -1; info.captured = true; s.last_captured = s.last_captured || []; s.last_captured.push(o); }
           }
         }
       }
@@ -272,7 +276,7 @@
       if (n.last.finished) sc += 1000;
       if (n.last.captured) sc += 300;
       if (st.tok[k][m.t] === -1) sc += 120;
-      if (m.to <= 50 && LU.global(k, m.to) % 13 === 0) sc += 15;
+      if (m.to <= 50 && LU.global(st.corner[k], m.to) % 13 === 0) sc += 15;
       sc += m.to; // advancing
       if (m.to === 56) sc += 500;
       if (sc > bs) { bs = sc; best = m; }
