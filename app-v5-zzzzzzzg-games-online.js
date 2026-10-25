@@ -12,6 +12,14 @@
 
   function sb() { return window.__sb; }
   function me() { return (typeof S !== "undefined" && S.uid) || ""; }
+  // host et guest sont des auth.uid() côté serveur : on compare avec le même identifiant
+  async function myUid() {
+    try {
+      var u = await sb().auth.getUser();
+      if (u && u.data && u.data.user && u.data.user.id) return u.data.user.id;
+    } catch (e) {}
+    return me();
+  }
   function nameOf(uid) {
     var x = ((typeof PR !== "undefined" && PR.dir) || []).find(function (d) { return d.uid === uid; });
     return x ? x.name : "Classmate";
@@ -128,7 +136,7 @@
     box0.appendChild(box);
     var r = await sb().rpc("game_list");
     if (!r || r.error || !r.data || !r.data.length) { box.remove(); return; }
-    var uid = me();
+    var uid = await myUid();
     var names = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", ttt: "Tic-tac-toe" };
     function other(row) { return row.host === uid ? row.guest : row.host; }
     box.innerHTML = '<div class="zg-label" style="margin:6px 0 0">Invitations and games</div>' + r.data.map(function (g) {

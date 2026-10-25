@@ -22,7 +22,7 @@
   var CHESS_SHAPES = {
     P: '<circle cx="22.5" cy="13" r="5"/><path d="M16 31c0-5 2.5-9 6.5-10.5 4 1.5 6.5 5.5 6.5 10.5z"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
     R: '<path d="M13 8h4v4h3V8h4v4h3V8h4v7H13z"/><path d="M16 15h13l-1 16H17z"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
-    N: '<path d="M11 33 L11 28 C11 22 15 20 17 16 C16 14 15 12 13 11 C17 7 22 5 26 7 C30 9 32 13 33 19 C34 25 34 29 34 33 Z"/><path d="M19 14 L13 19" class="slit"/><circle cx="23" cy="12.5" r="1.3" class="eye"/><rect x="9" y="33" width="27" height="4" rx="1.2"/>',
+    N: '<path d="M10 36 L10 31 C10 26 14 22 12 18 L9 21 C8 14 13 8 19 6 L22 9 C28 10 33 16 34 24 C34 28 33 32 35 36 Z"/><path d="M21 12 C24 14 26 17 27 20" class="slit"/><circle cx="16.5" cy="15" r="1.4" class="eye"/>',
     B: '<path d="M22.5 5c4.5 4 5.5 9 1.5 13 4 2 6.5 6.5 3.5 12h-10c-3-5.5-.5-10 3.5-12-4-4-3-9 1.5-13z"/><path d="M19 22l7-6" class="slit"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
     Q: '<path d="M11 33L9 13l6.5 8L22.5 9 29 21l6.5-8-2 20z"/><circle cx="9" cy="12" r="2.2"/><circle cx="22.5" cy="7.5" r="2.4"/><circle cx="36" cy="12" r="2.2"/><rect x="11" y="32" width="23" height="4" rx="1.2"/>',
     K: '<path d="M13.5 34L11 17l5.5 5L22.5 15 28 22l5.5-5-2.5 17z"/><rect x="21" y="3.5" width="3" height="8"/><rect x="18" y="5.5" width="9" height="3"/><rect x="11" y="32" width="23" height="4" rx="1.2"/>'
@@ -650,9 +650,11 @@
   function cellDiv(r, c, cls, col) {
     return '<div class="zgl-cell ' + cls + '" style="top:' + r * CELL + '%;left:' + c * CELL + '%;width:' + CELL + '%;height:' + CELL + '%;' + (col ? "background:" + col : "") + '"></div>';
   }
+  // pion en forme de goutte (comme sur la vidéo) : tête ronde + pied effilé, contour blanc
+  var PAWN_SVG = '<svg viewBox="0 0 20 28" aria-hidden="true"><path d="M10 1.5 C5.2 1.5 2 5 2 9.6 C2 14.5 6.8 18.5 9 25.5 C9.4 26.8 10.6 26.8 11 25.5 C13.2 18.5 18 14.5 18 9.6 C18 5 14.8 1.5 10 1.5 Z" fill="var(--c)" stroke="#fff" stroke-width="1.6"/><ellipse cx="6.6" cy="7" rx="2.2" ry="1.6" fill="rgba(255,255,255,.75)"/><circle cx="10" cy="10" r="2.3" fill="var(--d)" stroke="#fff" stroke-width=".8"/></svg>';
   function pawnHTML(fid, col, left, top, goIdx) {
     return '<div class="zgpw' + (goIdx >= 0 ? " go" : "") + '" data-fid="' + fid + '" ' + (goIdx >= 0 ? 'data-zgtok="' + goIdx + '"' : "") +
-      ' style="left:' + left + '%;top:' + top + '%;--c:' + col.hex + ';--d:' + col.dark + '"><i class="hd"></i><i class="bd"></i></div>';
+      ' style="left:' + left + '%;top:' + top + '%;--c:' + col.hex + ';--d:' + col.dark + '">' + PAWN_SVG + '</div>';
   }
 
   /* dé 3D : un cube par joueur */
@@ -1097,6 +1099,7 @@
 .zgl-qlbl.zgl-q2{top:61%;left:80%}.zgl-qlbl.zgl-q3{top:61%;left:20%}
 .zgl-cell.safe::after{content:"☆";color:#2b2b2b;font-size:80%;font-weight:700;background:none}
 .zgl-cell.start::after{content:"➤";font-size:70%}
+.zgpw svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 `;
 
   window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; }, pickFor: pickFor };

@@ -140,3 +140,7 @@ arHome=function(){
 /* 10 · closing the Arena forgets the battle screens (the room stays resumable) */
 const _btArClose=arClose;
 arClose=function(){BTNAV.view=null;return _btArClose()};
+
+/* 11 · opening the Arena always starts on its home page (never on a leftover battle or Battle Royale page) */
+const _btArOpen=arOpen;
+arOpen=function(){btStop();BT.on=false;BT.inHub=true;BTNAV.view=null;BTNAV.kind=null;return _btArOpen()};
