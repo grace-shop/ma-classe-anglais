@@ -26,7 +26,7 @@
     Q: '<path d="M14 34 C15 27 16.5 23 16.5 20 L28.5 20 C28.5 23 30 27 31 34 Z"/><rect x="14.5" y="18" width="16" height="3" rx="1.5"/><path d="M14.5 18 L10 9 L15.5 13 L17.5 6 L22.5 11.5 L27.5 6 L29.5 13 L35 9 L30.5 18 Z"/><circle cx="10" cy="8.2" r="2"/><circle cx="17.5" cy="5.2" r="2"/><circle cx="22.5" cy="9.5" r="2.1"/><circle cx="27.5" cy="5.2" r="2"/><circle cx="35" cy="8.2" r="2"/>',
     B: '<path d="M12.5 34 C14 28 16.5 25 17.5 21.5 L27.5 21.5 C28.5 25 31 28 32.5 34 Z"/><rect x="15.5" y="19.5" width="14" height="3" rx="1.5"/><path d="M22.5 4 C28 8.5 28.5 13 25 17.5 L20 17.5 C16.5 13 17 8.5 22.5 4 Z"/><circle cx="22.5" cy="3" r="1.6"/><path class="slit" d="M20.8 12.5 L24.4 8.6" />',
     R: '<path d="M14.5 33 L13.5 17 L31.5 17 L30.5 33 Z"/><rect x="12" y="14" width="21" height="3.6" rx="1.2"/><path d="M12 14 L12 6.5 L16.5 6.5 L16.5 10 L20.5 10 L20.5 6.5 L24.5 6.5 L24.5 10 L28.5 10 L28.5 6.5 L33 6.5 L33 14 Z"/>',
-    N: '<path d="M11 34 L11 29.5 C11 25 13.5 22.5 14 19 C14.5 15.5 12.8 12.5 11 11 L14.5 8.5 C17.5 6.2 21.5 6 24.5 7.5 C29 9.8 31.5 14.5 31.8 21 C32 26 33.5 30 34 34 Z"/><circle class="eye" cx="17" cy="14.5" r="1.3"/><path class="slit" d="M22 13 C24.5 15 26 18 26.5 21"/>',
+    N: '<path d="M10.5 34 C11.5 30 13 27.5 15 25 C14 23.6 11.5 21.6 10 20.1 C8.6 18.7 8.3 16.9 8.7 15.3 C9.5 12.1 11.7 9.5 14.5 7.3 C16.4 5.9 18.4 4.6 20.8 3.6 C21.8 3.2 22.7 3.5 23.3 4.4 C25.3 6.5 28.5 8.3 30.5 12.3 C32.7 16.7 34.7 21.2 35.2 26.2 L35.6 34 Z"/><circle class="eye" cx="17.2" cy="12.4" r="1.25"/><path class="slit" d="M21.6 9.6 C23.8 11.4 24.8 14.6 24.2 18.4"/>',
     P: '<circle cx="22.5" cy="13.5" r="5.2"/><rect x="16.5" y="19" width="12" height="3" rx="1.5"/><path d="M16 33 C16 27 18.5 23.5 19.5 22 L25.5 22 C26.5 23.5 29 27 29 33 Z"/>'
   };
   function chessPieceSVG(letter, white) {
@@ -662,11 +662,10 @@
       for (var t = 0; t < 4; t++) {
         var p = st.tok[k][t], rc = p < 0 ? LUDO_BASE[c][t] : ludoCell(c, p);
         if (!rc) continue;
-        var pos = p < 0 ? homeDot(c, t) : null; // centre of a dot in the home square, in grid lines
         var can = human && st.turn === k && st.dice && !G.rolling && moves.some(function (m) { return m.t === t; });
-        var off = p === 56 ? t * 1.3 - 2 : 0;
-        var lft = pos ? pos[0] * CELL - 3.5 : rc[1] * CELL + (CELL - 7) / 2 + off;
-        var tp = pos ? pos[1] * CELL - 3.5 : rc[0] * CELL + (CELL - 7) / 2 + off;
+        var ctr = pawnCentre(c, t, p, rc); // centre in cell units
+        var lft = ctr[0] * CELL - PAW_W / 2;
+        var tp = ctr[1] * CELL - PAW_H / 2;
         toks += pawnHTML("T" + k + t, CORNER[c], lft, tp, can ? t : -1);
       }
     }
@@ -690,6 +689,16 @@
   function arrowPos(c) {
     var pos = [["top:3%;left:3%"], ["top:3%;left:91%"], ["top:91%;left:91%"], ["top:91%;left:3%"]];
     return pos[c][0];
+  }
+  // taille d'un pion (en % du plateau) : il tient dans une case et dans un trou de la maison
+  var PAW_W = 3.8, PAW_H = 5.4;
+  // centre du triangle de chaque couleur au milieu du plateau (le carré central fait 3 cases)
+  var CENTRE_SPOT = [[6.85, 7.5], [7.5, 6.85], [8.15, 7.5], [7.5, 8.15]];
+  // où se trouve le pion, au centre exact de sa case (en unités de case)
+  function pawnCentre(c, t, p, rc) {
+    if (p < 0) { var d = homeDot(c, t); return [d[0], d[1]]; }     // trou de la maison
+    if (p === 56) { var s = CENTRE_SPOT[c]; return [s[0] + (t - 1.5) * 0.2, s[1]]; } // arrivé : triangle de sa couleur
+    return [rc[1] + 0.5, rc[0] + 0.5];                             // case du parcours ou du couloir
   }
   // les quatre points de chaque maison (carré blanc, un par pion) : x = colonne, y = ligne en lignes de grille
   var HOME_DOTS = [[2, 2], [4, 2], [2, 4], [4, 4]];
@@ -799,6 +808,7 @@
     if (p0 < 0) path.push(p1); else for (var q = p0 + 1; q <= p1; q++) path.push(q);
     if (path.length <= 1) {
       if (caps.length) SFX.capture();
+      if (p1 === 51 || p1 === 56) homeFx(k, t, p1);
       G.st = next; G.sel = null; G.anim = true;
       afterMove();
       return;
@@ -811,6 +821,7 @@
       var s2 = JSON.parse(JSON.stringify(st));
       s2.tok[k][t] = path[i];
       G.st = s2; G.anim = true; paint(); SFX.move();
+      if (path[i] === 51 || path[i] === 56) homeFx(k, t, path[i]);
       i++;
       if (i < path.length) { setTimeout(walk, 250); return; }
       G.rolling = false;
@@ -818,6 +829,24 @@
       G.st = next; G.anim = true;
       afterMove();
     })();
+  }
+  // un pion qui rentre chez lui : un carillon et de petites étincelles qui brillent pendant 1 seconde
+  function homeFx(k, t, p) {
+    try {
+      SFX.chime();
+      var el = document.querySelector('[data-fid="T' + k + t + '"]');
+      if (!el || !el.parentNode) return;
+      var x = parseFloat(el.style.left) + PAW_W / 2, y = parseFloat(el.style.top) + PAW_H / 2;
+      var col = el.style.getPropertyValue("--c") || "#fff";
+      for (var i = 0; i < 12; i++) {
+        var a = (i / 12) * Math.PI * 2, d = 6 + (i % 3) * 3;
+        var sp = document.createElement("i");
+        sp.className = "zgl-spark";
+        sp.style.cssText = "left:" + x + "%;top:" + y + "%;--c:" + col + ";--dx:" + (Math.cos(a) * d).toFixed(1) + "%;--dy:" + (Math.sin(a) * d).toFixed(1) + "%;animation-delay:" + (i % 2 ? 0 : 0.08) + "s";
+        el.parentNode.appendChild(sp);
+        setTimeout(function (n) { return function () { n.remove(); }; }(sp), 1100);
+      }
+    } catch (e) {}
   }
   function ludoPlay(t) { if (humanTurn() && G.st.dice && !G.rolling) ludoApply(t); }
 
@@ -1051,7 +1080,7 @@
 .zgl-cell.home{border-color:rgba(0,0,0,.12)}
 .zgl-cell.safe::after{content:"★";position:absolute;inset:0;display:grid;place-items:center;color:#7d8aa3;font-size:70%}
 .zgl-center{position:absolute;left:40%;top:40%;width:20%;height:20%;background:conic-gradient(from -45deg,#1FB35B 0 90deg,#F5C518 90deg 180deg,#1E88E5 180deg 270deg,#E5303A 270deg 360deg)}
-.zgpw{position:absolute;width:7%;height:7%;pointer-events:none;z-index:3;transform-origin:50% 100%}
+.zgpw{position:absolute;width:3.8%;height:5.4%;pointer-events:none;z-index:3;transform-origin:50% 100%}
 .zgpw .hd{position:absolute;left:18%;top:0;width:64%;height:56%;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fff 0 7%,var(--c) 28%,var(--c) 62%,var(--d) 100%);box-shadow:0 2px 2px rgba(0,0,0,.45)}
 .zgpw .bd{position:absolute;left:8%;bottom:0;width:84%;height:50%;border-radius:45% 45% 50% 50%/25% 25% 75% 75%;background:linear-gradient(90deg,var(--d),var(--c) 30%,#fff 44%,var(--c) 58%,var(--d));box-shadow:0 3px 3px rgba(0,0,0,.45)}
 .zgpw.go{pointer-events:auto;cursor:pointer;animation:zgbob 1s infinite}
@@ -1196,6 +1225,9 @@
 .zgl-qlbl b{font-weight:900;margin:0 1px}
 .zgl-qlbl{padding:3px 8px;box-shadow:0 2px 0 rgba(0,0,0,.25),0 0 0 1.5px rgba(255,255,255,.9)}
 .zgl-qdie .zgcube-wrap{box-shadow:0 6px 10px rgba(0,0,0,.35)}
+.zgl-spark{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#fff;box-shadow:0 0 6px 2px var(--c),0 0 2px #fff;pointer-events:none;z-index:6;opacity:0;animation:zgsparkle 1s ease-out forwards}
+@keyframes zgsparkle{0%{opacity:0;transform:translate(0,0) scale(.4)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.1)}}
+@media (prefers-reduced-motion:reduce){.zgl-spark{display:none}}
 `;
 
   window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; }, pickFor: pickFor };

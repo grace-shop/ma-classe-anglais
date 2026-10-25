@@ -632,7 +632,7 @@
   window.__telOf = (e) => { const d = String(e || "").split("@")[0]; return d.startsWith("228") && d.length === 11 ? "+228 " + d.slice(3).replace(/(\d\d)(?=\d)/g, "$1 ") : "+" + d; };
   const loginId = () => { const raw = ((document.getElementById("agE") || {}).value || "").trim(); if (idMode !== "tel") return { email: raw }; const d = telDigits(raw); return telOk(d) ? { email: telEmail(raw) } : { err: "Invalid number: write your phone number, for example 90 12 34 56." }; };
   const G = `<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2c-2 1.5-4.5 2.4-7.2 2.4-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
-  const CSS3 = `#authGate{position:fixed;inset:0;z-index:200;display:block!important;overflow:auto;padding:0!important;background:radial-gradient(120% 60% at 50% -5%,#2B3170 0%,#121531 45%,#070817 100%)!important}
+  const CSS3 = `#authGate{position:fixed;top:0;left:0;right:0;bottom:auto;height:100vh;height:100lvh;z-index:200;display:block!important;overflow-y:auto;overscroll-behavior:contain;padding:0!important;background:radial-gradient(120% 60% at 50% -5%,#B9E6FA 0%,#7CCBF2 42%,#4FB3E6 100%)!important}
 #authGate .lg{width:min(440px,100%);min-height:100%;margin:0 auto;display:flex;flex-direction:column;box-sizing:border-box;color:#fff;font-family:Manrope,system-ui,sans-serif}
 #authGate .lg-top{padding:calc(env(safe-area-inset-top,0px) + 40px) 28px 30px;text-align:center;display:grid;justify-items:center;gap:8px}
 #authGate .lg-logo{width:56px;height:56px;border-radius:18px;overflow:hidden;display:grid;place-items:center}
@@ -672,7 +672,10 @@
 #authGate .dlc b{display:block;font-size:1rem}#authGate .dlc small{display:block;color:#AEB6D8;font-size:.8rem;margin-top:2px}
 #authGate .dlc .go{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#6C80FF,#9A7CFF 55%,#4FD1E8);color:#06091c;font-weight:800}
 @media (max-width:440px){#authGate .dlc{grid-template-columns:auto 1fr}#authGate .dlc .go{grid-column:1/-1;justify-content:center}}
-@media (min-width:441px){#authGate .lg{padding:24px 0}#authGate .lg-sheet{min-height:0;border-radius:34px}}`;
+@media (min-width:441px){#authGate .lg{padding:24px 0}#authGate .lg-sheet{min-height:0;border-radius:34px}}
+#authGate .lg-brand{color:#0B2A47}#authGate .lg-title{color:#0B2A47;text-shadow:0 1px 0 rgba(255,255,255,.35)}#authGate .lg-sub{color:#15395C}
+#authGate .lg-top .lg-logo img{filter:drop-shadow(0 6px 14px rgba(11,42,71,.25))}
+#authGate .lg-sheet{box-shadow:0 -18px 46px rgba(11,42,71,.22)}`;
   let otpEmail = "", okView = false;
   function drawGate() {
     if (!gate) { const st = document.createElement("style"); st.textContent = CSS + CSS3; document.head.appendChild(st); gate = document.createElement("div"); gate.id = "authGate"; document.body.appendChild(gate); }

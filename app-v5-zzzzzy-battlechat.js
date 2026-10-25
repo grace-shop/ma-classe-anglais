@@ -29,8 +29,9 @@
       var s = JSON.parse(localStorage.getItem(KEY) || "null");
       if (!s || !s.room || !(typeof BT !== "undefined" ? BT : undefined) || BT.room) return;
       if (s.uid && me() && s.uid !== me()) return;   // another account on this phone
-      BT.room = s.room;
-      if (typeof btPoll === "function") btPoll();   // reloads the same room from the server
+      BT.room = s.room;   // remembered only: the Arena always opens on its home page, the Battles page offers "Back to my battle"
+      BT.on = false; BT.inHub = true;
+      if (typeof BTNAV !== "undefined") { BTNAV.view = null; BTNAV.kind = null; }
     } catch (e) {}
   }
 

@@ -38,7 +38,8 @@ function zzAlbumOpen(items,start,msg){
   // appui long sur la photo ou la vidéo : le même menu que sur un message (répondre, transférer, supprimer…)
   if(msg&&msg.id){
     var lpT=0,lpX=0,lpY=0;
-    var lpMenu=function(){lpT=0;if(navigator.vibrate)try{navigator.vibrate(12)}catch(x){};close();V4.act={kind:msg.k,id:msg.id};render()};
+    // the menu opens over the photo or video: the viewer stays open and the chat keeps its place
+    var lpMenu=function(){lpT=0;if(navigator.vibrate)try{navigator.vibrate(12)}catch(x){};V4.act={kind:msg.k,id:msg.id};if(typeof v4SyncSheets==="function")v4SyncSheets()};
     ov.addEventListener("pointerdown",function(e){
       if(e.target.closest&&e.target.closest("button"))return;
       clearTimeout(lpT);lpX=e.clientX;lpY=e.clientY;lpT=setTimeout(lpMenu,480);
@@ -264,8 +265,7 @@ function zzReviewSend(){
       o.dataset.lp="1";
       var t=0,x0=0,y0=0;
       var fire=function(){t=0;if(navigator.vibrate)try{navigator.vibrate(12)}catch(err){};
-        var close=document.querySelector('[data-v4="docClose"]');if(close)close.click();
-        V4.act={kind:msg.k,id:msg.id};render()};
+        V4.act={kind:msg.k,id:msg.id};if(typeof v4SyncSheets==="function")v4SyncSheets()};
       o.addEventListener("pointerdown",function(e){
         if(e.target.closest&&e.target.closest("button,a,input,audio,[data-v4]"))return;
         clearTimeout(t);x0=e.clientX;y0=e.clientY;t=setTimeout(fire,480);
