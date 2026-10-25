@@ -311,8 +311,8 @@
     var from = []; for (var j = 0; j < 9; j++) if (st.b[j] === p) from.push(j);
     var empty = []; for (var e = 0; e < 9; e++) if (!st.b[e]) empty.push(e);
     if (st.hand[p - 1] > 0) return empty.map(function (to) { return { to: to, from: -1 }; });
-    // three pieces left: they can fly
-    var flying = from.length === 3;
+    // pas de vol (règle demandée) : pas à pas, voisin libre uniquement
+    var flying = false; // pas de vol : un pion ne bouge que vers un voisin libre
     from.forEach(function (f) {
       (flying ? empty : MO.ADJ[f].filter(function (x) { return !st.b[x]; })).forEach(function (to) { out.push({ from: f, to: to }); });
     });
