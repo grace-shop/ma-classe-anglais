@@ -54,7 +54,7 @@ function rtNotifPlay(ctx,t){try{rtTone("notif").play(ctx,t)}catch(e){}}
 function rtPickersHTML(){
   const group=(kind,title)=>{const cur=rtGet(kind);
     return `<div class="rt-group"><b class="small">${title}</b>`+RT_LIST[kind].map(t=>{const on=t.id===cur;
-      return `<div class="secrow rt-row"><button type="button" class="linkbtn rt-pick" data-rt-pick="${kind}" data-id="${t.id}" aria-pressed="${on}">${on?ic("check"):""}<span>${esc(t.name)}${on?" (selected)":""}</span></button><button type="button" class="btn ghost sm" data-rt-play="${kind}" data-id="${t.id}" aria-label="Preview ${esc(t.name)}">${ic("speaker")}Preview</button></div>`}).join("")+`</div>`};
+      return `<div class="secrow rt-row"><button type="button" class="linkbtn rt-pick" data-rt-pick="${kind}" data-id="${t.id}" aria-pressed="${on}">${on?ic("check"):""}<span>${esc(t.name)}${on?" (selected)":""}${t.id===RT_DEF[kind]?" · default":""}</span></button><button type="button" class="btn ghost sm" data-rt-play="${kind}" data-id="${t.id}" aria-label="Preview ${esc(t.name)}">${ic("speaker")}Preview</button></div>`}).join("")+`</div>`};
   return group("call","Call ringtone")+group("notif","Notification sound")}
 
 document.addEventListener("click",e=>{
