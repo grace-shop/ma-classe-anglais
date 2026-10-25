@@ -10720,12 +10720,12 @@ arClose=function(){BTNAV.view=null;return _btArClose()};
 {const st=document.createElement('style');st.id='gameRoundCss';st.textContent=`
 /* the Game button: a rectangle whose two sides bulge outwards, in the colours of the theme */
 .ar-round-wrap{display:flex;justify-content:center;margin:14px 0 6px;background:none!important;box-shadow:none!important}
-.ar-round{position:relative;width:230px;max-width:72vw;height:96px;border:0;padding:0;margin:0;cursor:pointer;font:inherit;color:var(--on-ink,#fff);box-shadow:none!important;border-radius:0!important;background-clip:border-box;
+.ar-round{position:relative;width:320px;max-width:88vw;height:118px;border:0;padding:0;margin:0;cursor:pointer;font:inherit;color:var(--on-ink,#fff);box-shadow:none!important;border-radius:0!important;background-clip:border-box;
   background:var(--grad,linear-gradient(135deg,#5EEAD4,#818CF8));
   clip-path:polygon(9% 0,91% 0,92.1% 5%,93.8% 10%,95.2% 20%,96.7% 30%,97.8% 40%,98.6% 45%,100% 50%,98.6% 55%,97.8% 60%,96.7% 70%,95.2% 80%,93.8% 90%,92.1% 95%,91% 100%,9% 100%,7.9% 95%,6.2% 90%,4.8% 80%,3.3% 70%,2.2% 60%,1.4% 55%,0 50%,1.4% 45%,2.2% 40%,3.3% 30%,4.8% 20%,6.2% 10%,7.9% 5%);
   transition:transform .18s ease,filter .2s}
 .ar-round::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0) 48%,rgba(0,0,0,.12));pointer-events:none}
-.ar-round span{position:relative;font-weight:900;font-size:1.3rem;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.ar-round span{position:relative;font-weight:900;font-size:1.6rem;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 0 rgba(255,255,255,.35)}
 .ar-round:active{transform:scale(.96)}
 .ar-round:focus-visible{outline:2px solid var(--fg,#fff);outline-offset:4px}
 `;document.head.appendChild(st)}
@@ -17507,6 +17507,7 @@ async function zzBakeEntries(entries){
   LU.global = function (k, p) { return (k * 13 + p) % 52; };
   LU.moves = function (st, dice) {
     var k = st.turn, out = [];
+    if (st.forfeit) return out; // third six in a row: the turn is lost
     for (var t = 0; t < 4; t++) {
       var p = st.tok[k][t];
       if (p === 56) continue;
@@ -17515,6 +17516,8 @@ async function zzBakeEntries(entries){
     }
     return out;
   };
+  // safe squares: the start of each colour and the star 8 squares after it (8, 21, 34, 47 on the track)
+  LU.isSafe = function (g) { return g % 13 === 0 || g % 13 === 8; };
   LU.apply = function (st, mv) {
     var s = JSON.parse(JSON.stringify(st)), k = s.turn, dice = s.dice;
     delete s.last_captured;
@@ -17523,8 +17526,8 @@ async function zzBakeEntries(entries){
     var info = { captured: false, finished: mv.to === 56, entered: p === -1 };
     if (mv.to <= 50) {
       var g = LU.global(s.corner[k], mv.to);
-      // the start square of each colour is safe
-      var safe = mv.to === 0;
+      // start squares and star squares are safe: no capture there
+      var safe = LU.isSafe(g);
       if (!safe) {
         for (var o = 0; o < s.n; o++) {
           if (o === k) continue;
@@ -17537,22 +17540,24 @@ async function zzBakeEntries(entries){
     }
     if (info.finished && s.tok[k].every(function (x) { return x === 56; })) s.winner = k;
     s.rolled = false;
-    // an extra turn after a six
-    var again = dice === 6 && s.winner < 0;
-    if (!again) s.turn = (s.turn + 1) % s.n;
-    s.dice = 0; s.extra = again;
+    // a six, or a capture, gives another roll; the third six in a row loses the turn
+    s.sixes = dice === 6 ? (st.sixes || 0) + 1 : 0;
+    var again = (dice === 6 || info.captured) && s.winner < 0 && s.sixes < 3;
+    if (!again) { s.turn = (s.turn + 1) % s.n; s.sixes = 0; }
+    s.dice = 0; s.extra = again; s.forfeit = false;
     s.last = info;
     return s;
   };
   // no legal move: the turn passes
   LU.pass = function (st) {
     var s = JSON.parse(JSON.stringify(st));
-    s.turn = (s.turn + 1) % s.n; s.dice = 0; s.rolled = false; s.extra = false; s.last = null;
+    s.turn = (s.turn + 1) % s.n; s.dice = 0; s.rolled = false; s.extra = false; s.last = null; s.sixes = 0; s.forfeit = false;
     return s;
   };
   LU.roll = function (st, value) {
     var s = JSON.parse(JSON.stringify(st));
     s.dice = value; s.rolled = true;
+    s.forfeit = value === 6 && (st.sixes || 0) >= 2; // third six in a row
     return s;
   };
   // the best move for the side to move (dice already rolled)
@@ -18371,8 +18376,9 @@ async function zzBakeEntries(entries){
     var toks = "", qdice = "";
     for (var qk = 0; qk < n; qk++) {
       var qc = st.corner[qk], qname = G.mode === "ai" ? (qk === G.you ? "You" : "Computer") : (G.mode === "online" ? (qk === G.you ? "You" : G.oppName) : "Player " + (qk + 1));
+      var inBase = st.tok[qk].filter(function (x) { return x < 0; }).length;
       var qdie = cubeHTML("q" + qk, st.dice && st.turn === qk && !G.rolling ? st.dice : G.lastDie[qk], "sm", st.turn === qk && human && !st.dice && !G.rolling);
-      qdice += '<div class="zgl-qdie zgl-q' + qc + '">' + qdie + '</div><div class="zgl-qlbl zgl-q' + qc + '" style="--c:' + CORNER[qc].hex + '">' + esc(qname) + '</div>';
+      qdice += '<div class="zgl-qdie zgl-q' + qc + '">' + qdie + '</div><div class="zgl-qlbl zgl-q' + qc + '" style="--c:' + CORNER[qc].hex + '">' + esc(qname) + ' · <b>' + inBase + '</b> in base</div>';
     }
     for (var k = 0; k < n; k++) {
       var c = st.corner[k];
@@ -18442,7 +18448,7 @@ async function zzBakeEntries(entries){
   }
   // le dé tourne en 3D puis s'arrête sur sa face
   function runRollAnim(h, ra) {
-    var el = h.querySelector('[data-cube="d' + ra.p + '"]');
+    var el = h.querySelector('[data-cube="q' + ra.p + '"]');
     if (!el || !el.animate) return;
     var f = FINAL[ra.v];
     el.animate([
@@ -18465,11 +18471,12 @@ async function zzBakeEntries(entries){
       var r = el.getBoundingClientRect(), dx = prev.x - r.left, dy = prev.y - r.top;
       if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
       if (el.animate) {
+        var lud = G && G.game === "ludo";
         var a = el.animate([
           { transform: "translate(" + dx + "px," + dy + "px)" },
           { transform: "translate(" + dx / 2 + "px," + (dy / 2 - 14) + "px)", offset: 0.5 },
           { transform: "translate(0,0)" }
-        ], { duration: 420, easing: "cubic-bezier(.3,.7,.4,1)" });
+        ], { duration: lud ? 240 : 420, easing: lud ? "ease-in-out" : "cubic-bezier(.3,.7,.4,1)" });
         a.onfinish = function () { SFX.tok(); };
       }
     });
@@ -18528,7 +18535,7 @@ async function zzBakeEntries(entries){
       s2.tok[k][t] = path[i];
       G.st = s2; G.anim = true; paint(); SFX.move();
       i++;
-      if (i < path.length) { setTimeout(walk, 170); return; }
+      if (i < path.length) { setTimeout(walk, 250); return; }
       G.rolling = false;
       if (caps.length) SFX.capture();
       G.st = next; G.anim = true;
@@ -18907,6 +18914,11 @@ async function zzBakeEntries(entries){
 .zgpw svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 .zgl-cell.safe::after,.zgl-cell.star::after{content:"☆";position:absolute;inset:0;display:grid;place-items:center;color:#1f2937;font-size:85%;font-weight:700;background:none}
 .zgl-cell.star{background:#fff}
+.zgpw::before{content:"";position:absolute;left:12%;right:12%;bottom:-6%;height:24%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,0));z-index:-1;pointer-events:none}
+.zgpw{filter:drop-shadow(0 3px 2px rgba(0,0,0,.35))}
+.zgl-qlbl b{font-weight:900;margin:0 1px}
+.zgl-qlbl{padding:3px 8px;box-shadow:0 2px 0 rgba(0,0,0,.25),0 0 0 1.5px rgba(255,255,255,.9)}
+.zgl-qdie .zgcube-wrap{box-shadow:0 6px 10px rgba(0,0,0,.35)}
 `;
 
   window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; }, pickFor: pickFor };

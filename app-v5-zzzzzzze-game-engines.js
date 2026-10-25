@@ -218,6 +218,7 @@
   LU.global = function (k, p) { return (k * 13 + p) % 52; };
   LU.moves = function (st, dice) {
     var k = st.turn, out = [];
+    if (st.forfeit) return out; // third six in a row: the turn is lost
     for (var t = 0; t < 4; t++) {
       var p = st.tok[k][t];
       if (p === 56) continue;
@@ -226,6 +227,8 @@
     }
     return out;
   };
+  // safe squares: the start of each colour and the star 8 squares after it (8, 21, 34, 47 on the track)
+  LU.isSafe = function (g) { return g % 13 === 0 || g % 13 === 8; };
   LU.apply = function (st, mv) {
     var s = JSON.parse(JSON.stringify(st)), k = s.turn, dice = s.dice;
     delete s.last_captured;
@@ -234,8 +237,8 @@
     var info = { captured: false, finished: mv.to === 56, entered: p === -1 };
     if (mv.to <= 50) {
       var g = LU.global(s.corner[k], mv.to);
-      // the start square of each colour is safe
-      var safe = mv.to === 0;
+      // start squares and star squares are safe: no capture there
+      var safe = LU.isSafe(g);
       if (!safe) {
         for (var o = 0; o < s.n; o++) {
           if (o === k) continue;
@@ -248,22 +251,24 @@
     }
     if (info.finished && s.tok[k].every(function (x) { return x === 56; })) s.winner = k;
     s.rolled = false;
-    // an extra turn after a six
-    var again = dice === 6 && s.winner < 0;
-    if (!again) s.turn = (s.turn + 1) % s.n;
-    s.dice = 0; s.extra = again;
+    // a six, or a capture, gives another roll; the third six in a row loses the turn
+    s.sixes = dice === 6 ? (st.sixes || 0) + 1 : 0;
+    var again = (dice === 6 || info.captured) && s.winner < 0 && s.sixes < 3;
+    if (!again) { s.turn = (s.turn + 1) % s.n; s.sixes = 0; }
+    s.dice = 0; s.extra = again; s.forfeit = false;
     s.last = info;
     return s;
   };
   // no legal move: the turn passes
   LU.pass = function (st) {
     var s = JSON.parse(JSON.stringify(st));
-    s.turn = (s.turn + 1) % s.n; s.dice = 0; s.rolled = false; s.extra = false; s.last = null;
+    s.turn = (s.turn + 1) % s.n; s.dice = 0; s.rolled = false; s.extra = false; s.last = null; s.sixes = 0; s.forfeit = false;
     return s;
   };
   LU.roll = function (st, value) {
     var s = JSON.parse(JSON.stringify(st));
     s.dice = value; s.rolled = true;
+    s.forfeit = value === 6 && (st.sixes || 0) >= 2; // third six in a row
     return s;
   };
   // the best move for the side to move (dice already rolled)
