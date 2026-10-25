@@ -17537,8 +17537,8 @@ async function zzBakeEntries(entries){
     var from = []; for (var j = 0; j < 9; j++) if (st.b[j] === p) from.push(j);
     var empty = []; for (var e = 0; e < 9; e++) if (!st.b[e]) empty.push(e);
     if (st.hand[p - 1] > 0) return empty.map(function (to) { return { to: to, from: -1 }; });
-    // three pieces left: they can fly
-    var flying = from.length === 3;
+    // pas de vol (règle demandée) : pas à pas, voisin libre uniquement
+    var flying = false; // pas de vol : un pion ne bouge que vers un voisin libre
     from.forEach(function (f) {
       (flying ? empty : MO.ADJ[f].filter(function (x) { return !st.b[x]; })).forEach(function (to) { out.push({ from: f, to: to }); });
     });
@@ -17668,6 +17668,19 @@ async function zzBakeEntries(entries){
 
   var NAMES = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", ttt: "Tic-tac-toe" };
   var GLYPH = { K: "♚", Q: "♛", R: "♜", B: "♝", N: "♞", P: "♟" };
+  // pièces en SVG (style Staunton) : la couleur vient du CSS (.w clair / .b foncé)
+  var CHESS_SHAPES = {
+    P: '<circle cx="22.5" cy="13" r="5"/><path d="M16 31c0-5 2.5-9 6.5-10.5 4 1.5 6.5 5.5 6.5 10.5z"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
+    R: '<path d="M13 8h4v4h3V8h4v4h3V8h4v7H13z"/><path d="M16 15h13l-1 16H17z"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
+    N: '<path d="M14 34v-5c0-6-3-9-2-15 1-4 5-6 8-4l5-3c3 4 4 7 3 11-1 5 3 9 3 16z"/><circle cx="23" cy="14" r="1.1" class="eye"/><rect x="12" y="33" width="21" height="4" rx="1.2"/>',
+    B: '<path d="M22.5 5c4.5 4 5.5 9 1.5 13 4 2 6.5 6.5 3.5 12h-10c-3-5.5-.5-10 3.5-12-4-4-3-9 1.5-13z"/><path d="M19 22l7-6" class="slit"/><rect x="13" y="31" width="19" height="3" rx="1.2"/>',
+    Q: '<path d="M11 33L9 13l6.5 8L22.5 9 29 21l6.5-8-2 20z"/><circle cx="9" cy="12" r="2.2"/><circle cx="22.5" cy="7.5" r="2.4"/><circle cx="36" cy="12" r="2.2"/><rect x="11" y="32" width="23" height="4" rx="1.2"/>',
+    K: '<path d="M13.5 34L11 17l5.5 5L22.5 15 28 22l5.5-5-2.5 17z"/><rect x="21" y="3.5" width="3" height="8"/><rect x="18" y="5.5" width="9" height="3"/><rect x="11" y="32" width="23" height="4" rx="1.2"/>'
+  };
+  function chessPieceSVG(letter, white) {
+    var k = letter.toUpperCase();
+    return '<svg viewBox="0 0 45 45" aria-hidden="true">' + (CHESS_SHAPES[k] || '') + '<rect x="9" y="37" width="27" height="4" rx="1.5"/></svg>';
+  }
   var DIFF = { easy: { chess: 1, morris: 1, ttt: 0 }, medium: { chess: 2, morris: 3, ttt: 1 }, hard: { chess: 3, morris: 5, ttt: 2 } };
   // couleurs de pions choisissables
   var CORNER = [
@@ -17763,7 +17776,7 @@ async function zzBakeEntries(entries){
       '<div class="zg-hub">' +
         card("chess", "Chess", "Castling, en passant, promotion", '<div class="pv pv-chess"><i class="w"></i><i class="b"></i><i class="b"></i><i class="w"></i></div>') +
         card("ludo", "Ludo", "2 to 4 players", '<div class="pv pv-ludo"><i class="red"></i><i class="green"></i><i class="blue"></i><i class="yellow"></i></div>') +
-        card("morris", "Three men's morris", "Mills and flying", '<div class="pv pv-morris"><b></b><b class="bk"></b><b></b></div>') +
+        card("morris", "Three men's morris", "Mills, step by step", '<div class="pv pv-morris"><b></b><b class="bk"></b><b></b></div>') +
         card("ttt", "Tic-tac-toe", "Three in a row", '<div class="pv pv-ttt"><span>✕</span><span>○</span><span>✕</span></div>') +
       '</div>' +
       (PLACE === "battle" ? '<div class="zg-inbox" id="zgInboxHost"></div>' : "");
@@ -17882,7 +17895,7 @@ async function zzBakeEntries(entries){
   function schedule() {
     clearTimeout(TIMER); TIMER = 0;
     if (!G || G.over) return;
-    if (isAiTurn()) TIMER = setTimeout(aiMove, 520);
+    if (isAiTurn()) TIMER = setTimeout(aiMove, G.game === "ttt" ? 280 : 520);
   }
 
   // un coup est joué : on enregistre les captures, on joue le son, on rafraîchit
@@ -18113,7 +18126,7 @@ async function zzBakeEntries(entries){
     return '<div class="zgcap">' + list.map(function (c) {
       if (c.kind === "chess") {
         var w = ZG.chess.white(c.p);
-        return '<span class="cg ' + (w ? "w" : "b") + '">' + GLYPH[c.p.toUpperCase()] + '</span>';
+        return '<span class="cg ' + (w ? "w" : "b") + '">' + chessPieceSVG(c.p, w) + '</span>';
       }
       return '<i class="cd" style="--c:' + c.col.hex + ';--d:' + c.col.dark + '"></i>';
     }).join("") + '</div>';
@@ -18129,14 +18142,14 @@ async function zzBakeEntries(entries){
       var cls = "zgc-sq " + ((r + c) % 2 ? "dk" : "lt");
       if (i === G.sel) cls += " sel";
       var tg = targets.filter(function (m) { return m.t === i; });
-      if (tg.length) cls += " to" + (tg[0].c ? " cap" : "");
+      if (tg.length) cls += " to" + (tg[0].c || (st.b[i] && ZG.chess.white(st.b[i]) !== ZG.chess.white(st.b[G.sel])) ? " cap" : "");
       if (last && last.t === i) cls += " lastt";
       if (last && last.f === i) cls += " lastf";
       var piece = "";
       if (p) {
         var w = ZG.chess.white(p), mv = anim && last && last.t === i && last.f != null;
         var sty = mv ? ' style="--fx:' + ((last.f % 8) - c) * 100 + '%;--fy:' + (Math.floor(last.f / 8) - r) * 100 + '%"' : "";
-        piece = '<span class="zgp ' + (w ? "w" : "b") + (mv ? " mv" : "") + '"' + sty + '>' + GLYPH[p.toUpperCase()] + '</span>';
+        piece = '<span class="zgp ' + (w ? "w" : "b") + (mv ? " mv" : "") + '"' + sty + '>' + chessPieceSVG(p, w) + '</span>';
       }
       rows += '<button class="' + cls + '" data-zgsq="' + i + '">' + piece + '</button>';
     }
@@ -18187,7 +18200,7 @@ async function zzBakeEntries(entries){
       '<div class="zgm-frame"><div class="zgm-board">' + svg + discs + hits + '</div></div>' +
       '<div class="zgp-row">' + playerChip(mySide, nameForSide(mySide), "") + '</div>' +
       '<div class="zg-hand"><span>' + nameForSide(0) + ': ' + st.hand[0] + ' to place</span><span>' + nameForSide(1) + ': ' + st.hand[1] + ' to place</span></div>' +
-      '<div class="zg-info">Place your pieces, then slide them along a line. Three in a line is a mill: take one of the other side\'s pieces. With three pieces you can fly to any empty point.</div>';
+      '<div class="zg-info">Place your pieces, then slide them along a line. Three in a line is a mill: take one of the other side\'s pieces. Pieces only step to a neighbouring empty point, one line at a time.</div>';
   }
   function morrisSlide(h) {
     h.querySelectorAll(".zgm-mv").forEach(function (el) {
@@ -18219,7 +18232,7 @@ async function zzBakeEntries(entries){
       strike = '<svg class="zgt-strike" viewBox="0 0 100 100"><line pathLength="100" x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"/></svg>';
     }
     var grid = '<svg class="zgt-grid" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="33.3" y1="3" x2="33.3" y2="97"/><line x1="66.6" y1="3" x2="66.6" y2="97"/><line x1="3" y1="33.3" x2="97" y2="33.3"/><line x1="3" y1="66.6" x2="97" y2="66.6"/></svg>';
-    return '<div class="zgt-frame"><div class="zgt-board">' + grid + cells + strike + '</div></div>' +
+    return '<div class="zgt-frame"><div class="zgt-board' + (human || st.win ? '' : ' thinking') + '">' + grid + cells + strike + '</div></div>' +
       '<div class="zg-info">Get three of your marks in a row, across, down or diagonally.</div>' +
       '<button class="zg-big alt" data-zg="again">New game</button>';
   }
@@ -18235,10 +18248,15 @@ async function zzBakeEntries(entries){
     var st = G.st, n = st.n, human = !isAiTurn();
     var moves = st.dice && !G.rolling ? ZG.ludo.moves(st, st.dice) : [];
     var quads = LUDO_QUAD.map(function (q, c) {
-      return '<div class="zgl-quad" style="top:' + q[0] * CELL + '%;left:' + q[1] * CELL + '%;background:' + CORNER[c].hex + '"><div class="zgl-in"></div></div>';
+      return '<div class="zgl-quad" style="top:' + q[0] * CELL + '%;left:' + q[1] * CELL + '%;background:' + CORNER[c].hex + ';--c:' + CORNER[c].hex + '"><div class="zgl-in"></div></div>';
     }).join("");
     var cells = "";
-    LUDO_TRACK.forEach(function (rc, g) { cells += cellDiv(rc[0], rc[1], "track" + (LUDO_SAFE[g] ? " safe" : ""), ""); });
+    LUDO_TRACK.forEach(function (rc, g) {
+      // case de départ de chaque couleur : pleine couleur avec une flèche ; étoile = case sûre
+      var start = g % 13 === 0 ? " start" : "";
+      var col = g % 13 === 0 ? CORNER[g / 13].hex : "";
+      cells += cellDiv(rc[0], rc[1], "track" + (LUDO_SAFE[g] ? " safe" : "") + start, col);
+    });
     LUDO_HOMES.forEach(function (list, c) { list.forEach(function (rc) { cells += cellDiv(rc[0], rc[1], "home", CORNER[c].hex); }); });
     var toks = "";
     for (var k = 0; k < n; k++) {
@@ -18406,6 +18424,7 @@ async function zzBakeEntries(entries){
     paint();
   }
   function tttTap(i) {
+    if (!humanTurn()) return; // un seul coup humain puis l'ordinateur répond
     var st = G.st, ok = ZG.ttt.moves(st).some(function (m) { return m.at === i; });
     if (!ok) return;
     G.last = { f: null, t: i }; G.anim = true;
@@ -18651,6 +18670,51 @@ async function zzBakeEntries(entries){
 @keyframes zgtrophy{0%{transform:translateY(-40px) scale(.4) rotate(-12deg);opacity:0}60%{transform:translateY(6px) scale(1.08) rotate(3deg);opacity:1}100%{transform:none}}
 @keyframes zgpop{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
 #zgfx{position:fixed;inset:0;width:100%;height:100%;z-index:10110;pointer-events:none}
+.zgt-board.thinking{opacity:.62;filter:saturate(.7);transition:opacity .2s}
+.zgt-board.thinking .zgt-c{cursor:default}
+/* ---- échecs : plateau en bois, pièces réalistes, points bleus, captures agrandies ---- */
+.zgc-frame{background:linear-gradient(135deg,#7a3314,#4a1a08 45%,#8a3d1a 70%,#3d1405);box-shadow:inset 0 0 0 2px rgba(255,220,160,.25),inset 0 0 0 5px #5a2410,inset 0 0 0 7px rgba(212,160,90,.5),0 18px 34px rgba(0,0,0,.55)}
+.zgc-board{box-shadow:inset 0 0 0 2px #2a0e03,0 0 0 1px rgba(0,0,0,.4)}
+.zgc-sq.lt{background:repeating-linear-gradient(88deg,rgba(120,70,30,.05) 0 2px,transparent 2px 7px),repeating-linear-gradient(2deg,rgba(255,255,255,.05) 0 1px,transparent 1px 5px),linear-gradient(135deg,#f0dcb4,#dcbc8a)}
+.zgc-sq.dk{background:repeating-linear-gradient(88deg,rgba(40,15,0,.12) 0 2px,transparent 2px 6px),repeating-linear-gradient(2deg,rgba(255,220,170,.06) 0 1px,transparent 1px 4px),linear-gradient(135deg,#9a5a2c,#6e3a18)}
+.zgc-sq.to::before{content:"";position:absolute;left:50%;top:50%;width:30%;height:30%;margin:-15% 0 0 -15%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8fd0ff,#2f7de1 60%,#1a57b0);box-shadow:0 1px 3px rgba(0,0,0,.5);z-index:2;pointer-events:none}
+.zgc-sq.to{box-shadow:none}
+.zgc-sq.cap{box-shadow:inset 0 0 0 4px rgba(47,125,225,.95)}
+.zgc-sq.cap::before{display:none}
+.zgc-sq.lastt::after,.zgc-sq.lastf::after{background:rgba(250,204,21,.28)}
+.zgp{font-size:0;line-height:0;padding:7%;box-sizing:border-box;filter:drop-shadow(0 3px 2px rgba(0,0,0,.55))}
+.zgp svg{width:100%;height:100%;overflow:visible;display:block}
+.zgp svg *{stroke-width:1.1;stroke-linejoin:round;stroke-linecap:round}
+.zgp.w svg{fill:#fbf7ee;stroke:#6b5a44}
+.zgp.w svg .eye,.zgp.w svg .slit{fill:none}
+.zgp.w svg .slit{stroke:#6b5a44;fill:none}
+.zgp.b svg{fill:#2a1a10;stroke:#0c0604}
+.zgp.b svg .eye{fill:#c9a878;stroke:none}
+.zgp.b svg .slit{stroke:#c9a878;fill:none}
+.zgp.w svg rect,.zgp.b svg rect{fill:inherit}
+.zgp.w svg rect:last-child,.zgp.b svg rect:last-child{fill:inherit}
+.zgp.w svg{filter:drop-shadow(0 0 0 transparent)}
+.zgcap .cg{width:34px;height:34px;padding:2px;box-sizing:border-box;display:inline-block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+.zgcap .cg svg{width:100%;height:100%;display:block}
+.zgcap .cg.w svg{fill:#fbf7ee;stroke:#6b5a44;stroke-width:1.1}
+.zgcap .cg.b svg{fill:#2a1a10;stroke:#0c0604;stroke-width:1.1}
+.zgcap{gap:6px;min-height:38px}
+/* ---- ludo : plateau proche des vidéos de référence ---- */
+.zgl-board{background:#fff}
+.zgl-cell{border:1px solid #2b2b2b;box-sizing:border-box}
+.zgl-cell.track{border-color:#2b2b2b}
+.zgl-cell.safe::after{content:"★";color:#2b2b2b;font-size:75%;background:none}
+.zgl-cell.start{box-shadow:inset 0 0 0 2px rgba(0,0,0,.35)}
+.zgl-cell.start::after{content:"➤";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:72%;text-shadow:0 1px 1px rgba(0,0,0,.45);transform:rotate(var(--arrow,0deg))}
+.zgl-in{background:#fff;box-shadow:inset 0 0 0 2px #2b2b2b;border-radius:6px;left:16.67%;top:16.67%;width:66.67%;height:66.67%}
+.zgl-in::before,.zgl-in::after{content:"";position:absolute;width:20%;height:20%;border-radius:50%;background:var(--c)}
+.zgl-in::before{left:12%;top:12%;box-shadow:0 0 0 0 transparent}
+.zgl-in::after{right:12%;bottom:12%}
+.zgl-in{position:absolute}
+.zgl-in{background:radial-gradient(circle at 26% 26%,var(--c) 0 9%,transparent 10%) ,radial-gradient(circle at 74% 26%,var(--c) 0 9%,transparent 10%),radial-gradient(circle at 26% 74%,var(--c) 0 9%,transparent 10%),radial-gradient(circle at 74% 74%,var(--c) 0 9%,transparent 10%),#fff}
+.zgl-in::before,.zgl-in::after{display:none}
+.zgpw .hd{box-shadow:0 0 0 1.5px #fff,0 1px 3px rgba(0,0,0,.5)}
+.zgpw .bd{box-shadow:0 0 0 1.5px #fff,0 2px 3px rgba(0,0,0,.45)}
 `;
 
   window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; }, pickFor: pickFor };
