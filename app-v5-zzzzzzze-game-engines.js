@@ -331,7 +331,12 @@
       if (MO.mill(s.b, p, m.to)) {
         var opp = 3 - p;
         var hasTake = s.b.some(function (x, i) { return x === opp; });
-        if (hasTake) { s.pending = true; return s; }
+        if (hasTake) {
+          // si retirer un pion fait perdre l'adversaire, la victoire est annoncée tout de suite
+          var oppTotal = s.b.filter(function (x) { return x === opp; }).length + s.hand[opp - 1];
+          if (oppTotal - 1 >= 3) { s.pending = true; return s; }
+          for (var z = 0; z < 9; z++) if (s.b[z] === opp) { s.b[z] = 0; break; }
+        }
       }
       s.turn = 3 - p;
     }
