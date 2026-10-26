@@ -81,6 +81,19 @@
   function muted() { try { return localStorage.getItem("ec_game_mute") === "1"; } catch (e) { return false; } }
   function setMuted(v) { try { localStorage.setItem("ec_game_mute", v ? "1" : "0"); } catch (e) {} }
   // speaker button in every game header: taps switch the game sounds off or on
+  function msgBtn() {
+    return '<button class="zg-snd" data-zg="msg" aria-label="Message your opponent">' + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></button>';
+  }
+  function msgOpp() {
+    if (!G || !G.oppUid) return;
+    var u = G.oppUid;
+    close();
+    try {
+      if (typeof S !== "undefined" && S.mode === "student" && typeof peerStart === "function") {
+        S.view = { type: "peer", id: u }; PR.with = u; peerStart(); peerMarkRead(u); scrollTo(0, 0); render();
+      }
+    } catch (err) {}
+  }
   function sndBtn() {
     var off = muted();
     return '<button class="zg-snd' + (off ? " off" : "") + '" data-zg="snd" aria-label="' + (off ? "Turn game sounds on" : "Turn game sounds off") + '" aria-pressed="' + off + '">' +
@@ -218,7 +231,7 @@
     css();
     clearTimeout(TIMER); TIMER = 0; stopFire();
     G = { game: opts.game, mode: opts.mode, diff: opts.diff || "medium", you: opts.you == null ? 0 : opts.you, sel: null, busy: false, over: false,
-      id: opts.id || null, v: opts.v || 1, oppName: opts.oppName || "Classmate", anim: false, last: null, rolling: false, rollAnim: null,
+      id: opts.id || null, v: opts.v || 1, oppName: opts.oppName || "Classmate", oppUid: opts.oppUid || null, anim: false, last: null, rolling: false, rollAnim: null,
       cols: opts.cols || null, caps: [[], []], lastDie: [1, 1, 1, 1] };
     if (opts.game === "chess" && opts.you == null && G.cols) G.you = G.cols[0] === "b" ? 1 : 0;
     if (opts.st) G.st = opts.st;
@@ -253,6 +266,9 @@
     if (G.game === "chess") return G.st.turn !== (G.you === 0 ? "w" : "b");
     if (G.game === "morris" || G.game === "ttt") return G.st.turn !== (G.you === 0 ? 1 : 2);
     return G.st.turn !== G.you;
+  }
+  function refreshSnd() {
+    document.querySelectorAll("[data-zg=\"snd\"]").forEach(function (el) { el.outerHTML = sndBtn(); });
   }
   function humanTurn() { return G && !G.over && !G.rolling && isMyTurn() && !isAiTurn(); }
 
@@ -459,7 +475,7 @@
       h.className = "zg-page game " + G.game;
       h.setAttribute("data-zgshown", G.game);
       h.innerHTML =
-        '<div class="zg-head"><button class="zg-x" data-zg="back" aria-label="Back">‹ Back</button><div><b>' + esc(NAMES[G.game]) + '</b><small>' + sub + '</small></div>' + sndBtn() + '</div>' +
+        '<div class="zg-head"><button class="zg-x" data-zg="back" aria-label="Back">‹ Back</button><div><b>' + esc(NAMES[G.game]) + '</b><small>' + sub + '</small></div>' + (G.mode === "online" && G.oppUid ? msgBtn() : "") + sndBtn() + '</div>' +
         '<div class="zg-status">' + esc(statusText()) + '</div><div class="zg-body">' + body + '</div>';
     }
     if (old) flipRun(h, old);
@@ -707,7 +723,7 @@
     return pos[c][0];
   }
   // taille d'un pion (en % du plateau) : il tient dans une case et dans un trou de la maison
-  var PAW_W = 4.0, PAW_H = 5.6, HOLE = 6.2;
+  var PAW_W = 4.8, PAW_H = 6.6, HOLE = 7.4;
   // centre du triangle de chaque couleur au milieu du plateau (le carré central fait 3 cases)
   var CENTRE_SPOT = [[6.85, 7.5], [7.5, 6.85], [8.15, 7.5], [7.5, 8.15]];
   // où se trouve le pion, au centre exact de sa case (en unités de case)
@@ -758,7 +774,7 @@
       { transform: "rotateX(" + (f[0] + 540) + "deg) rotateY(" + (f[1] + 540) + "deg) translateY(-22px)", offset: 0.55, easing: "cubic-bezier(.1,.7,.4,1)" },
       { transform: "rotateX(" + (f[0] + 16) + "deg) rotateY(" + (f[1] - 12) + "deg) translateY(0)", offset: 0.85, easing: "ease-out" },
       { transform: "rotateX(" + f[0] + "deg) rotateY(" + f[1] + "deg) translateY(0)" }
-    ], { duration: 950, easing: "linear" });
+    ], { duration: 650, easing: "linear" });
   }
 
   // le pion qui avance : petit saut et son à l'arrivée
@@ -801,7 +817,7 @@
       paint();
       if (done) done();
       else ludoAfterRoll();
-    }, 950);
+    }, 650);
   }
   function ludoRoll() {
     if (!humanTurn() || G.st.dice) return;
@@ -947,11 +963,12 @@
       e.preventDefault();
       var x = b.getAttribute("data-zg");
       if (x === "close") { close(); return; }
-      if (x === "snd") { setMuted(!muted()); if (G) paint(); else hub(PLACE || "arena"); return; }
+      if (x === "snd") { setMuted(!muted()); if (G) refreshSnd(); else hub(PLACE || "arena"); return; }
       if (x === "hub") { hub(PLACE || "arena"); return; }
       if (x === "back-setup") { setup(SEL.game); return; }
       if (x === "back") { if (G && G.mode === "online") { close(); return; } back(); return; }
       if (!G) return;
+      if (x === "msg") { msgOpp(); return; }
       if (x === "again") {
         var keep = { game: G.game, mode: G.mode, diff: G.diff, you: G.you, players: G.n, cols: G.cols };
         open(keep); return;
@@ -1096,7 +1113,7 @@
 @keyframes zgdraw{to{stroke-dashoffset:0}}
 .zgt-strike{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .zgt-strike line{stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;animation:zgdraw .5s ease-out forwards;filter:drop-shadow(0 0 3px #fff)}
-.zgl-frame{width:min(96vw,440px);padding:10px;box-sizing:border-box;border-radius:16px;background:#0a1e4f;box-shadow:0 18px 36px rgba(0,0,0,.55),0 6px 0 #061333,inset 0 0 0 2px rgba(255,255,255,.2)}
+.zgl-frame{width:min(96vw,440px);padding:14px;box-sizing:border-box;border-radius:20px;background:linear-gradient(135deg,#7a3314,#4a1a08 45%,#8a3d1a 70%,#3d1405);box-shadow:inset 0 0 0 2px rgba(255,220,160,.25),inset 0 0 0 5px #5a2410,inset 0 0 0 7px rgba(212,160,90,.5),0 18px 34px rgba(0,0,0,.55)}
 .zgl-board{position:relative;width:100%;aspect-ratio:1;background:#fff;border-radius:8px;overflow:hidden;box-shadow:inset 0 0 0 3px #0b1640}
 .zgl-quad{position:absolute;width:40%;height:40%}
 .zgl-in{position:absolute;left:16.67%;top:16.67%;width:66.67%;height:66.67%;background:#fff;border-radius:14px;box-shadow:inset 0 3px 0 rgba(0,0,0,.08)}
@@ -1104,7 +1121,7 @@
 .zgl-cell.home{border-color:rgba(0,0,0,.12)}
 .zgl-cell.safe::after{content:"★";position:absolute;inset:0;display:grid;place-items:center;color:#7d8aa3;font-size:70%}
 .zgl-center{position:absolute;left:40%;top:40%;width:20%;height:20%;background:conic-gradient(from -45deg,#1FB35B 0 90deg,#F5C518 90deg 180deg,#1E88E5 180deg 270deg,#E5303A 270deg 360deg)}
-.zgpw{position:absolute;width:4%;height:5.6%;pointer-events:none;z-index:3;transform-origin:50% 100%}
+.zgpw{position:absolute;width:4.8%;height:6.6%;pointer-events:none;z-index:3;transform-origin:50% 100%}
 .zgpw .hd{position:absolute;left:18%;top:0;width:64%;height:56%;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fff 0 7%,var(--c) 28%,var(--c) 62%,var(--d) 100%);box-shadow:0 2px 2px rgba(0,0,0,.45)}
 .zgpw .bd{position:absolute;left:8%;bottom:0;width:84%;height:50%;border-radius:45% 45% 50% 50%/25% 25% 75% 75%;background:linear-gradient(90deg,var(--d),var(--c) 30%,#fff 44%,var(--c) 58%,var(--d));box-shadow:0 3px 3px rgba(0,0,0,.45)}
 .zgpw.go{pointer-events:auto;cursor:pointer;animation:zgbob 1s infinite}
@@ -1259,6 +1276,23 @@
 .zg-snd{width:40px;height:40px;flex:none;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;background:rgba(255,255,255,.14);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 4px 10px rgba(0,0,0,.25)}
 .zg-snd svg{width:20px;height:20px}.zg-snd.off{opacity:.6}
 .zg-head{display:flex;align-items:center;gap:12px}.zg-head>div:nth-child(2){flex:1;min-width:0}
+.zgc-frame{background:linear-gradient(160deg,#0c1a3f,#06102a 60%,#0b1c46);box-shadow:0 0 0 2px #3EE6FF,0 0 18px rgba(62,230,255,.55),0 0 46px rgba(62,230,255,.22),inset 0 0 22px rgba(62,230,255,.14)}
+.zgc-board{border-radius:12px;box-shadow:inset 0 0 0 2px #3EE6FF}
+.zgc-sq.lt{background:linear-gradient(135deg,#eaf6ff,#bfe0fb)}
+.zgc-sq.dk{background:linear-gradient(135deg,#1a3a7a,#0b1d47)}
+.zgc-sq.lt .zgc-rk,.zgc-sq.lt .zgc-fl{color:#1b3f86}
+.zgc-sq.dk .zgc-rk,.zgc-sq.dk .zgc-fl{color:#7fdcff}
+.zgc-sq.sel{box-shadow:inset 0 0 0 3px #3EE6FF,inset 0 0 14px rgba(62,230,255,.6)}
+.zgc-sq.to::before{background:radial-gradient(circle at 35% 30%,#e6fbff,#3EE6FF 60%,#0aa9c9);box-shadow:0 0 8px rgba(62,230,255,.9)}
+.zgc-sq.cap{box-shadow:inset 0 0 0 4px #3EE6FF,inset 0 0 14px rgba(62,230,255,.5)}
+.zgc-sq.lastt::after,.zgc-sq.lastf::after{background:rgba(62,230,255,.16)}
+.zgp.w{text-shadow:none}.zgp.b{text-shadow:none}
+.zgp.w svg{fill:#13285e;stroke:#ffffff;stroke-width:1.3px;filter:drop-shadow(0 0 3px rgba(255,255,255,.75))}
+.zgp.b svg{fill:#060f2b;stroke:#3EE6FF;stroke-width:1.3px;filter:drop-shadow(0 0 4px rgba(62,230,255,.95))}
+.zgp.w svg .slit{stroke:#9fd8ff}
+.zgp.b svg .eye{fill:#3EE6FF;stroke:none}
+.zgp.b svg .slit{stroke:#3EE6FF}
+.zgc-sq,.zgcube-wrap,.zgpw,[data-zg],[data-zgroll],[data-zgc]{touch-action:manipulation}
 `;
 
   window.ZGUI = { open: open, menu: menu, close: close, adopt: adopt, current: function () { return G; }, pickFor: pickFor };
