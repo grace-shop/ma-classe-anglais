@@ -135,16 +135,19 @@
     return n;
   };
 
+  // the king may be left in check or even captured: a king capture ends the game (see CH.status)
+  CH.hasKing = function (st, s) {
+    for (var i = 0; i < 64; i++) { var p = st.b[i]; if (p && p.toLowerCase() === "k" && CH.white(p) === (s === "w")) return true; }
+    return false;
+  };
   CH.legal = function (st) {
-    var s = st.turn, ps = CH.pseudo(st, s), out = [];
-    for (var i = 0; i < ps.length; i++) {
-      var n = CH.make(st, ps[i]);
-      if (!CH.inCheck(n, s)) out.push(ps[i]);
-    }
-    return out;
+    var s = st.turn;
+    if (!CH.hasKing(st, s)) return [];
+    return CH.pseudo(st, s);
   };
   // "play", "mate", "stale", "draw" (50 moves)
   CH.status = function (st) {
+    if (!CH.hasKing(st, st.turn)) return "mate";
     var moves = CH.legal(st);
     if (!moves.length) return CH.inCheck(st, st.turn) ? "mate" : "stale";
     if (st.half >= 100) return "draw";
@@ -163,6 +166,8 @@
   };
   CH.eval = function (st) {
     var sc = 0;
+    if (!CH.hasKing(st, "w")) return -100000;
+    if (!CH.hasKing(st, "b")) return 100000;
     for (var i = 0; i < 64; i++) {
       var p = st.b[i]; if (!p) continue;
       var t = p.toLowerCase(), w = CH.white(p);
@@ -181,6 +186,7 @@
     var nodes = 0;
     function neg(s, d, alpha, beta) {
       nodes++;
+      if (!CH.hasKing(s, s.turn)) return -100000 + (depth - d);
       if (d === 0) return sign_of(s) * CH.eval(s);
       var ms = CH.legal(s);
       if (!ms.length) return CH.inCheck(s, s.turn) ? -100000 + (depth - d) : 0;
