@@ -88,7 +88,7 @@
           if (!row) continue;
           if (row.status === "playing") {
             el.remove();
-            ZGUI.open({ game: game, mode: "online", you: hostYou(game, row.state.cols), id: id, v: row.state.v, st: row.state.st, cols: row.state.cols, oppName: name });
+            ZGUI.open({ game: game, mode: "online", you: hostYou(game, row.state.cols), id: id, v: row.state.v, st: row.state.st, cols: row.state.cols, oppName: name, oppUid: row.guest });
             return;
           }
           if (row.status === "declined") { el.remove(); note(name + " declined the invitation", "x"); return; }
@@ -162,7 +162,7 @@
         if (ac.error) { note(fail(ac.error), "x"); return; }
         var hostCols = row.state.cols;
         var openAs = function (cols, st) {
-          ZGUI.open({ game: row.kind, mode: "online", you: row.kind === "chess" ? (hostCols[0] === "b" ? 0 : 1) : 1, id: id, v: row.state.v, st: st, cols: cols, oppName: nameOf(row.host) });
+          ZGUI.open({ game: row.kind, mode: "online", you: row.kind === "chess" ? (hostCols[0] === "b" ? 0 : 1) : 1, id: id, v: row.state.v, st: st, cols: cols, oppName: nameOf(row.host), oppUid: row.host });
           ZGUI.current().v = row.state.v;
           // mon choix part vers l'hôte avec le premier coup de la partie
           if (window.zgPush) window.zgPush(ZGUI.current());
@@ -179,7 +179,7 @@
       }
       if (a === "resume") {
         var mine2 = row.host === uid ? hostYou(row.kind, row.state.cols) : 1 - hostYou(row.kind, row.state.cols);
-        ZGUI.open({ game: row.kind, mode: "online", you: mine2, id: id, v: row.state.v, st: row.state.st, cols: row.state.cols, oppName: nameOf(other(row)) });
+        ZGUI.open({ game: row.kind, mode: "online", you: mine2, id: id, v: row.state.v, st: row.state.st, cols: row.state.cols, oppName: nameOf(other(row)), oppUid: other(row) });
       }
     }, true);
   };
