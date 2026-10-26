@@ -723,7 +723,7 @@
     return pos[c][0];
   }
   // taille d'un pion (en % du plateau) : il tient dans une case et dans un trou de la maison
-  var PAW_W = 4.8, PAW_H = 6.6, HOLE = 7.4;
+  var PAW_W = 5.8, PAW_H = 8.0, HOLE = 8.8;
   // centre du triangle de chaque couleur au milieu du plateau (le carré central fait 3 cases)
   var CENTRE_SPOT = [[6.85, 7.5], [7.5, 6.85], [8.15, 7.5], [7.5, 8.15]];
   // où se trouve le pion, au centre exact de sa case (en unités de case)
@@ -1121,7 +1121,7 @@
 .zgl-cell.home{border-color:rgba(0,0,0,.12)}
 .zgl-cell.safe::after{content:"★";position:absolute;inset:0;display:grid;place-items:center;color:#7d8aa3;font-size:70%}
 .zgl-center{position:absolute;left:40%;top:40%;width:20%;height:20%;background:conic-gradient(from -45deg,#1FB35B 0 90deg,#F5C518 90deg 180deg,#1E88E5 180deg 270deg,#E5303A 270deg 360deg)}
-.zgpw{position:absolute;width:4.8%;height:6.6%;pointer-events:none;z-index:3;transform-origin:50% 100%}
+.zgpw{position:absolute;width:5.8%;height:8%;pointer-events:none;z-index:3;transform-origin:50% 100%}
 .zgpw .hd{position:absolute;left:18%;top:0;width:64%;height:56%;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fff 0 7%,var(--c) 28%,var(--c) 62%,var(--d) 100%);box-shadow:0 2px 2px rgba(0,0,0,.45)}
 .zgpw .bd{position:absolute;left:8%;bottom:0;width:84%;height:50%;border-radius:45% 45% 50% 50%/25% 25% 75% 75%;background:linear-gradient(90deg,var(--d),var(--c) 30%,#fff 44%,var(--c) 58%,var(--d));box-shadow:0 3px 3px rgba(0,0,0,.45)}
 .zgpw.go{pointer-events:auto;cursor:pointer;animation:zgbob 1s infinite}
