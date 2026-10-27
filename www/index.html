@@ -19349,12 +19349,14 @@ async function zzBakeEntries(entries){
     sb.rpc = function (name, args, opts) {
       if (!WRITES[name]) return orig(name, args, opts);
       if (navigator.onLine === false) { enqueue(name, args); return Promise.resolve({ data: null, error: null, queued: true }); }
-      return Promise.resolve(orig(name, args, opts)).then(function (r) {
+      // a request that does not answer in 12 s is treated as offline: it is queued, so sending never hangs
+      var timed = new Promise(function (resolve) {
+        var t = setTimeout(function () { resolve({ error: { message: "Failed to fetch (timeout)" } }); }, 12000);
+        Promise.resolve(orig(name, args, opts)).then(function (r) { clearTimeout(t); resolve(r); }, function (e) { clearTimeout(t); resolve({ error: e }); });
+      });
+      return timed.then(function (r) {
         if (r && r.error && isNetErr(r.error)) { enqueue(name, args); return { data: null, error: null, queued: true }; }
         return r;
-      }, function (e) {
-        if (isNetErr(e)) { enqueue(name, args); return { data: null, error: null, queued: true }; }
-        throw e;
       });
     };
   }
@@ -19365,6 +19367,19 @@ async function zzBakeEntries(entries){
     if (sb) { clearInterval(wait); install(sb); flush(); }
     else if (++tries > 600) clearInterval(wait);
   }, 100);
+
+  // watchdog: the peer send guard (PR.sending) must never stay on; if a send is still busy after 20 s, release it
+  var busySince = 0;
+  setInterval(function () {
+    if (typeof PR === "undefined") return;
+    if (!PR.sending) { busySince = 0; return; }
+    if (!busySince) busySince = Date.now();
+    if (Date.now() - busySince > 20000) {
+      PR.sending = false; busySince = 0;
+      try { toast("L\x27envoi a été bloqué. Réessayez."); } catch (e) {}
+      try { render(); } catch (e) {}
+    }
+  }, 1000);
 
   window.addEventListener("online", function () { flush(); });
   setInterval(flush, 15000);
