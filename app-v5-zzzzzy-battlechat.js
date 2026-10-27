@@ -298,7 +298,7 @@
     var el = document.getElementById("zzBci");
     if (el && el.value.trim() === lastSaid.trim()) el.value = "";
   }
-  setInterval(guardField, 50);
+  setInterval(guardField, 1000);
   ["focusin", "input", "keyup", "compositionupdate", "compositionend", "pointerup"].forEach(function (ev) {
     document.addEventListener(ev, function (e) {
       if (e.target && e.target.id === "zzBci") guardField();
