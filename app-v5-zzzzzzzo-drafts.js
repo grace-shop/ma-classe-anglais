@@ -20,6 +20,13 @@
     set(key(el.id), el.value.trim() ? el.value : "");
   }, true);
 
+  // sending clears the draft: the field is emptied by code, so no input event is fired for it
+  var FORM_INPUT = { chat: "chatInput", peerchat: "peerInput", staffchat: "staffInput" };
+  document.addEventListener("submit", function (e) {
+    var id = FORM_INPUT[e.target && e.target.id];
+    if (id) set(key(id), "");
+  }, true);
+
   // when a chat input appears empty, fill it with its saved draft
   function restore() {
     IDS.forEach(function (id) {
