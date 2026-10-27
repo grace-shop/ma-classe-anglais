@@ -73,6 +73,11 @@ Deno.serve(async (req) => {
     uids = [rec.receiver];
     text = "New message from a classmate";   // le texte reste privé sur l'écran verrouillé
     kind = "message";
+  } else if (body.table === "game_matches" && body.type === "INSERT" && rec.status === "invited" && rec.guest) {
+    // invitation a une partie : previent l'invite (texte sans detail sur l'ecran verrouille)
+    uids = [rec.guest];
+    text = "You have a game invitation";
+    kind = "game";
   } else if (body.table === "call_signals" && body.type === "INSERT" && rec.kind === "ring" && rec.to_uid) {
     uids = [rec.to_uid];
     text = "Incoming call";
