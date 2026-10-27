@@ -1,0 +1,4 @@
+-- Webhook to create in Supabase (Database Webhooks):
+--  table: game_matches, event: INSERT
+--  target: the push function (same as messages and calls)
+--  header: x-webhook-secret = the value of PUSH_WEBHOOK_SECRET
