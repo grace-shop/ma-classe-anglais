@@ -8,9 +8,12 @@
 {
   const YT_SRC=/youtube|youtu\.be|vimeo/i;
   // met en pause tout ce qui joue, sauf « except » (un média) et « keepWin » (la fenêtre d'un lecteur qui vient de démarrer)
+  // the media of a call (video tiles and the voice of the other person) are never paused by this rule:
+  // otherwise one tile starting pauses the other one, and the voice stops
+  const inCall=m=>!!(m.closest&&m.closest("#callScr"))||(m.id||"").indexOf("callAud-")===0;
   const pauseAll=(except,keepWin)=>{
     document.querySelectorAll("video,audio").forEach(m=>{
-      if(m!==except&&!m.paused) try{m.pause()}catch(e){}
+      if(m!==except&&!m.paused&&!inCall(m)) try{m.pause()}catch(e){}
     });
     document.querySelectorAll("iframe").forEach(f=>{
       if(!YT_SRC.test(f.getAttribute("src")||"")) return;
@@ -21,7 +24,7 @@
   // « play » ne remonte pas dans le document : on écoute en phase de capture
   document.addEventListener("play",e=>{
     const t=e.target;
-    if(t&&(t.tagName==="VIDEO"||t.tagName==="AUDIO")) pauseAll(t,null);
+    if(t&&(t.tagName==="VIDEO"||t.tagName==="AUDIO")&&!inCall(t)) pauseAll(t,null);
   },true);
   // messages venant d'un lecteur YouTube : il vient de démarrer (état 1 = lecture)
   window.addEventListener("message",e=>{
