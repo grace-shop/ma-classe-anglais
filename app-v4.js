@@ -957,7 +957,7 @@ async function v4TextSend(kind,f){const id=V4IN(kind),inp=document.getElementByI
   const tgt=f.dataset.s,hadFocus=document.activeElement===inp;if(inp)inp.value="";delete S.drafts[id];
   let text=orig;
   // the grammar check never holds a message back: if it answers within 1.5 s its correction is added, otherwise the message goes at once
-  if(v4NeedFix(orig)){const r=await Promise.race([v4Check(orig),new Promise(res=>setTimeout(()=>res(null),1500))]);if(r)text=v4Pack(orig,r.en,r.k)}
+  if(kind!=="group"&&v4NeedFix(orig)){const r=await Promise.race([v4Check(orig),new Promise(res=>setTimeout(()=>res(null),1500))]);if(r)text=v4Pack(orig,r.en,r.k)}
   // the person sees their message at once; it is confirmed (or removed) when the server answers
   const tmpId="tmp"+Date.now();
   if(kind==="peer"){PR.sending=true;PR.inbox.unshift({id:tmpId,sender:S.uid,receiver:tgt,body:text,att:null,meta:null,created_at:new Date().toISOString(),read_at:null})}
