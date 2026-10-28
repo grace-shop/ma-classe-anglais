@@ -115,3 +115,33 @@ if (existsSync("android-extras/screenshare")) {
   }
   console.log("✓ partage d'écran (plugin ScreenShare) ajouté");
 }
+
+// Les plugins natifs doivent être enregistrés dans MainActivity. Le modèle de Capacitor n'a pas toujours
+// de onCreate : on écrit donc la classe entière (même paquet), avec l'enregistrement avant super.onCreate.
+{
+  const dir = "android/app/src/main/java/tg/maclasse/anglais";
+  const act = dir + "/MainActivity.java";
+  if (existsSync(act)) {
+    const plugins = [];
+    if (existsSync("android-extras/callkeeper")) plugins.push("CallKeeperPlugin");
+    if (existsSync("android-extras/screenshare")) plugins.push("ScreenSharePlugin");
+    const old = readFileSync(act, "utf8");
+    const pkg = (old.match(/^package\s+([\w.]+);/m) || [])[1] || "tg.maclasse.anglais";
+    const regs = plugins.map(c => `registerPlugin(${c}.class);`).join("\n        ");
+    writeFileSync(act, `package ${pkg};
+
+import android.os.Bundle;
+
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        ${regs}
+        super.onCreate(savedInstanceState);
+    }
+}
+`);
+    console.log("✓ MainActivity : plugins enregistrés →", plugins.join(", "));
+  }
+}
