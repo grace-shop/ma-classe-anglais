@@ -3,7 +3,7 @@
 
 create table if not exists public.game_matches (
   id uuid primary key default gen_random_uuid(),
-  kind text not null check (kind in ('chess', 'ludo', 'morris')),
+  kind text not null check (kind in ('chess', 'ludo', 'morris', 'ttt')),
   host uuid not null,
   guest uuid not null,
   status text not null default 'invited' check (status in ('invited', 'playing', 'over', 'declined')),
@@ -22,7 +22,7 @@ language plpgsql security definer set search_path = public as $$
 declare me uuid := auth.uid(); id uuid;
 begin
   if me is null or p_to is null or p_to = me then raise exception 'Access denied'; end if;
-  if p_kind not in ('chess', 'ludo', 'morris') then raise exception 'Unknown game'; end if;
+  if p_kind not in ('chess', 'ludo', 'morris', 'ttt') then raise exception 'Unknown game'; end if;
   if not public.peer_ok(p_to) then raise exception 'You can only invite a classmate who accepts messages'; end if;
   insert into game_matches (kind, host, guest, status, state) values (p_kind, me, p_to, 'invited', p_state) returning game_matches.id into id;
   return id;
