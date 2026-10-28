@@ -5993,9 +5993,23 @@ function callScreenShow(){
   callScreenSync();
 }
 function callScreenHide(){const el=document.getElementById("callScr");if(el)el.hidden=true;clearInterval(CALL.clock);CALL.clock=null}
+/* a tile shows a whole screen when someone shares it, or when its picture is a phone screen
+   (much taller than a camera picture), even if the "screen" message did not come */
+function callTileShared(t,u){
+  const v=t.querySelector("video");
+  const tall=!!v&&v.videoWidth>0&&v.videoHeight/v.videoWidth>1.5;
+  return !!(u==="me"?CALL.screen:CALL.shares[u])||tall;
+}
 /* a video that has a picture but stays paused (the browser can stop autoplay when its stream arrives late) is started again */
 function callNudgeVideo(){
-  document.querySelectorAll("#csGrid video").forEach(v=>{if(v.paused&&v.srcObject){const p=v.play();if(p&&p.catch)p.catch(()=>{})}});
+  let changed=false;
+  document.querySelectorAll("#csGrid .call-tile").forEach(t=>{
+    const v=t.querySelector("video");if(!v)return;
+    if(v.paused&&v.srcObject){const p=v.play();if(p&&p.catch)p.catch(()=>{})}
+    const want=callTileShared(t,t.dataset.u);
+    if(want!==t.classList.contains("zz-shared"))changed=true;
+  });
+  if(changed)callScreenSync();
 }
 function callScreenStatus(){
   callNudgeVideo();
@@ -6025,7 +6039,7 @@ function callScreenSync(){
   const localKey=(CALL.local?CALL.local.getTracks().map(t=>t.id).join(","):"");
   const me=callTileEl(grid,"me",callMyName());
   me.classList.toggle("on",CALL.camOn||!!CALL.screen);
-  me.classList.toggle("zz-shared",!!CALL.screen);
+  me.classList.toggle("zz-shared",callTileShared(me,"me"));
   const mv=me.querySelector("video");
   const myKey=localKey+"|"+(CALL.screen?CALL.screen.id:"");
   if((CALL.local||CALL.screen)&&mv.dataset.k!==myKey){mv.srcObject=new MediaStream(CALL.screen?CALL.screen.getVideoTracks():CALL.local.getTracks());mv.dataset.k=myKey}
@@ -6036,7 +6050,7 @@ function callScreenSync(){
     const v=t.querySelector("video");
     const live=P&&P.stream&&P.stream.getVideoTracks().some(x=>x.readyState==="live"&&!x.muted);
     t.classList.toggle("on",!!live);
-    t.classList.toggle("zz-shared",!!CALL.shares[u]);
+    t.classList.toggle("zz-shared",callTileShared(t,u));
     const sig=P&&P.stream?P.stream.id:"";
     if(P&&P.stream&&v.dataset.k!==sig){v.srcObject=P.stream;v.dataset.k=sig;v.play&&v.play().catch(()=>{})}
     if(!P){t.querySelector(".call-nm").textContent=callName(u)+" · calling…"}
