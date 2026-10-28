@@ -131,6 +131,7 @@
   /* ---- invitations et parties en cours (menu Battle Royale) ---- */
   window.zgInboxInto = async function (box0) {
     if (!box0 || !sb()) return;
+    window.__zgInboxParent = box0;
     var box = document.createElement("div");
     box.id = "zgInbox"; box.style.display = "grid"; box.style.gap = "8px";
     box0.appendChild(box);
@@ -146,8 +147,10 @@
           '<small><button class="zg-btn" style="min-width:0;padding:8px 14px;margin-top:6px" data-zgi="accept" data-id="' + g.id + '">Accept</button> ' +
           '<button class="zg-btn ghost" style="min-width:0;padding:8px 14px;margin-top:6px" data-zgi="decline" data-id="' + g.id + '">Decline</button></small></span></div>';
       }
-      if (g.status === "invited") return '<div class="opt" style="cursor:default"><span>⏳</span><span>Waiting for ' + esc(nm) + ' · ' + esc(names[g.kind]) + '</span></div>';
-      return '<button class="opt" data-zgi="resume" data-id="' + g.id + '"><span>▶</span><span>' + esc(names[g.kind]) + ' with ' + esc(nm) + '<small>Tap to open</small></span></button>';
+      if (g.status === "invited") return '<div class="opt-row"><div class="opt" style="cursor:default"><span>⏳</span><span>Waiting for ' + esc(nm) + ' · ' + esc(names[g.kind]) + '<small>Invitation sent</small></span></div>' +
+        '<button type="button" class="zg-x" data-zgi="cancel" data-id="' + g.id + '" aria-label="Cancel invitation" title="Cancel invitation">✕</button></div>';
+      return '<div class="opt-row"><button class="opt" data-zgi="resume" data-id="' + g.id + '"><span>▶</span><span>' + esc(names[g.kind]) + ' with ' + esc(nm) + '<small>Tap to open</small></span></button>' +
+        '<button type="button" class="zg-x" data-zgi="quit" data-id="' + g.id + '" aria-label="Interrupt game" title="Interrupt the game">✕</button></div>';
     }).join("");
     box.addEventListener("click", async function (e) {
       var b = e.target.closest && e.target.closest("[data-zgi]");
@@ -156,6 +159,16 @@
       var a = b.getAttribute("data-zgi"), id = b.getAttribute("data-id");
       var row = r.data.filter(function (g) { return g.id === id; })[0];
       if (!row) return;
+      if (a === "cancel" || a === "quit") {
+        var q = a === "quit" ? "Interrupt this game? It will end for both players." : "Cancel this invitation?";
+        if (!window.confirm(q)) return;
+        var cx = await sb().rpc("game_cancel", { p_id: id });
+        if (cx.error) { note(fail(cx.error), "x"); return; }
+        note(a === "quit" ? "Game interrupted" : "Invitation cancelled", "x");
+        var par = window.__zgInboxParent; box.remove();
+        if (par) window.zgInboxInto(par);
+        return;
+      }
       if (a === "decline") { var d = await sb().rpc("game_respond", { p_id: id, p_accept: false }); if (d.error) note(fail(d.error), "x"); else { note("Declined", "x"); box.remove(); } return; }
       if (a === "accept") {
         var ac = await sb().rpc("game_respond", { p_id: id, p_accept: true });

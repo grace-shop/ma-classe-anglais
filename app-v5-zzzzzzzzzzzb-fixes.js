@@ -86,3 +86,14 @@ document.addEventListener("click", function (e) {
   setTimeout(check, 4000);
   setInterval(check, 15000);
 })();
+
+/* 3 · game rows: cancel a sent invitation, or interrupt a game in progress (the small ✕ next to the row) */
+(function () {
+  var st = document.createElement("style");
+  st.textContent = [
+    "#zgInbox .opt-row{display:flex;align-items:center;gap:8px}",
+    "#zgInbox .opt-row>.opt{flex:1;min-width:0}",
+    "#zgInbox .zg-x{flex:none;width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,80,110,.14);color:#ffd6de;font:inherit;font-weight:800;cursor:pointer}"
+  ].join("");
+  document.head.appendChild(st);
+})();
