@@ -22,8 +22,10 @@
 
   // sending clears the draft: the field is emptied by code, so no input event is fired for it
   var FORM_INPUT = { chat: "chatInput", peerchat: "peerInput", staffchat: "staffInput" };
+  // the chat forms have no id: they are told apart by data-f
   document.addEventListener("submit", function (e) {
-    var id = FORM_INPUT[e.target && e.target.id];
+    var f = e.target && e.target.dataset && e.target.dataset.f;
+    var id = FORM_INPUT[f];
     if (id) set(key(id), "");
   }, true);
 

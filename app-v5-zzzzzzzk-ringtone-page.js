@@ -1,32 +1,42 @@
-/* ---- the ringtones are at the top of "Settings & security": the call ringtone and the notification sound,
-   each with its default marked, and a preview for every one ---- */
+/* ---- Ringtones: a fold button (title + chevron) in Settings and on the profile page.
+   Folded by default. Each place remembers its own state on this phone. ---- */
 (function () {
-  if (typeof secView !== "function" || typeof rtPickersHTML !== "function") return;
-  var _sec = secView;
-  secView = function () {
-    var h = _sec();
-    var open = false;
-    try { open = localStorage.getItem("ec_rt_fold") === "open"; } catch (e) {}
-    var head = '<button type="button" class="rt-fold" data-rt-fold="1" aria-expanded="' + open + '">' +
-      '<span class="rt-fold-t">🎵 Ringtones</span><span class="rt-chev">' + (open ? "▾" : "▸") + "</span></button>";
-    var body = open ? '<p class="small muted" style="margin:0">Choose the ringtone for calls and the sound for messages. The default is marked. Tap “Preview” to hear it.</p>' + rtPickersHTML() : "";
-    var card = '<div class="glass card sec rt-top">' + head + body + "</div>";
-    return card + h;
+  var CHEV = '<svg class="rt-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  function keyOf(id) { return "ec_rt_fold" + (id === "1" ? "" : "_" + id); }
+  window.rtFoldOpen = function (id) { try { return localStorage.getItem(keyOf(id)) === "open"; } catch (e) { return false; } };
+  window.rtFoldHead = function (id, title, open) {
+    return '<button type="button" class="rt-fold" data-rt-fold="' + id + '" aria-expanded="' + !!open + '">' +
+      '<span class="rt-fold-t">' + title + "</span>" + CHEV + "</button>";
   };
-})();
 
-/* click on the title to fold or unfold the ringtones (folded by default, to keep the page short) */
-document.addEventListener("click", function (e) {
-  var b = e.target.closest && e.target.closest("[data-rt-fold]");
-  if (!b) return;
-  e.preventDefault(); e.stopImmediatePropagation();
-  var open = false;
-  try { open = localStorage.getItem("ec_rt_fold") === "open"; } catch (x) {}
-  try { localStorage.setItem("ec_rt_fold", open ? "closed" : "open"); } catch (x) {}
-  render();
-}, true);
-(function () {
+  if (typeof secView === "function" && typeof rtPickersHTML === "function") {
+    var _sec = secView;
+    secView = function () {
+      var h = _sec();
+      var open = window.rtFoldOpen("1");
+      var card = '<div class="glass card sec rt-top">' + window.rtFoldHead("1", "🎵 Ringtones", open) +
+        (open ? '<p class="small muted" style="margin:6px 0 8px">Choose the ringtone for calls and the sound for messages. The default is marked. Tap “Preview” to hear it.</p>' + rtPickersHTML() : "") +
+        "</div>";
+      return card + h;
+    };
+  }
+
+  /* one click handler for every fold button; capture phase so a parent cannot block it */
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-rt-fold]");
+    if (!b) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    var id = b.getAttribute("data-rt-fold"), k = keyOf(id);
+    var open = false;
+    try { open = localStorage.getItem(k) === "open"; } catch (x) {}
+    try { localStorage.setItem(k, open ? "closed" : "open"); } catch (x) {}
+    render();
+  }, true);
+
   var st = document.createElement("style");
-  st.textContent = ".rt-fold{display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;background:none;border:0;color:inherit;font:inherit;font-size:1.15rem;font-weight:700;padding:2px 0;cursor:pointer;text-align:left}.rt-fold:focus-visible{outline:2px solid #a78bfa;outline-offset:4px;border-radius:8px}.rt-chev{font-size:1.1rem;opacity:.75}";
+  st.textContent = ".rt-fold{display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;background:none;border:0;color:inherit;font:inherit;font-size:1.15rem;font-weight:700;padding:4px 0;cursor:pointer;text-align:left}" +
+    ".rt-fold:focus-visible{outline:2px solid #a78bfa;outline-offset:4px;border-radius:8px}" +
+    ".rt-chev{flex:none;opacity:.85;transition:transform .25s ease}" +
+    '.rt-fold[aria-expanded="true"] .rt-chev{transform:rotate(180deg)}';
   document.head.appendChild(st);
 })();
