@@ -21,11 +21,11 @@ function rtNote(ctx,t0,f0,len,vol,opt){
 
 /* call tones: play(ctx,t) schedules ONE ring starting at t; the ring repeats every `period` seconds */
 const RT_CALL=[
-  {id:"classic",name:"Classic",period:1.5,play(c,t){rtNote(c,t,880,0.6,0.25,{attack:0.05})}},
-  {id:"dual",name:"Phone ring",period:3,play(c,t){for(const s of[0,0.6]){rtNote(c,t+s,440,0.4,0.18);rtNote(c,t+s,480,0.4,0.18)}}},
-  {id:"rise",name:"Rising",period:2,play(c,t){[523,659,784,1047].forEach((f,i)=>rtNote(c,t+i*0.12,f,0.3,0.2,{type:"triangle"}))}},
-  {id:"chimes",name:"Chimes",period:2.6,play(c,t){for(const[s,f]of[[0,1397],[0.9,1319]]){rtNote(c,t+s,f,1,0.2);rtNote(c,t+s,f*2,0.5,0.05)}}},
-  {id:"pulse",name:"Pulse",period:1.4,play(c,t){for(const s of[0,0.14,0.28])rtNote(c,t+s,1200,0.09,0.08,{type:"square",attack:0.004})}}
+  {id:"classic",name:"Classic",period:4,play(c,t){for(const s of[0,1.5])rtNote(c,t+s,880,1.3,0.25,{attack:0.05})}},
+  {id:"dual",name:"Phone ring",period:4,play(c,t){for(const s of[0,1.4]){rtNote(c,t+s,440,1.2,0.18);rtNote(c,t+s,480,1.2,0.18)}}},
+  {id:"rise",name:"Rising",period:4,play(c,t){for(const s of[0,1.5])[523,659,784,1047].forEach((f,i)=>rtNote(c,t+s+i*0.2,f,0.7,0.2,{type:"triangle"}))}},
+  {id:"chimes",name:"Chimes",period:4,play(c,t){for(const s of[0,1.6])for(const[d,f]of[[0,1397],[0.9,1319]]){rtNote(c,t+s+d,f,1.2,0.2);rtNote(c,t+s+d,f*2,0.6,0.05)}}},
+  {id:"pulse",name:"Pulse",period:4,play(c,t){for(let i=0;i<12;i++)rtNote(c,t+i*0.22,1200,0.12,0.08,{type:"square",attack:0.004})}}
 ];
 
 /* notification sounds: play(ctx,t) plays one sound of 1 to 1.6 s */

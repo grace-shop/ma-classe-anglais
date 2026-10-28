@@ -7566,11 +7566,11 @@ function rtNote(ctx,t0,f0,len,vol,opt){
 
 /* call tones: play(ctx,t) schedules ONE ring starting at t; the ring repeats every `period` seconds */
 const RT_CALL=[
-  {id:"classic",name:"Classic",period:1.5,play(c,t){rtNote(c,t,880,0.6,0.25,{attack:0.05})}},
-  {id:"dual",name:"Phone ring",period:3,play(c,t){for(const s of[0,0.6]){rtNote(c,t+s,440,0.4,0.18);rtNote(c,t+s,480,0.4,0.18)}}},
-  {id:"rise",name:"Rising",period:2,play(c,t){[523,659,784,1047].forEach((f,i)=>rtNote(c,t+i*0.12,f,0.3,0.2,{type:"triangle"}))}},
-  {id:"chimes",name:"Chimes",period:2.6,play(c,t){for(const[s,f]of[[0,1397],[0.9,1319]]){rtNote(c,t+s,f,1,0.2);rtNote(c,t+s,f*2,0.5,0.05)}}},
-  {id:"pulse",name:"Pulse",period:1.4,play(c,t){for(const s of[0,0.14,0.28])rtNote(c,t+s,1200,0.09,0.08,{type:"square",attack:0.004})}}
+  {id:"classic",name:"Classic",period:4,play(c,t){for(const s of[0,1.5])rtNote(c,t+s,880,1.3,0.25,{attack:0.05})}},
+  {id:"dual",name:"Phone ring",period:4,play(c,t){for(const s of[0,1.4]){rtNote(c,t+s,440,1.2,0.18);rtNote(c,t+s,480,1.2,0.18)}}},
+  {id:"rise",name:"Rising",period:4,play(c,t){for(const s of[0,1.5])[523,659,784,1047].forEach((f,i)=>rtNote(c,t+s+i*0.2,f,0.7,0.2,{type:"triangle"}))}},
+  {id:"chimes",name:"Chimes",period:4,play(c,t){for(const s of[0,1.6])for(const[d,f]of[[0,1397],[0.9,1319]]){rtNote(c,t+s+d,f,1.2,0.2);rtNote(c,t+s+d,f*2,0.6,0.05)}}},
+  {id:"pulse",name:"Pulse",period:4,play(c,t){for(let i=0;i<12;i++)rtNote(c,t+i*0.22,1200,0.12,0.08,{type:"square",attack:0.004})}}
 ];
 
 /* notification sounds: play(ctx,t) plays one sound of 1 to 1.6 s */
@@ -12031,11 +12031,28 @@ nav.tabs button:focus:not(:focus-visible){outline:none}
 #authGate .ot-eye.on{color:#22E37A}
 
 /* sign-in page stays still: no sweeping shapes, no floating logo, no scrolling */
-#authGate.cream{overflow:hidden!important;justify-content:center!important;touch-action:none}
+#authGate.cream{overflow-y:auto!important;overscroll-behavior:contain;justify-content:safe center!important;touch-action:pan-y!important}
 #authGate.cream .tw::after,#authGate.cream .tw-p::before,#authGate.cream .tw-p::after,#authGate.cream .tw-info-p::before,#authGate.cream .tw-info-p::after{animation:none!important;transition:none!important}
 #authGate .lg-logo,#authGate .lg-logo *,#authGate .cr-top *{animation:none!important}
 @media (prefers-reduced-motion:reduce){
   #authGate .tw::before,#authGate .ot-card::before,#authGate .tw:has(.msg.err),#authGate .ot-card:has(.msg.err){animation:none!important}
+}
+
+/* phones: the sign-in / sign-up card keeps its fields and buttons on screen (no fixed-ratio box that cuts them),
+   inputs are 16 px so iOS does not zoom, and the page can scroll when the keyboard is open */
+@media (max-width:720px){
+  #authGate.cream{padding:24px 14px!important}
+  #authGate.cream .tw{aspect-ratio:auto!important;height:auto!important;grid-template-columns:1fr!important;border-radius:28px!important}
+  #authGate.cream .tw-p{overflow:visible!important;padding:26px 20px!important}
+  #authGate.cream .tw h3,#authGate.cream .tw h2{font-size:1.7rem!important;margin:0 0 12px!important}
+  #authGate.cream .tw p{max-width:100%!important;font-size:.92rem!important;margin:0 0 14px!important}
+  #authGate.cream .tw-form{gap:12px!important}
+  #authGate.cream .tw input,#authGate.cream .tw .tw-pw{width:100%!important}
+  #authGate.cream .tw input{height:48px!important;font-size:16px!important;padding:0 14px!important}
+  #authGate.cream .tw .tw-eye{width:40px!important;height:40px!important}
+  #authGate.cream .tw .tw-btn{height:48px!important;min-width:0!important;width:100%!important;font-size:.95rem!important}
+  #authGate.cream .tw .tw-link{font-size:.85rem}
+  #authGate.cream .lg-soc{padding:12px}
 }
 `;
   document.head.appendChild(st);
@@ -19295,9 +19312,30 @@ async function zzBakeEntries(entries){
   var _sec = secView;
   secView = function () {
     var h = _sec();
-    var card = '<div class="glass card sec rt-top"><h3>Ringtones</h3><p class="small muted" style="margin:0">Choose the ringtone for calls and the sound for messages. The default is marked. Tap “Preview” to hear it.</p>' + rtPickersHTML() + '</div>';
+    var open = false;
+    try { open = localStorage.getItem("ec_rt_fold") === "open"; } catch (e) {}
+    var head = '<button type="button" class="rt-fold" data-rt-fold="1" aria-expanded="' + open + '">' +
+      '<span class="rt-fold-t">🎵 Ringtones</span><span class="rt-chev">' + (open ? "▾" : "▸") + "</span></button>";
+    var body = open ? '<p class="small muted" style="margin:0">Choose the ringtone for calls and the sound for messages. The default is marked. Tap “Preview” to hear it.</p>' + rtPickersHTML() : "";
+    var card = '<div class="glass card sec rt-top">' + head + body + "</div>";
     return card + h;
   };
+})();
+
+/* click on the title to fold or unfold the ringtones (folded by default, to keep the page short) */
+document.addEventListener("click", function (e) {
+  var b = e.target.closest && e.target.closest("[data-rt-fold]");
+  if (!b) return;
+  e.preventDefault();
+  var open = false;
+  try { open = localStorage.getItem("ec_rt_fold") === "open"; } catch (x) {}
+  try { localStorage.setItem("ec_rt_fold", open ? "closed" : "open"); } catch (x) {}
+  render();
+}, false);
+(function () {
+  var st = document.createElement("style");
+  st.textContent = ".rt-fold{display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;background:none;border:0;color:inherit;font:inherit;font-size:1.15rem;font-weight:700;padding:2px 0;cursor:pointer;text-align:left}.rt-fold:focus-visible{outline:2px solid #a78bfa;outline-offset:4px;border-radius:8px}.rt-chev{font-size:1.1rem;opacity:.75}";
+  document.head.appendChild(st);
 })();
 
 /* ---- app-v5-zzzzzzzl-outbox.js ---- */

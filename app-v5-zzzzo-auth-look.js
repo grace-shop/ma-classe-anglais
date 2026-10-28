@@ -34,11 +34,28 @@
 #authGate .ot-eye.on{color:#22E37A}
 
 /* sign-in page stays still: no sweeping shapes, no floating logo, no scrolling */
-#authGate.cream{overflow:hidden!important;justify-content:center!important;touch-action:none}
+#authGate.cream{overflow-y:auto!important;overscroll-behavior:contain;justify-content:safe center!important;touch-action:pan-y!important}
 #authGate.cream .tw::after,#authGate.cream .tw-p::before,#authGate.cream .tw-p::after,#authGate.cream .tw-info-p::before,#authGate.cream .tw-info-p::after{animation:none!important;transition:none!important}
 #authGate .lg-logo,#authGate .lg-logo *,#authGate .cr-top *{animation:none!important}
 @media (prefers-reduced-motion:reduce){
   #authGate .tw::before,#authGate .ot-card::before,#authGate .tw:has(.msg.err),#authGate .ot-card:has(.msg.err){animation:none!important}
+}
+
+/* phones: the sign-in / sign-up card keeps its fields and buttons on screen (no fixed-ratio box that cuts them),
+   inputs are 16 px so iOS does not zoom, and the page can scroll when the keyboard is open */
+@media (max-width:720px){
+  #authGate.cream{padding:24px 14px!important}
+  #authGate.cream .tw{aspect-ratio:auto!important;height:auto!important;grid-template-columns:1fr!important;border-radius:28px!important}
+  #authGate.cream .tw-p{overflow:visible!important;padding:26px 20px!important}
+  #authGate.cream .tw h3,#authGate.cream .tw h2{font-size:1.7rem!important;margin:0 0 12px!important}
+  #authGate.cream .tw p{max-width:100%!important;font-size:.92rem!important;margin:0 0 14px!important}
+  #authGate.cream .tw-form{gap:12px!important}
+  #authGate.cream .tw input,#authGate.cream .tw .tw-pw{width:100%!important}
+  #authGate.cream .tw input{height:48px!important;font-size:16px!important;padding:0 14px!important}
+  #authGate.cream .tw .tw-eye{width:40px!important;height:40px!important}
+  #authGate.cream .tw .tw-btn{height:48px!important;min-width:0!important;width:100%!important;font-size:.95rem!important}
+  #authGate.cream .tw .tw-link{font-size:.85rem}
+  #authGate.cream .lg-soc{padding:12px}
 }
 `;
   document.head.appendChild(st);
