@@ -754,7 +754,10 @@
       });
     }
   }
+  const errText = (err) => { console.error("[auth]", err); return "Could not reach the server: " + ((err && err.message) || "try again in a moment.") ; };
   async function sendOtp() {
+    if (!sb) await waitSb();
+    if (!sb) throw new Error("the server is not ready, check your connection");
     const raw = ((document.getElementById("agE") || {}).value || "").trim();
     if (!/^\S+@\S+\.\S+$/.test(raw)) return say("Write a valid e-mail address first.");
     const { error } = await sb.auth.signInWithOtp({ email: raw, options: { shouldCreateUser: false } });
@@ -762,6 +765,8 @@
     otpEmail = raw; mode = "otp"; say("A code was sent to " + raw + ". Check your inbox and your spam folder.", true);
   }
   async function verifyOtpCode() {
+    if (!sb) await waitSb();
+    if (!sb) throw new Error("the server is not ready, check your connection");
     const token = [...gate.querySelectorAll(".ot")].map((b) => b.value).join("");
     if (token.length < 6) return say("Enter all 6 digits.");
     mode = "newpass";                                   // no automatic sign-in until the new password is saved
@@ -772,7 +777,10 @@
   }
   function showGate() { drawGate(); }
   function hideGate() { if (gate) { gate.remove(); gate = null; } const sp = document.getElementById("splash"); if (sp) sp.style.display = ""; }
-  const say = (t, ok) => { note = { t, ok }; drawGate(); };
+  const snapshot = () => { const k = {}; if (gate) gate.querySelectorAll("#authGate input").forEach((i) => { if (i.id) k[i.id] = i.value; }); return k; };
+  const restore = (k) => { Object.keys(k).forEach((id) => { const i = document.getElementById(id); if (i && !i.value) i.value = k[id]; }); };
+  const say = (t, ok) => { const k = snapshot(); note = { t, ok }; drawGate(); restore(k); };
+  const waitSb = () => new Promise((res) => { const t = setInterval(() => { if (sb) { clearInterval(t); res(); } }, 150); setTimeout(() => { clearInterval(t); res(); }, 15000); });
   const frErr = (m) => /Invalid login/i.test(m) ? "Wrong e-mail or password." : /already registered|already exists/i.test(m) ? (idMode === "tel" ? "An account already exists with this number: please log in." : "An account already exists with this e-mail: please log in.") : /Email not confirmed/i.test(m) ? "First confirm your e-mail with the link you received." : /Password should/i.test(m) ? "The password must have at least 6 characters." : /rate limit/i.test(m) ? "Too many tries. Wait a few minutes." : /same.?password|different from the old/i.test(m) ? "Choose a password different from your old one." : /session|not authenticated|expired/i.test(m) ? "This code has expired. Ask for a new one." : m;
   document.addEventListener("click", async (e) => {
     const b = e.target.closest && e.target.closest("#authGate [data-x]"); if (!b) return; e.preventDefault();
@@ -780,7 +788,7 @@
     if (x === "eye") { const inp = b.parentNode.querySelector("input"); const show = inp.type === "password"; inp.type = show ? "text" : "password"; b.classList.toggle("on", show); b.setAttribute("aria-label", show ? "Hide password" : "Show password"); inp.focus(); return; }
     if (x === "in" || x === "up") { mode = x; note = null; drawGate(); return; }
     if (x === "otpreq") { mode = "otpreq"; note = null; drawGate(); return; }
-    if (x === "resend") return sendOtp();
+    if (x === "resend") return sendOtp().catch((err) => say(errText(err)));
     if (x === "ios") { window.__iosGuide(); return; }
     if (x === "idEmail" || x === "idTel") { idMode = x === "idTel" ? "tel" : "email"; try { localStorage.setItem("mca_idmode", idMode); } catch (e) {} note = null; drawGate(); const f = document.getElementById("agE"); if (f) f.focus(); return; }
     if (x === "google") {
@@ -800,11 +808,14 @@
   });
   document.addEventListener("submit", async (e) => {
     const f = e.target.closest && e.target.closest("#authGate form"); if (!f) return; e.preventDefault(); e.stopImmediatePropagation();
-    if (f.dataset.f === "otpreq") return sendOtp();
-    if (f.dataset.f === "otp") return verifyOtpCode();
+    if (f.dataset.f === "otpreq") return await sendOtp();
+    if (f.dataset.f === "otp") return await verifyOtpCode();
     const v = (id) => ((document.getElementById(id) || {}).value || "").trim();
-    const btn = f.querySelector("button[type=submit]"); if (btn) btn.disabled = true;
+    const btn = f.querySelector("button[type=submit]"); const btnTxt = btn ? btn.textContent : "";
+    if (btn) { btn.disabled = true; btn.textContent = "Please wait…"; }
     try {
+      if (!sb) await waitSb();
+      if (!sb) throw new Error("the server is not ready, check your connection");
       const id = f.dataset.f === "newpass" ? {} : loginId();
       if (id.err) { say(id.err); return; }
       if (f.dataset.f === "in") { const { error } = await sb.auth.signInWithPassword({ email: id.email, password: v("agP") }); if (error) say(idMode === "tel" && /Invalid login/i.test(error.message) ? "Wrong number or password." : frErr(error.message)); }
@@ -812,7 +823,9 @@
         const { data, error } = await sb.auth.signUp({ email: id.email, password: v("agP"), options: { data: { full_name: v("agN"), ...(idMode === "tel" ? { phone: "+" + telDigits(v("agE")) } : {}) }, emailRedirectTo: isNative() ? CFG.nativeRedirect : location.origin + location.pathname } });
         if (error) say(frErr(error.message)); else if (!data.session) { mode = "in"; say(idMode === "tel" ? "Account created! Now log in with your number and your password." : "Account created! Open the confirmation e-mail, then log in.", true); }
       } else if (f.dataset.f === "newpass") { const { error } = await sb.auth.updateUser({ password: v("agP") }); if (error) say(frErr(error.message)); else { mode = "in"; note = null; hideGate(); location.reload(); } }
-    } finally { if (btn) btn.disabled = false; }
+    } catch (err) {
+      say(errText(err));
+    } finally { if (btn && btn.isConnected) { btn.disabled = false; btn.textContent = btnTxt; } }
   }, true);
 
   /* ---------------- contenu de départ (première connexion de la prof principale) ---------------- */
