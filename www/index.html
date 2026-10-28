@@ -19981,33 +19981,40 @@ document.addEventListener("click", function (e) {
       avatar and buttons, the name cut with « … » instead of wrapping.
    ===================================================================== */
 
-/* 1 · after sending, the field is emptied and the draft is forgotten */
-document.addEventListener("submit", function (e) {
-  var f = e.target && e.target.dataset && e.target.dataset.f;
-  var id = { chat: "chatInput", peerchat: "peerInput", staffchat: "staffInput" }[f];
-  if (!id) return;
-  var inp = document.getElementById(id);
-  var text = inp ? (inp.value || "").trim() : "";
-  if (!text) return;
-  [60, 400, 1200].forEach(function (ms) {
-    setTimeout(function () {
-      var el = document.getElementById(id);
-      if (!el) return;
-      /* only if the text is still there: a failed send keeps the text on purpose (it is in S.drafts) */
-      var kept = (typeof S !== "undefined" && S.drafts && S.drafts[id] === text);
-      if ((el.value || "").trim() === text && !kept) {
-        el.value = "";
-        try {
-          var pre = "mca_draft:" + id + "|";
-          for (var i = localStorage.length - 1; i >= 0; i--) {
-            var k = localStorage.key(i);
-            if (k && k.indexOf(pre) === 0) localStorage.removeItem(k);
-          }
-        } catch (x) {}
+/* 1 · after sending, the message field is emptied and its draft is forgotten.
+   The check is made after the send handlers have read the field (they run first),
+   and only when the message really went into the conversation (so a failed send keeps its text). */
+(function () {
+  var MAP = { chat: "chatInput", peerchat: "peerInput", staffchat: "staffInput" };
+  function clearField(id, text) {
+    var el = document.getElementById(id);
+    if (!el || (el.value || "").trim() !== text) return;
+    el.value = "";
+    try {
+      var pre = "mca_draft:" + id + "|";
+      for (var i = localStorage.length - 1; i >= 0; i--) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf(pre) === 0) localStorage.removeItem(k);
       }
-    }, ms);
-  });
-}, true);
+    } catch (x) {}
+    try { if (S.drafts && S.drafts[id] === text) delete S.drafts[id]; } catch (x) {}
+  }
+  function sentOk(id, text) {
+    if (id !== "peerInput") return true;            // teacher chats: the field is emptied by their own handler
+    try { return PR.inbox.some(function (m) { return m.sender === S.uid && (m.body || "") === text; }); } catch (x) { return false; }
+  }
+  document.addEventListener("submit", function (e) {
+    var f = e.target && e.target.dataset && e.target.dataset.f;
+    var id = MAP[f];
+    if (!id) return;
+    var inp = document.getElementById(id);
+    var text = inp ? (inp.value || "").trim() : "";
+    if (!text) return;
+    [0, 40, 200, 600, 1500, 3000].forEach(function (ms) {
+      setTimeout(function () { if (sentOk(id, text)) clearField(id, text); }, ms);
+    });
+  }, true);
+})();
 
 /* 2 · fit the header of a conversation to the screen */
 (function () {
