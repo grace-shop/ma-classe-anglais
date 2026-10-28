@@ -6003,7 +6003,11 @@ function callRing(on){
 }
 let CALL_AC=null;
 function callTone(){
-  try{CALL_AC=CALL_AC||new (window.AudioContext||window.webkitAudioContext)();
+  /* the ring uses the app's shared audio context: it was unlocked by the first tap. A new context created while a call
+     arrives (no tap) stays silent on Android, which is why the ring could not be heard. */
+  try{
+    const shared=typeof nAudio==="function"?nAudio():null;
+    CALL_AC=shared||CALL_AC||new (window.AudioContext||window.webkitAudioContext)();
     if(CALL_AC.state==="suspended")CALL_AC.resume();
     rtCallPlay(CALL_AC,CALL_AC.currentTime+0.02)}catch(e){}
 }
