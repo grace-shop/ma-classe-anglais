@@ -91,3 +91,27 @@ if (existsSync("android-extras/sounds")) {
   for (const f of rds("android-extras/sounds")) if (f.endsWith(".wav")) cp2("android-extras/sounds/" + f, "android/app/src/main/res/raw/" + f);
   console.log("✓ sons de notification copiés");
 }
+
+// Partage d'écran pendant l'appel : plugin ScreenShare + service de capture (android-extras/screenshare)
+if (existsSync("android-extras/screenshare")) {
+  const dir = "android/app/src/main/java/tg/maclasse/anglais";
+  mkdirSync(dir, { recursive: true });
+  for (const f of readdirSync("android-extras/screenshare")) cp("android-extras/screenshare/" + f, dir + "/" + f);
+  const mf = "android/app/src/main/AndroidManifest.xml";
+  let m = readFileSync(mf, "utf8");
+  if (!m.includes("ScreenShareService")) {
+    m = m.replace("<application", `<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <application`);
+    m = m.replace("</application>", `    <service android:name=".ScreenShareService" android:foregroundServiceType="mediaProjection" android:exported="false" />
+    </application>`);
+    writeFileSync(mf, m);
+  }
+  const act = dir + "/MainActivity.java";
+  let a = readFileSync(act, "utf8");
+  if (!a.includes("ScreenSharePlugin")) {
+    a = a.replace("super.onCreate(savedInstanceState);", "registerPlugin(ScreenSharePlugin.class);\n        super.onCreate(savedInstanceState);");
+    writeFileSync(act, a);
+  }
+  console.log("✓ partage d'écran (plugin ScreenShare) ajouté");
+}
