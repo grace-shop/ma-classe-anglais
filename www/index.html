@@ -4127,11 +4127,15 @@ async function fShareOut(){const it=fShareItem();if(!it)return;const text=`${it.
 /* chat: videos too */
 {const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img")return fVidTile({p:a.p,t:a.t,d:a.d,e:a.e})+_mb(text,null);return _mb(text,a)}}
 /* ---------------- notifications ---------------- */
-const N={list:[],loaded:false,un:null,uid:null,at:0,markT:null};
+const N={list:[],loaded:false,un:null,uid:null,at:0,markT:null,sw:0,gone:null,goneUid:null};
+/* only the newest notifications are listed; older ones are hidden, not deleted */
+const NSHOW=15;
+/* notifications the person deleted on this phone (kept even if the server delete did not work) */
+function nGone(){if(!N.gone||N.goneUid!==S.uid){N.goneUid=S.uid;N.gone=new Set();try{N.gone=new Set((JSON.parse(localStorage.getItem("mca_notif_gone:"+S.uid)||"[]")).map(String))}catch(e){}}return N.gone}
 const nOn=()=>!!window.__notif&&!!S.uid&&(S.mode==="teacher"?!!(S.isOwner||S.isStaff):!!S.me);
-async function nLoad(){if(!nOn())return;N.at=Date.now();try{N.list=await window.__notif.list();N.loaded=true}catch(e){N.loaded=true}render()}
+async function nLoad(){if(!nOn())return;N.at=Date.now();try{N.list=(await window.__notif.list()).filter(x=>!nGone().has(String(x.id)));N.loaded=true}catch(e){N.loaded=true}render()}
 function nStart(){if(!nOn())return;if(N.uid&&N.uid!==S.uid){try{N.un&&N.un()}catch(e){}N.un=null;N.list=[]}if(N.un)return;N.uid=S.uid;nLoad();
-  N.un=window.__notif.listen(n=>{if(N.list.some(x=>x.id===n.id))return;N.list.unshift(n);nArrive(n);render()})}
+  N.un=window.__notif.listen(n=>{if(nGone().has(String(n.id))||N.list.some(x=>x.id===n.id))return;N.list.unshift(n);nArrive(n);render()})}
 setInterval(()=>{if(!nOn())return;if(!N.un||N.uid!==S.uid)nStart();else if(document.visibilityState==="visible"&&Date.now()-N.at>90000)nLoad()},4000);
 const nName=n=>(n.who&&n.who.name)||"Someone";
 function nTitle(n){const m=nName(n);return({msg:m,story_reply:m,comment:m,like:m,share:m,story_like:m,tmsg:n.who?.role==="teacher"?m:"Your teacher",smsg:m,staff:m})[n.kind]||"English Classes"}
@@ -4147,15 +4151,30 @@ async function nSys(title,body,tag,skipNative){try{
   if(r&&r.showNotification)r.showNotification(title,o);else new Notification(title,o)}catch(e){}}
 function nPermState(){if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())return typeof notifOn==="function"&&notifOn()?"granted":"default";return"Notification"in window?Notification.permission:"unsupported"}
 function nBell(){const h=document.getElementById("hdr");if(!h)return;let b=h.querySelector('[data-v4="nOpen"]');if(!nOn()){if(b)b.remove();return}
-  const n=N.list.filter(x=>!x.read_at).length;if(!b){h.insertAdjacentHTML("afterbegin",`<button class="iconbtn nbell" data-v4="nOpen" aria-label="Notifications" title="Notifications">${BELL}<span class="nbadge" hidden></span></button>`);b=h.querySelector('[data-v4="nOpen"]')}
+  const n=N.list.slice(0,NSHOW).filter(x=>!x.read_at).length;if(!b){h.insertAdjacentHTML("afterbegin",`<button class="iconbtn nbell" data-v4="nOpen" aria-label="Notifications" title="Notifications">${BELL}<span class="nbadge" hidden></span></button>`);b=h.querySelector('[data-v4="nOpen"]')}
   const sp=b.querySelector(".nbadge"),t=n?(n>9?"9+":String(n)):"";if(sp.textContent!==t){sp.textContent=t;sp.hidden=!n}}
 function nView(){if(!N.loaded)nLoad();
   if(N.list.some(x=>!x.read_at)&&!N.markT)N.markT=setTimeout(()=>{N.markT=null;if(S.view?.type!=="notifs")return;window.__notif.read(null).catch(()=>{});setTimeout(()=>{for(const x of N.list)if(!x.read_at)x.read_at=new Date().toISOString();render()},4000)},1500);
   const perm=nPermState();
   return`<div class="section" style="max-width:640px;margin-inline:auto">${backBtn()}<div class="row"><span class="nbig">${BELL}</span><div><span class="eyebrow">Activity</span><h2>Notifications</h2></div></div>
   ${perm==="default"?`<div class="glass card row between" style="gap:12px"><span class="small">Get a notification on your phone when someone writes to you or reacts to your posts.</span><button class="btn sm" data-v4="nPerm">Turn on</button></div>`:perm==="denied"?`<p class="hint">Notifications are blocked for this site: allow them in your browser settings.</p>`:""}
-  ${!N.loaded?`<div class="empty">Loading…</div>`:N.list.length?`<div class="glass list">${N.list.map(n=>`<div class="it click${n.read_at?"":" nun"}" data-v4="nGo" data-id="${n.id}" tabindex="0">${n.actor?whoAva(n.who,n.actor,42):`<span class="av">🔔</span>`}<div class="txt"><b>${esc(nTitle(n))}</b><span>${E(nBody(n))}</span><small class="muted">${ago(+new Date(n.created_at))}</small></div>${n.read_at?"":`<i class="ndot" aria-label="New"></i>`}</div>`).join("")}</div>`:`<div class="empty">No notifications yet. When someone writes to you, comments or reacts, you will see it here.</div>`}
+  ${!N.loaded?`<div class="empty">Loading…</div>`:N.list.length?`<div class="nbar"><span class="small muted">${N.list.length>NSHOW?`${NSHOW} newest of ${N.list.length}`:`${N.list.length} notification${N.list.length>1?"s":""}`}</span><button type="button" class="btn sm" data-v4="nClearAll">Delete all</button></div><div class="glass list nlist">${N.list.slice(0,NSHOW).map(nRow).join("")}</div>${N.list.length>NSHOW?`<p class="hint nold">Older notifications are hidden.</p>`:""}`:`<div class="empty">No notifications yet. When someone writes to you, comments or reacts, you will see it here.</div>`}
   </div>`}
+/* one notification row: swipe it to the left to delete it */
+function nRow(n){return`<div class="nrow"><div class="nbg" aria-hidden="true">Delete</div><div class="it click${n.read_at?"":" nun"}" data-v4="nGo" data-id="${n.id}" tabindex="0">${n.actor?whoAva(n.who,n.actor,42):`<span class="av">🔔</span>`}<div class="txt"><b>${esc(nTitle(n))}</b><span>${E(nBody(n))}</span><small class="muted">${ago(+new Date(n.created_at))}</small></div>${n.read_at?"":`<i class="ndot" aria-label="New"></i>`}</div></div>`}
+function nRemove(ids,all){ids=ids.map(String);const g=nGone();ids.forEach(i=>g.add(i));try{localStorage.setItem("mca_notif_gone:"+S.uid,JSON.stringify([...g].slice(-500)))}catch(e){}
+  N.list=N.list.filter(x=>!g.has(String(x.id)));render();
+  try{(all?window.__notif.removeAll():window.__notif.remove(ids)).catch(()=>{})}catch(e){}}
+function nClearAll(){const ids=N.list.map(x=>String(x.id));if(!ids.length)return;nRemove(ids,true);toast("Notifications deleted","check")}
+let nDrag=null;
+document.addEventListener("pointerdown",e=>{const it=e.target.closest&&e.target.closest(".nrow > .it");if(!it||e.button!==0)return;nDrag={it,row:it.parentElement,x:e.clientX,y:e.clientY,dx:0,on:false,id:it.dataset.id}},true);
+document.addEventListener("pointermove",e=>{if(!nDrag)return;const dx=e.clientX-nDrag.x,dy=e.clientY-nDrag.y;
+  if(!nDrag.on){if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){nDrag=null;return}if(dx>-10)return;nDrag.on=true}
+  nDrag.dx=Math.min(0,dx);nDrag.it.style.transition="none";nDrag.it.style.transform="translateX("+nDrag.dx+"px)";nDrag.row.style.setProperty("--sw",Math.min(1,-nDrag.dx/100))},true);
+function nDragEnd(){const d=nDrag;nDrag=null;if(!d||!d.on)return;N.sw=Date.now();
+  if(-d.dx>100){d.it.style.transition="transform .2s ease, opacity .2s";d.it.style.transform="translateX(-110%)";d.it.style.opacity="0";setTimeout(()=>nRemove([d.id],false),200)}
+  else{d.it.style.transition="transform .2s ease";d.it.style.transform="";d.row.style.setProperty("--sw","0")}}
+document.addEventListener("pointerup",nDragEnd,true);document.addEventListener("pointercancel",nDragEnd,true);
 function nGo(id){const n=N.list.find(x=>String(x.id)===String(id));if(!n)return;if(!n.read_at){n.read_at=new Date().toISOString();window.__notif.read([n.id]).catch(()=>{})}const r=n.ref||"";S.animate=true;
   if(r.startsWith("peer:")&&S.mode==="student"&&peerOn()){const u=r.slice(5);S.view={type:"peer",id:u};PR.with=u;peerStart();peerMarkRead(u)}
   else if(r==="chat"&&S.mode==="student"){S.view={type:"chat",id:S.uid};subChat(S.uid)}
@@ -4182,7 +4201,8 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"fSvSnd":{F.svMute=false;const v=document.getElementById("fsvVid");if(v){v.muted=false;v.play().catch(()=>{})}const h=document.getElementById("fsvhost");const b=h&&h.querySelector(".fsv-snd");if(b)b.remove();return}
   case"vplay":vPlay(el.dataset.p,el.dataset.t,el.dataset.e);return;
   case"nOpen":S.view={type:"notifs"};S.animate=true;scrollTo(0,0);render();return;
-  case"nGo":nGo(id);return;
+  case"nGo":if(Date.now()-N.sw<400)return;nGo(id);return;
+  case"nClearAll":nClearAll();return;
   case"nPerm":nAskPerm();return;
   }},true);
 document.addEventListener("input",e=>{if(e.target&&e.target.id==="fsh_q"&&F.share){F.share.q=e.target.value;const h=document.getElementById("fsvhost");if(h)h._h="";feedSync()}});
@@ -5643,7 +5663,7 @@ const CALL_ICE=(()=>{const ice=[{urls:"stun:stun.l.google.com:19302"},{urls:"stu
   const c=window.APP_CONFIG||{},urls=String(c.turnUrls||"").split(",").map(x=>x.trim()).filter(Boolean);
   if(urls.length&&c.turnUser&&c.turnPass)ice.push({urls,username:c.turnUser,credential:c.turnPass});
   return ice})();
-const CALL={id:null,host:null,kind:"duo",video:false,group:null,others:[],peers:{},local:null,joined:false,micOn:true,camOn:false,ring:null,ringT:null,timer:null,clock:null,t0:0,pick:new Set(),cands:null};
+const CALL={id:null,host:null,kind:"duo",video:false,group:null,others:[],peers:{},local:null,screen:null,joined:false,micOn:true,camOn:false,ring:null,ringT:null,timer:null,clock:null,t0:0,pick:new Set(),cands:null};
 const CALL_TEST=()=>!!window.__callBus;   /* automated tests replace the database with a local bus */
 let CALL_UID=null;
 
@@ -5666,6 +5686,7 @@ let CALL_UID=null;
 .call-btns button{width:56px;height:56px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;display:grid;place-items:center;cursor:pointer;padding:0}
 .call-btns button.off{background:#fff;color:#111}
 .call-btns button.end{background:#EF4444;width:64px;height:64px}
+.call-btns button.share-on{background:#5EEAD4;color:#06201C}
 .call-btns button.end svg{transform:rotate(135deg)}
 .call-btns svg,.call-entry svg,.call-in svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .call-add{background:rgba(255,255,255,.08);border-radius:18px;padding:10px;max-height:38vh;overflow:auto;display:grid;gap:4px}
@@ -5683,10 +5704,14 @@ let CALL_UID=null;
 .call-entry svg{width:16px;height:16px}
 `;document.head.appendChild(st)}
 ICONS.phone=ICONS.phone||'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>';
+ICONS.screen=ICONS.screen||'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4M9 10l3 3 3-3"/>';
 ICONS.camoff=ICONS.camoff||'<path d="M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2M22 8l-6 4 6 4V8zM2 2l20 20"/>';
 
 /* ---- helpers ---- */
 const callMyName=()=>(S.me&&S.me.name)||(S.who&&S.who.email)||"Classmate";
+/* the video sent to the others: my shared screen when I share it, otherwise my camera */
+function callVideoOut(){if(CALL.screen){const t=CALL.screen.getVideoTracks()[0];if(t&&t.readyState==="live")return t}return (CALL.local&&CALL.local.getVideoTracks()[0])||null}
+function callSendVideo(){for(const P of Object.values(CALL.peers))if(P.tv)P.tv.sender.replaceTrack(callVideoOut()).catch(()=>{})}
 function callName(uid){const m=Object.values(GR.mem||{}).flat().find(x=>x.uid===uid);return dispName(uid,(m&&m.who&&m.who.name)||(CALL.names&&CALL.names[uid])||"Classmate")}
 function callErr(e){return (e&&e.message)||"The call could not start"}
 function callRpc(fn,args){
@@ -5771,7 +5796,7 @@ function callPeer(uid,answering){
 function callAttachLocal(P){
   if(!CALL.local)return;
   if(!P.ta||!P.tv)return;
-  const a=CALL.local.getAudioTracks()[0]||null,v=CALL.local.getVideoTracks()[0]||null;
+  const a=CALL.local.getAudioTracks()[0]||null,v=callVideoOut();
   P.ta.sender.replaceTrack(a).catch(()=>{});
   P.tv.sender.replaceTrack(v).catch(()=>{});
 }
@@ -5835,12 +5860,12 @@ async function callToggleCam(){
   if(CALL.camOn){
     CALL.local.getVideoTracks().forEach(t=>{t.stop();CALL.local.removeTrack(t)});
     CALL.camOn=false;
-    for(const P of Object.values(CALL.peers))P.tv.sender.replaceTrack(null).catch(()=>{});
+    callSendVideo();
   }else{
     try{
       const v=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:640},height:{ideal:480}}});
       const t=v.getVideoTracks()[0];CALL.local.addTrack(t);CALL.camOn=true;
-      for(const P of Object.values(CALL.peers))P.tv.sender.replaceTrack(t).catch(()=>{});
+      callSendVideo();
     }catch(e){toast("The camera is not available","x")}
   }
   callScreenSync();
@@ -5891,6 +5916,8 @@ function callCleanup(){
   for(const u of Object.keys(CALL.peers)){callRemoteAudioEnd(u);try{CALL.peers[u].pc.close()}catch(e){}}
   CALL.peers={};
   if(CALL.local)CALL.local.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
+  if(CALL.screen)CALL.screen.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
+  CALL.screen=null;
   CALL.local=null;CALL.id=null;CALL.joined=false;CALL.others=[];CALL.host=null;CALL.pick=new Set();CALL.cands=null;
   callScreenHide();
 }
@@ -5919,6 +5946,27 @@ async function callAddGo(){
     CALL.pick=new Set();CALL.cands=null;CALL.adding=false;
     toast("Invitation sent","check");callScreenSync();
   }catch(e){toast(callErr(e),"x")}
+}
+
+/* ---- sharing my screen with the others in the call ---- */
+async function callToggleScreen(){
+  if(!CALL.id||!CALL.local)return;
+  if(CALL.screen){callStopScreen();return}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia){toast("Screen sharing is not available on this phone","x");return}
+  let st;
+  try{st=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false})}
+  catch(e){toast("Screen sharing was not started","mute");return}
+  const t=st.getVideoTracks()[0];if(!t){st.getTracks().forEach(x=>x.stop());return}
+  try{t.contentHint="detail"}catch(e){}
+  CALL.screen=st;
+  t.onended=()=>{if(CALL.screen===st)callStopScreen()};
+  callSendVideo();callScreenSync();
+  toast("You are sharing your screen","check");
+}
+function callStopScreen(){
+  const st=CALL.screen;CALL.screen=null;
+  if(st)st.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
+  callSendVideo();callScreenSync();
 }
 
 /* ---- the call screen (lives outside the app, so it stays open while you browse) ---- */
@@ -5962,9 +6010,10 @@ function callScreenSync(){
   if(title)title.textContent=CALL.kind==="group"||people.length>1?(CALL.group?"Group call":"Group call · "+people.length+" people"):"Call with "+callName(people[0]||CALL.host||"");
   const localKey=(CALL.local?CALL.local.getTracks().map(t=>t.id).join(","):"");
   const me=callTileEl(grid,"me",callMyName());
-  me.classList.toggle("on",CALL.camOn);
+  me.classList.toggle("on",CALL.camOn||!!CALL.screen);
   const mv=me.querySelector("video");
-  if(CALL.local&&mv.dataset.k!==localKey){mv.srcObject=new MediaStream(CALL.local.getTracks());mv.dataset.k=localKey}
+  const myKey=localKey+"|"+(CALL.screen?CALL.screen.id:"");
+  if((CALL.local||CALL.screen)&&mv.dataset.k!==myKey){mv.srcObject=new MediaStream(CALL.screen?CALL.screen.getVideoTracks():CALL.local.getTracks());mv.dataset.k=myKey}
   for(const u of people){
     keep.add(u);
     const P=CALL.peers[u];
@@ -5984,6 +6033,7 @@ function callScreenSync(){
   const b=document.getElementById("csBtns");
   b.innerHTML=`<button type="button" data-call="mic" class="${CALL.micOn?"":"off"}" aria-label="${CALL.micOn?"Mute microphone":"Unmute microphone"}">${ic(CALL.micOn?"mic":"mute")}</button>
     <button type="button" data-call="cam" class="${CALL.camOn?"":"off"}" aria-label="${CALL.camOn?"Turn camera off":"Turn camera on"}">${ic(CALL.camOn?"camera":"camoff")}</button>
+    <button type="button" data-call="screen" class="${CALL.screen?"share-on":""}" aria-label="${CALL.screen?"Stop sharing my screen":"Share my screen"}">${ic("screen")}</button>
     <button type="button" data-call="add" aria-label="Add someone to the call">${ic("plus")}</button>
     <button type="button" data-call="end" class="end" aria-label="End call">${ic("phone")}</button>`;
   const add=document.getElementById("csAdd");
@@ -6041,6 +6091,7 @@ function callAct(a,el){
   if(a==="dec"){callDeclineRing();return}
   if(a==="mic"){callToggleMic();return}
   if(a==="cam"){callToggleCam();return}
+  if(a==="screen"){callToggleScreen();return}
   if(a==="end"){callLeave();return}
   if(a==="add"){CALL.adding=!CALL.adding;CALL.cands=null;CALL.pick=new Set();callScreenSync();return}
   if(a==="pick"){const u=el.dataset.uid;if(CALL.pick.has(u))CALL.pick.delete(u);else CALL.pick.add(u);callScreenSync();return}
@@ -19810,11 +19861,18 @@ async function zzBakeEntries(entries){
     return '<div class="rt-group"><div class="rt-title"><span>' + ICON[kind] + "</span><b>" + title + "</b></div>" + rows + extra + "</div>";
   }
   rtPickersHTML = function () {
-    return '<div class="rt-wrap">' + group("call", "Call ringtone") + group("notif", "Notification sound") + "</div>";
+    return '<details class="rt-fold"><summary><span>🎵</span><b>Ringtones</b><small>Tap to open or close</small></summary><div class="rt-wrap">' + group("call", "Call ringtone") + group("notif", "Notification sound") + "</div></details>";
   };
 
   var CSS = [
     ".rt-wrap{display:grid;gap:18px;margin-top:8px}",
+    ".rt-fold{border-radius:18px;border:1px solid rgba(160,140,255,.3);background:rgba(255,255,255,.03);padding:4px 12px}",
+    ".rt-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 4px;font-size:1.05rem}",
+    ".rt-fold>summary::-webkit-details-marker{display:none}",
+    ".rt-fold>summary::after{content:\"▾\";margin-left:auto;transition:transform .2s}",
+    ".rt-fold[open]>summary::after{transform:rotate(180deg)}",
+    ".rt-fold>summary small{opacity:.6;font-size:.8rem}",
+    ".rt-fold[open]>summary small{display:none}",
     ".rt-group{display:grid;gap:8px;padding:12px;border-radius:18px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(160,140,255,.25);box-shadow:0 0 18px rgba(140,110,255,.12)}",
     ".rt-title{display:flex;align-items:center;gap:8px;margin:2px 4px 4px;font-size:1.02rem}",
     ".rt-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;border:1px solid rgba(255,255,255,.08);transition:box-shadow .2s,border-color .2s}",
@@ -19830,6 +19888,40 @@ async function zzBakeEntries(entries){
   ].join("");
   var st = document.createElement("style");
   st.textContent = CSS;
+  document.head.appendChild(st);
+})();
+
+/* ---- app-v5-zzzzzzzu-ring-long.js ---- */
+/* ---- Call ringtones last longer: each built-in call tone is repeated for about 8 seconds, then pauses
+   for a moment before it starts again. Your own music is already played in full (up to 30 s). ---- */
+(function () {
+  if (typeof RT_CALL === "undefined") return;
+  var TOTAL = 8, PAUSE = 1.5;
+  RT_CALL.forEach(function (t) {
+    if (t.id === "custom" || t.__long) return;
+    var play0 = t.play, p0 = t.period || 2;
+    var reps = Math.max(1, Math.floor(TOTAL / p0));
+    t.__long = true;
+    t.play = function (c, at) {
+      for (var k = 0; k < reps; k++) play0(c, at + k * p0);
+    };
+    t.period = reps * p0 + PAUSE;
+  });
+})();
+
+/* ---- app-v5-zzzzzzzv-notif-swipe.js ---- */
+/* ---- Notifications: swipe a row to the left to delete it, "Delete all" at the top,
+   only the 15 newest are listed (the logic is in app-v4.js, section notifications) ---- */
+(function () {
+  var st = document.createElement("style");
+  st.id = "zzzzzzzv-notif-swipe";
+  st.textContent = [
+    ".nbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:4px 2px 8px}",
+    ".nrow{position:relative;overflow:hidden;border-radius:14px;--sw:0}",
+    ".nrow .nbg{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:20px;background:linear-gradient(90deg,rgba(229,72,77,0),rgba(229,72,77,.92));color:#fff;font-weight:700;opacity:var(--sw);pointer-events:none}",
+    ".nrow .it{position:relative;touch-action:pan-y;user-select:none;-webkit-user-select:none}",
+    ".nold{text-align:center;margin:8px 0 0;opacity:.7}"
+  ].join("");
   document.head.appendChild(st);
 })();
 

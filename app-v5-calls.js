@@ -11,7 +11,7 @@ const CALL_ICE=(()=>{const ice=[{urls:"stun:stun.l.google.com:19302"},{urls:"stu
   const c=window.APP_CONFIG||{},urls=String(c.turnUrls||"").split(",").map(x=>x.trim()).filter(Boolean);
   if(urls.length&&c.turnUser&&c.turnPass)ice.push({urls,username:c.turnUser,credential:c.turnPass});
   return ice})();
-const CALL={id:null,host:null,kind:"duo",video:false,group:null,others:[],peers:{},local:null,joined:false,micOn:true,camOn:false,ring:null,ringT:null,timer:null,clock:null,t0:0,pick:new Set(),cands:null};
+const CALL={id:null,host:null,kind:"duo",video:false,group:null,others:[],peers:{},local:null,screen:null,joined:false,micOn:true,camOn:false,ring:null,ringT:null,timer:null,clock:null,t0:0,pick:new Set(),cands:null};
 const CALL_TEST=()=>!!window.__callBus;   /* automated tests replace the database with a local bus */
 let CALL_UID=null;
 
@@ -34,6 +34,7 @@ let CALL_UID=null;
 .call-btns button{width:56px;height:56px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;display:grid;place-items:center;cursor:pointer;padding:0}
 .call-btns button.off{background:#fff;color:#111}
 .call-btns button.end{background:#EF4444;width:64px;height:64px}
+.call-btns button.share-on{background:#5EEAD4;color:#06201C}
 .call-btns button.end svg{transform:rotate(135deg)}
 .call-btns svg,.call-entry svg,.call-in svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .call-add{background:rgba(255,255,255,.08);border-radius:18px;padding:10px;max-height:38vh;overflow:auto;display:grid;gap:4px}
@@ -51,10 +52,14 @@ let CALL_UID=null;
 .call-entry svg{width:16px;height:16px}
 `;document.head.appendChild(st)}
 ICONS.phone=ICONS.phone||'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>';
+ICONS.screen=ICONS.screen||'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4M9 10l3 3 3-3"/>';
 ICONS.camoff=ICONS.camoff||'<path d="M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2M22 8l-6 4 6 4V8zM2 2l20 20"/>';
 
 /* ---- helpers ---- */
 const callMyName=()=>(S.me&&S.me.name)||(S.who&&S.who.email)||"Classmate";
+/* the video sent to the others: my shared screen when I share it, otherwise my camera */
+function callVideoOut(){if(CALL.screen){const t=CALL.screen.getVideoTracks()[0];if(t&&t.readyState==="live")return t}return (CALL.local&&CALL.local.getVideoTracks()[0])||null}
+function callSendVideo(){for(const P of Object.values(CALL.peers))if(P.tv)P.tv.sender.replaceTrack(callVideoOut()).catch(()=>{})}
 function callName(uid){const m=Object.values(GR.mem||{}).flat().find(x=>x.uid===uid);return dispName(uid,(m&&m.who&&m.who.name)||(CALL.names&&CALL.names[uid])||"Classmate")}
 function callErr(e){return (e&&e.message)||"The call could not start"}
 function callRpc(fn,args){
@@ -139,7 +144,7 @@ function callPeer(uid,answering){
 function callAttachLocal(P){
   if(!CALL.local)return;
   if(!P.ta||!P.tv)return;
-  const a=CALL.local.getAudioTracks()[0]||null,v=CALL.local.getVideoTracks()[0]||null;
+  const a=CALL.local.getAudioTracks()[0]||null,v=callVideoOut();
   P.ta.sender.replaceTrack(a).catch(()=>{});
   P.tv.sender.replaceTrack(v).catch(()=>{});
 }
@@ -203,12 +208,12 @@ async function callToggleCam(){
   if(CALL.camOn){
     CALL.local.getVideoTracks().forEach(t=>{t.stop();CALL.local.removeTrack(t)});
     CALL.camOn=false;
-    for(const P of Object.values(CALL.peers))P.tv.sender.replaceTrack(null).catch(()=>{});
+    callSendVideo();
   }else{
     try{
       const v=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:640},height:{ideal:480}}});
       const t=v.getVideoTracks()[0];CALL.local.addTrack(t);CALL.camOn=true;
-      for(const P of Object.values(CALL.peers))P.tv.sender.replaceTrack(t).catch(()=>{});
+      callSendVideo();
     }catch(e){toast("The camera is not available","x")}
   }
   callScreenSync();
@@ -259,6 +264,8 @@ function callCleanup(){
   for(const u of Object.keys(CALL.peers)){callRemoteAudioEnd(u);try{CALL.peers[u].pc.close()}catch(e){}}
   CALL.peers={};
   if(CALL.local)CALL.local.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
+  if(CALL.screen)CALL.screen.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
+  CALL.screen=null;
   CALL.local=null;CALL.id=null;CALL.joined=false;CALL.others=[];CALL.host=null;CALL.pick=new Set();CALL.cands=null;
   callScreenHide();
 }
@@ -287,6 +294,27 @@ async function callAddGo(){
     CALL.pick=new Set();CALL.cands=null;CALL.adding=false;
     toast("Invitation sent","check");callScreenSync();
   }catch(e){toast(callErr(e),"x")}
+}
+
+/* ---- sharing my screen with the others in the call ---- */
+async function callToggleScreen(){
+  if(!CALL.id||!CALL.local)return;
+  if(CALL.screen){callStopScreen();return}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia){toast("Screen sharing is not available on this phone","x");return}
+  let st;
+  try{st=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false})}
+  catch(e){toast("Screen sharing was not started","mute");return}
+  const t=st.getVideoTracks()[0];if(!t){st.getTracks().forEach(x=>x.stop());return}
+  try{t.contentHint="detail"}catch(e){}
+  CALL.screen=st;
+  t.onended=()=>{if(CALL.screen===st)callStopScreen()};
+  callSendVideo();callScreenSync();
+  toast("You are sharing your screen","check");
+}
+function callStopScreen(){
+  const st=CALL.screen;CALL.screen=null;
+  if(st)st.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
+  callSendVideo();callScreenSync();
 }
 
 /* ---- the call screen (lives outside the app, so it stays open while you browse) ---- */
@@ -330,9 +358,10 @@ function callScreenSync(){
   if(title)title.textContent=CALL.kind==="group"||people.length>1?(CALL.group?"Group call":"Group call · "+people.length+" people"):"Call with "+callName(people[0]||CALL.host||"");
   const localKey=(CALL.local?CALL.local.getTracks().map(t=>t.id).join(","):"");
   const me=callTileEl(grid,"me",callMyName());
-  me.classList.toggle("on",CALL.camOn);
+  me.classList.toggle("on",CALL.camOn||!!CALL.screen);
   const mv=me.querySelector("video");
-  if(CALL.local&&mv.dataset.k!==localKey){mv.srcObject=new MediaStream(CALL.local.getTracks());mv.dataset.k=localKey}
+  const myKey=localKey+"|"+(CALL.screen?CALL.screen.id:"");
+  if((CALL.local||CALL.screen)&&mv.dataset.k!==myKey){mv.srcObject=new MediaStream(CALL.screen?CALL.screen.getVideoTracks():CALL.local.getTracks());mv.dataset.k=myKey}
   for(const u of people){
     keep.add(u);
     const P=CALL.peers[u];
@@ -352,6 +381,7 @@ function callScreenSync(){
   const b=document.getElementById("csBtns");
   b.innerHTML=`<button type="button" data-call="mic" class="${CALL.micOn?"":"off"}" aria-label="${CALL.micOn?"Mute microphone":"Unmute microphone"}">${ic(CALL.micOn?"mic":"mute")}</button>
     <button type="button" data-call="cam" class="${CALL.camOn?"":"off"}" aria-label="${CALL.camOn?"Turn camera off":"Turn camera on"}">${ic(CALL.camOn?"camera":"camoff")}</button>
+    <button type="button" data-call="screen" class="${CALL.screen?"share-on":""}" aria-label="${CALL.screen?"Stop sharing my screen":"Share my screen"}">${ic("screen")}</button>
     <button type="button" data-call="add" aria-label="Add someone to the call">${ic("plus")}</button>
     <button type="button" data-call="end" class="end" aria-label="End call">${ic("phone")}</button>`;
   const add=document.getElementById("csAdd");
@@ -409,6 +439,7 @@ function callAct(a,el){
   if(a==="dec"){callDeclineRing();return}
   if(a==="mic"){callToggleMic();return}
   if(a==="cam"){callToggleCam();return}
+  if(a==="screen"){callToggleScreen();return}
   if(a==="end"){callLeave();return}
   if(a==="add"){CALL.adding=!CALL.adding;CALL.cands=null;CALL.pick=new Set();callScreenSync();return}
   if(a==="pick"){const u=el.dataset.uid;if(CALL.pick.has(u))CALL.pick.delete(u);else CALL.pick.add(u);callScreenSync();return}
