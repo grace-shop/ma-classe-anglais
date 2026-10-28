@@ -41,6 +41,8 @@
   try{
     const App=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
     if(App&&App.addListener)App.addListener("backButton",()=>{
+      /* Nova is open: back closes Nova, and nothing else */
+      if(typeof AI!=="undefined"&&AI.open){AI.open=false;try{AI.ctl&&AI.ctl.abort()}catch(e){}renderAI();return}
       const dv=document.getElementById("docv"),vp=document.getElementById("vplayer"),za=document.getElementById("zzal");
       if(za){za.remove();return}
       if(dv){if(typeof closeDoc==="function")closeDoc();else dv.remove();return}

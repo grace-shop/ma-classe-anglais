@@ -10023,6 +10023,8 @@ function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
   try{
     const App=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
     if(App&&App.addListener)App.addListener("backButton",()=>{
+      /* Nova is open: back closes Nova, and nothing else */
+      if(typeof AI!=="undefined"&&AI.open){AI.open=false;try{AI.ctl&&AI.ctl.abort()}catch(e){}renderAI();return}
       const dv=document.getElementById("docv"),vp=document.getElementById("vplayer"),za=document.getElementById("zzal");
       if(za){za.remove();return}
       if(dv){if(typeof closeDoc==="function")closeDoc();else dv.remove();return}
@@ -20049,6 +20051,33 @@ document.addEventListener("click", function (e) {
     "}"
   ].join("\n");
   document.head.appendChild(st);
+})();
+
+/* ---- app-v5-zzzzzzzzzzzd-nova.js ---- */
+/* =====================================================================
+   v5 · Nova (the ✦ button, bottom right) opens at the first tap, and closes properly.
+   - The button sits clearly above the bottom bar, and no blue tap square appears on it.
+   - Opening is taken care of first, so nothing above it can take the tap.
+   The Android back button closing Nova is in app-v5-zzzo-nav.js.
+   ===================================================================== */
+(function () {
+  var st = document.createElement("style");
+  st.textContent = [
+    "#aiFab,#aiPanel button,#aiPanel a{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none}",
+    "#aiFab:focus{outline:none}",
+    "#aiFab:focus-visible{outline:2px solid #EBD7A8;outline-offset:3px}",
+    "@media (max-width:760px){#aiFab{bottom:calc(100px + env(safe-area-inset-bottom,0px))!important;right:14px!important;min-width:56px;min-height:56px;justify-content:center}}"
+  ].join("");
+  document.head.appendChild(st);
+
+  // the open button: handled first, so a tap always opens Nova
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("#aiFab");
+    if (!b || b.hidden) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (typeof aiOpen === "function") aiOpen();
+  }, true);
 })();
 
 /* ==== v4 END ==== */
