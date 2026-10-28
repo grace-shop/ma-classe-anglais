@@ -5661,7 +5661,7 @@ const CALL_ICE=(()=>{const ice=[{urls:"stun:stun.l.google.com:19302"},{urls:"stu
   const c=window.APP_CONFIG||{},urls=String(c.turnUrls||"").split(",").map(x=>x.trim()).filter(Boolean);
   if(urls.length&&c.turnUser&&c.turnPass)ice.push({urls,username:c.turnUser,credential:c.turnPass});
   return ice})();
-const CALL={id:null,host:null,kind:"duo",video:false,group:null,others:[],peers:{},local:null,screen:null,joined:false,micOn:true,camOn:false,ring:null,ringT:null,timer:null,clock:null,t0:0,pick:new Set(),cands:null};
+const CALL={shares:{},id:null,host:null,kind:"duo",video:false,group:null,others:[],peers:{},local:null,screen:null,joined:false,micOn:true,camOn:false,ring:null,ringT:null,timer:null,clock:null,t0:0,pick:new Set(),cands:null};
 const CALL_TEST=()=>!!window.__callBus;   /* automated tests replace the database with a local bus */
 let CALL_UID=null;
 
@@ -5676,6 +5676,8 @@ let CALL_UID=null;
 .call-grid.n5,.call-grid.n6,.call-grid.n7,.call-grid.n8,.call-grid.n9{grid-template-columns:1fr 1fr 1fr}
 .call-tile{position:relative;border-radius:22px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);aspect-ratio:3/4;display:grid;place-items:center;min-height:0}
 .call-tile video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}
+.call-tile.zz-shared video{object-fit:contain;background:#000}
+.call-tile.zz-shared{aspect-ratio:auto;min-height:50vh;grid-column:1/-1;background:#000}
 .call-tile.on video{opacity:1}
 .call-av{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;font-size:1.5rem;font-weight:800;background:linear-gradient(120deg,#5EEAD4,#818CF8);color:#06201C}
 .call-tile.on .call-av{display:none}
@@ -5709,7 +5711,7 @@ ICONS.camoff=ICONS.camoff||'<path d="M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 
 const callMyName=()=>(S.me&&S.me.name)||(S.who&&S.who.email)||"Classmate";
 /* the video sent to the others: my shared screen when I share it, otherwise my camera */
 function callVideoOut(){if(CALL.screen){const t=CALL.screen.getVideoTracks()[0];if(t&&t.readyState==="live")return t}return (CALL.local&&CALL.local.getVideoTracks()[0])||null}
-function callSendVideo(){for(const P of Object.values(CALL.peers))if(P.tv)P.tv.sender.replaceTrack(callVideoOut()).catch(()=>{})}
+function callSendVideo(){for(const P of Object.values(CALL.peers))if(P.tv)P.tv.sender.replaceTrack(callVideoOut()).catch(()=>{});for(const u of Object.keys(CALL.peers))callSendTo(CALL.id,u,"screen",{on:!!CALL.screen})}
 function callName(uid){const m=Object.values(GR.mem||{}).flat().find(x=>x.uid===uid);return dispName(uid,(m&&m.who&&m.who.name)||(CALL.names&&CALL.names[uid])||"Classmate")}
 function callErr(e){return (e&&e.message)||"The call could not start"}
 function callRpc(fn,args){
@@ -5753,6 +5755,7 @@ function onCallSignal(r){
       if(!CALL.others.includes(from))CALL.others.push(from);
       callPeer(from);callOffer(from);callScreenSync();return;
     case"offer":callOnOffer(from,p.sdp);return;
+    case"screen":CALL.shares[from]=!!p.on;callScreenSync();return;
     case"answer":callOnAnswer(from,p.sdp);return;
     case"ice":callOnIce(from,p.c);return;
     case"leave":
@@ -5800,6 +5803,7 @@ function callAttachLocal(P){
 }
 function callDropPeer(uid){const P=CALL.peers[uid];callRemoteAudioEnd(uid);if(P){try{P.pc.close()}catch(e){}}delete CALL.peers[uid];CALL.others=CALL.others.filter(x=>x!==uid);callScreenSync()}
 async function callOffer(uid){
+  if(CALL.screen)callSendTo(CALL.id,uid,"screen",{on:true});
   const P=callPeer(uid);
   try{const off=await P.pc.createOffer();await P.pc.setLocalDescription(off);callSendTo(CALL.id,uid,"offer",{sdp:P.pc.localDescription.sdp})}catch(e){console.warn(e)}
 }
@@ -6014,6 +6018,7 @@ function callScreenSync(){
   const localKey=(CALL.local?CALL.local.getTracks().map(t=>t.id).join(","):"");
   const me=callTileEl(grid,"me",callMyName());
   me.classList.toggle("on",CALL.camOn||!!CALL.screen);
+  me.classList.toggle("zz-shared",!!CALL.screen);
   const mv=me.querySelector("video");
   const myKey=localKey+"|"+(CALL.screen?CALL.screen.id:"");
   if((CALL.local||CALL.screen)&&mv.dataset.k!==myKey){mv.srcObject=new MediaStream(CALL.screen?CALL.screen.getVideoTracks():CALL.local.getTracks());mv.dataset.k=myKey}
@@ -6024,6 +6029,7 @@ function callScreenSync(){
     const v=t.querySelector("video");
     const live=P&&P.stream&&P.stream.getVideoTracks().some(x=>x.readyState==="live"&&!x.muted);
     t.classList.toggle("on",!!live);
+    t.classList.toggle("zz-shared",!!CALL.shares[u]);
     const sig=P&&P.stream?P.stream.id:"";
     if(P&&P.stream&&v.dataset.k!==sig){v.srcObject=P.stream;v.dataset.k=sig;v.play&&v.play().catch(()=>{})}
     if(!P){t.querySelector(".call-nm").textContent=callName(u)+" · calling…"}
@@ -12420,9 +12426,11 @@ body header.top .iconbtn .count,body header.top .iconbtn .badge{color:#0B0D18!im
     grid.classList.toggle("zz-swap", swap);
 
     var big = null;
+    var shared = tiles.filter(function (t) { return t.classList.contains("zz-shared"); })[0];
     if (swap) {
       var keys = tiles.map(function (t) { return t.dataset.u; });
-      if (bigKey && keys.indexOf(bigKey) !== -1) big = bigKey;
+      if (shared) big = shared.dataset.u;
+      else if (bigKey && keys.indexOf(bigKey) !== -1) big = bigKey;
       else big = keys.filter(function (k) { return k !== "me"; })[0] || keys[0];
     }
     tiles.forEach(function (t) {

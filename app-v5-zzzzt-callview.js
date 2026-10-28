@@ -23,9 +23,11 @@
     grid.classList.toggle("zz-swap", swap);
 
     var big = null;
+    var shared = tiles.filter(function (t) { return t.classList.contains("zz-shared"); })[0];
     if (swap) {
       var keys = tiles.map(function (t) { return t.dataset.u; });
-      if (bigKey && keys.indexOf(bigKey) !== -1) big = bigKey;
+      if (shared) big = shared.dataset.u;
+      else if (bigKey && keys.indexOf(bigKey) !== -1) big = bigKey;
       else big = keys.filter(function (k) { return k !== "me"; })[0] || keys[0];
     }
     tiles.forEach(function (t) {
