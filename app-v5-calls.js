@@ -332,7 +332,12 @@ function callScreenShow(){
   callScreenSync();
 }
 function callScreenHide(){const el=document.getElementById("callScr");if(el)el.hidden=true;clearInterval(CALL.clock);CALL.clock=null}
+/* a video that has a picture but stays paused (the browser can stop autoplay when its stream arrives late) is started again */
+function callNudgeVideo(){
+  document.querySelectorAll("#csGrid video").forEach(v=>{if(v.paused&&v.srcObject){const p=v.play();if(p&&p.catch)p.catch(()=>{})}});
+}
 function callScreenStatus(){
+  callNudgeVideo();
   const s=document.getElementById("csStatus");if(!s)return;
   const n=Object.values(CALL.peers).filter(P=>P.state==="connected").length;
   const t=Math.floor((Date.now()-CALL.t0)/1000);
