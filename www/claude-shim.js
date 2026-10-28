@@ -806,8 +806,9 @@
       return error ? say(frErr(error.message)) : say("A link to change your password has just been sent to " + email + ".", true);
     }
   });
-  document.addEventListener("submit", async (e) => {
-    const f = e.target.closest && e.target.closest("#authGate form"); if (!f) return; e.preventDefault(); e.stopImmediatePropagation();
+  async function onAuthSubmit(f) {
+    console.log("[auth] submit", f.dataset.f);
+    if (f.dataset.f !== "newpass" && f.dataset.f !== "otp" && !f.checkValidity()) { say("Please fill in every field correctly (password: at least 6 characters)."); return; }
     if (f.dataset.f === "otpreq") return await sendOtp();
     if (f.dataset.f === "otp") return await verifyOtpCode();
     const v = (id) => ((document.getElementById(id) || {}).value || "").trim();
@@ -826,7 +827,11 @@
     } catch (err) {
       say(errText(err));
     } finally { if (btn && btn.isConnected) { btn.disabled = false; btn.textContent = btnTxt; } }
-  }, true);
+  }
+  // the form can be sent from the submit event OR straight from the button click: the click path works even when
+  // something on the page prevents the native submit (the button was seen to receive the click, but no submit followed)
+  document.addEventListener("submit", (e) => { const f = e.target.closest && e.target.closest("#authGate form"); if (!f) return; e.preventDefault(); e.stopImmediatePropagation(); onAuthSubmit(f); }, true);
+  document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest("#authGate form button[type=submit]"); if (!b || !b.form) return; e.preventDefault(); e.stopImmediatePropagation(); onAuthSubmit(b.form); }, true);
 
   /* ---------------- contenu de départ (première connexion de la prof principale) ---------------- */
   async function offerStarterContent() {
