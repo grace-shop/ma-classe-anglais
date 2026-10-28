@@ -19981,39 +19981,63 @@ document.addEventListener("click", function (e) {
       avatar and buttons, the name cut with « … » instead of wrapping.
    ===================================================================== */
 
-/* 1 · after sending, the message field is emptied and its draft is forgotten.
-   The check is made after the send handlers have read the field (they run first),
-   and only when the message really went into the conversation (so a failed send keeps its text). */
+/* 1 · after sending, the message field is emptied, and stays empty.
+   The cause: the chat send handler (set up earlier) calls stopImmediatePropagation on the submit event,
+   so the draft module never got it. The saved draft (mca_draft:…) was then put back in the new field
+   every time the chat was redrawn. This module listens on window, which runs before the handlers,
+   forgets the draft of the sent text, and empties the field once the send has read it. */
 (function () {
   var MAP = { chat: "chatInput", peerchat: "peerInput", staffchat: "staffInput" };
-  function clearField(id, text) {
-    var el = document.getElementById(id);
-    if (!el || (el.value || "").trim() !== text) return;
-    el.value = "";
+  var pending = {};   // id -> { text, until }
+
+  function currentKey(id) {
+    try { var v = S.view; return "mca_draft:" + id + "|" + (v ? v.type + ":" + v.id : "home"); } catch (x) { return ""; }
+  }
+  function forget(id, text) {
     try {
+      var k0 = currentKey(id);
+      if (k0) localStorage.removeItem(k0);
       var pre = "mca_draft:" + id + "|";
       for (var i = localStorage.length - 1; i >= 0; i--) {
         var k = localStorage.key(i);
-        if (k && k.indexOf(pre) === 0) localStorage.removeItem(k);
+        if (k && k.indexOf(pre) === 0 && (localStorage.getItem(k) || "").trim() === text) localStorage.removeItem(k);
       }
     } catch (x) {}
     try { if (S.drafts && S.drafts[id] === text) delete S.drafts[id]; } catch (x) {}
   }
-  function sentOk(id, text) {
-    if (id !== "peerInput") return true;            // teacher chats: the field is emptied by their own handler
-    try { return PR.inbox.some(function (m) { return m.sender === S.uid && (m.body || "") === text; }); } catch (x) { return false; }
+  function tidy(id) {
+    var P = pending[id];
+    if (!P) return;
+    if (Date.now() > P.until) { delete pending[id]; return; }
+    var el = document.getElementById(id);
+    if (!el || (el.value || "").trim() !== P.text) return;
+    var failed = false;
+    try { failed = S.drafts && S.drafts[id] === P.text; } catch (x) {}
+    if (failed) { delete pending[id]; return; }      // the send failed: the text is put back on purpose
+    try { el.blur(); } catch (x) {}
+    el.value = "";
+    forget(id, P.text);
+    delete pending[id];
   }
-  document.addEventListener("submit", function (e) {
+
+  window.addEventListener("submit", function (e) {
     var f = e.target && e.target.dataset && e.target.dataset.f;
     var id = MAP[f];
     if (!id) return;
     var inp = document.getElementById(id);
     var text = inp ? (inp.value || "").trim() : "";
     if (!text) return;
-    [0, 40, 200, 600, 1500, 3000].forEach(function (ms) {
-      setTimeout(function () { if (sentOk(id, text)) clearField(id, text); }, ms);
+    forget(id, text);                                  // the draft goes now, so a redraw cannot bring it back
+    pending[id] = { text: text, until: Date.now() + 6000 };
+    [0, 30, 120, 300, 700, 1500, 3000, 5000].forEach(function (ms) {
+      setTimeout(function () { tidy(id); }, ms);
     });
   }, true);
+
+  // the field can be rebuilt after the send: clear it again if it comes back with the sent text
+  new MutationObserver(function () {
+    Object.keys(pending).forEach(tidy);
+  }).observe(document.body, { childList: true, subtree: true });
 })();
 
 /* 2 · fit the header of a conversation to the screen */
