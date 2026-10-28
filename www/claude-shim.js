@@ -325,6 +325,8 @@
   window.__notif = {
     list: async () => { const { data, error } = await sb.from("notifications").select("*").order("created_at", { ascending: false }).limit(80); if (error) throw new Error(error.message || "x"); return data || []; },
     read: async (ids) => { await sb.rpc("mark_notifs_read", { p_ids: ids && ids.length ? ids : null }); },
+    remove: async (ids) => { const { error } = await sb.from("notifications").delete().in("id", ids); if (error) throw new Error(error.message || "x"); },
+    removeAll: async () => { const { error } = await sb.from("notifications").delete().eq("uid", session.user.id); if (error) throw new Error(error.message || "x"); },
     listen: (fn) => {
       try {
         const uid = session && session.user && session.user.id; if (!uid) return () => {};

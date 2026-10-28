@@ -1405,11 +1405,15 @@ async function fShareOut(){const it=fShareItem();if(!it)return;const text=`${it.
 /* chat: videos too */
 {const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img")return fVidTile({p:a.p,t:a.t,d:a.d,e:a.e})+_mb(text,null);return _mb(text,a)}}
 /* ---------------- notifications ---------------- */
-const N={list:[],loaded:false,un:null,uid:null,at:0,markT:null};
+const N={list:[],loaded:false,un:null,uid:null,at:0,markT:null,sw:0,gone:null,goneUid:null};
+/* only the newest notifications are listed; older ones are hidden, not deleted */
+const NSHOW=15;
+/* notifications the person deleted on this phone (kept even if the server delete did not work) */
+function nGone(){if(!N.gone||N.goneUid!==S.uid){N.goneUid=S.uid;N.gone=new Set();try{N.gone=new Set((JSON.parse(localStorage.getItem("mca_notif_gone:"+S.uid)||"[]")).map(String))}catch(e){}}return N.gone}
 const nOn=()=>!!window.__notif&&!!S.uid&&(S.mode==="teacher"?!!(S.isOwner||S.isStaff):!!S.me);
-async function nLoad(){if(!nOn())return;N.at=Date.now();try{N.list=await window.__notif.list();N.loaded=true}catch(e){N.loaded=true}render()}
+async function nLoad(){if(!nOn())return;N.at=Date.now();try{N.list=(await window.__notif.list()).filter(x=>!nGone().has(String(x.id)));N.loaded=true}catch(e){N.loaded=true}render()}
 function nStart(){if(!nOn())return;if(N.uid&&N.uid!==S.uid){try{N.un&&N.un()}catch(e){}N.un=null;N.list=[]}if(N.un)return;N.uid=S.uid;nLoad();
-  N.un=window.__notif.listen(n=>{if(N.list.some(x=>x.id===n.id))return;N.list.unshift(n);nArrive(n);render()})}
+  N.un=window.__notif.listen(n=>{if(nGone().has(String(n.id))||N.list.some(x=>x.id===n.id))return;N.list.unshift(n);nArrive(n);render()})}
 setInterval(()=>{if(!nOn())return;if(!N.un||N.uid!==S.uid)nStart();else if(document.visibilityState==="visible"&&Date.now()-N.at>90000)nLoad()},4000);
 const nName=n=>(n.who&&n.who.name)||"Someone";
 function nTitle(n){const m=nName(n);return({msg:m,story_reply:m,comment:m,like:m,share:m,story_like:m,tmsg:n.who?.role==="teacher"?m:"Your teacher",smsg:m,staff:m})[n.kind]||"English Classes"}
@@ -1425,15 +1429,30 @@ async function nSys(title,body,tag,skipNative){try{
   if(r&&r.showNotification)r.showNotification(title,o);else new Notification(title,o)}catch(e){}}
 function nPermState(){if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())return typeof notifOn==="function"&&notifOn()?"granted":"default";return"Notification"in window?Notification.permission:"unsupported"}
 function nBell(){const h=document.getElementById("hdr");if(!h)return;let b=h.querySelector('[data-v4="nOpen"]');if(!nOn()){if(b)b.remove();return}
-  const n=N.list.filter(x=>!x.read_at).length;if(!b){h.insertAdjacentHTML("afterbegin",`<button class="iconbtn nbell" data-v4="nOpen" aria-label="Notifications" title="Notifications">${BELL}<span class="nbadge" hidden></span></button>`);b=h.querySelector('[data-v4="nOpen"]')}
+  const n=N.list.slice(0,NSHOW).filter(x=>!x.read_at).length;if(!b){h.insertAdjacentHTML("afterbegin",`<button class="iconbtn nbell" data-v4="nOpen" aria-label="Notifications" title="Notifications">${BELL}<span class="nbadge" hidden></span></button>`);b=h.querySelector('[data-v4="nOpen"]')}
   const sp=b.querySelector(".nbadge"),t=n?(n>9?"9+":String(n)):"";if(sp.textContent!==t){sp.textContent=t;sp.hidden=!n}}
 function nView(){if(!N.loaded)nLoad();
   if(N.list.some(x=>!x.read_at)&&!N.markT)N.markT=setTimeout(()=>{N.markT=null;if(S.view?.type!=="notifs")return;window.__notif.read(null).catch(()=>{});setTimeout(()=>{for(const x of N.list)if(!x.read_at)x.read_at=new Date().toISOString();render()},4000)},1500);
   const perm=nPermState();
   return`<div class="section" style="max-width:640px;margin-inline:auto">${backBtn()}<div class="row"><span class="nbig">${BELL}</span><div><span class="eyebrow">Activity</span><h2>Notifications</h2></div></div>
   ${perm==="default"?`<div class="glass card row between" style="gap:12px"><span class="small">Get a notification on your phone when someone writes to you or reacts to your posts.</span><button class="btn sm" data-v4="nPerm">Turn on</button></div>`:perm==="denied"?`<p class="hint">Notifications are blocked for this site: allow them in your browser settings.</p>`:""}
-  ${!N.loaded?`<div class="empty">Loading…</div>`:N.list.length?`<div class="glass list">${N.list.map(n=>`<div class="it click${n.read_at?"":" nun"}" data-v4="nGo" data-id="${n.id}" tabindex="0">${n.actor?whoAva(n.who,n.actor,42):`<span class="av">🔔</span>`}<div class="txt"><b>${esc(nTitle(n))}</b><span>${E(nBody(n))}</span><small class="muted">${ago(+new Date(n.created_at))}</small></div>${n.read_at?"":`<i class="ndot" aria-label="New"></i>`}</div>`).join("")}</div>`:`<div class="empty">No notifications yet. When someone writes to you, comments or reacts, you will see it here.</div>`}
+  ${!N.loaded?`<div class="empty">Loading…</div>`:N.list.length?`<div class="nbar"><span class="small muted">${N.list.length>NSHOW?`${NSHOW} newest of ${N.list.length}`:`${N.list.length} notification${N.list.length>1?"s":""}`}</span><button type="button" class="btn sm" data-v4="nClearAll">Delete all</button></div><div class="glass list nlist">${N.list.slice(0,NSHOW).map(nRow).join("")}</div>${N.list.length>NSHOW?`<p class="hint nold">Older notifications are hidden.</p>`:""}`:`<div class="empty">No notifications yet. When someone writes to you, comments or reacts, you will see it here.</div>`}
   </div>`}
+/* one notification row: swipe it to the left to delete it */
+function nRow(n){return`<div class="nrow"><div class="nbg" aria-hidden="true">Delete</div><div class="it click${n.read_at?"":" nun"}" data-v4="nGo" data-id="${n.id}" tabindex="0">${n.actor?whoAva(n.who,n.actor,42):`<span class="av">🔔</span>`}<div class="txt"><b>${esc(nTitle(n))}</b><span>${E(nBody(n))}</span><small class="muted">${ago(+new Date(n.created_at))}</small></div>${n.read_at?"":`<i class="ndot" aria-label="New"></i>`}</div></div>`}
+function nRemove(ids,all){ids=ids.map(String);const g=nGone();ids.forEach(i=>g.add(i));try{localStorage.setItem("mca_notif_gone:"+S.uid,JSON.stringify([...g].slice(-500)))}catch(e){}
+  N.list=N.list.filter(x=>!g.has(String(x.id)));render();
+  try{(all?window.__notif.removeAll():window.__notif.remove(ids)).catch(()=>{})}catch(e){}}
+function nClearAll(){const ids=N.list.map(x=>String(x.id));if(!ids.length)return;nRemove(ids,true);toast("Notifications deleted","check")}
+let nDrag=null;
+document.addEventListener("pointerdown",e=>{const it=e.target.closest&&e.target.closest(".nrow > .it");if(!it||e.button!==0)return;nDrag={it,row:it.parentElement,x:e.clientX,y:e.clientY,dx:0,on:false,id:it.dataset.id}},true);
+document.addEventListener("pointermove",e=>{if(!nDrag)return;const dx=e.clientX-nDrag.x,dy=e.clientY-nDrag.y;
+  if(!nDrag.on){if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){nDrag=null;return}if(dx>-10)return;nDrag.on=true}
+  nDrag.dx=Math.min(0,dx);nDrag.it.style.transition="none";nDrag.it.style.transform="translateX("+nDrag.dx+"px)";nDrag.row.style.setProperty("--sw",Math.min(1,-nDrag.dx/100))},true);
+function nDragEnd(){const d=nDrag;nDrag=null;if(!d||!d.on)return;N.sw=Date.now();
+  if(-d.dx>100){d.it.style.transition="transform .2s ease, opacity .2s";d.it.style.transform="translateX(-110%)";d.it.style.opacity="0";setTimeout(()=>nRemove([d.id],false),200)}
+  else{d.it.style.transition="transform .2s ease";d.it.style.transform="";d.row.style.setProperty("--sw","0")}}
+document.addEventListener("pointerup",nDragEnd,true);document.addEventListener("pointercancel",nDragEnd,true);
 function nGo(id){const n=N.list.find(x=>String(x.id)===String(id));if(!n)return;if(!n.read_at){n.read_at=new Date().toISOString();window.__notif.read([n.id]).catch(()=>{})}const r=n.ref||"";S.animate=true;
   if(r.startsWith("peer:")&&S.mode==="student"&&peerOn()){const u=r.slice(5);S.view={type:"peer",id:u};PR.with=u;peerStart();peerMarkRead(u)}
   else if(r==="chat"&&S.mode==="student"){S.view={type:"chat",id:S.uid};subChat(S.uid)}
@@ -1460,7 +1479,8 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"fSvSnd":{F.svMute=false;const v=document.getElementById("fsvVid");if(v){v.muted=false;v.play().catch(()=>{})}const h=document.getElementById("fsvhost");const b=h&&h.querySelector(".fsv-snd");if(b)b.remove();return}
   case"vplay":vPlay(el.dataset.p,el.dataset.t,el.dataset.e);return;
   case"nOpen":S.view={type:"notifs"};S.animate=true;scrollTo(0,0);render();return;
-  case"nGo":nGo(id);return;
+  case"nGo":if(Date.now()-N.sw<400)return;nGo(id);return;
+  case"nClearAll":nClearAll();return;
   case"nPerm":nAskPerm();return;
   }},true);
 document.addEventListener("input",e=>{if(e.target&&e.target.id==="fsh_q"&&F.share){F.share.q=e.target.value;const h=document.getElementById("fsvhost");if(h)h._h="";feedSync()}});

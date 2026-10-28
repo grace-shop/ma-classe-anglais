@@ -123,11 +123,18 @@
     return '<div class="rt-group"><div class="rt-title"><span>' + ICON[kind] + "</span><b>" + title + "</b></div>" + rows + extra + "</div>";
   }
   rtPickersHTML = function () {
-    return '<div class="rt-wrap">' + group("call", "Call ringtone") + group("notif", "Notification sound") + "</div>";
+    return '<details class="rt-fold"><summary><span>🎵</span><b>Ringtones</b><small>Tap to open or close</small></summary><div class="rt-wrap">' + group("call", "Call ringtone") + group("notif", "Notification sound") + "</div></details>";
   };
 
   var CSS = [
     ".rt-wrap{display:grid;gap:18px;margin-top:8px}",
+    ".rt-fold{border-radius:18px;border:1px solid rgba(160,140,255,.3);background:rgba(255,255,255,.03);padding:4px 12px}",
+    ".rt-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 4px;font-size:1.05rem}",
+    ".rt-fold>summary::-webkit-details-marker{display:none}",
+    ".rt-fold>summary::after{content:\"▾\";margin-left:auto;transition:transform .2s}",
+    ".rt-fold[open]>summary::after{transform:rotate(180deg)}",
+    ".rt-fold>summary small{opacity:.6;font-size:.8rem}",
+    ".rt-fold[open]>summary small{display:none}",
     ".rt-group{display:grid;gap:8px;padding:12px;border-radius:18px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(160,140,255,.25);box-shadow:0 0 18px rgba(140,110,255,.12)}",
     ".rt-title{display:flex;align-items:center;gap:8px;margin:2px 4px 4px;font-size:1.02rem}",
     ".rt-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;border:1px solid rgba(255,255,255,.08);transition:box-shadow .2s,border-color .2s}",
