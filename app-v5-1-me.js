@@ -27,13 +27,15 @@ document.addEventListener("keydown",e=>{if(V4.docProt&&(e.ctrlKey||e.metaKey)&&/
 
 /* ---- Classmates list: pin, archive, mute, nicknames (like WhatsApp) ---- */
 V5.showArch=false;
+/* unsent text saved on this phone for each classmate (see the drafts module) */
+function peerDraftText(uid){try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k.indexOf("mca_draft:peerInput|")!==0)continue;const w=k.split("|")[1]||"";if(w.split(":").slice(1).join(":")===uid){const v=(localStorage.getItem(k)||"").trim();if(v)return v}}}catch(e){}return ""}
 peersView=function(){const me=S.uid,last={},un={};
   for(const m of PR.inbox){const o=m.sender===me?m.receiver:m.sender;if(!last[o])last[o]=m;if(m.receiver===me&&!m.read_at&&!m.deleted_at)un[m.sender]=(un[m.sender]||0)+1}
   const q=(S.drafts.peer_q||"").trim().toLowerCase(),t=m=>m?+new Date(m.created_at):0,pin=u=>((v5Prefs().conv["peer:"+u]||{}).pin)||0;
-  const all=PR.dir.filter(x=>!BL.set.has(x.uid)&&frState(x.uid)==="friends").filter(x=>!q||x.name.toLowerCase().includes(q)||nickOf(x.uid).toLowerCase().includes(q)).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid],pin:pin(x.uid),arch:convHas("peer:"+x.uid,"arch"),mute:convHas("peer:"+x.uid,"mute")}));
-  const sort=(a,b)=>(!!b.pin-!!a.pin)||(b.pin-a.pin)||(b.un-a.un)||(t(b.last)-t(a.last))||(b.on-a.on)||a.name.localeCompare(b.name);
+  const all=PR.dir.filter(x=>!BL.set.has(x.uid)&&frState(x.uid)==="friends").filter(x=>!q||x.name.toLowerCase().includes(q)||nickOf(x.uid).toLowerCase().includes(q)).map(x=>({...x,on:!!S.peers[x.uid],un:un[x.uid]||0,last:last[x.uid],pin:pin(x.uid),dr:!!peerDraftText(x.uid),arch:convHas("peer:"+x.uid,"arch"),mute:convHas("peer:"+x.uid,"mute")}));
+  const sort=(a,b)=>(!!b.pin-!!a.pin)||(b.pin-a.pin)||(!!b.dr-!!a.dr)||(b.un-a.un)||(t(b.last)-t(a.last))||(b.on-a.on)||a.name.localeCompare(b.name);
   const rows=all.filter(x=>q||!x.arch).sort(sort),arch=all.filter(x=>x.arch).sort(sort);
-  const row=x=>{const nk=nickOf(x.uid),prev=x.last?((x.last.sender===me?"You: ":"")+String(x.last.deleted_at?"⊘ Message deleted":(v4Plain(x.last.body)||attLabel(x.last.att))).slice(0,60)):((x.classe?CL(x.classe)+(x.same?" · your class":""):"")||"Say hello!");
+  const row=x=>{const nk=nickOf(x.uid),dtxt=peerDraftText(x.uid),prev=dtxt?("Draft: "+dtxt).slice(0,60):x.last?((x.last.sender===me?"You: ":"")+String(x.last.deleted_at?"⊘ Message deleted":(v4Plain(x.last.body)||attLabel(x.last.att))).slice(0,60)):((x.classe?CL(x.classe)+(x.same?" · your class":""):"")||"Say hello!");
     return`<div class="it click pv-row${x.un?" pv-un":""}" data-a="openPeer" data-id="${x.uid}" tabindex="0">${avatar(x.uid,x.name)}<div class="txt"><b>${esc(nk||x.name)}${nk?` <small class="muted">${esc(x.name)}</small>`:""}${x.on?` <span class="pv-on" title="Online"></span>`:""}</b><span>${esc(prev)}</span></div>
     <div class="pv-meta"><small>${x.last?fmtTime(t(x.last)):""}</small><span class="row" style="gap:4px">${x.pin?`<i class="pv-ic" title="Pinned">📌</i>`:""}${x.mute?`<i class="pv-ic" title="Muted">🔕</i>`:""}${x.un?`<span class="pv-badge">${x.un}</span>`:""}</span></div>
     <button type="button" class="iconbtn sm pv-more" data-v4="pvMore" data-id="${x.uid}" aria-label="Options for ${esc(nk||x.name)}">⋯</button></div>`};

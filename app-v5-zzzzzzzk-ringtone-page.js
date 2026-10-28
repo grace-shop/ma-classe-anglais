@@ -19,12 +19,12 @@
 document.addEventListener("click", function (e) {
   var b = e.target.closest && e.target.closest("[data-rt-fold]");
   if (!b) return;
-  e.preventDefault();
+  e.preventDefault(); e.stopImmediatePropagation();
   var open = false;
   try { open = localStorage.getItem("ec_rt_fold") === "open"; } catch (x) {}
   try { localStorage.setItem("ec_rt_fold", open ? "closed" : "open"); } catch (x) {}
   render();
-}, false);
+}, true);
 (function () {
   var st = document.createElement("style");
   st.textContent = ".rt-fold{display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;background:none;border:0;color:inherit;font:inherit;font-size:1.15rem;font-weight:700;padding:2px 0;cursor:pointer;text-align:left}.rt-fold:focus-visible{outline:2px solid #a78bfa;outline-offset:4px;border-radius:8px}.rt-chev{font-size:1.1rem;opacity:.75}";
