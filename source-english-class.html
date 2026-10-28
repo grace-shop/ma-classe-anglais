@@ -3667,14 +3667,19 @@ Answer only in JSON: {"status":"ok" or "french" or "mistakes","english":"the cor
   return{k:st==="french"?"fr":"fix",en:en.slice(0,480)}}catch(e){return null}}
 function v4Pack(fr,en,k){const mk=k==="fix"?V4MK2:V4MK,room=1000-mk.length-en.length;return(fr.length>room?fr.slice(0,Math.max(0,room-1))+"…":fr)+mk+en}
 async function v4TextSend(kind,f){const id=V4IN(kind),inp=document.getElementById(id),orig=(inp&&inp.value||"").trim();if(!orig)return;
-  if(kind==="peer"&&(PR.sending||V4.fixing))return;
+  if(kind==="peer"&&PR.sending)return;
   if(kind==="peer"&&!navigator.onLine){toast("No network: try again when you are online.","x");return}
   const tgt=f.dataset.s,hadFocus=document.activeElement===inp;if(inp)inp.value="";delete S.drafts[id];
   let text=orig;
-  if(v4NeedFix(orig)){V4.fixing=kind;render();const r=await v4Check(orig);V4.fixing=null;if(r)text=v4Pack(orig,r.en,r.k)}
-  if(kind==="peer")PR.sending=true;render();
+  // the grammar check never holds a message back: if it answers within 1.5 s its correction is added, otherwise the message goes at once
+  if(v4NeedFix(orig)){const r=await Promise.race([v4Check(orig),new Promise(res=>setTimeout(()=>res(null),1500))]);if(r)text=v4Pack(orig,r.en,r.k)}
+  // the person sees their message at once; it is confirmed (or removed) when the server answers
+  const tmpId="tmp"+Date.now();
+  if(kind==="peer"){PR.sending=true;PR.inbox.unshift({id:tmpId,sender:S.uid,receiver:tgt,body:text,att:null,meta:null,created_at:new Date().toISOString(),read_at:null})}
+  render();
   try{await v4Deliver(kind,tgt,text,null,v4TakeReply(kind))}catch(e){toast((e&&e.message)||"Could not send","x");S.drafts[id]=orig}
-  if(kind==="peer")PR.sending=false;render();
+  if(kind==="peer"){PR.inbox=PR.inbox.filter(x=>x.id!==tmpId);PR.sending=false}
+  render();
   CHAT_STICK.on=true;const cs=document.getElementById("chatScroll");if(cs)cs.scrollTop=cs.scrollHeight;
   if(hadFocus){const n=document.getElementById(id);if(n)n.focus({preventScroll:true})}}
 /* Nova panel: same correction on the learner's bubble */
