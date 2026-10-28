@@ -40,6 +40,10 @@
 
   callToggleScreen = async function () {
     var P = plugin();
+    if (!P && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+      toast("Screen sharing needs the new version of the app (install the latest APK).", "x");
+      return;
+    }
     if (!P) return _toggle.apply(this, arguments);
     if (!CALL.id || !CALL.local) return;
     if (CALL.screen) { callStopScreen(); return; }
