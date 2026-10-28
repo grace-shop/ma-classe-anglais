@@ -120,6 +120,16 @@ Pour qu'un appel continue quand on quitte l'application, il faut reconstruire l'
 
 Limites : un navigateur web ne peut pas garder un appel en arrière-plan. Sur Android, la caméra peut se mettre en pause quand l'application n'est pas visible, même avec le service d'appel actif.
 
+## Partage d'écran pendant un appel (Android)
+
+Le navigateur intégré de l'application Android ne permet pas le partage d'écran. Une version native existe dans `android-extras/screenshare/` :
+
+1. `python3 scripts/inject-v4.py && python3 build.py`
+2. `npx cap sync android` (le script `scripts/patch-android.mjs` copie le plugin, ajoute les permissions et enregistre le plugin)
+3. Générer le nouvel APK dans Android Studio.
+
+Limites : le partage envoie environ 3 images par seconde (fluide pour des diapositives, pas pour une vidéo). Il faut autoriser la capture d'écran à chaque partage, et une notification reste affichée pendant le partage.
+
 ## Bon à savoir
 
 - **Projet gratuit en pause** : sur l'offre gratuite de Supabase, un projet sans aucune connexion pendant 7 jours est mis en pause (vacances !). Il suffit de cliquer *Restore* dans Supabase ; aucune donnée n'est perdue. L'offre Pro (25 $/mois) supprime les pauses.
