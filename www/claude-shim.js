@@ -630,7 +630,7 @@
   const telEmail = (v) => telDigits(v) + "@" + TEL_DOMAIN;
   window.__isTelEmail = (e) => String(e || "").toLowerCase().endsWith("@" + TEL_DOMAIN);
   window.__telOf = (e) => { const d = String(e || "").split("@")[0]; return d.startsWith("228") && d.length === 11 ? "+228 " + d.slice(3).replace(/(\d\d)(?=\d)/g, "$1 ") : "+" + d; };
-  const loginId = () => { const raw = ((document.getElementById("agE") || {}).value || "").trim(); if (idMode !== "tel") return { email: raw }; const d = telDigits(raw); return telOk(d) ? { email: telEmail(raw) } : { err: "Invalid number: write your phone number, for example 90 12 34 56." }; };
+  const loginId = () => { const raw = ((document.getElementById("agE") || {}).value || "").trim(); if (idMode !== "tel" || raw.includes("@")) return { email: raw }; const d = telDigits(raw); return telOk(d) ? { email: telEmail(raw) } : { err: "Invalid number: write your phone number, for example 90 12 34 56." }; };
   const G = `<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2c-2 1.5-4.5 2.4-7.2 2.4-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
   const CSS3 = `#authGate{position:fixed;top:0;left:0;right:0;bottom:auto;height:100vh;height:100lvh;z-index:200;display:block!important;overflow-y:auto;overscroll-behavior:contain;padding:0!important;background:radial-gradient(120% 60% at 50% -5%,#B9E6FA 0%,#7CCBF2 42%,#4FB3E6 100%)!important}
 #authGate .lg{width:min(440px,100%);min-height:100%;margin:0 auto;display:flex;flex-direction:column;box-sizing:border-box;color:#fff;font-family:Manrope,system-ui,sans-serif}
@@ -683,7 +683,7 @@
     const isIn = mode === "in", isUp = mode === "up", reset = mode === "newpass";
     const eyeBtn = `<button type="button" class="eye" data-x="eye" aria-label="Show password" title="Show password"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>`;
     const phone = idMode === "tel";
-    const idField = `<label>${phone ? "Phone number" : "E-mail"}<input id="agE" ${phone ? 'type="tel" inputmode="tel" autocomplete="tel" placeholder="90 12 34 56" maxlength="20"' : 'type="email" autocomplete="email" placeholder="your.email@gmail.com"'} required></label>`;
+    const idField = `<label>${phone ? "Phone number or e-mail" : "E-mail"}<input id="agE" ${phone ? 'type="text" inputmode="text" autocomplete="username" placeholder="90 12 34 56 or your.email@gmail.com"' : 'type="email" autocomplete="email" placeholder="your.email@gmail.com"'} required></label>`;
     const pwField = (ac, ph) => `<label>Password<span class="pw"><input id="agP" type="password" required minlength="6" autocomplete="${ac}" placeholder="${ph}">${eyeBtn}</span></label>`;
     const seg = isIn || isUp ? `<div class="lg-seg" role="group" aria-label="Account"><button type="button" data-x="in" aria-pressed="${isIn}">Sign In</button><button type="button" data-x="up" aria-pressed="${isUp}">Sign Up</button></div>` : "";
     const social = CFG.googleEnabled === false ? "" : `<div class="lg-or">or continue with</div><button type="button" class="lg-soc" data-x="google">${G}Google</button>`;
@@ -712,7 +712,7 @@
       const upT = mode === "up";
       const eyeT = `<button type="button" class="tw-eye" data-x="eye" aria-label="Show password"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>`;
       const phoneT = idMode === "tel";
-      const idT = `<input id="agE" ${phoneT ? 'type="tel" inputmode="tel" placeholder="Phone number"' : 'type="email" autocomplete="email" placeholder="Email"'} required>`;
+      const idT = `<input id="agE" ${phoneT ? 'type="text" inputmode="text" autocomplete="username" placeholder="Phone number or e-mail"' : 'type="email" autocomplete="email" placeholder="Email"'} required>`;
       const pwT = `<span class="tw-pw"><input id="agP" type="password" minlength="6" required autocomplete="${upT ? "new-password" : "current-password"}" placeholder="Password">${eyeT}</span>`;
       const nameT = `<input id="agN" required maxlength="60" autocomplete="name" placeholder="Name">`;
       const formT = upT
