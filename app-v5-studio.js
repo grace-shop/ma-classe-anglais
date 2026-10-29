@@ -259,7 +259,7 @@ function avtSVG(raw,gest,size){return sxAvt(raw,gest,size)}
 /* ---------- avatar builder ---------- */
 function avtView(){
   const me=S.me||{};
-  const d=AV.draft||(AV.draft={...avtOf(me.avt),bio:me.bio||""});
+  const d=AV.draft||(AV.draft={...avtOf(me.avt),bio:me.bio||"",name:me.name||""});
   const G=+d.g?1:0;
   const chips=(k,names)=>`<div class="sx-opts">${names.map((x,i)=>`<button type="button" class="sx-opt ${d[k]===i?"on":""}" data-v4="avPart" data-k="${k}" data-n="${i}" aria-pressed="${d[k]===i}">${esc(x)}</button>`).join("")}</div>`;
   const sw=(k,cols,label)=>`<div class="sx-swatches">${cols.map((c,i)=>`<button type="button" class="sx-sw ${d[k]===i?"on":""}" style="background:${typeof c==="string"?c:`linear-gradient(135deg,${c[0]},${c[1]})`}" data-v4="avPart" data-k="${k}" data-n="${i}" aria-label="${label} ${i+1}" aria-pressed="${d[k]===i}"></button>`).join("")}</div>`;
@@ -279,6 +279,7 @@ function avtView(){
       ${sec("Outfit colour",sw("outfit",AV.outfit,"Outfit colour"))}
       ${sec("Accessories",chips("acc",G?["None","Glasses","Headphones"]:["None","Glasses","Headphones","Earrings"]))}
       ${sec("Background",sw("bg",AV.bg,"Background"))}
+      <label class="sx-bio"><span class="sx-lab">Your name (2 to 40 letters)</span><input id="avName" maxlength="40" autocomplete="name" value="${esc(d.name!=null?d.name:(me.name||""))}" placeholder="Your name" style="width:100%;box-sizing:border-box;border-radius:14px;padding:10px 12px;border:1px solid rgba(255,255,255,.18);background:rgba(10,12,30,.28);color:#fff;font:inherit"></label>
       <label class="sx-bio"><span class="sx-lab">Bio</span><textarea id="avBio" maxlength="150" placeholder="A few words about you">${esc(d.bio||"")}</textarea></label>
       <button type="button" class="sx-pill big" data-v4="avSave">${sxIc("spark")}<span>Save my avatar and bio</span></button>
     </div></div>`}
