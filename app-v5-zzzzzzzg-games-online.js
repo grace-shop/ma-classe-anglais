@@ -8,7 +8,7 @@
   var ZGUI = window.ZGUI;
   if (!ZGUI) return;
   var ZG = window.ZG;
-  var POLL_MS = 1400;
+  var POLL_MS = 800;
 
   function sb() { return window.__sb; }
   function me() { return (typeof S !== "undefined" && S.uid) || ""; }
@@ -38,7 +38,7 @@
     if (game === "chess") return { st: ZG.chess.start(), v: 1, cols: [cols[0], cols[0] === "w" ? "b" : "w"] };
     if (game === "morris") return { st: ZG.morris.start(), v: 1, cols: [cols[0], cols[0] === 0 ? 1 : 0] };
     if (game === "ttt") return { st: ZG.ttt.start(), v: 1, cols: [0, 1] };
-    var other = [0, 1, 2, 3].filter(function (c) { return c !== cols[0]; })[0];
+    var other = (cols[0] + 2) % 4; // two players face each other
     return { st: ZG.ludo.start(2, [cols[0], other]), v: 1, cols: [cols[0], other] };
   }
   // côté du joueur 0 de la partie (chess : blanc = 0, noir = 1)
@@ -54,16 +54,36 @@
   };
 
   /* ---- lire les coups de l'autre joueur pendant la partie ---- */
+  // a new version of the match (from the live channel or from the poll): show it right away
+  function applyRow(row) {
+    var G = ZGUI.current && ZGUI.current();
+    if (!G || G.mode !== "online" || !row || row.id !== G.id || G.over) return;
+    if (row.status === "declined") { note(G.oppName + " declined", "x"); ZGUI.close(); return; }
+    if (row.state && row.state.v > G.v) ZGUI.adopt(row.state.st, row.state.v, row.state.cols);
+    else if (row.status === "over" && row.state && !G.over) ZGUI.adopt(row.state.st, row.state.v, row.state.cols);
+  }
+  // live channel: the move arrives the moment it is saved (needs supabase/jeux-ttt.sql once); the poll below is the safety net
+  var RT = { id: null, ch: null };
+  function ensureChannel(G) {
+    var want = G && G.mode === "online" && G.id ? G.id : null;
+    if (RT.id === want) return;
+    if (RT.ch) { try { sb().removeChannel(RT.ch); } catch (e) {} RT.ch = null; }
+    RT.id = want;
+    if (!want) return;
+    try {
+      RT.ch = sb().channel("zg-" + want + "-" + Math.random().toString(36).slice(2, 6))
+        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "game_matches", filter: "id=eq." + want }, function (pl) { try { applyRow(pl && pl.new); } catch (e) {} })
+        .subscribe();
+    } catch (e) { RT.ch = null; }
+  }
   setInterval(async function () {
     var G = ZGUI.current && ZGUI.current();
-    if (!G || G.mode !== "online" || !G.id || !sb() || G.over) return;
+    if (!sb()) return;
+    ensureChannel(G);
+    if (!G || G.mode !== "online" || !G.id || G.over) return;
     try {
       var r = await sb().from("game_matches").select("*").eq("id", G.id).single();
-      var row = r && r.data;
-      if (!row) return;
-      if (row.status === "declined") { note(G.oppName + " declined", "x"); ZGUI.close(); return; }
-      if (row.state && row.state.v > G.v) ZGUI.adopt(row.state.st, row.state.v, row.state.cols);
-      else if (row.status === "over" && row.state && !G.over) ZGUI.adopt(row.state.st, row.state.v, row.state.cols);
+      if (r && r.data) applyRow(r.data);
     } catch (e) {}
   }, POLL_MS);
 
@@ -182,6 +202,7 @@
         };
         if (row.kind === "chess") { openAs([hostCols[0], hostCols[0] === "w" ? "b" : "w"], row.state.st); return; }
         if (row.kind === "ttt") { openAs([0, 1], row.state.st); return; }
+        if (row.kind === "ludo") { var lc = [hostCols[0], (hostCols[0] + 2) % 4]; openAs(lc, ZG.ludo.start(2, lc)); return; }
         var taken = [hostCols[0]];
         ZGUI.pickFor(row.kind, taken, function (mine) {
           var cols = [hostCols[0], mine];

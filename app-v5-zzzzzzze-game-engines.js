@@ -217,7 +217,9 @@
   LU.start = function (n, corners) {
     var toks = [];
     for (var k = 0; k < n; k++) toks.push([-1, -1, -1, -1]);
-    var cor = (corners && corners.length >= n) ? corners.slice(0, n) : [0, 1, 2, 3].slice(0, n);
+    var cor = (corners && corners.length >= n) ? corners.slice(0, n) : (n === 2 ? [3, 1] : [0, 1, 2, 3].slice(0, n));
+    // two players always sit face to face (opposite corners), like in every Ludo app
+    if (n === 2) cor = [cor[0], (cor[0] + 2) % 4];
     var names = ["red", "green", "yellow", "blue"];
     return { n: n, corner: cor, colors: cor.map(function (c) { return names[c]; }), tok: toks, turn: 0, dice: 0, rolled: false, sixes: 0, winner: -1, log: "" };
   };
@@ -257,9 +259,9 @@
     }
     if (info.finished && s.tok[k].every(function (x) { return x === 56; })) s.winner = k;
     s.rolled = false;
-    // a six, or a capture, gives another roll; the third six in a row loses the turn
+    // a six, a capture, or a pawn that reaches home gives another roll; the third six in a row loses the turn
     s.sixes = dice === 6 ? (st.sixes || 0) + 1 : 0;
-    var again = (dice === 6 || info.captured) && s.winner < 0 && s.sixes < 3;
+    var again = (dice === 6 || info.captured || info.finished) && s.winner < 0 && s.sixes < 3;
     if (!again) { s.turn = (s.turn + 1) % s.n; s.sixes = 0; }
     s.dice = 0; s.extra = again; s.forfeit = false;
     s.last = info;
@@ -277,19 +279,50 @@
     s.forfeit = value === 6 && (st.sixes || 0) >= 2; // third six in a row
     return s;
   };
+  // how many opponent pawns could land on track square g with one roll (1 to 6) from where they stand
+  LU.danger = function (st, k, g) {
+    var n = 0;
+    for (var o = 0; o < st.n; o++) {
+      if (o === k) continue;
+      for (var u = 0; u < 4; u++) {
+        var op = st.tok[o][u];
+        if (op < 0 || op > 50) continue;
+        var og = LU.global(st.corner[o], op);
+        var d = (g - og + 52) % 52;
+        // the opponent can only reach g if it is still on its way there (its own home lane is past square 50)
+        if (d >= 1 && d <= 6 && op + d <= 50) n++;
+      }
+    }
+    return n;
+  };
   // the best move for the side to move (dice already rolled)
-  LU.pick = function (st) {
+  // level 0: mostly random, 1: greedy (finish, capture, come out), 2: also avoids danger and uses safe squares
+  LU.pick = function (st, level) {
     var ms = LU.moves(st, st.dice);
     if (!ms.length) return null;
+    if (level === 0 && Math.random() < 0.6) return ms[Math.floor(Math.random() * ms.length)];
     var k = st.turn, best = null, bs = -Infinity;
     ms.forEach(function (m) {
-      var n = LU.apply(st, m), sc = 0;
+      var n = LU.apply(st, m), sc = 0, from = st.tok[k][m.t];
       if (n.last.finished) sc += 1000;
       if (n.last.captured) sc += 300;
-      if (st.tok[k][m.t] === -1) sc += 120;
+      if (from === -1) sc += 120;
       if (m.to <= 50 && LU.global(st.corner[k], m.to) % 13 === 0) sc += 15;
       sc += m.to; // advancing
       if (m.to === 56) sc += 500;
+      if (level >= 2) {
+        // leaving a square where an opponent can hit me is good; landing where one can is bad (safe squares are fine)
+        if (from >= 0 && from <= 50) {
+          var gf = LU.global(st.corner[k], from);
+          if (!LU.isSafe(gf) && LU.danger(st, k, gf) > 0) sc += 45;
+        }
+        if (m.to <= 50) {
+          var gt = LU.global(st.corner[k], m.to);
+          if (LU.isSafe(gt)) sc += 25;
+          else sc -= 40 * LU.danger(n, k, gt);
+        }
+        if (m.to > 50) sc += 30; // inside the home lane nobody can touch it
+      }
       if (sc > bs) { bs = sc; best = m; }
     });
     return best;
@@ -420,11 +453,12 @@
     }
     return best;
   }
-  // level: 0 easy (random), 1 medium (sometimes random), 2 hard (perfect)
+  // level: 0 easy (often random), 1 medium (small slips), 2 hard (perfect)
   function best(st, level) {
     var ms = moves(st);
     if (!ms.length) return null;
-    if (level === 0 || (level === 1 && Math.random() < 0.35)) return ms[Math.floor(Math.random() * ms.length)];
+    var slip = level === 0 ? 0.6 : (level === 1 ? 0.12 : 0);
+    if (Math.random() < slip) return ms[Math.floor(Math.random() * ms.length)];
     var b = st.b.slice(), bestM = ms[0], bestS = -2;
     ms.forEach(function (m) {
       b[m.at] = st.turn;

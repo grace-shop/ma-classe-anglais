@@ -15,3 +15,9 @@ begin
   return id;
 end $$;
 grant execute on function public.game_invite(uuid, text, jsonb) to authenticated;
+
+-- Parties en direct : le coup de l'autre joueur arrive tout de suite (au lieu d'attendre l'actualisation).
+do $$ begin
+  alter publication supabase_realtime add table public.game_matches;
+exception when duplicate_object then null;
+end $$;
