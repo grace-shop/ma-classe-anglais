@@ -88,7 +88,7 @@ const avtFor=uid=>{const p=AV.cache[uid]||(()=>{try{return JSON.parse(localStora
 /* ---- builder screen ---- */
 function avtView(){
   const me=S.me||{};
-  const d=AV.draft||(AV.draft={...avtOf(me.avt),bio:me.bio||""});
+  const d=AV.draft||(AV.draft={...avtOf(me.avt),bio:me.bio||"",name:me.name||""});
   const part=(k,list,label)=>`<div class="av3-row"><b class="small muted">${label}</b><div class="av3-chips">${list.map((x,i)=>{
       const v=typeof x==="string"&&x[0]==="#"?`<i style="background:${x}"></i>`:esc(String(x));
       return`<button type="button" class="av3-chip ${d[k]===i?"on":""}" data-v4="avPart" data-k="${k}" data-n="${i}" aria-pressed="${d[k]===i}" aria-label="${label} ${i+1}">${v}</button>`}).join("")}</div></div>`;
@@ -116,13 +116,17 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   const k=el.dataset.v4;if(!/^av(Part|Save|Open|Back)$/.test(k))return;
   if(k==="avOpen"){AV.draft=null;S.view={type:"avt"};S.animate=true;scrollTo(0,0);render();return}
   if(k==="avBack"){AV.draft=null;S.view=null;S.animate=true;render();return}
-  if(k==="avPart"){const bio=document.getElementById("avBio");if(AV.draft&&bio)AV.draft.bio=bio.value;
+  if(k==="avPart"){const bio=document.getElementById("avBio"),nm=document.getElementById("avName");if(AV.draft&&bio)AV.draft.bio=bio.value;if(AV.draft&&nm)AV.draft.name=nm.value;
     AV.draft[el.dataset.k]=+el.dataset.n;render();return}
-  if(k==="avSave"){const bio=document.getElementById("avBio");const d=AV.draft||{};const avt=avtOf(d);const b=String((bio&&bio.value)||d.bio||"").slice(0,150);
+  if(k==="avSave"){const bio=document.getElementById("avBio");const nmEl=document.getElementById("avName");const d=AV.draft||{};const avt=avtOf(d);const b=String((bio&&bio.value)||d.bio||"").slice(0,150);
+    const nm=String(nmEl?nmEl.value:(d.name||S.me&&S.me.name||"")).replace(/\s+/g," ").trim().slice(0,40);
     if(!S.uid||S.mode!=="student"){toast("Only students can save an avatar.","x");return}
+    if(nm.length<2){toast("Write your name (at least 2 letters).","x");return}
     const ps=(({g,skin,hair,hairCol,eyes,mouth,brow,outfit,cut,acc,bg})=>({g,skin,hair,hairCol,eyes,mouth,brow,outfit,cut,acc,bg}))(avt);
-    S.me={...(S.me||{}),avt:ps,bio:b};
-    write(()=>S.db.doc("students/"+S.uid).update({avt:ps,bio:b})).then(()=>{toast("Avatar and bio saved","check")}).catch(()=>toast("Saved on this phone: it will be sent when you are online.","check"));
+    S.me={...(S.me||{}),avt:ps,bio:b,name:nm};
+    write(()=>S.db.doc("students/"+S.uid).update({avt:ps,bio:b,name:nm})).then(()=>{toast("Profile saved","check")}).catch(()=>toast("Saved on this phone: it will be sent when you are online.","check"));
+    // the leaderboard copy of the name (if it exists yet)
+    try{write(()=>S.db.doc("board/"+S.uid).update({name:nm})).catch(()=>{})}catch(e){}
     AV.draft=null;S.view=null;S.animate=true;render();return}
 },true);
 /* gestures: the avatar moves to the next gesture every 2.5 s, without re-rendering the page */
