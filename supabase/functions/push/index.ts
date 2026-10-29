@@ -82,6 +82,9 @@ Deno.serve(async (req) => {
     uids = [rec.to_uid];
     text = "Incoming call";
     kind = "call";
+  } else if (body.table === "notifications" && body.type === "INSERT" && rec.uid && rec.kind === "game") {
+    // l'invitation de jeu est déjà notifiée par la table game_matches : pas de deuxième notification
+    return new Response("ignored");
   } else if (body.table === "notifications" && body.type === "INSERT" && rec.uid) {
     // tout ce qui apparaît dans la cloche de la Communauté (commentaires, j'aime, défis…)
     uids = [rec.uid];
