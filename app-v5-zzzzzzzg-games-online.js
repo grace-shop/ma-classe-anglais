@@ -117,6 +117,23 @@
     })();
   }
 
+  /* ---- rejouer en ligne : nouvelle invitation au même camarade, même jeu ---- */
+  document.addEventListener("click", async function (e) {
+    var b = e.target.closest && e.target.closest('[data-zg="rematch"]');
+    if (!b) return;
+    e.preventDefault();
+    var G = ZGUI.current && ZGUI.current();
+    if (!G || G.mode !== "online" || !G.oppUid) return;
+    var kind = G.game, uid = G.oppUid, name = G.oppName || "Classmate";
+    var cols = kind === "chess" ? ["w", "b"] : [0, 1];
+    if (!sb()) { note("Connect to play remotely.", "x"); return; }
+    ZGUI.close();
+    var init = initial(kind, cols);
+    var r = await sb().rpc("game_invite", { p_to: uid, p_kind: kind, p_state: init });
+    if (r.error) { note(fail(r.error), "x"); return; }
+    waitCard(r.data, kind, name, init.cols);
+  }, true);
+
   /* ---- choisir le camarade (les couleurs sont choisies avant, dans la page de jeu) ---- */
   window.zgOnlineStart = function (sel) {
     var friends = ((typeof PR !== "undefined" && PR.dir) || []).filter(function (x) {
