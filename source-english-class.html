@@ -19770,7 +19770,8 @@ async function zzBakeEntries(entries){
     return card + _sec();
   };
   document.addEventListener("click", function (e) {
-    var b = e.target.closest && e.target.closest("[data-lite]");
+    // only the economy-mode button: <html data-lite="1"> also matches and would cancel every click in the app
+    var b = e.target.closest && e.target.closest("button[data-lite]");
     if (!b) return;
     e.preventDefault();
     window.mcaLite.set(b.getAttribute("data-lite") === "1");
