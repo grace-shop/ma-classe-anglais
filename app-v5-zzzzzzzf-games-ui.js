@@ -411,7 +411,7 @@
     el.innerHTML = '<div class="zg-endcard">' +
       (win ? '<div class="zg-trophy">' + TROPHY + '</div>' : '') +
       '<b>' + esc(msg) + '</b><small>' + esc(end.text) + '</small>' +
-      (G.mode === "online" ? '' : '<button class="zg-big" data-zg="again">Play again</button>') +
+      (G.mode === "online" ? '<button class="zg-big" data-zg="rematch">Play again</button>' : '<button class="zg-big" data-zg="again">Play again</button>') +
       '<button class="zg-big alt" data-zg="hub">Other games</button>' +
       '<button class="zg-big alt2" data-zg="close">Quit</button></div>';
     host().appendChild(el);
