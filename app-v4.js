@@ -1256,8 +1256,13 @@ async function fComment(id,inp){const t=(inp.value||"").trim();if(!t)return;inp.
 async function fLike(id,e){const L=F.likes[id]=F.likes[id]||[],i=L.findIndex(l=>l.uid===S.uid);e=e||(i>=0?L[i].e:"❤️")||"❤️";F.pick=null;if(i>=0&&L[i].e===e)L.splice(i,1);else if(i>=0)L[i].e=e;else L.push({post_id:id,uid:S.uid,e});render();try{await window.__feed.like(id,e)}catch(er){toast(er.message||"Could not react","x");feedLoad()}}
 async function fStoryPost(){const c=F.sc;if(!c||c.busy)return;const t=((document.getElementById("fsc_text")||{}).value||"").trim();if(!t&&!c.file){toast("Write something or add a photo.","x");return}
   if(c.aud==="hide"&&!c.hide){toast("Choose the classmate who must not see this story.","x");return}
-  c.busy=true;c.text=t;feedSync();try{if(c.video)toast("Uploading the video… keep the app open.","clock");const media=c.file?await fUpload(c.file,c.d):null;const body=await fFix(t,300);await window.__feed.story(media,body,c.url?"":c.bg,{dur:c.dur||5,aud:c.aud==="hide"?"hide":"all",hide:c.aud==="hide"?c.hide:null});if(media)fRememberMedia(media);if(c.url)URL.revokeObjectURL(c.url);F.sc=null;feedSync();toast("Story shared! It stays 24 hours.","rocket");await feedLoad()}
-  catch(e){c.busy=false;feedSync();toast((e&&e.message)||"Could not share","x")}}
+  c.busy=true;c.text=t;
+  /* leave the story screen right away: the app opens on its home page and the story is sent from there */
+  F.sc=null;feedSync();S.view=null;S.tab="home";S.animate=true;scrollTo(0,0);render();
+  const bg=async()=>{try{if(typeof zzProg==="function")zzProg("Sharing your story…");const media=c.file?await fUpload(c.file,c.d):null;const body=await fFix(t,300);await window.__feed.story(media,body,c.url?"":c.bg,{dur:c.dur||5,aud:c.aud==="hide"?"hide":"all",hide:c.aud==="hide"?c.hide:null});if(media)fRememberMedia(media);if(c.url)URL.revokeObjectURL(c.url);toast("Story shared! It stays 24 hours.","rocket");await feedLoad()}
+  catch(e){c.busy=false;F.sc=c;toast(((e&&e.message)||"Could not share")+" Your story was kept: open Stories to try again.","x")}
+  finally{if(typeof zzProgEnd==="function")zzProgEnd()}};
+  bg()}
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-v4]");if(!el)return;const a=el.dataset.v4,id=el.dataset.id;
   switch(a){
   case"fFeed":S.view={type:"feed"};S.animate=true;scrollTo(0,0);render();return;

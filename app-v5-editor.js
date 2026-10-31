@@ -49,7 +49,7 @@ window.addEventListener("change",e=>{
 /* ---- open / close ---- */
 function ed5Host(){let h=document.getElementById("edt5");if(!h){h=document.createElement("div");h.id="edt5";h.className="edt5";h.hidden=true;document.body.appendChild(h)}return h}
 function ed5Busy(on,msg,pct){let b=document.getElementById("edt5busy");if(!b){b=document.createElement("div");b.id="edt5busy";b.className="edt5-busy";b.hidden=true;document.body.appendChild(b)}
-  if(on){b.innerHTML=`<div><b>${msg||"Working…"}</b><div class="bar"><i style="width:${Math.round((pct||0)*100)}%"></i></div></div>`;b.hidden=false}else b.hidden=true}
+  if(on){b.innerHTML=`<div><b>${msg||"Working…"}</b><div class="bar"><i style="width:${Math.round((pct||0)*100)}%"></i></div>${ED5.cutting?`<button type="button" class="edt5-btn" data-edcancel="1" style="margin-top:18px">Cancel</button>`:""}</div>`;b.hidden=false}else b.hidden=true}
 function ed5Open(file,kind,targetId){
   ED5.open=true;ED5.file=file;ED5.kind=kind;ED5.target=targetId;ED5.rot=0;ED5.zoom=1;ED5.dx=0;ED5.dy=0;ED5.aspect=0;ED5.busy=false;
   if(kind==="image"){
@@ -162,9 +162,10 @@ async function ed5Cut(f,s,e,onp){
   const t0=Date.now(),span=Math.max(0.5,e-s);
   await new Promise(res=>{const iv=setInterval(()=>{
     onp&&onp(Math.min(1,(v.currentTime-s)/span));
-    if(v.currentTime>=e-0.05||v.ended||Date.now()-t0>span*1000+4000){clearInterval(iv);res()}},150)});
+    if(ED5.cancelCut||v.currentTime>=e-0.05||v.ended||Date.now()-t0>span*1000+4000){clearInterval(iv);res()}},150)});
   v.pause();rec.stop();await stopped;
   try{URL.revokeObjectURL(v.src)}catch(x){}
+  if(ED5.cancelCut)throw new Error("cancel");
   const type=(rec.mimeType||mime||"video/webm").split(";")[0];
   return new File(parts,"cut-"+Date.now()+(type.includes("mp4")?".mp4":".webm"),{type});
 }
@@ -203,6 +204,15 @@ function ed5SetDur(d){
   ed5VidSync();
 }
 
+/* ---- cancel while the video is being cut: stop, and leave without adding anything ---- */
+function ed5CancelCut(){if(!ED5.cutting)return false;ED5.cancelCut=true;ED5.cutting=false;ed5Busy(false);return true}
+document.addEventListener("click",e=>{
+  const c=e.target.closest&&e.target.closest("[data-edcancel]");if(!c)return;
+  e.preventDefault();e.stopPropagation();ed5CancelCut();
+},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")ed5CancelCut()});
+window.ed5CancelCut=ed5CancelCut;
+
 /* ---- buttons ---- */
 document.addEventListener("click",async e=>{
   const b=e.target.closest&&e.target.closest("[data-ed]");if(!b||!ED5.open)return;
@@ -225,10 +235,13 @@ document.addEventListener("click",async e=>{
         const full=ED5.dur>0&&(ED5.s>0.1||ED5.e<ED5.dur-0.1);
         if(!full||!window.MediaRecorder){ed5Deliver(ED5.file);return}
         const h=document.getElementById("edt5");if(h)h.hidden=true;
+        ED5.cancelCut=false;ED5.cutting=true;
         ed5Busy(true,"Cutting the video…",0);
         const f=ED5.file,s=ED5.s,en=ED5.e;
-        try{const out=await ed5Cut(f,s,en,p=>ed5Busy(true,"Cutting the video…",p));ed5Busy(false);ed5Deliver(out)}
-        catch(err){ed5Busy(false);toast("The video could not be cut here. It will be posted as it is.","mute");ed5Deliver(f)}
+        try{const out=await ed5Cut(f,s,en,p=>{if(!ED5.cancelCut)ed5Busy(true,"Cutting the video…",p)});ED5.cutting=false;ed5Busy(false);ed5Deliver(out)}
+        catch(err){ED5.cutting=false;ed5Busy(false);
+          if(ED5.cancelCut){ED5.cancelCut=false;ed5Close(false);return}
+          toast("The video could not be cut here. It will be posted as it is.","mute");ed5Deliver(f)}
       }
     }catch(err){toast("The photo could not be edited. It will be posted as it is.","mute");ed5Deliver(ED5.file)}
     finally{ED5.busy=false}

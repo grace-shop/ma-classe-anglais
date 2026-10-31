@@ -5,7 +5,7 @@
    - en touchant la notification ou le bandeau, elle arrive sur la liste des invitations.
    La ligne de notification est créée par game_invite (supabase/jeux-invite.sql). */
 {
-  var GI_NAMES = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", ttt: "Tic-tac-toe" };
+  var GI_NAMES = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", ttt: "Tic-tac-toe", rope: "Rope Bros" };
 
   var giCss = document.createElement("style");
   giCss.textContent =

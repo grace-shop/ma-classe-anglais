@@ -40,7 +40,7 @@ document.addEventListener("click", function (e) {
 
 /* 2 · invitations: banner and check */
 (function () {
-  var SEEN = "mca_inv_seen", NAMES = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", ttt: "Tic-tac-toe" };
+  var SEEN = "mca_inv_seen", NAMES = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", ttt: "Tic-tac-toe", rope: "Rope Bros" };
   function seen() { try { return JSON.parse(localStorage.getItem(SEEN) || "null"); } catch (e) { return null; } }
   function save(ids) { try { localStorage.setItem(SEEN, JSON.stringify(ids.slice(-200))); } catch (e) {} }
   function who(uid) {

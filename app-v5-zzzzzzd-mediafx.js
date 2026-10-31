@@ -151,25 +151,26 @@ async function zzStoryReview(files){
   foot.insertAdjacentHTML("afterbegin",'<input id="zzStCap" class="zzst-cap" maxlength="300" placeholder="Add a caption for these stories…" autocomplete="off">');
   const inp=foot.querySelector("#zzStCap");inp.value=R.cap||"";inp.addEventListener("input",function(){R.cap=inp.value})}}
 async function zzStorySend(){
-  const R=ZZR;if(!R||R.busy)return;R.busy=true;
+  const R=ZZR;if(!R||R.busy)return;
   const cap=((R.cap||"")+"").trim();
-  const total=R.items.length;let done=0;
+  const items=R.items.slice(),total=items.length;let done=0;
+  /* close the picker, go to the home page, and send the stories from there */
+  zzReviewClose();F.sc=null;S.view=null;S.tab="home";S.animate=true;scrollTo(0,0);render();
   zzProg("Sharing "+total+" stor"+(total>1?"ies":"y")+"…");
   try{
-    for(const it of R.items.slice()){
+    for(const it of items){
       const media=await fUpload(it.file,it.d||0);
       const body=await fFix(cap,300);
       await window.__feed.story(media,body,"",{dur:5,aud:"all",hide:null});
       if(media)fRememberMedia(media);
-      done++;R.items.splice(R.items.indexOf(it),1);
+      done++;
       zzProg("Sharing "+Math.min(done+1,total)+" / "+total+"…");
     }
-    zzReviewClose();F.sc=null;feedSync();
+    feedSync();
     toast(done>1?done+" stories shared! They stay 24 hours.":"Story shared! It stays 24 hours.","rocket");
     await feedLoad();
   }catch(e){
-    R.busy=false;toast((e&&e.message)||"Could not share","x");
-    if(ZZR===R)zzReviewPaint();
+    toast(((e&&e.message)||"Could not share")+(done?" ("+done+" / "+total+" shared)":""),"x");
   }
   zzProgEnd();
 }
