@@ -37,7 +37,6 @@
   function initial(game, cols) {
     if (game === "chess") return { st: ZG.chess.start(), v: 1, cols: [cols[0], cols[0] === "w" ? "b" : "w"] };
     if (game === "morris") return { st: ZG.morris.start(), v: 1, cols: [cols[0], cols[0] === 0 ? 1 : 0] };
-    if (game === "ttt") return { st: ZG.ttt.start(), v: 1, cols: [0, 1] };
     var other = (cols[0] + 2) % 4; // two players face each other
     return { st: ZG.ludo.start(2, [cols[0], other]), v: 1, cols: [cols[0], other] };
   }
@@ -175,9 +174,9 @@
     var r = await sb().rpc("game_list");
     if (!r || r.error || !r.data || !r.data.length) { box.remove(); return; }
     var uid = await myUid();
-    var names = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", ttt: "Tic-tac-toe" };
+    var names = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris" };
     function other(row) { return row.host === uid ? row.guest : row.host; }
-    box.innerHTML = '<div class="zg-label" style="margin:6px 0 0">Invitations and games</div>' + r.data.map(function (g) {
+    box.innerHTML = '<div class="zg-label" style="margin:6px 0 0">Invitations and games</div>' + r.data.filter(function (g) { return names[g.kind]; }).map(function (g) {
       var nm = nameOf(other(g));
       if (g.status === "invited" && g.guest === uid) {
         return '<div class="opt" style="cursor:default"><span>📨</span><span>' + esc(nm) + ' invites you to ' + esc(names[g.kind]) +
@@ -218,7 +217,6 @@
           if (window.zgPush) window.zgPush(ZGUI.current());
         };
         if (row.kind === "chess") { openAs([hostCols[0], hostCols[0] === "w" ? "b" : "w"], row.state.st); return; }
-        if (row.kind === "ttt") { openAs([0, 1], row.state.st); return; }
         if (row.kind === "ludo") { var lc = [hostCols[0], (hostCols[0] + 2) % 4]; openAs(lc, ZG.ludo.start(2, lc)); return; }
         var taken = [hostCols[0]];
         ZGUI.pickFor(row.kind, taken, function (mine) {
