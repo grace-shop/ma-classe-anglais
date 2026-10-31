@@ -1,3 +1,13 @@
+/* perf: the many page-wide MutationObservers are run once per frame (all the changes of a burst together),
+   instead of once for each change; they still run before the screen is painted */
+(function(){const Nat=window.MutationObserver;if(!Nat||Nat.__mca)return;
+  function MO(cb){const q=[];let t=0,self=this;this._n=new Nat(function(recs){q.push.apply(q,recs);if(t)return;
+    t=requestAnimationFrame(function(){t=0;const r=q.splice(0);if(r.length)try{cb.call(self,r,self)}catch(e){try{console.error(e)}catch(x){}}})});
+    this._q=q}
+  MO.prototype.observe=function(){return this._n.observe.apply(this._n,arguments)};
+  MO.prototype.disconnect=function(){this._q.length=0;return this._n.disconnect()};
+  MO.prototype.takeRecords=function(){return this._q.splice(0).concat(this._n.takeRecords())};
+  MO.__mca=true;window.MutationObserver=MO})();
 /* =====================================================================
    v4 — visionneuse intégrée (PDF, images) qui marche hors ligne,
    messageries riches (vocaux, photos, fichiers, stickers, emojis),

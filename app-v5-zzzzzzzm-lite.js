@@ -13,7 +13,8 @@
   function stored() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
   function autoLow() {
     var mem = navigator.deviceMemory || 8, cores = navigator.hardwareConcurrency || 8;
-    return mem <= 3 || cores <= 4;
+    // light by default: blur and looping animations are what make Android WebViews stutter; only strong phones keep them
+    return !(mem >= 8 && cores >= 8);
   }
   function isLite() { var s = stored(); return s === null ? autoLow() : s === "1"; }
   function apply() { document.documentElement.classList.toggle("lite", isLite()); }
