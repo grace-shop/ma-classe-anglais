@@ -19424,6 +19424,42 @@ async function zzBakeEntries(entries){
     return S;
   }
 
+
+  /* ---------- le singe de l'ordinateur ----------
+     À chaque décision, il essaie quelques gestes sur une copie du jeu (≈ 0,8 s d'avance, en supposant que
+     l'autre singe garde son geste) et garde le meilleur : ne pas tomber, se rapprocher du drapeau, garder la corde souple. */
+  function simClone(S) {
+    var c = makeSim(S.L);
+    c.frame = S.frame; c.deaths = S.deaths; c.done = S.done; c.doneAt = S.doneAt; c.ev = [];
+    c.turtles = S.turtles.map(function (t) { return Object.assign({}, t); });
+    c.m = S.m.map(function (m) {
+      var q = Object.assign({}, m), ti = S.turtles.indexOf(m.stand);
+      if (ti >= 0) q.stand = c.turtles[ti];
+      return q;
+    });
+    return c;
+  }
+  var BOT_TRY = [{ r: 1 }, { r: 1, j: 1 }, { j: 1 }, {}, { l: 1 }, { l: 1, j: 1 }, { d: 1 }, { r: 1, d: 1 }];
+  function botPick(S, i, other) {
+    var best = null, bs = -1e9, F = S.L.flag;
+    for (var c = 0; c < BOT_TRY.length; c++) {
+      var g = BOT_TRY[c], T = simClone(S), d0 = S.deaths, k;
+      for (k = 0; k < 48; k++) {
+        var mine = { l: g.l, r: g.r, d: g.d && k < 4, j: g.j && k < 15 }, inp = [{}, {}];
+        inp[i] = mine; inp[1 - i] = other || {};
+        T.step(inp);
+        if (T.done) break;
+      }
+      var me = T.m[i], you = T.m[1 - i];
+      var sc = -Math.hypot(me.x - F.x, me.y - F.y) - 0.5 * Math.hypot(you.x - F.x, you.y - F.y) - (T.deaths - d0) * 600 - (me.dead > 0 ? 600 : 0);
+      var rope = Math.hypot(me.x - you.x, me.y - you.y); if (rope > REST) sc -= (rope - REST) * 0.6;
+      if (T.done) sc += 800;
+      if (g.r) sc += 0.5;
+      if (sc > bs) { bs = sc; best = g; }
+    }
+    return { l: !!best.l, r: !!best.r, j: !!best.j, d: !!best.d };
+  }
+
   /* ---------- le dessin ---------- */
   var COL = [
     { body: "#d8463d", dark: "#9c2b25", name: "Red" },
@@ -19602,7 +19638,7 @@ async function zzBakeEntries(entries){
   document.head.appendChild(zrStyle);
 
   /* ---------- l'écran de jeu ---------- */
-  var ST = { host: null, sim: null, level: 0, cv: null, ctx: null, raf: 0, keys: {}, kb: [{}, {}], touch: {}, sc: 1, dpr: 1, pad: [{}, {}], cam: { x: 0, y: 0, vw: 420 }, parts: [], t0: 0, last: 0, acc: 0, frame: 0, ended: false, ac: null };
+  var ST = { ai: false, botIn: {}, botAt: 0, host: null, sim: null, level: 0, cv: null, ctx: null, raf: 0, keys: {}, kb: [{}, {}], touch: {}, sc: 1, dpr: 1, pad: [{}, {}], cam: { x: 0, y: 0, vw: 420 }, parts: [], t0: 0, last: 0, acc: 0, frame: 0, ended: false, ac: null };
   var KEY = "mca_ropebros";
   function saved() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { return {}; } }
   function save(o) { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {} }
@@ -19625,7 +19661,7 @@ async function zzBakeEntries(entries){
   /* ---------- à distance : chaque téléphone conduit son singe ----------
      Le téléphone de celui qui invite (singe rouge) calcule le jeu. L'invité (singe bleu) envoie ses touches
      et reçoit la position des singes 10 fois par seconde. Canal « broadcast » de Supabase Realtime. */
-  var NET = null, REMOTE = false;
+  var NET = null, REMOTE = false, MODE = "local";
   function netSend(o) {
     if (!NET || !NET.ch) return;
     try { var r = NET.ch.send({ type: "broadcast", event: "m", payload: o }); if (r && r.catch) r.catch(function () {}); } catch (e) {}
@@ -19732,9 +19768,10 @@ async function zzBakeEntries(entries){
       '<div class="zg-head"><button class="zg-x" data-zg="hub" aria-label="Back">‹ Back</button><div><b>Rope Bros</b><small>Two friends, one rope</small></div></div>' +
       '<div class="zr-sel">' +
         '<div class="zr-pic">' + monkeyPic() + '</div>' +
-        '<div class="zr-mode"><button type="button" class="zr-md' + (REMOTE ? '' : ' on') + '" data-zr="mode" data-v="local">Same phone</button><button type="button" class="zr-md' + (REMOTE ? ' on' : '') + '" data-zr="mode" data-v="remote">With a classmate</button></div>' +
+        '<div class="zr-mode"><button type="button" class="zr-md' + (MODE === "ai" ? ' on' : '') + '" data-zr="mode" data-v="ai">With the computer</button><button type="button" class="zr-md' + (MODE === "local" ? ' on' : '') + '" data-zr="mode" data-v="local">Same phone</button><button type="button" class="zr-md' + (MODE === "remote" ? ' on' : '') + '" data-zr="mode" data-v="remote">With a classmate</button></div>' +
+        (MODE === "ai" ? '<p class="zr-how"><b>With the computer:</b> you are the <b style="color:#d8463d">red</b> monkey, the computer plays the blue one and helps you through the rope. Touch your monkey to run, above it to jump, below it to drop.</p>' : '') +
         (REMOTE ? '<p class="zr-how"><b>Remotely:</b> pick a level, then a classmate. Each of you plays one monkey on your own phone (you are the red one). The rope pulls your friend: move together and reach the flag.</p>' : '') +
-        '<p class="zr-how"' + (REMOTE ? ' hidden' : '') + '>Play together on one phone: each of you touches your own monkey — on it to run, above it to jump, below it to drop, left of it to go back. The rope pulls your friend, so move together and bring both monkeys to the flag.</p>' +
+        '<p class="zr-how"' + (MODE !== "local" ? ' hidden' : '') + '>Play together on one phone: each of you touches your own monkey — on it to run, above it to jump, below it to drop, left of it to go back. The rope pulls your friend, so move together and bring both monkeys to the flag.</p>' +
         '<div class="zr-grid">' + LEVELS.map(function (L, i) {
           var done = sv.done && sv.done[i];
           return '<button class="zr-lv' + (done ? " ok" : "") + '" data-zr="lv" data-i="' + i + '"><b>' + (i + 1) + '</b><span>' + esc2(L.name) + '</span><small>' + (done ? "✓ " + done + "s" : "Play") + '</small></button>';
@@ -19755,9 +19792,11 @@ async function zzBakeEntries(entries){
     ST.cam = { x: LEVELS[i].start.x - 160, y: 90, vw: 340 };
     ST.parts = []; ST.acc = 0; ST.last = 0; ST.frame = 0; ST.t0 = performance.now();
     var N = NET && NET.ready ? NET : null;
+    ST.ai = MODE === "ai" && !N; ST.botIn = {}; ST.botAt = 0;
     h.className = "zg-page rope play";
     var hint = N
       ? 'You are the <b style="color:' + COL[N.role].dark + '">' + COL[N.role].name + '</b> monkey. Touch it to run, above it to jump, below it to drop, left of it to go back.'
+      : ST.ai ? 'You are the <b style="color:#9c2b25">red</b> monkey. Touch it to run, above it to jump, below it to drop, left of it to go back. The computer plays the blue one.'
       : 'Touch your monkey to run, above it to jump, below it to drop, left of it to go back. <b style="color:#9c2b25">Red</b> and <b style="color:#1c7c82">Blue</b> each touch their own.';
     h.innerHTML =
       '<div class="zg-head"><button class="zg-x" data-zr="' + (N ? "leave" : "menu") + '" aria-label="' + (N ? "Leave" : "Levels") + '">‹ ' + (N ? "Leave" : "Levels") + '</button><div><b>Rope Bros</b><small>Level ' + (i + 1) + ' · ' + esc2(LEVELS[i].name) + (N ? ' · with ' + esc2(N.name) : '') + '</small></div>' +
@@ -19799,7 +19838,10 @@ async function zzBakeEntries(entries){
       ST.acc -= 16.667; ST.frame++;
       var N = NET && NET.ready ? NET : null, pads = padNow();
       if (N && N.role === 1) netGuestFrame(S, N);                               // remote guest: the host runs the game
-      else S.step(N ? [pads[0], netRin(N)] : pads);
+      else {
+        if (ST.ai) { if (ST.frame - ST.botAt >= 5 || ST.botAt > ST.frame) { ST.botIn = botPick(S, 1, pads[0]); ST.botAt = ST.frame; } pads[1] = ST.botIn; }
+        S.step(N ? [pads[0], netRin(N)] : pads);
+      }
       S.ev.splice(0).forEach(function (ev) {
         if (N && N.role === 0) N.evq.push(ev);
         if (ev.t === "jump") beep(ev.i ? 520 : 440, 0.09, "triangle", 0.05);
@@ -19878,6 +19920,7 @@ async function zzBakeEntries(entries){
   }
   function nearest(x, y) {
     if (NET && NET.ready) return NET.role;
+    if (ST.ai) return 0;
     var best = 0, bd = 1e9;
     for (var i = 0; i < 2; i++) { var p = monkeyXY(i); if (!p) continue; var d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = i; } }
     return best;
@@ -19924,14 +19967,14 @@ async function zzBakeEntries(entries){
     else if (a === "menu") levelSelect(h);
     else if (a === "restart") start(h, ST.level);
     else if (a === "next") start(h, Math.min(LEVELS.length - 1, ST.level + 1));
-    else if (a === "mode") { REMOTE = b.getAttribute("data-v") === "remote"; levelSelect(h); }
+    else if (a === "mode") { MODE = b.getAttribute("data-v"); REMOTE = MODE === "remote"; levelSelect(h); }
     else if (a === "leave") { netClose(true); levelSelect(h); }
   }, true);
 
   // quitter le jeu (retour au menu des jeux ou fermeture) : la boucle s'arrête d'elle-même, on libère le clavier
   document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest('[data-zg="hub"],[data-zg="close"]')) stop(); }, true);
 
-  window.ZRope = { open: levelSelect, openOnline: openOnline, peek: function () { return { pad: ST.pad, touch: ST.touch, xy: monkeyXY }; }, start: start, makeSim: makeSim, levels: LEVELS, consts: { R: R, REST: REST }, stop: stop, pic: monkeyPic };
+  window.ZRope = { open: levelSelect, openOnline: openOnline, peek: function () { return { pad: ST.pad, touch: ST.touch, xy: monkeyXY }; }, start: start, makeSim: makeSim, levels: LEVELS, consts: { R: R, REST: REST }, stop: stop, pic: monkeyPic, botPick: botPick };
 })();
 
 /* ---- app-v5-zzzzzzzg-games-online.js ---- */
