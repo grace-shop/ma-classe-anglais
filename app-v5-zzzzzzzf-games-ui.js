@@ -265,6 +265,7 @@
   function open(opts) {
     css();
     clearTimeout(TIMER); TIMER = 0; stopFire();
+    if (opts.game === "rope" && window.ZRope && window.ZRope.openOnline) { G = null; window.ZRope.openOnline(host(), opts); return; }
     G = { game: opts.game, mode: opts.mode, diff: opts.diff || "medium", you: opts.you == null ? 0 : opts.you, sel: null, busy: false, over: false,
       id: opts.id || null, v: opts.v || 1, oppName: opts.oppName || "Classmate", oppUid: opts.oppUid || null, anim: false, last: null, rolling: false, rollAnim: null,
       cols: opts.cols || null, caps: [[], []], lastDie: [1, 1, 1, 1] };

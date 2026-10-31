@@ -20,7 +20,16 @@
     return o;
   };
   // rétablit la page précédente ; renvoie false s'il n'y en a pas
+  // emoji / sticker panel open: back only closes it, and the conversation stays
+  function closePanel(){
+    if(typeof V4!=="undefined"&&V4.panel){V4.panel=null;render();return true}
+    return false;
+  }
+  document.addEventListener("click",e=>{
+    if(typeof V4!=="undefined"&&V4.panel&&e.target&&e.target.closest&&e.target.closest("#chatScroll"))closePanel();
+  });
   function back(){
+    if(closePanel())return true;
     if(!HIST.length)return false;
     const s=HIST.pop();
     restoring=true;
@@ -41,6 +50,8 @@
   try{
     const App=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
     if(App&&App.addListener)App.addListener("backButton",()=>{
+      if(window.ed5CancelCut&&window.ed5CancelCut())return;
+      if(closePanel())return;
       /* Nova is open: back closes Nova, and nothing else */
       if(typeof AI!=="undefined"&&AI.open){AI.open=false;try{AI.ctl&&AI.ctl.abort()}catch(e){}renderAI();return}
       const dv=document.getElementById("docv"),vp=document.getElementById("vplayer"),za=document.getElementById("zzal");
