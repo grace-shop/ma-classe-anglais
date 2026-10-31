@@ -478,3 +478,48 @@ function callBarHTML(kind,id){
 }
 {const _pcv=peerChatView;peerChatView=function(){const id=S.view&&S.view.id;return(id?callBarHTML("duo",id):"")+_pcv()}}
 {const _gcv=grChatView;grChatView=function(){const id=S.view&&S.view.id;return(id&&grMember(id)&&GR.mem[id]&&GR.mem[id].length>1?callBarHTML("group",id):"")+_gcv()}}
+
+/* ---- microphone watchdog: if my voice is not leaving this phone, take the microphone again ----
+   (Android can silently cut a microphone: another app, the screen going off, a phone call, a recording.)
+   Every 2.5 s: the audio sender must hold a live, unmuted track and the sent bytes must grow. */
+{
+  const WD={last:{},bad:0,busy:false};
+  async function callMicRetake(why){
+    if(WD.busy||!CALL.id||!CALL.local)return;WD.busy=true;
+    try{
+      const st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+      const nt=st.getAudioTracks()[0];if(!nt)return;
+      nt.enabled=CALL.micOn;
+      CALL.local.getAudioTracks().forEach(t=>{try{t.stop()}catch(e){}CALL.local.removeTrack(t)});
+      CALL.local.addTrack(nt);
+      for(const P of Object.values(CALL.peers)){if(P.ta)try{await P.ta.sender.replaceTrack(nt)}catch(e){}}
+      WD.bad=0;WD.last={};
+      try{console.info("call mic retaken:",why)}catch(e){}
+    }catch(e){try{toast("Your microphone is not available. Check it is allowed and not used by another app.","x")}catch(x){}}
+    finally{WD.busy=false}
+  }
+  setInterval(async()=>{
+    if(!CALL.id||!CALL.local||document.visibilityState!=="visible")return;
+    const peers=Object.values(CALL.peers).filter(P=>P.pc&&P.pc.connectionState==="connected"&&P.ta);
+    if(!peers.length){WD.bad=0;return}
+    const t=CALL.local.getAudioTracks()[0];
+    if(!t||t.readyState!=="live"||t.muted){WD.bad+=2}
+    else if(CALL.micOn){
+      let grew=true;
+      for(const P of peers){
+        try{
+          const rep=await P.pc.getStats(P.ta.sender.track||null);let bytes=null;
+          rep.forEach(r=>{if(r.type==="outbound-rtp"&&(r.kind==="audio"||r.mediaType==="audio"))bytes=r.bytesSent});
+          if(bytes==null)continue;
+          if(WD.last[P.uid]!=null&&bytes<=WD.last[P.uid])grew=false;
+          WD.last[P.uid]=bytes;
+        }catch(e){}
+        if(P.ta.sender.track!==t){try{await P.ta.sender.replaceTrack(t)}catch(e){}}
+      }
+      WD.bad=grew?0:WD.bad+1;
+    }
+    if(WD.bad>=2)callMicRetake("stalled");
+  },2500);
+  // coming back to the app after another app used the phone: take the microphone again
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&CALL.id)setTimeout(()=>{const t=CALL.local&&CALL.local.getAudioTracks()[0];if(!t||t.readyState!=="live"||t.muted)callMicRetake("resume")},400)});
+}
