@@ -26,7 +26,7 @@
           nv.volume = keep.vol;
           var seek = function () { try { if (keep.t > 0.05) nv.currentTime = keep.t; } catch (e) {} };
           if (nv.readyState >= 1) seek(); else nv.addEventListener("loadedmetadata", seek, { once: true });
-          if (keep.paused) nv.pause();
+          if (keep.paused || (F.sv && F.sv.typing)) nv.pause();
           else nv.play().catch(function () {});
         }
       } catch (e) {}

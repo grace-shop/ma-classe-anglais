@@ -90,7 +90,7 @@
 
   // a photo: offer to edit it first
   async function chooseFile(file) {
-    if (isVideo(file)) return makeSticker(file);
+    if (isVideo(file)) return chooseVideo(file);
     if (isGif(file)) return makeSticker(file);
     var go = await ask("Ton sticker", "Tu veux le modifier avant de le créer ? (rogner, texte, flou, stickers…)", [
       { key: "edit", label: "Modifier", primary: true },
@@ -139,6 +139,160 @@
       };
       v.load();
     });
+  }
+
+  // ---- video sticker: length (1 to 30 s), optional editing, then recording ----
+  var VMAX = 30;
+  (function () {
+    var st = document.createElement("style");
+    st.textContent = ".zz-dur{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}" +
+      ".zz-dp{padding:8px 14px;border-radius:999px;border:1px solid var(--line2);background:var(--surface2);color:var(--fg);font:inherit;font-weight:700;cursor:pointer}" +
+      ".zz-dp.on{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}" +
+      ".zz-dc{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 12px;color:var(--muted)}" +
+      ".zz-dc input{width:96px;padding:10px;border-radius:12px;border:1px solid var(--line2);background:var(--surface2);color:var(--fg);font:inherit;text-align:center}";
+    document.head.appendChild(st);
+  })();
+
+  function askDuration() {
+    return new Promise(function (resolve) {
+      var box = document.createElement("div");
+      box.id = "zzStk";
+      var presets = [1, 2, 3, 5, 10, 15, 20, 30];
+      box.innerHTML = '<div class="zz-skb" data-x="1"></div><div class="zz-sks"><div class="zz-skg"></div>' +
+        '<div class="zz-skh">Durée du sticker</div>' +
+        '<p class="zz-skp">Combien de secondes ? (1 à 30 s)</p>' +
+        '<div class="zz-dur">' + presets.map(function (n) { return '<button type="button" class="zz-dp" data-d="' + n + '">' + n + ' s</button>'; }).join("") + '</div>' +
+        '<div class="zz-dc"><input id="zzDur" type="number" min="1" max="30" value="5" inputmode="numeric"><span>secondes</span></div>' +
+        '<button type="button" class="zz-ska pri" data-ok="1">Continuer</button>' +
+        '<button type="button" class="zz-skc" data-x="1">Annuler</button></div>';
+      document.body.appendChild(box);
+      var inp = box.querySelector("#zzDur");
+      function mark() { var n = Math.floor(+inp.value); box.querySelectorAll(".zz-dp").forEach(function (b) { b.classList.toggle("on", +b.dataset.d === n); }); }
+      mark();
+      function done(v) { box.remove(); resolve(v); }
+      inp.addEventListener("input", mark);
+      box.addEventListener("click", function (e) {
+        var t = e.target;
+        if (t.dataset && t.dataset.x) return done(null);
+        if (t.dataset && t.dataset.d) { inp.value = t.dataset.d; mark(); return; }
+        if (t.dataset && t.dataset.ok) {
+          var n = Math.floor(+inp.value);
+          if (!(n >= 1 && n <= VMAX)) { toast("Entre une durée de 1 à 30 secondes.", "x"); return; }
+          done(n);
+        }
+      });
+    });
+  }
+
+  // a still picture of the first frame, to open the photo editor on it
+  function frameStill(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file), v = document.createElement("video");
+      v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = url;
+      v.onerror = function () { URL.revokeObjectURL(url); reject(new Error("Vidéo non lisible")); };
+      v.onloadeddata = function () {
+        var c = document.createElement("canvas");
+        c.width = v.videoWidth; c.height = v.videoHeight;
+        if (!c.width || !c.height) { URL.revokeObjectURL(url); reject(new Error("Vidéo non lisible")); return; }
+        c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+        c.toBlob(function (b) {
+          URL.revokeObjectURL(url);
+          if (!b) { reject(new Error("Image non lisible")); return; }
+          resolve(URL.createObjectURL(b));
+        }, "image/jpeg", 0.9);
+      };
+      v.load();
+    });
+  }
+
+  // records `dur` seconds of the video, with the photo-editor edits applied to every frame
+  function recordVideo(file, dur, E) {
+    return new Promise(function (resolve, reject) {
+      if (typeof MediaRecorder === "undefined" || !window.__zzPaintFrame) { reject(new Error("Sticker vidéo non disponible sur ce téléphone")); return; }
+      var url = URL.createObjectURL(file);
+      var v = document.createElement("video");
+      v.muted = true; v.playsInline = true; v.preload = "auto"; v.loop = true; v.src = url;
+      var done = false, rec = null, timer = null, iv = null;
+      function fin(err, blob) {
+        if (done) return; done = true;
+        clearInterval(iv); clearTimeout(timer); v.pause();
+        URL.revokeObjectURL(url);
+        if (err) reject(err); else resolve(blob);
+      }
+      v.onerror = function () { fin(new Error("Vidéo non lisible")); };
+      v.onloadeddata = function () {
+        var w = v.videoWidth, h = v.videoHeight;
+        if (!w || !h) { fin(new Error("Vidéo non lisible")); return; }
+        var sc = Math.min(1, 2048 / Math.max(w, h));
+        var W = E ? E.W : Math.max(1, Math.round(w * sc));
+        var H = E ? E.H : Math.max(1, Math.round(h * sc));
+        var crop = E ? E.crop : { x: 0, y: 0, w: W, h: H };
+        var objs = E ? E.objs : [];
+        var f = Math.min(1, 320 / Math.max(crop.w, crop.h));
+        var cv = document.createElement("canvas");
+        cv.width = Math.max(1, Math.round(crop.w * f)); cv.height = Math.max(1, Math.round(crop.h * f));
+        var ctx = cv.getContext("2d");
+        var full = document.createElement("canvas"); full.width = W; full.height = H;
+        var fctx = full.getContext("2d");
+        var mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp8") ? "video/webm;codecs=vp8" : "video/webm";
+        try { rec = new MediaRecorder(cv.captureStream(20), { mimeType: mime, videoBitsPerSecond: 900000 }); }
+        catch (e) { fin(new Error("Sticker vidéo impossible à créer sur ce téléphone")); return; }
+        var chunks = [];
+        rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+        rec.onstop = function () { fin(null, new Blob(chunks, { type: "video/webm" })); };
+        function draw() {
+          if (done) return;
+          fctx.clearRect(0, 0, W, H);
+          window.__zzPaintFrame(v, W, H, objs, fctx);
+          ctx.clearRect(0, 0, cv.width, cv.height);
+          ctx.drawImage(full, crop.x, crop.y, crop.w, crop.h, 0, 0, cv.width, cv.height);
+        }
+        v.currentTime = 0;
+        v.play().then(function () {
+          draw();
+          iv = setInterval(draw, 50);
+          rec.start(200);
+          timer = setTimeout(function () { if (rec.state !== "inactive") rec.stop(); }, dur * 1000);
+        }).catch(function () { fin(new Error("Vidéo non lisible")); });
+      };
+      v.load();
+    });
+  }
+
+  function saveSticker(blob, ext, t) {
+    return window.__chatFiles.upload(blob, "sticker." + ext).then(function (up) {
+      var l = store().list();
+      l.unshift({ id: Math.random().toString(36).slice(2, 10), p: up.p, t: up.t || t });
+      store().save(l.slice(0, 60));
+      toast("Sticker ajouté à ta collection", "check");
+      if (typeof render === "function") render();
+    });
+  }
+
+  function makeVideoSticker(file, dur, E) {
+    toast("Création du sticker (" + dur + " s)…", "check");
+    recordVideo(file, dur, E)
+      .then(function (blob) { return saveSticker(blob, "webm", "video/webm"); })
+      .catch(function (e) { toast(String((e && e.message) || "Sticker impossible à créer").slice(0, 120), "x"); });
+  }
+
+  async function chooseVideo(file) {
+    if (file.size > MAX_VIDEO) { toast("Vidéo trop lourde (40 Mo max).", "x"); return; }
+    var dur = await askDuration();
+    if (!dur) return;
+    var go = await ask("Ton sticker vidéo", dur + " s · Tu veux le modifier avant de le créer ? (rogner, texte, flou, dessin…)", [
+      { key: "edit", label: "Modifier", primary: true },
+      { key: "as", label: "Créer tel quel" }
+    ]);
+    if (!go) return;
+    if (go === "as" || !window.__zzPhotoEdit) return makeVideoSticker(file, dur, null);
+    try {
+      var still = await frameStill(file);
+      window.__zzLastEdit = null;
+      window.__zzPhotoEdit.open(still, function () {
+        makeVideoSticker(file, dur, window.__zzLastEdit || null);
+      });
+    } catch (e) { toast(String((e && e.message) || "Vidéo non lisible").slice(0, 120), "x"); }
   }
 
   function makeSticker(file) {

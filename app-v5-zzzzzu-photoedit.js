@@ -570,6 +570,12 @@
   zzPeSt.textContent = "#zzPe .zz-peemo[data-pane=emo]{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-height:34vh;overflow-y:auto;-webkit-overflow-scrolling:touch}#zzPe .zz-peemo[data-pane=emo] button{font-size:1.45rem;height:42px;padding:0;border:0;background:transparent}#zzPe .zz-peemo[data-pane=mine]{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-height:40vh;overflow-y:auto}#zzPe .zz-peemo[data-pane=mine] button{position:relative;height:0;padding:0 0 100% 0;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.05);overflow:hidden}#zzPe .zz-peemo[data-pane=mine] img{position:absolute;left:6px;top:6px;width:calc(100% - 12px);height:calc(100% - 12px);object-fit:contain;display:block}.zz-pestab{display:flex;gap:8px;margin-bottom:8px}.zz-pestab button{flex:1;padding:8px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:transparent;color:inherit;font:700 .9rem system-ui,sans-serif;cursor:pointer}.zz-pestab button[aria-pressed=true]{background:#A78BFA;color:#0B0D18;border-color:transparent}.zz-peemo[data-pane=mine] button{padding:4px;aspect-ratio:auto}.zz-peemo[data-pane=mine] img{width:100%;height:auto;display:block;object-fit:contain}.zz-pemp{grid-column:1/-1;opacity:.7;text-align:center;margin:8px 0}";
   document.head.appendChild(zzPeSt);
   window.__zzPhotoEdit = { open: open };
+  // draws one frame (picture or video) with the same edits as a photo: used for video stickers
+  window.__zzPaintFrame = function (src, W, H, objs, ctx) {
+    var keep = ed;
+    ed = { img: src, W: W, H: H, objs: objs || [], ctx: ctx };
+    try { paint(ctx, false); } finally { ed = keep; }
+  };
   // draws src (a frame, at W x H) with the objects, onto canvas; nothing of the open editor changes
   window.__zzPaintTo = function (canvas, src, W, H, objs) {
     var keep = ed;

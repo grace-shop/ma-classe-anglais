@@ -43,21 +43,21 @@
 
 /* ---- PC sidebar (video 3) ---- */
 @media (min-width:1100px){
-  body nav.tabs{left:16px!important;top:50%!important;width:212px!important;max-width:212px!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:4px!important;padding:18px 12px 14px!important;border-radius:26px!important;background:var(--nav-bg,var(--surface))!important;border:1px solid var(--line)!important;box-shadow:0 30px 60px -20px rgba(0,0,0,.35),inset 0 1px 0 var(--line)!important;backdrop-filter:blur(22px) saturate(1.3)!important;-webkit-backdrop-filter:blur(22px) saturate(1.3)!important;max-height:calc(100vh - 40px)!important;overflow:auto}
+  body nav.tabs{left:16px!important;top:50%!important;width:212px!important;max-width:212px!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:4px!important;padding:18px 12px 14px!important;border-radius:26px!important;background:var(--nav-bg)!important;border:1px solid var(--line)!important;box-shadow:0 30px 60px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.12)!important;backdrop-filter:blur(22px) saturate(1.3)!important;-webkit-backdrop-filter:blur(22px) saturate(1.3)!important;max-height:calc(100vh - 40px)!important;overflow:auto}
   body nav.tabs .lk-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 12px;font:800 1rem/1 Manrope,system-ui,sans-serif;color:var(--fg);letter-spacing:.01em}
-  body nav.tabs .lk-logo{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--grad);color:var(--on-ink,#fff);font-weight:800;font-size:.95rem}
+  body nav.tabs .lk-logo{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#6C80FF,#9A7CFF);color:#fff;font-weight:800;font-size:.95rem}
   body nav.tabs .lk-user{display:flex;align-items:center;gap:10px;padding:10px;margin:0 0 14px;border-radius:16px;background:var(--surface2);border:1px solid var(--line)}
-  body nav.tabs .lk-av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--on-ink);font-weight:800;font-size:.9rem;flex:0 0 auto}
+  body nav.tabs .lk-av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--fg);font-weight:800;font-size:.9rem;flex:0 0 auto}
   body nav.tabs .lk-user b{display:block;color:var(--fg);font-size:.85rem}
   body nav.tabs .lk-user small{display:block;color:var(--muted);font-size:.72rem;margin-top:2px}
   body nav.tabs .lk-menu{font:700 .66rem/1 Manrope,system-ui,sans-serif;letter-spacing:.18em;color:var(--muted);padding:4px 10px 8px}
-  body nav.tabs button{flex-direction:row!important;justify-content:flex-start;gap:12px!important;padding:11px 12px!important;border-radius:14px!important;font-size:.92rem!important;font-weight:600;color:var(--ink-soft,var(--muted))!important;background:none!important;box-shadow:none!important;width:100%!important;text-align:left}
-  body nav.tabs button:hover{background:var(--line)!important;color:var(--fg)!important}
+  body nav.tabs button{flex-direction:row!important;justify-content:flex-start;gap:12px!important;padding:11px 12px!important;border-radius:14px!important;font-size:.92rem!important;font-weight:600;color:var(--muted)!important;background:none!important;box-shadow:none!important;width:100%!important;text-align:left}
+  body nav.tabs button:hover{background:var(--surface2)!important;color:var(--fg)!important}
   body nav.tabs button svg{width:20px!important;height:20px!important;flex:0 0 auto}
-  body nav.tabs button[aria-current="true"]{color:var(--on-ink,#fff)!important;background:var(--ink)!important;box-shadow:0 8px 22px -10px rgba(0,0,0,.35)!important}
+  body nav.tabs button[aria-current="true"]{color:var(--fg)!important;background:var(--ink-soft)!important;box-shadow:inset 0 0 0 1px var(--line2)!important}
   body nav.tabs .count{top:50%!important;right:12px!important;transform:translateY(-50%)}
   body nav.tabs .lk-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:4px}
-  body nav.tabs .lk-foot button{color:var(--muted)!important}
+  body nav.tabs .lk-foot button{color:#AEB5DA!important}
   .wrap{margin-left:max(266px,calc((100vw - 1180px)/2))!important;max-width:min(1180px,calc(100vw - 320px))!important}
   body header.top{border-radius:0 0 22px 22px}
 }
