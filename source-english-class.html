@@ -3764,7 +3764,7 @@ function v4MsgHTML(kind,m,c){const a=m.att,once=!!(a&&a.o)&&!m.del,stk=a&&a.k===
       :m.opened?`<div class="v4once off">${ob}<b>Opened</b></div>`
       :`<button type="button" class="v4once" data-v4="once" data-k="${kind}" data-id="${esc(m.id)}">${ob}<b>Photo</b><small>Tap to view once</small></button>`}
   else body=msgBodyHTML(m.text,a);
-  const isSt=!!m.re&&String(m.re.id||"").indexOf("story:")===0;const reThumb=isSt&&m.re.p&&V4.obj&&V4.obj[m.re.p];const re=m.re&&!m.del?(isSt?`<div class="v4quote v4qs" data-v4="jump" data-id="${esc(m.re.id)}" data-w="${esc(m.re.w||"")}"><span class="v4q-th" style="${reThumb?"":"background:"+sbg(m.re.bg)}">${reThumb?`<img src="${reThumb}" alt="">`:""}</span><span class="v4q-tx"><span class="v4q-w">Statut de ${esc(String(v4Who(kind,m.re.w,c)||"").split(" ")[0])}</span><span class="v4q-t">${esc(String(m.re.t||"").slice(0,100))}</span></span></div>`:`<div class="v4quote" data-v4="jump" data-id="${esc(m.re.id||"")}"><div class="v4q-w">${esc(v4Who(kind,m.re.w,c))}</div><div class="v4q-t">${esc(m.re.t||"")}</div></div>`):"";
+  const re=m.re&&!m.del?`<div class="v4quote" data-v4="jump" data-id="${esc(m.re.id||"")}"><div class="v4q-w">${esc(v4Who(kind,m.re.w,c))}</div><div class="v4q-t">${esc(m.re.t||"")}</div></div>`:"";
   const rx=Object.values(m.react||{}).filter(Boolean),rxh=rx.length&&!m.del?`<div class="v4rx">${[...new Set(rx)].map(e=>`<span class="v4emo">${e}</span>`).join("")}${rx.length>1?`<b>${rx.length}</b>`:""}</div>`:"";
   const tick=m.mine&&!m.del&&kind!=="x"?`<i class="v4tick${m.read?" rd":""}" aria-label="${m.read?"Read":"Sent"}">${m.read?"✓✓":"✓"}</i>`:"";
   return`<div class="msg ${m.pin?"zz-pn ":""}${m.mine?"mine":""}${stk?" stk":""}${m.del?" del":""}${rxh?" hasrx":""}" data-mid="${esc(m.id)}" data-k="${kind}" id="m-${esc(m.id)}">${re}${body}<span>${fmtTime(m.at)}${tick}</span>${rxh}</div>`}
@@ -3817,7 +3817,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"delMe":{const x=v4ActMsg();V4.act=null;if(x){v4HideForMe(x.raw.id);toast("Message deleted for you","trash")}render();return}
   case"delAll":v4DelAll();return;
   case"once":v4OpenOnce(el.dataset.k,el.dataset.id);return;
-  case"jump":{if(String(el.dataset.id||"").indexOf("story:")===0){const sid=el.dataset.id.slice(6),w=el.dataset.w;if(F.stories.some(x=>x.id===sid)&&w)fOpenStory(w);else toast("This status has expired","x");return}const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
+  case"jump":{const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
   case"preX":if(V4.pre)URL.revokeObjectURL(V4.pre.url);V4.pre=null;render();return;
   case"preOnce":if(V4.pre){V4.pre.cap=(document.getElementById("v4cap")||{}).value||V4.pre.cap||"";V4.pre.once=!V4.pre.once;render()}return;
   case"preSend":{const P=V4.pre;if(!P)return;if(P.video&&P.edit){const capV=(document.getElementById("v4cap")||{}).value||"";zzBakeThenSend(P,capV);return}const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,P.video?undefined:"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
@@ -3951,7 +3951,7 @@ function fStoryHTML(){const c=fCur();if(!c)return"";const{g,s}=c,mine=g.uid===S.
   ${s.body?`<div class="fsv-text${s.media?" cap":""}">${fText(s.body)}</div>`:""}
   <button type="button" class="fsv-nav l" data-v4="fSvPrev" aria-label="Previous"></button><button type="button" class="fsv-nav r" data-v4="fSvNext" aria-label="Next"></button>
   <div class="fsv-bot">${mine||fStaff()?`<button type="button" class="btn ghost sm" data-v4="fSvViews">${ic("eye")}${views.length}${rxs.length?` · ${[...new Set(rxs.map(x=>x.e))].slice(0,3).map(e=>E(e)).join("")} ${rxs.length}`:""}</button>${mine?"":fSvReactBtns(s)}<button type="button" class="btn ghost sm" data-v4="fShare" data-k="story" data-id="${esc(s.id)}">${ic("send")}Share</button><button type="button" class="btn ghost sm" data-v4="fSvDel">${ic("trash")}Delete</button>`
-    :`${fSvReactBtns(s)}${S.mode==="student"&&peerOn()?`<form class="fsv-reply" data-ff="srep"><input id="fsv_rep" placeholder="Répondre à ${esc(String(g.who?.name||"").split(" ")[0])}…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}<button type="button" class="btn ghost sm fsv-sh" data-v4="fShare" data-k="story" data-id="${esc(s.id)}" aria-label="Share">${ic("send")}</button>`}</div>
+    :`${fSvReactBtns(s)}${S.mode==="student"&&peerOn()&&g.who?.role==="student"?`<form class="fsv-reply" data-ff="srep"><input id="fsv_rep" placeholder="Reply to ${esc(String(g.who?.name||"").split(" ")[0])}…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}<button type="button" class="btn ghost sm fsv-sh" data-v4="fShare" data-k="story" data-id="${esc(s.id)}" aria-label="Share">${ic("send")}</button>`}</div>
   ${v.views?`<div class="v4sheet fsv-views"><b>Seen by ${views.length}</b>${views.length?views.map(x=>{const r=rxs.find(y=>y.uid===x.uid);return`<div class="row">${whoAva(x.who,x.uid,30)}<span>${esc(x.who?.name||"Student")}</span>${r?`<span class="fsv-vr">${E(r.e)}</span>`:""}<small class="muted" style="margin-left:auto">${ago(+new Date(x.at))}</small></div>`}).join(""):`<p class="small muted">Nobody yet.</p>`}<button type="button" class="v4cancel" data-v4="fSvViewsX">Close</button></div>`:""}
   </div>`}
 /* story composer */
@@ -4020,7 +4020,7 @@ document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||!["po
   else if(f.dataset.ff==="com")fComment(f.dataset.id,f.querySelector("input"));
   else if(f.dataset.ff==="srep"){const c=fCur(),inp=document.getElementById("fsv_rep"),t=(inp&&inp.value||"").trim();if(!c||!t)return;inp.value="";
     const what=c.s.body?v4Plain(c.s.body).slice(0,100):"📷 Photo";
-    (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story:"+c.s.id,t:what,w:c.g.uid,p:(c.s.media&&c.s.media.p)||null,bg:c.s.bg||null}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}F.sv&&(F.sv.typing=false);fShow()})()}},true);
+    (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story",t:"Story: "+what,w:c.g.uid}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}F.sv&&(F.sv.typing=false);fShow()})()}},true);
 document.addEventListener("focusin",e=>{if(e.target&&e.target.id==="fsv_rep"&&F.sv){F.sv.typing=true;clearTimeout(F.svT);feedSync()}});
 document.addEventListener("keydown",e=>{if(!F.sv&&!F.sc)return;if(e.key==="Escape"){if(F.sc){F.sc=null;feedSync()}else fCloseStory()}else if(F.sv&&!F.sv.typing&&e.key==="ArrowRight")fStep(1);else if(F.sv&&!F.sv.typing&&e.key==="ArrowLeft")fStep(-1)});
 {const _l=v4ChatLayout;v4ChatLayout=function(){_l();if(F.sv||F.sc||F.share||document.getElementById("fsvhost")?._h)feedSync();nBell()}}
@@ -4138,7 +4138,7 @@ async function fShareOut(){const it=fShareItem();if(!it)return;const text=`${it.
     if(navigator.share){await navigator.share({title:"English Classes",text,url});return}
     await navigator.clipboard.writeText(text+"\n"+url);toast("Copied: paste it where you want","copy")}catch(e){if(e&&e.name!=="AbortError")toast("Sharing is not available here.","x")}}
 /* chat: videos too */
-{const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img"&&a.k!=="sticker")return fVidTile({p:a.p,t:a.t,d:a.d,e:a.e})+_mb(text,null);return _mb(text,a)}}
+{const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img")return fVidTile({p:a.p,t:a.t,d:a.d,e:a.e})+_mb(text,null);return _mb(text,a)}}
 /* ---------------- notifications ---------------- */
 const N={list:[],loaded:false,un:null,uid:null,at:0,markT:null,sw:0,gone:null,goneUid:null};
 /* only the newest notifications are listed; older ones are hidden, not deleted */
@@ -9098,6 +9098,16 @@ vPlay=async function(p,t){
 .fvid.busy .fplay{opacity:.45}
 `;document.head.appendChild(st)}
 
+/* ---- app-v5-zz9-fixes.js ---- */
+/* Corrections : bulletins visibles et notifiés, Nova masqué pendant les tests et hors compte validé, stickers vidéo courts. */
+function aiBlocked(){if(S.mode!=="student")return false;if(!S.me||stOf(S.me)!=="active")return true;if(S.run||(S.liveOn&&liveOpen(S.live))||(S.view&&["lesson","ep","hw"].includes(S.view.type)))return true;return false}
+function bulletinNewHTML(m){const list=Object.values(m.bulletinT||{}).sort((a,b)=>String(b.y).localeCompare(String(a.y))||b.t-a.t);if(!list.length)return"";const e=list[0];return`<div class="section"><div class="glass card click" data-a="tab" data-k="me" tabindex="0" style="border-color:var(--gold-soft)"><div class="row between"><span class="ic t-gold">${ic("grade")}</span><span class="chip ok">${e.avg!=null?fmt2(e.avg)+" /20":"—"}</span></div><h3>Your report card is ready</h3><span class="small muted">${TRI_NAMES[e.t-1]} · ${esc(e.y)}${e.rank?" · Rank "+esc(String(e.rank))+" of "+esc(String(e.of)):""}</span></div></div>`}
+function bulletinWatch(){if(!S.me)return;const now=Object.entries(S.me.bulletinT||{}).map(([k,v])=>k+":"+((v&&v.at)||0));const sb=seenGet("mca_bullseen");if(!sb){seenSet("mca_bullseen",new Set(now));return}const nb=now.filter(x=>!sb.has(x));if(!nb.length)return;toast("Your report card is ready","grade");notifyNow("Report card","Your averages for this term are published. See them on your home page.");seenSet("mca_bullseen",new Set([...sb,...nb]))}
+(function(){function clip(v){if(v.__zzclip)return;v.__zzclip=1;v.addEventListener("timeupdate",function(){if(v.currentTime>=5)v.currentTime=0})}function scan(){document.querySelectorAll("video.zz-stkv,video[data-zzp]").forEach(clip)}new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});scan()})();
+(function(){var st=document.createElement("style");st.id="zz9stk";st.textContent="video.zz-stkv{width:150px;max-width:55vw;height:auto;aspect-ratio:1/1;object-fit:contain;display:block;background:transparent;border:0;box-shadow:none;border-radius:0}";document.head.appendChild(st)})();
+ /* ---- zz9 : citation de statut ---- */
+(function(){var st=document.createElement("style");st.id="zz9quote";st.textContent=".v4qs{display:flex;gap:10px;align-items:center;cursor:pointer}.v4q-th{width:44px;height:44px;border-radius:10px;flex:none;overflow:hidden;display:block}.v4q-th img{width:100%;height:100%;object-fit:cover;display:block}.v4q-tx{display:grid;min-width:0}.v4qs .v4q-w,.v4qs .v4q-t{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}";document.head.appendChild(st)})();
+
 /* ---- app-v5-zzz-community-polish.js ---- */
 /* =====================================================================
    v5 · Community polish.
@@ -11375,21 +11385,21 @@ ROYALE_CH.push(...(window.ROYALE_NEW||[]));
 
 /* ---- PC sidebar (video 3) ---- */
 @media (min-width:1100px){
-  body nav.tabs{left:16px!important;top:50%!important;width:212px!important;max-width:212px!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:4px!important;padding:18px 12px 14px!important;border-radius:26px!important;background:linear-gradient(160deg,rgba(44,48,84,.55),rgba(12,14,28,.74))!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 30px 60px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.12)!important;backdrop-filter:blur(22px) saturate(1.3)!important;-webkit-backdrop-filter:blur(22px) saturate(1.3)!important;max-height:calc(100vh - 40px)!important;overflow:auto}
-  body nav.tabs .lk-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 12px;font:800 1rem/1 Manrope,system-ui,sans-serif;color:#fff;letter-spacing:.01em}
-  body nav.tabs .lk-logo{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#6C80FF,#9A7CFF);color:#fff;font-weight:800;font-size:.95rem}
-  body nav.tabs .lk-user{display:flex;align-items:center;gap:10px;padding:10px;margin:0 0 14px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
-  body nav.tabs .lk-av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#2A3262;color:#fff;font-weight:800;font-size:.9rem;flex:0 0 auto}
-  body nav.tabs .lk-user b{display:block;color:#fff;font-size:.85rem}
-  body nav.tabs .lk-user small{display:block;color:#8C94BE;font-size:.72rem;margin-top:2px}
-  body nav.tabs .lk-menu{font:700 .66rem/1 Manrope,system-ui,sans-serif;letter-spacing:.18em;color:#7C84AA;padding:4px 10px 8px}
-  body nav.tabs button{flex-direction:row!important;justify-content:flex-start;gap:12px!important;padding:11px 12px!important;border-radius:14px!important;font-size:.92rem!important;font-weight:600;color:#C9CEE8!important;background:none!important;box-shadow:none!important;width:100%!important;text-align:left}
-  body nav.tabs button:hover{background:rgba(255,255,255,.06)!important;color:#fff!important}
+  body nav.tabs{left:16px!important;top:50%!important;width:212px!important;max-width:212px!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:4px!important;padding:18px 12px 14px!important;border-radius:26px!important;background:var(--nav-bg,var(--surface))!important;border:1px solid var(--line)!important;box-shadow:0 30px 60px -20px rgba(0,0,0,.35),inset 0 1px 0 var(--line)!important;backdrop-filter:blur(22px) saturate(1.3)!important;-webkit-backdrop-filter:blur(22px) saturate(1.3)!important;max-height:calc(100vh - 40px)!important;overflow:auto}
+  body nav.tabs .lk-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 12px;font:800 1rem/1 Manrope,system-ui,sans-serif;color:var(--fg);letter-spacing:.01em}
+  body nav.tabs .lk-logo{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--grad);color:var(--on-ink,#fff);font-weight:800;font-size:.95rem}
+  body nav.tabs .lk-user{display:flex;align-items:center;gap:10px;padding:10px;margin:0 0 14px;border-radius:16px;background:var(--surface2);border:1px solid var(--line)}
+  body nav.tabs .lk-av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--on-ink);font-weight:800;font-size:.9rem;flex:0 0 auto}
+  body nav.tabs .lk-user b{display:block;color:var(--fg);font-size:.85rem}
+  body nav.tabs .lk-user small{display:block;color:var(--muted);font-size:.72rem;margin-top:2px}
+  body nav.tabs .lk-menu{font:700 .66rem/1 Manrope,system-ui,sans-serif;letter-spacing:.18em;color:var(--muted);padding:4px 10px 8px}
+  body nav.tabs button{flex-direction:row!important;justify-content:flex-start;gap:12px!important;padding:11px 12px!important;border-radius:14px!important;font-size:.92rem!important;font-weight:600;color:var(--ink-soft,var(--muted))!important;background:none!important;box-shadow:none!important;width:100%!important;text-align:left}
+  body nav.tabs button:hover{background:var(--line)!important;color:var(--fg)!important}
   body nav.tabs button svg{width:20px!important;height:20px!important;flex:0 0 auto}
-  body nav.tabs button[aria-current="true"]{color:#fff!important;background:linear-gradient(90deg,rgba(127,140,255,.3),rgba(127,140,255,.07))!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),0 8px 22px -10px rgba(127,140,255,.6)!important}
+  body nav.tabs button[aria-current="true"]{color:var(--on-ink,#fff)!important;background:var(--ink)!important;box-shadow:0 8px 22px -10px rgba(0,0,0,.35)!important}
   body nav.tabs .count{top:50%!important;right:12px!important;transform:translateY(-50%)}
-  body nav.tabs .lk-foot{margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);display:grid;gap:4px}
-  body nav.tabs .lk-foot button{color:#AEB5DA!important}
+  body nav.tabs .lk-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:4px}
+  body nav.tabs .lk-foot button{color:var(--muted)!important}
   .wrap{margin-left:max(266px,calc((100vw - 1180px)/2))!important;max-width:min(1180px,calc(100vw - 320px))!important}
   body header.top{border-radius:0 0 22px 22px}
 }
@@ -16431,7 +16441,7 @@ function zzVidLive(el,url,edit){
    - A sticker is kept on the server; the list is kept on this phone.
    ===================================================================== */
 (function () {
-  var MAX_VIDEO = 40 * 1024 * 1024;   // the source video; the sticker itself is cut to 1 second
+  var MAX_VIDEO = 40 * 1024 * 1024;   // the source video; the sticker itself is cut to 5 seconds
 
   function store() {
     var uid = ((typeof S !== "undefined" ? S : undefined) && S.uid) || "anon";
@@ -16525,14 +16535,14 @@ function zzVidLive(el,url,edit){
     window.__zzPhotoEdit.open(url, function (edited) { makeSticker(edited); });
   }
 
-  // a 1-second square clip cut from the video (centred, 320 px), like a photo sticker
+  // a 5-second square clip cut from the video (centred, 320 px), like a photo sticker
   function videoClip(file) {
     return new Promise(function (resolve, reject) {
       if (typeof MediaRecorder === "undefined") { reject(new Error("Sticker vidéo non disponible sur ce téléphone")); return; }
       var url = URL.createObjectURL(file);
       var v = document.createElement("video");
       v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = url;
-      var SIDE = 320, DUR = 1, done = false, rec = null;
+      var SIDE = 320, DUR = 5, done = false, rec = null;
       function fail(msg) { if (done) return; done = true; URL.revokeObjectURL(url); reject(new Error(msg)); }
       v.onerror = function () { fail("Vidéo non lisible"); };
       v.onloadeddata = function () {
@@ -16553,7 +16563,7 @@ function zzVidLive(el,url,edit){
           ctx.drawImage(v, sx, sy, side, side, 0, 0, SIDE, SIDE);
           requestAnimationFrame(frame);
         }
-        setTimeout(function () { if (!done && rec && rec.state !== "inactive") { v.pause(); rec.stop(); } }, 4000);
+        setTimeout(function () { if (!done && rec && rec.state !== "inactive") { v.pause(); rec.stop(); } }, 8000);
         rec.start(100);
         v.currentTime = 0;
         v.play().then(function () { requestAnimationFrame(frame); }).catch(function () { fail("Vidéo non lisible"); });
@@ -21405,6 +21415,7 @@ document.addEventListener("click", function (e) {
     return k > 0 ? h.slice(0, k) + card + h.slice(k) : h + card;
   };
 }
+
 
 /* ==== v4 END ==== */
 render();
