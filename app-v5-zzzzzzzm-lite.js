@@ -8,7 +8,7 @@
     "backdrop-filter:none!important;-webkit-backdrop-filter:none!important;" +
     "text-shadow:none!important;transition:none!important;scroll-behavior:auto!important}" +
     "html.lite *{animation-play-state:paused!important}" +
-    "html.lite .glass{background:var(--lite-bg,rgba(20,24,40,.92))!important}";
+    "html.lite .glass{background:var(--lite-bg,var(--glass-bg,rgba(20,24,40,.92)))!important}";
 
   function stored() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
   function autoLow() {

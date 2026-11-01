@@ -683,7 +683,7 @@ body[data-mode="teacher"] *,body[data-mode="teacher"] *::before,body[data-mode="
   #aiFab{bottom:26px;right:26px}
 }
 @media (min-width:1700px){.wrap{max-width:1320px;margin-left:max(130px,calc((100vw - 1320px)/2))}}
-.chip.ok{color:#3ad29f;border-color:rgba(58,210,159,.45)}
+.chip.ok{color:var(--ok-ink);border-color:rgba(58,210,159,.45)}
 /* en-tête compact sur petits écrans */
 .brand{min-width:0;flex:none}
 @media (max-width:480px){
@@ -1257,7 +1257,7 @@ function homeView(){const m=S.me,xp=m.xp||0,rank=rankOf(xp),into=xp%XP_PER_RANK,
     nextHw&&{a:"openHw",id:nextHw.id,icon:"pen",tone:"t-ok",eb:"Homework · due "+fmtDate(nextHw.due),t:nextHw.title,lvl:nextHw.level}].filter(Boolean).slice(0,6);
   const earned=BADGES.filter(b=>(m.badges||{})[b.id]);
   const w=wordOfDay(),wDone=m.wotdDay===t;
-  return`${m.profile?"":profileCard()}<div class="section"><div class="glass hero glow-border"><div style="display:grid;gap:10px"><span class="eyebrow">${greet}${schoolPeriod().label?" · "+schoolPeriod().label:""}</span><h2>${esc(m.name.split(" ")[0])}, <span class="gradtext">let's learn!</span></h2>
+  return`${m.profile?"":profileCard()}${bulletinNewHTML(m)}<div class="section"><div class="glass hero glow-border"><div style="display:grid;gap:10px"><span class="eyebrow">${greet}${schoolPeriod().label?" · "+schoolPeriod().label:""}</span><h2>${esc(m.name.split(" ")[0])}, <span class="gradtext">let's learn!</span></h2>
     <p class="sub">Level ${esc(m.level)} · ${LEVEL_NAMES[m.level]||""}${m.profile?" · "+esc(PROFILES[m.profile])+(m.classe?" ("+esc(CL(m.classe))+")":""):""}. ${dayXp>=DAILY_GOAL?"Daily goal reached, well done!":`${DAILY_GOAL-dayXp} more XP to reach your daily goal.`}</p>
     <div style="max-width:340px;display:grid;gap:6px"><div class="row between small"><span class="muted">Daily goal</span><span class="mono">${Math.min(dayXp,DAILY_GOAL)}/${DAILY_GOAL} XP</span></div><div class="bar gold"><i style="width:${Math.min(100,pct(dayXp,DAILY_GOAL))}%"></i></div></div></div>
     <div class="hero-side">${mascotHTML(TIPS_STUDENT)}<div class="stats"><div class="ring">${ringSVG(into/XP_PER_RANK)}<div class="lbl"><div><span>Rank</span><br><b>${rank}</b></div></div></div>
@@ -2034,7 +2034,7 @@ function aiSuggestions(){if(S.mode==="teacher")return["Create a 5-question quiz 
   const p=S.me?.profile;return[p==="college"?"How can I revise well for the BEPC English test?":p==="lycee"?"How can I pass the BAC English test?":p==="etudiant"?"How do I structure an essay in English?":"How do I introduce myself in English at a job interview?","What is the difference between since and for?","Correct my sentence: She don't like rice.","Explain the present perfect to me with simple examples"]}
 function aiSpeakText(t){if(!canSpeak)return;const plain=String(t).replace(/[*`#]/g,"").replace(/^\s*[-•]\s+/gm,"").trim();const en=(plain.match(/\b(the|is|are|you|and|to|of|I|it|in|my|have|do)\b/gi)||[]).length,fr=(plain.match(/\b(le|la|les|est|et|de|des|un|une|tu|je|pour|que|en)\b/gi)||[]).length;speak(plain,"en")}
 function renderAI(visOnly){const fab=$("#aiFab"),panel=$("#aiPanel");if(!fab||!panel)return;
-  const ok=!!AI.sample&&!AI.disabled&&!S.offline&&(S.mode==="teacher"||!!S.me);fab.hidden=!ok||AI.open;const wasHidden=panel.hidden;panel.hidden=!ok||!AI.open;if(!ok||!AI.open||(visOnly&&!wasHidden))return;
+  const ok=!!AI.sample&&!AI.disabled&&!S.offline&&(S.mode==="teacher"||!!S.me)&&!aiBlocked();fab.hidden=!ok||AI.open;const wasHidden=panel.hidden;panel.hidden=!ok||!AI.open;if(!ok||!AI.open||(visOnly&&!wasHidden))return;
   $("#aiSpeakBtn").innerHTML=ic(AI.speak?"speaker":"mute");$("#aiSpeakBtn").setAttribute("aria-pressed",String(AI.speak));
   const clr=panel.querySelector('[data-a="aiClear"]'),cls=panel.querySelector('[data-a="aiClose"]');if(!clr.innerHTML)clr.innerHTML=ic("refresh");if(!cls.innerHTML)cls.innerHTML=ic("x");
   $("#aiClip").hidden=!AI.canImg;
@@ -2276,7 +2276,7 @@ function notifyNew(){if(S.mode!=="student"||!S.me||!S.meLoaded)return;
   const hwIds=new Set(S.homework.filter(visible).map(h=>h.id));
   let sf=seenGet("mca_fbseen"),sh=seenGet("mca_hwseen");
   if(!sf){seenSet("mca_fbseen",fbIds);sf=fbIds}else{const n=[...fbIds].filter(x=>!sf.has(x));if(n.length){toast("Your teacher corrected "+(n.length>1?n.length+" pieces of work":"your work"),"check");notifyNow("Work corrected","Go and see your mark and your teacher’s comment.");seenSet("mca_fbseen",new Set([...sf,...n]))}}
-  if(!sh){if(hwIds.size)seenSet("mca_hwseen",hwIds)}else{const n=S.homework.filter(visible).filter(h=>!sh.has(h.id));if(n.length){toast("New homework: "+n[0].title,"pen");notifyNow("New homework",n[0].title+(n[0].due?" · due "+fmtDate(n[0].due):""));seenSet("mca_hwseen",new Set([...sh,...n.map(h=>h.id)]));notifRefresh()}}}
+  if(!sh){if(hwIds.size)seenSet("mca_hwseen",hwIds)}else{const n=S.homework.filter(visible).filter(h=>!sh.has(h.id));if(n.length){toast("New homework: "+n[0].title,"pen");notifyNow("New homework",n[0].title+(n[0].due?" · due "+fmtDate(n[0].due):""));seenSet("mca_hwseen",new Set([...sh,...n.map(h=>h.id)]));notifRefresh()}}bulletinWatch();}
 setInterval(notifyNew,6000);
 const notifCard=()=>{if(S.mode!=="student"||!LN())return"";const on=notifOn();
   return`<div class="row" style="margin-top:12px;gap:10px;flex-wrap:wrap"><button class="btn ${on?"ghost":""} sm" data-a="${on?"notifOff":"notifOn"}">${ic("mega")}${on?"Reminders on: turn off":"Turn on reminders"}</button><span class="hint">A reminder at 6 pm and the day before each homework is due.</span></div>`};
@@ -3951,7 +3951,7 @@ function fStoryHTML(){const c=fCur();if(!c)return"";const{g,s}=c,mine=g.uid===S.
   ${s.body?`<div class="fsv-text${s.media?" cap":""}">${fText(s.body)}</div>`:""}
   <button type="button" class="fsv-nav l" data-v4="fSvPrev" aria-label="Previous"></button><button type="button" class="fsv-nav r" data-v4="fSvNext" aria-label="Next"></button>
   <div class="fsv-bot">${mine||fStaff()?`<button type="button" class="btn ghost sm" data-v4="fSvViews">${ic("eye")}${views.length}${rxs.length?` · ${[...new Set(rxs.map(x=>x.e))].slice(0,3).map(e=>E(e)).join("")} ${rxs.length}`:""}</button>${mine?"":fSvReactBtns(s)}<button type="button" class="btn ghost sm" data-v4="fShare" data-k="story" data-id="${esc(s.id)}">${ic("send")}Share</button><button type="button" class="btn ghost sm" data-v4="fSvDel">${ic("trash")}Delete</button>`
-    :`${fSvReactBtns(s)}${S.mode==="student"&&peerOn()&&g.who?.role==="student"?`<form class="fsv-reply" data-ff="srep"><input id="fsv_rep" placeholder="Reply to ${esc(String(g.who?.name||"").split(" ")[0])}…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}<button type="button" class="btn ghost sm fsv-sh" data-v4="fShare" data-k="story" data-id="${esc(s.id)}" aria-label="Share">${ic("send")}</button>`}</div>
+    :`${fSvReactBtns(s)}${S.mode==="student"&&peerOn()?`<form class="fsv-reply" data-ff="srep"><input id="fsv_rep" placeholder="Reply to ${esc(String(g.who?.name||"").split(" ")[0])}…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}<button type="button" class="btn ghost sm fsv-sh" data-v4="fShare" data-k="story" data-id="${esc(s.id)}" aria-label="Share">${ic("send")}</button>`}</div>
   ${v.views?`<div class="v4sheet fsv-views"><b>Seen by ${views.length}</b>${views.length?views.map(x=>{const r=rxs.find(y=>y.uid===x.uid);return`<div class="row">${whoAva(x.who,x.uid,30)}<span>${esc(x.who?.name||"Student")}</span>${r?`<span class="fsv-vr">${E(r.e)}</span>`:""}<small class="muted" style="margin-left:auto">${ago(+new Date(x.at))}</small></div>`}).join(""):`<p class="small muted">Nobody yet.</p>`}<button type="button" class="v4cancel" data-v4="fSvViewsX">Close</button></div>`:""}
   </div>`}
 /* story composer */
@@ -20421,7 +20421,7 @@ async function zzBakeEntries(entries){
     "backdrop-filter:none!important;-webkit-backdrop-filter:none!important;" +
     "text-shadow:none!important;transition:none!important;scroll-behavior:auto!important}" +
     "html.lite *{animation-play-state:paused!important}" +
-    "html.lite .glass{background:var(--lite-bg,rgba(20,24,40,.92))!important}";
+    "html.lite .glass{background:var(--lite-bg,var(--glass-bg,rgba(20,24,40,.92)))!important}";
 
   function stored() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
   function autoLow() {
@@ -21380,6 +21380,15 @@ document.addEventListener("click", function (e) {
 /* ==== v4 END ==== */
 render();
 loadThree();
+
+/* ---- app-v5-zz9-fixes.js ---- */
+/* Corrections : bulletins visibles et notifiés, Nova masqué pendant les tests et hors compte validé, stickers vidéo courts. */
+function aiBlocked(){if(S.mode!=="student")return false;if(!S.me||stOf(S.me)!=="active")return true;if(S.run||(S.liveOn&&liveOpen(S.live))||(S.view&&["lesson","ep","hw"].includes(S.view.type)))return true;return false}
+function bulletinNewHTML(m){const list=Object.values(m.bulletinT||{}).sort((a,b)=>String(b.y).localeCompare(String(a.y))||b.t-a.t);if(!list.length)return"";const e=list[0];return`<div class="section"><div class="glass card click" data-a="tab" data-k="me" tabindex="0" style="border-color:var(--gold-soft)"><div class="row between"><span class="ic t-gold">${ic("grade")}</span><span class="chip ok">${e.avg!=null?fmt2(e.avg)+" /20":"—"}</span></div><h3>Your report card is ready</h3><span class="small muted">${TRI_NAMES[e.t-1]} · ${esc(e.y)}${e.rank?" · Rank "+esc(String(e.rank))+" of "+esc(String(e.of)):""}</span></div></div>`}
+function bulletinWatch(){if(!S.me)return;const now=Object.entries(S.me.bulletinT||{}).map(([k,v])=>k+":"+((v&&v.at)||0));const sb=seenGet("mca_bullseen");if(!sb){seenSet("mca_bullseen",new Set(now));return}const nb=now.filter(x=>!sb.has(x));if(!nb.length)return;toast("Your report card is ready","grade");notifyNow("Report card","Your averages for this term are published. See them on your home page.");seenSet("mca_bullseen",new Set([...sb,...nb]))}
+(function(){function clip(v){if(v.__zzclip)return;v.__zzclip=1;v.addEventListener("timeupdate",function(){if(v.currentTime>=1)v.currentTime=0})}function scan(){document.querySelectorAll("video.zz-stkv,video[data-zzp]").forEach(clip)}new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});scan()})();
+(function(){var st=document.createElement("style");st.id="zz9stk";st.textContent="video.zz-stkv{width:150px;max-width:55vw;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:18px;border:2px solid rgba(255,255,255,.9);box-shadow:0 6px 16px rgba(0,0,0,.25);background:transparent}";document.head.appendChild(st)})();
+
 </script>
 <style id="ui-future">
 .ai-b,.pt-bub{position:relative;border-radius:22px!important;background:linear-gradient(145deg,rgba(30,37,88,.94),rgba(12,16,42,.94))!important;border:1px solid rgba(94,234,212,.22)!important;box-shadow:0 14px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.06),0 0 26px rgba(94,234,212,.09)!important;backdrop-filter:blur(12px);transition:transform .2s ease}
