@@ -1049,7 +1049,7 @@ function v4MsgHTML(kind,m,c){const a=m.att,once=!!(a&&a.o)&&!m.del,stk=a&&a.k===
       :m.opened?`<div class="v4once off">${ob}<b>Opened</b></div>`
       :`<button type="button" class="v4once" data-v4="once" data-k="${kind}" data-id="${esc(m.id)}">${ob}<b>Photo</b><small>Tap to view once</small></button>`}
   else body=msgBodyHTML(m.text,a);
-  const re=m.re&&!m.del?`<div class="v4quote" data-v4="jump" data-id="${esc(m.re.id||"")}"><div class="v4q-w">${esc(v4Who(kind,m.re.w,c))}</div><div class="v4q-t">${esc(m.re.t||"")}</div></div>`:"";
+  const isSt=!!m.re&&String(m.re.id||"").indexOf("story:")===0;const reThumb=isSt&&m.re.p&&V4.obj&&V4.obj[m.re.p];const re=m.re&&!m.del?(isSt?`<div class="v4quote v4qs" data-v4="jump" data-id="${esc(m.re.id)}" data-w="${esc(m.re.w||"")}"><span class="v4q-th" style="${reThumb?"":"background:"+sbg(m.re.bg)}">${reThumb?`<img src="${reThumb}" alt="">`:""}</span><span class="v4q-tx"><span class="v4q-w">Statut de ${esc(String(v4Who(kind,m.re.w,c)||"").split(" ")[0])}</span><span class="v4q-t">${esc(String(m.re.t||"").slice(0,100))}</span></span></div>`:`<div class="v4quote" data-v4="jump" data-id="${esc(m.re.id||"")}"><div class="v4q-w">${esc(v4Who(kind,m.re.w,c))}</div><div class="v4q-t">${esc(m.re.t||"")}</div></div>`):"";
   const rx=Object.values(m.react||{}).filter(Boolean),rxh=rx.length&&!m.del?`<div class="v4rx">${[...new Set(rx)].map(e=>`<span class="v4emo">${e}</span>`).join("")}${rx.length>1?`<b>${rx.length}</b>`:""}</div>`:"";
   const tick=m.mine&&!m.del&&kind!=="x"?`<i class="v4tick${m.read?" rd":""}" aria-label="${m.read?"Read":"Sent"}">${m.read?"✓✓":"✓"}</i>`:"";
   return`<div class="msg ${m.pin?"zz-pn ":""}${m.mine?"mine":""}${stk?" stk":""}${m.del?" del":""}${rxh?" hasrx":""}" data-mid="${esc(m.id)}" data-k="${kind}" id="m-${esc(m.id)}">${re}${body}<span>${fmtTime(m.at)}${tick}</span>${rxh}</div>`}
@@ -1102,7 +1102,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"delMe":{const x=v4ActMsg();V4.act=null;if(x){v4HideForMe(x.raw.id);toast("Message deleted for you","trash")}render();return}
   case"delAll":v4DelAll();return;
   case"once":v4OpenOnce(el.dataset.k,el.dataset.id);return;
-  case"jump":{const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
+  case"jump":{if(String(el.dataset.id||"").indexOf("story:")===0){openQuotedStory(el.dataset.id.slice(6),el.dataset.w);return}const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
   case"preX":if(V4.pre)URL.revokeObjectURL(V4.pre.url);V4.pre=null;render();return;
   case"preOnce":if(V4.pre){V4.pre.cap=(document.getElementById("v4cap")||{}).value||V4.pre.cap||"";V4.pre.once=!V4.pre.once;render()}return;
   case"preSend":{const P=V4.pre;if(!P)return;if(P.video&&P.edit){const capV=(document.getElementById("v4cap")||{}).value||"";zzBakeThenSend(P,capV);return}const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,P.video?undefined:"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
@@ -1305,7 +1305,7 @@ document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||!["po
   else if(f.dataset.ff==="com")fComment(f.dataset.id,f.querySelector("input"));
   else if(f.dataset.ff==="srep"){const c=fCur(),inp=document.getElementById("fsv_rep"),t=(inp&&inp.value||"").trim();if(!c||!t)return;inp.value="";
     const what=c.s.body?v4Plain(c.s.body).slice(0,100):"📷 Photo";
-    (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story",t:"Story: "+what,w:c.g.uid}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}F.sv&&(F.sv.typing=false);fShow()})()}},true);
+    (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story:"+c.s.id,t:what,w:c.g.uid,p:(c.s.media&&c.s.media.p)||null,bg:c.s.bg||null}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}F.sv&&(F.sv.typing=false);fShow()})()}},true);
 document.addEventListener("focusin",e=>{if(e.target&&e.target.id==="fsv_rep"&&F.sv){F.sv.typing=true;clearTimeout(F.svT);feedSync()}});
 document.addEventListener("keydown",e=>{if(!F.sv&&!F.sc)return;if(e.key==="Escape"){if(F.sc){F.sc=null;feedSync()}else fCloseStory()}else if(F.sv&&!F.sv.typing&&e.key==="ArrowRight")fStep(1);else if(F.sv&&!F.sv.typing&&e.key==="ArrowLeft")fStep(-1)});
 {const _l=v4ChatLayout;v4ChatLayout=function(){_l();if(F.sv||F.sc||F.share||document.getElementById("fsvhost")?._h)feedSync();nBell()}}
@@ -1423,7 +1423,7 @@ async function fShareOut(){const it=fShareItem();if(!it)return;const text=`${it.
     if(navigator.share){await navigator.share({title:"English Classes",text,url});return}
     await navigator.clipboard.writeText(text+"\n"+url);toast("Copied: paste it where you want","copy")}catch(e){if(e&&e.name!=="AbortError")toast("Sharing is not available here.","x")}}
 /* chat: videos too */
-{const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img")return fVidTile({p:a.p,t:a.t,d:a.d,e:a.e})+_mb(text,null);return _mb(text,a)}}
+{const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img"&&a.k!=="sticker")return fVidTile({p:a.p,t:a.t,d:a.d,e:a.e})+_mb(text,null);return _mb(text,a)}}
 /* ---------------- notifications ---------------- */
 const N={list:[],loaded:false,un:null,uid:null,at:0,markT:null,sw:0,gone:null,goneUid:null};
 /* only the newest notifications are listed; older ones are hidden, not deleted */
