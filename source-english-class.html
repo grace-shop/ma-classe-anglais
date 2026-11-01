@@ -4020,8 +4020,12 @@ document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||!["po
   else if(f.dataset.ff==="com")fComment(f.dataset.id,f.querySelector("input"));
   else if(f.dataset.ff==="srep"){const c=fCur(),inp=document.getElementById("fsv_rep"),t=(inp&&inp.value||"").trim();if(!c||!t)return;inp.value="";
     const what=c.s.body?v4Plain(c.s.body).slice(0,100):"📷 Photo";
-    (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story",t:"Story: "+what,w:c.g.uid}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}F.sv&&(F.sv.typing=false);fShow()})()}},true);
-document.addEventListener("focusin",e=>{if(e.target&&e.target.id==="fsv_rep"&&F.sv){F.sv.typing=true;clearTimeout(F.svT);feedSync()}});
+    (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story",t:"Story: "+what,w:c.g.uid}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}const ri=document.getElementById("fsv_rep");if(ri)ri.value="";fTypeResume();feedSync()})()}},true);
+/* reply in a story: the story stops while typing, keeps its place, and goes on after sending or leaving the box */
+function fTypeResume(){const v=F.sv;if(!v||!v.typing)return;v.typing=false;const vid=document.getElementById("fsvVid");if(vid&&vid.paused){try{vid.play().catch(()=>{})}catch(e){}}
+  clearTimeout(F.svT);if(!v.views&&!v.share&&!v.paused&&fCur())F.svT=setTimeout(()=>fStep(1),v.tRem||1000);feedSync()}
+document.addEventListener("focusin",e=>{if(e.target&&e.target.id==="fsv_rep"&&F.sv&&!F.sv.typing){const c=fCur(),dur=c?fSdur(c.s)*1000+(fIsVid(c.s)?2500:0):0;F.sv.typing=true;F.sv.tRem=Math.max(300,dur-(Date.now()-F.sv.t0));clearTimeout(F.svT);const vid=document.getElementById("fsvVid");if(vid){try{vid.pause()}catch(x){}}feedSync()}});
+document.addEventListener("focusout",e=>{if(e.target&&e.target.id==="fsv_rep")setTimeout(()=>{const a=document.activeElement;if(!(a&&a.id==="fsv_rep"))fTypeResume()},250)});
 document.addEventListener("keydown",e=>{if(!F.sv&&!F.sc)return;if(e.key==="Escape"){if(F.sc){F.sc=null;feedSync()}else fCloseStory()}else if(F.sv&&!F.sv.typing&&e.key==="ArrowRight")fStep(1);else if(F.sv&&!F.sv.typing&&e.key==="ArrowLeft")fStep(-1)});
 {const _l=v4ChatLayout;v4ChatLayout=function(){_l();if(F.sv||F.sc||F.share||document.getElementById("fsvhost")?._h)feedSync();nBell()}}
 /* where it appears */
