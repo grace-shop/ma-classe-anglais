@@ -116,6 +116,25 @@ if (existsSync("android-extras/screenshare")) {
   console.log("✓ partage d'écran (plugin ScreenShare) ajouté");
 }
 
+// Mise à jour dans l'application : le fichier téléchargé s'ouvre dans l'installeur Android (plugin ApkInstaller)
+if (existsSync("android-extras/installer")) {
+  const dir = "android/app/src/main/java/tg/maclasse/anglais";
+  mkdirSync(dir, { recursive: true });
+  for (const f of readdirSync("android-extras/installer")) cp("android-extras/installer/" + f, dir + "/" + f);
+  mkdirSync("android/app/src/main/res/xml", { recursive: true });
+  writeFileSync("android/app/src/main/res/xml/apk_paths.xml", '<?xml version="1.0" encoding="utf-8"?>\n<paths><cache-path name="apk" path="." /></paths>\n');
+  const mf = "android/app/src/main/AndroidManifest.xml";
+  let m = readFileSync(mf, "utf8");
+  if (!m.includes("apkprovider")) {
+    m = m.replace("</application>", `    <provider android:name="androidx.core.content.FileProvider" android:authorities="${"$"}{applicationId}.apkprovider" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/apk_paths" />
+        </provider>
+    </application>`);
+    writeFileSync(mf, m);
+  }
+  console.log("✓ installeur de mise à jour (ApkInstaller) ajouté");
+}
+
 // Les plugins natifs doivent être enregistrés dans MainActivity. Le modèle de Capacitor n'a pas toujours
 // de onCreate : on écrit donc la classe entière (même paquet), avec l'enregistrement avant super.onCreate.
 {
@@ -125,6 +144,7 @@ if (existsSync("android-extras/screenshare")) {
     const plugins = [];
     if (existsSync("android-extras/callkeeper")) plugins.push("CallKeeperPlugin");
     if (existsSync("android-extras/screenshare")) plugins.push("ScreenSharePlugin");
+    if (existsSync("android-extras/installer")) plugins.push("ApkInstallerPlugin");
     const old = readFileSync(act, "utf8");
     const pkg = (old.match(/^package\s+([\w.]+);/m) || [])[1] || "tg.maclasse.anglais";
     const regs = plugins.map(c => `registerPlugin(${c}.class);`).join("\n        ");

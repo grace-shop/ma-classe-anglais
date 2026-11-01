@@ -498,10 +498,11 @@
     const l = d.querySelector("#updLater"); if (l) l.onclick = () => d.remove();
   };
   const setUpd = (txt, pct) => { const t = document.getElementById("updTxt"); if (t && txt) t.innerHTML = txt; const b = document.getElementById("updBar"); if (b && pct != null) { b.style.display = "block"; b.firstElementChild.style.width = Math.round(pct) + "%"; } };
+  // La mise à jour reste dans l'application : téléchargement, puis l'installeur Android s'ouvre (jamais le navigateur)
   async function installApk(url) {
-    const FS = plug("Filesystem"), FO = plug("FileOpener"), BR = plug("Browser"), H = plug("CapacitorHttp");
-    const viaBrowser = (msg) => { setUpd(msg || "The download opens in the browser: then open the file and tap “Update”.", null); if (BR) BR.open({ url }); else location.href = url; };
-    if (!(FS && FS.downloadFile && FO)) return viaBrowser();
+    const FS = plug("Filesystem"), AI = plug("ApkInstaller"), H = plug("CapacitorHttp");
+    const failed = (msg) => setUpd(msg || "The update could not start. Check your connection, then tap “Update now” again.", null);
+    if (!(FS && FS.downloadFile && AI)) return failed("This version of the app cannot install updates by itself. Install the latest version once from the download page, then updates will work here.");
     try {
       // GitHub redirige le lien vers son serveur de fichiers : on récupère d'abord l'adresse finale
       let finalUrl = url;
@@ -511,12 +512,11 @@
       try { await FS.deleteFile({ path: "english-classes-maj.apk", directory: "CACHE" }); } catch (e) {}
       const r = await FS.downloadFile({ url: finalUrl, path: "english-classes-maj.apk", directory: "CACHE", progress: true });
       try { h && h.remove(); } catch (e) {}
-      // vérification : un vrai fichier d'application pèse plusieurs Mo
-      let size = 0; try { const st = await FS.stat({ path: "english-classes-maj.apk", directory: "CACHE" }); size = st.size || 0; } catch (e) {}
-      if (size && size < 2000000) throw new Error("fichier incomplet");
-      setUpd("Tap “Update” on the Android screen. Your data is kept.", 100);
-      await FO.open({ filePath: r.path || r.uri, contentType: "application/vnd.android.package-archive", openWithDefault: true });
-    } catch (e) { viaBrowser("The direct download did not work: it opens in the browser. Then open the downloaded file and tap “Update”."); }
+      setUpd("Opening the installer…", 99);
+      const res = await AI.install({ path: r.path || r.uri });
+      if (res && res.needsPermission) return setUpd("Allow installs for English Classes on the screen that opens, come back here, then tap “Update now” again.", null);
+      setUpd("Tap “Install” on the Android screen. Your data is kept.", 100);
+    } catch (e) { failed(); }
   }
   async function checkNativeUpdate(manual) {
     if (!isNative()) return;

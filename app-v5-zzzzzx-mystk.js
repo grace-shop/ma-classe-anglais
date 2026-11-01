@@ -9,7 +9,7 @@
    - A sticker is kept on the server; the list is kept on this phone.
    ===================================================================== */
 (function () {
-  var MAX_VIDEO = 40 * 1024 * 1024;   // the source video; the sticker itself is cut to 1 second
+  var MAX_VIDEO = 40 * 1024 * 1024;   // the source video; the sticker itself is cut to 5 seconds
 
   function store() {
     var uid = ((typeof S !== "undefined" ? S : undefined) && S.uid) || "anon";
@@ -103,14 +103,14 @@
     window.__zzPhotoEdit.open(url, function (edited) { makeSticker(edited); });
   }
 
-  // a 1-second square clip cut from the video (centred, 320 px), like a photo sticker
+  // a 5-second square clip cut from the video (centred, 320 px), like a photo sticker
   function videoClip(file) {
     return new Promise(function (resolve, reject) {
       if (typeof MediaRecorder === "undefined") { reject(new Error("Sticker vidéo non disponible sur ce téléphone")); return; }
       var url = URL.createObjectURL(file);
       var v = document.createElement("video");
       v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = url;
-      var SIDE = 320, DUR = 1, done = false, rec = null;
+      var SIDE = 320, DUR = 5, done = false, rec = null;
       function fail(msg) { if (done) return; done = true; URL.revokeObjectURL(url); reject(new Error(msg)); }
       v.onerror = function () { fail("Vidéo non lisible"); };
       v.onloadeddata = function () {
@@ -131,7 +131,7 @@
           ctx.drawImage(v, sx, sy, side, side, 0, 0, SIDE, SIDE);
           requestAnimationFrame(frame);
         }
-        setTimeout(function () { if (!done && rec && rec.state !== "inactive") { v.pause(); rec.stop(); } }, 4000);
+        setTimeout(function () { if (!done && rec && rec.state !== "inactive") { v.pause(); rec.stop(); } }, 8000);
         rec.start(100);
         v.currentTime = 0;
         v.play().then(function () { requestAnimationFrame(frame); }).catch(function () { fail("Vidéo non lisible"); });

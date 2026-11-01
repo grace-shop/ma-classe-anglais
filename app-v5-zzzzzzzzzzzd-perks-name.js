@@ -70,6 +70,3 @@
   };
 }
 
-/* ==== v4 END ==== */
-render();
-loadThree();
