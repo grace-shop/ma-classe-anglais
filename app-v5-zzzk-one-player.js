@@ -13,6 +13,7 @@
   const inCall=m=>!!(m.closest&&m.closest("#callScr"))||(m.id||"").indexOf("callAud-")===0;
   const pauseAll=(except,keepWin)=>{
     document.querySelectorAll("video,audio").forEach(m=>{
+      if(m.dataset&&m.dataset.stk) return;                 // animated stickers play on their own
       if(m!==except&&!m.paused&&!inCall(m)) try{m.pause()}catch(e){}
     });
     document.querySelectorAll("iframe").forEach(f=>{
@@ -24,6 +25,7 @@
   // « play » ne remonte pas dans le document : on écoute en phase de capture
   document.addEventListener("play",e=>{
     const t=e.target;
+    if(t&&t.dataset&&t.dataset.stk) return;
     if(t&&(t.tagName==="VIDEO"||t.tagName==="AUDIO")&&!inCall(t)) pauseAll(t,null);
   },true);
   // messages venant d'un lecteur YouTube : il vient de démarrer (état 1 = lecture)

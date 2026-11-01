@@ -183,7 +183,7 @@
     srcBlob({ k: "m", id: path, t: mime }).then(function (b) {
       var u = URL.createObjectURL(b);
       el.src = u;
-      if (el.tagName === "VIDEO") { el.muted = true; el.play && el.play().catch(function () {}); }
+      if (el.tagName === "VIDEO") { el.muted = true; }   // the sticker plays by itself when it is on screen (app-v5-zzzzzzzzzzzf-stickers.js)
     }).catch(function () {
       el.removeAttribute("src");
       el.alt = "Sticker indisponible";
