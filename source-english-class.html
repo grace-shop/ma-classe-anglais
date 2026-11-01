@@ -4138,7 +4138,7 @@ async function fShareOut(){const it=fShareItem();if(!it)return;const text=`${it.
     if(navigator.share){await navigator.share({title:"English Classes",text,url});return}
     await navigator.clipboard.writeText(text+"\n"+url);toast("Copied: paste it where you want","copy")}catch(e){if(e&&e.name!=="AbortError")toast("Sharing is not available here.","x")}}
 /* chat: videos too */
-{const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img")return fVidTile({p:a.p,t:a.t,d:a.d,e:a.e})+_mb(text,null);return _mb(text,a)}}
+{const _mb=msgBodyHTML;msgBodyHTML=function(text,a){if(a&&typeof a==="object"&&a.p&&/^video\//.test(a.t||"")&&a.k!=="img"&&a.k!=="sticker")return fVidTile({p:a.p,t:a.t,d:a.d,e:a.e})+_mb(text,null);return _mb(text,a)}}
 /* ---------------- notifications ---------------- */
 const N={list:[],loaded:false,un:null,uid:null,at:0,markT:null,sw:0,gone:null,goneUid:null};
 /* only the newest notifications are listed; older ones are hidden, not deleted */
@@ -21478,6 +21478,15 @@ document.addEventListener("click", function (e) {
   arm();
 })();
 
+/* ---- video sticker look: small square, thin white border, no player parts at all ---- */
+(function(){var st=document.createElement("style");st.id="zzStkLook";st.textContent=
+".msg video.zz-stkv,.msg img.zz-stki{width:130px;max-width:50vw;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:10px;border:2px solid rgba(255,255,255,.92);box-sizing:border-box;background:#000;display:block;filter:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}"+
+"video.zz-stkv::-webkit-media-controls,video.zz-stkv::-webkit-media-controls-enclosure,video.zz-stkv::-webkit-media-controls-panel,video.zz-stkv::-webkit-media-controls-overlay-play-button,video.zz-stkv::-webkit-media-controls-start-playback-button,video.zz-stkv::-webkit-media-controls-play-button,video.zz-stkv::-webkit-media-controls-timeline,video.zz-stkv::-webkit-media-controls-current-time-display,video.zz-stkv::-webkit-media-controls-fullscreen-button{display:none!important;opacity:0!important;-webkit-appearance:none}"+
+".msg.stk>span{align-self:flex-end;margin-top:3px;background:rgba(0,0,0,.45);color:#fff;border-radius:9px;padding:1px 7px;font-size:11px}";
+document.head.appendChild(st);
+document.addEventListener("contextmenu",function(e){var t=e.target;if(t&&t.closest&&t.closest("video.zz-stkv"))e.preventDefault()},true);
+document.addEventListener("pause",function(e){var v=e.target;if(v&&v.tagName==="VIDEO"&&v.classList.contains("zz-stkv")&&v.dataset.stkon!=="0"&&!v.ended&&document.visibilityState==="visible")setTimeout(function(){if(v.isConnected&&v.paused)v.play().catch(function(){})},60)},true);
+})();
 /* ==== v4 END ==== */
 render();
 loadThree();
@@ -21487,7 +21496,6 @@ loadThree();
 function aiBlocked(){if(S.mode!=="student")return false;if(!S.me||stOf(S.me)!=="active")return true;if(S.run||(S.liveOn&&liveOpen(S.live))||(S.view&&["lesson","ep","hw"].includes(S.view.type)))return true;return false}
 function bulletinNewHTML(m){const list=Object.values(m.bulletinT||{}).sort((a,b)=>String(b.y).localeCompare(String(a.y))||b.t-a.t);if(!list.length)return"";const e=list[0];return`<div class="section"><div class="glass card click" data-a="tab" data-k="me" tabindex="0" style="border-color:var(--gold-soft)"><div class="row between"><span class="ic t-gold">${ic("grade")}</span><span class="chip ok">${e.avg!=null?fmt2(e.avg)+" /20":"—"}</span></div><h3>Your report card is ready</h3><span class="small muted">${TRI_NAMES[e.t-1]} · ${esc(e.y)}${e.rank?" · Rank "+esc(String(e.rank))+" of "+esc(String(e.of)):""}</span></div></div>`}
 function bulletinWatch(){if(!S.me)return;const now=Object.entries(S.me.bulletinT||{}).map(([k,v])=>k+":"+((v&&v.at)||0));const sb=seenGet("mca_bullseen");if(!sb){seenSet("mca_bullseen",new Set(now));return}const nb=now.filter(x=>!sb.has(x));if(!nb.length)return;toast("Your report card is ready","grade");notifyNow("Report card","Your averages for this term are published. See them on your home page.");seenSet("mca_bullseen",new Set([...sb,...nb]))}
-(function(){function clip(v){if(v.__zzclip)return;v.__zzclip=1;v.addEventListener("timeupdate",function(){if(v.currentTime>=1)v.currentTime=0})}function scan(){document.querySelectorAll("video.zz-stkv,video[data-zzp]").forEach(clip)}new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});scan()})();
 (function(){var st=document.createElement("style");st.id="zz9stk";st.textContent="video.zz-stkv{width:150px;max-width:55vw;height:auto;aspect-ratio:1/1;object-fit:contain;display:block;background:transparent;border:0;box-shadow:none;border-radius:0}";document.head.appendChild(st)})();
  /* ---- zz9 : citation de statut ---- */
 (function(){var st=document.createElement("style");st.id="zz9quote";st.textContent=".v4qs{display:flex;gap:10px;align-items:center;cursor:pointer}.v4q-th{width:44px;height:44px;border-radius:10px;flex:none;overflow:hidden;display:block}.v4q-th img{width:100%;height:100%;object-fit:cover;display:block}.v4q-tx{display:grid;min-width:0}.v4qs .v4q-w,.v4qs .v4q-t{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}";document.head.appendChild(st)})();
