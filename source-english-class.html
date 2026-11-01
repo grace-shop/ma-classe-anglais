@@ -4018,7 +4018,7 @@ document.addEventListener("change",e=>{const el=e.target;if(!el||!el.id)return;
 document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||!["post","com","srep"].includes(f.dataset.ff))return;e.preventDefault();e.stopImmediatePropagation();
   if(f.dataset.ff==="post")fPost();
   else if(f.dataset.ff==="com")fComment(f.dataset.id,f.querySelector("input"));
-  else if(f.dataset.ff==="srep"){const c=fCur(),inp=document.getElementById("fsv_rep"),t=(inp&&inp.value||"").trim();if(!c||!t)return;inp.value="";
+  else if(f.dataset.ff==="srep"){const c=fCur(),inp=f.querySelector("input")||document.getElementById("fsv_rep"),t=(inp&&inp.value||"").trim();if(!c){toast("This status is closed.","x");return}if(!t)return;inp.value="";
     const what=c.s.body?v4Plain(c.s.body).slice(0,100):"📷 Photo";
     (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story:"+c.s.id,t:what,w:c.g.uid,p:(c.s.media&&c.s.media.p)||null,bg:c.s.bg||null}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}F.sv&&(F.sv.typing=false);fShow()})()}},true);
 document.addEventListener("focusin",e=>{if(e.target&&e.target.id==="fsv_rep"&&F.sv){F.sv.typing=true;clearTimeout(F.svT);feedSync()}});
