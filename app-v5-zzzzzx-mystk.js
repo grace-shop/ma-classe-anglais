@@ -9,7 +9,7 @@
    - A sticker is kept on the server; the list is kept on this phone.
    ===================================================================== */
 (function () {
-  var MAX_VIDEO = 6 * 1024 * 1024;   // a sticker video must stay small
+  var MAX_VIDEO = 40 * 1024 * 1024;   // the source video; the sticker itself is cut to 1 second
 
   function store() {
     var uid = ((typeof S !== "undefined" ? S : undefined) && S.uid) || "anon";
@@ -103,25 +103,54 @@
     window.__zzPhotoEdit.open(url, function (edited) { makeSticker(edited); });
   }
 
+  // a 1-second square clip cut from the video (centred, 320 px), like a photo sticker
+  function videoClip(file) {
+    return new Promise(function (resolve, reject) {
+      if (typeof MediaRecorder === "undefined") { reject(new Error("Sticker vidéo non disponible sur ce téléphone")); return; }
+      var url = URL.createObjectURL(file);
+      var v = document.createElement("video");
+      v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = url;
+      var SIDE = 320, DUR = 1, done = false, rec = null;
+      function fail(msg) { if (done) return; done = true; URL.revokeObjectURL(url); reject(new Error(msg)); }
+      v.onerror = function () { fail("Vidéo non lisible"); };
+      v.onloadeddata = function () {
+        var w = v.videoWidth, h = v.videoHeight;
+        if (!w || !h) { fail("Vidéo non lisible"); return; }
+        var side = Math.min(w, h), sx = (w - side) / 2, sy = (h - side) / 2;
+        var cv = document.createElement("canvas"); cv.width = SIDE; cv.height = SIDE;
+        var ctx = cv.getContext("2d");
+        var mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp8") ? "video/webm;codecs=vp8" : "video/webm";
+        try { rec = new MediaRecorder(cv.captureStream(24), { mimeType: mime, videoBitsPerSecond: 800000 }); }
+        catch (e) { fail("Sticker vidéo impossible à créer sur ce téléphone"); return; }
+        var chunks = [];
+        rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+        rec.onstop = function () { if (done) return; done = true; URL.revokeObjectURL(url); resolve(new Blob(chunks, { type: "video/webm" })); };
+        function frame() {
+          if (done) return;
+          if (v.currentTime >= DUR || v.ended) { v.pause(); if (rec.state !== "inactive") rec.stop(); return; }
+          ctx.drawImage(v, sx, sy, side, side, 0, 0, SIDE, SIDE);
+          requestAnimationFrame(frame);
+        }
+        setTimeout(function () { if (!done && rec && rec.state !== "inactive") { v.pause(); rec.stop(); } }, 4000);
+        rec.start(100);
+        v.currentTime = 0;
+        v.play().then(function () { requestAnimationFrame(frame); }).catch(function () { fail("Vidéo non lisible"); });
+      };
+      v.load();
+    });
+  }
+
   function makeSticker(file) {
     var video = isVideo(file);
-    var type = (file.type || "").toLowerCase();
-    var name = (file.name || "").toLowerCase();
-    if (video) {
-      // only the formats that every phone shows inside a bubble
-      if (/\.mp4$/.test(name) || type === "video/mp4") type = "video/mp4";
-      else if (/\.webm$/.test(name) || type === "video/webm") type = "video/webm";
-      else { toast("Ce format de vidéo ne marche pas en sticker. Utilise une vidéo MP4 ou WebM, ou fais un GIF.", "x"); return; }
-      if (file.size > MAX_VIDEO) { toast("Vidéo trop lourde pour un sticker (6 Mo max). Prends une vidéo plus courte.", "x"); return; }
-    }
+    if (video && file.size > MAX_VIDEO) { toast("Vidéo trop lourde (40 Mo max).", "x"); return; }
     toast("Création du sticker…", "check");
-    var job = video ? Promise.resolve(new Blob([file], { type: type }))
-      : (isGif(file) ? Promise.resolve(file) : resizeToWebp(file));
+    var job = video ? videoClip(file) : (isGif(file) ? Promise.resolve(file) : resizeToWebp(file));
     job.then(function (blob) {
-      var ext = video ? (type === "video/webm" ? "webm" : "mp4") : (isGif(file) ? "gif" : "webp");
+      var ext = video ? "webm" : (isGif(file) ? "gif" : "webp");
+      var t = video ? "video/webm" : (blob.type || "");
       return window.__chatFiles.upload(blob, "sticker." + ext).then(function (up) {
         var l = store().list();
-        l.unshift({ id: Math.random().toString(36).slice(2, 10), p: up.p, t: up.t || blob.type });
+        l.unshift({ id: Math.random().toString(36).slice(2, 10), p: up.p, t: up.t || t });
         store().save(l.slice(0, 60));
         toast("Sticker ajouté à ta collection", "check");
         if (typeof render === "function") render();

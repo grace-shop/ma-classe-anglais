@@ -16,7 +16,7 @@
     // light by default: blur and looping animations are what make Android WebViews stutter; only strong phones keep them
     return !(mem >= 8 && cores >= 8);
   }
-  function isLite() { var s = stored(); return s === null ? autoLow() : s === "1"; }
+  function isLite() { var s = stored(); return s === null ? true : s === "1"; }
   function apply() { document.documentElement.classList.toggle("lite", isLite()); }
 
   var st = document.createElement("style");

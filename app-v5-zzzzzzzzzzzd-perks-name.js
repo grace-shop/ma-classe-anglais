@@ -69,3 +69,7 @@
     return k > 0 ? h.slice(0, k) + card + h.slice(k) : h + card;
   };
 }
+
+/* ==== v4 END ==== */
+render();
+loadThree();
