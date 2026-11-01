@@ -501,61 +501,43 @@
   // La mise à jour reste dans l'application : téléchargement, puis l'installeur Android s'ouvre (jamais le navigateur)
   async function installApk(url) {
     const FS = plug("Filesystem"), AI = plug("ApkInstaller"), H = plug("CapacitorHttp");
-    const failed = (msg) => setUpd(msg || "The update could not start. Check your connection, then tap “Update now” again.", null);
-    if (!(FS && FS.downloadFile && AI)) return failed("This version of the app cannot install updates by itself. Install the latest version once from the download page, then updates will work here.");
-    const NAME = "english-classes-maj.apk";
-    // GitHub redirige le lien vers son serveur de fichiers (adresse signée, valable peu de temps) : on récupère l'adresse finale
-    // et la taille exacte du fichier, pour vérifier ensuite que le téléchargement est complet
-    const probe = async () => {
-      let finalUrl = url, size = 0;
-      if (H && H.request) {
-        try {
-          const r = await H.request({ url, method: "GET", headers: { Range: "bytes=0-0" } });
-          if (r && r.url && /^https:/.test(r.url)) finalUrl = r.url;
-          const hd = (r && r.headers) || {};
-          for (const k in hd) {
-            const key = k.toLowerCase();
-            if (key === "content-range") { const m = /\/(\d+)\s*$/.exec(String(hd[k])); if (m) size = parseInt(m[1], 10); }
-            else if (key === "content-length" && r.status === 200 && !size) size = parseInt(hd[k], 10) || 0;
-          }
-        } catch (e) {}
-      }
-      return { finalUrl, size };
-    };
-    const openPage = async () => {
-      setUpd("The automatic download did not work. Opening the download page: tap the file, then “Install”.", null);
-      try { const B = plug("Browser"); if (B && B.open) { await B.open({ url: CFG.apkUrl || url }); return; } } catch (e) {}
-      try { window.open(CFG.apkUrl || url, "_system"); } catch (e) {}
-    };
-    let permAsked = false;
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      let h = null;
-      try {
-        const { finalUrl, size } = await probe();
-        setUpd(attempt === 1 ? "Downloading the new version…" : "Downloading again (try " + attempt + " of 3)…", 2);
-        try { h = await FS.addListener("progress", (p) => { if (p && p.contentLength) setUpd(null, 2 + (p.bytes / p.contentLength) * 95); }); } catch (e) {}
-        try { await FS.deleteFile({ path: NAME, directory: "CACHE" }); } catch (e) {}
-        const r = await FS.downloadFile({ url: finalUrl, path: NAME, directory: "CACHE", progress: true });
-        try { h && h.remove(); } catch (e) {} h = null;
-        const path = r.path || r.uri;
-        // le fichier doit avoir exactement la taille annoncée : sinon il est incomplet et Android dirait « problème lors de l'analyse du package »
-        let got = 0; try { const st = await FS.stat({ path: NAME, directory: "CACHE" }); got = (st && st.size) || 0; } catch (e) {}
-        if ((size && got && got !== size) || (got && got < 2000000)) { try { await FS.deleteFile({ path: NAME, directory: "CACHE" }); } catch (e) {} continue; }
-        setUpd("Opening the installer…", 99);
-        const res = await AI.install({ path, size });
-        if (res && res.needsPermission) {
-          if (permAsked) return setUpd("Allow installs for English Classes on the screen that opens, come back here, then tap “Update now” again.", null);
-          permAsked = true; return setUpd("Allow installs for English Classes on the screen that opens, come back here, then tap “Update now” again.", null);
+    const failed = (why) => setUpd("The update did not finish" + (why ? " (" + String(why).slice(0, 90) + ")" : "") + ". Stay connected and tap “Update now” again: it resumes by itself.", null);
+    const permMsg = "Allow installs for English Classes on the screen that opens, come back here, then tap “Update now” again.";
+    if (!(AI && (AI.download || (FS && FS.downloadFile)))) return setUpd("This version of the app cannot install updates by itself. Install the latest version once from the download page, then updates will work here.", null);
+    let h = null;
+    try {
+      setUpd("Downloading the new version…", 2);
+      let path, size = 0;
+      if (AI.download) {
+        // native download inside the app: resumes after a cut, checks that the file is complete (never the browser)
+        try { h = await AI.addListener("progress", (p) => { if (p && p.total) setUpd(null, 2 + (p.bytes / p.total) * 95); }); } catch (e) {}
+        const r = await AI.download({ url, name: "english-classes-maj.apk" });
+        path = r.path; size = r.size || 0;
+      } else {
+        // older installed version of the app: download with the file plugin, with the size checked
+        let finalUrl = url;
+        if (H && H.request) {
+          try {
+            const r = await H.request({ url, method: "GET", headers: { Range: "bytes=0-0" } });
+            if (r && r.url && /^https:/.test(r.url)) finalUrl = r.url;
+            const hd = (r && r.headers) || {};
+            for (const k in hd) if (k.toLowerCase() === "content-range") { const m = /\/(\d+)\s*$/.exec(String(hd[k])); if (m) size = parseInt(m[1], 10); }
+          } catch (e) {}
         }
-        return setUpd("Tap “Install” on the Android screen. Your data is kept.", 100);
-      } catch (e) {
-        try { h && h.remove(); } catch (x) {}
-        const msg = String((e && (e.message || e)) || "");
-        if (/corrupt|incomplete|wrong app/i.test(msg)) { try { await FS.deleteFile({ path: NAME, directory: "CACHE" }); } catch (x) {} continue; }
-        if (attempt >= 3) break;
+        try { h = await FS.addListener("progress", (p) => { if (p && p.contentLength) setUpd(null, 2 + (p.bytes / p.contentLength) * 95); }); } catch (e) {}
+        try { await FS.deleteFile({ path: "english-classes-maj.apk", directory: "CACHE" }); } catch (e) {}
+        const r = await FS.downloadFile({ url: finalUrl, path: "english-classes-maj.apk", directory: "CACHE", progress: true });
+        path = r.path || r.uri;
       }
+      try { h && h.remove(); } catch (e) {} h = null;
+      setUpd("Opening the installer…", 99);
+      const res = await AI.install({ path, size });
+      if (res && res.needsPermission) return setUpd(permMsg, null);
+      setUpd("Tap “Install” on the Android screen. Your data is kept.", 100);
+    } catch (e) {
+      try { h && h.remove(); } catch (x) {}
+      failed((e && (e.message || e)) || "");
     }
-    await openPage();
   }
   async function checkNativeUpdate(manual) {
     if (!isNative()) return;
