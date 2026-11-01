@@ -3817,7 +3817,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   case"delMe":{const x=v4ActMsg();V4.act=null;if(x){v4HideForMe(x.raw.id);toast("Message deleted for you","trash")}render();return}
   case"delAll":v4DelAll();return;
   case"once":v4OpenOnce(el.dataset.k,el.dataset.id);return;
-  case"jump":{if(String(el.dataset.id||"").indexOf("story:")===0){const sid=el.dataset.id.slice(6),w=el.dataset.w;if(F.stories.some(x=>x.id===sid)&&w)fOpenStory(w);else toast("This status has expired","x");return}const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
+  case"jump":{if(String(el.dataset.id||"").indexOf("story:")===0){openQuotedStory(el.dataset.id.slice(6),el.dataset.w);return}const t=document.getElementById("m-"+el.dataset.id);if(t){t.scrollIntoView({block:"center",behavior:"smooth"});t.classList.add("v4flash");setTimeout(()=>t.classList.remove("v4flash"),1200)}return}
   case"preX":if(V4.pre)URL.revokeObjectURL(V4.pre.url);V4.pre=null;render();return;
   case"preOnce":if(V4.pre){V4.pre.cap=(document.getElementById("v4cap")||{}).value||V4.pre.cap||"";V4.pre.once=!V4.pre.once;render()}return;
   case"preSend":{const P=V4.pre;if(!P)return;if(P.video&&P.edit){const capV=(document.getElementById("v4cap")||{}).value||"";zzBakeThenSend(P,capV);return}const cap=(document.getElementById("v4cap")||{}).value||"";V4.pre=null;URL.revokeObjectURL(P.url);render();v4SendFile(P.kind,P.target,P.file,P.file.name,P.video?undefined:"img",null,{once:P.once,caption:cap,hd:!!P.hd});return}
@@ -3933,6 +3933,15 @@ function feedView(embedded){if(!F.loaded&&!F.loading)feedLoad();try{localStorage
   ${F.loaded&&F.more&&vis.length?`<div style="text-align:center"><button type="button" class="btn ghost sm" data-v4="fMore">See older posts</button></div>`:""}
   </div>`}
 /* story viewer */
+async function openQuotedStory(sid,w){
+  if(!sid||!w)return;
+  const has=()=>F.stories.some(x=>x.id===sid);
+  if(!has()){try{F.loading=false;await feedLoad()}catch(e){}}
+  if(!has()){toast("This status has expired","x");return}
+  const G=fGroups(),gi=G.findIndex(x=>x.uid===w);if(gi<0){toast("This status has expired","x");return}
+  const si=Math.max(0,G[gi].list.findIndex(x=>x.id===sid));
+  F.sv={G,gi,si,t0:Date.now(),views:false};fShow();
+}
 function fOpenStory(uid){const G=fGroups(),gi=G.findIndex(x=>x.uid===uid);if(gi<0)return;const g=G[gi];let si=g.list.findIndex(s=>!F.seen.has(s.id));if(si<0||uid===S.uid)si=0;F.sv={G,gi,si,t0:Date.now(),views:false};fShow()}
 function fCur(){const v=F.sv;if(!v)return null;const g=v.G[v.gi];return g?{g,s:g.list[v.si]}:null}
 function fShow(){const c=fCur();if(!c){F.sv=null;feedSync();return}const s=c.s;F.sv.t0=Date.now();
