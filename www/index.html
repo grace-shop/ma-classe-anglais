@@ -21702,7 +21702,15 @@ openQuotedStory = async function (sid, w, snap) {
     if (!h || !c || !c.s || !c.s.media) return h;
     var btn = '<button type="button" class="iconbtn" data-zzdl="1" onclick="zzDownloadStory(event)" aria-label="Download" title="Download">' +
       '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button>';
-    return h.replace('<button type="button" class="iconbtn" data-v4="fSvClose"', btn + '<button type="button" class="iconbtn" data-v4="fSvClose"');
+    var out = h.replace('<button type="button" class="iconbtn" data-v4="fSvClose"', btn + '<button type="button" class="iconbtn" data-v4="fSvClose"');
+    // Diagnostic line: where does the media loading stop?
+    var m = c.s.media, isV = typeof fIsVid === "function" && fIsVid(c.s);
+    var info = "DIAG p=" + String(m.p || "").slice(-14) + " t=" + (m.t || "none") + " vid=" + isV +
+      " obj=" + (m.p && V4.obj[m.p] ? "yes" : "no") +
+      " svUrl=" + (F.svUrl && F.svUrl.id === c.s.id ? "yes" : "no") +
+      " err=" + (F.svErr && F.svErr.id === c.s.id ? F.svErr.m : "none");
+    var dbg = '<div style="position:absolute;top:70px;left:8px;right:8px;z-index:50;background:#000a;color:#ff0;font:12px monospace;padding:4px 6px;border-radius:6px;pointer-events:none">' + info.replace(/</g, "&lt;") + '</div>';
+    return out.replace('<div class="fsv"', dbg + '<div class="fsv"');
   };
 
   function currentMediaUrl() {
