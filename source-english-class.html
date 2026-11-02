@@ -3526,6 +3526,8 @@ const BOOSTS=[{id:"boost30",t:"Turbo XP ×2 · 30 min",min:30,price:250},{id:"bo
 const boostLeft=()=>Math.max(0,((S.me&&S.me.boostUntil)||0)-Date.now());
 const spotLeft=m=>Math.max(0,((m&&m.spotUntil)||0)-Date.now());
 const shCoins=()=>coinsOf(S.me);
+/* modifier son profil (nom, bio, photo, couverture) coûte des XP ; la première mise en place du nom est gratuite */
+const PROFILE_CHANGE_XP=100;
 function shSpend(price,patch,msg){const m=S.me;if(!m)return false;if(shCoins()<price){toast("Not enough XP yet: keep working!","x");return false}
   meWrite({spent:(m.spent||0)+price,...patch});beep("win");if(!LITE)confetti();toast(msg+` (−${price} XP)`,"bag");return true}
 /* XP doublés pendant le turbo */
@@ -7597,6 +7599,8 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
     if(!S.uid||S.mode!=="student"){toast("Only students can save an avatar.","x");return}
     if(nm.length<2){toast("Write your name (at least 2 letters).","x");return}
     const ps=(({g,skin,hair,hairCol,eyes,mouth,brow,outfit,cut,acc,bg})=>({g,skin,hair,hairCol,eyes,mouth,brow,outfit,cut,acc,bg}))(avt);
+    const was=S.me||{};const first=!was.name;const changed=nm!==(was.name||"")||b!==(was.bio||"")||JSON.stringify(ps)!==JSON.stringify(was.avt||null);
+    if(changed&&!first&&!shSpend(PROFILE_CHANGE_XP,{},"Profile changed")) return;
     S.me={...(S.me||{}),avt:ps,bio:b,name:nm};
     write(()=>S.db.doc("students/"+S.uid).update({avt:ps,bio:b,name:nm})).then(()=>{toast("Profile saved","check")}).catch(()=>toast("Saved on this phone: it will be sent when you are online.","check"));
     // the leaderboard copy of the name (if it exists yet)
@@ -7659,7 +7663,7 @@ function covBanner(url,editable){
 {const _pf=profileView;profileView=function(){const url=S.me&&S.me.cover;return`<div class="section av3-wrap" style="max-width:720px;margin-inline:auto;gap:0">${covBanner(url,true)}</div>`+_pf()}}
 {const _pv2=personView;personView=function(){const id=S.view&&S.view.id;covLoad(id);const h=_pv2();const url=id&&AV.covers[id];
   return url?h.replace('<div class="section av3-wrap" style="max-width:720px;margin-inline:auto">',`<div class="section av3-wrap" style="max-width:720px;margin-inline:auto">${covBanner(url,false)}`):h}}
-async function covSet(url){if(!S.uid||S.mode!=="student")return;S.me={...(S.me||{}),cover:url||""};
+async function covSet(url){if(!S.uid||S.mode!=="student")return;if((url||"")!==((S.me&&S.me.cover)||"")&&!shSpend(PROFILE_CHANGE_XP,{},"Cover changed"))return;S.me={...(S.me||{}),cover:url||""};
   await write(()=>S.db.doc("students/"+S.uid).update({cover:url||""}));render()}
 document.addEventListener("change",async e=>{const el=e.target;if(!el||el.id!=="covFile")return;const f=el.files&&el.files[0];el.value="";if(!f)return;
   if(!navigator.onLine){toast("No network: try again when you are online.","x");return}
@@ -21567,6 +21571,7 @@ document.addEventListener("click", function (e) {
     var el = document.getElementById("pfName"), nm = String(el ? el.value : "").replace(/\s+/g, " ").trim().slice(0, 40);
     if (nm.length < 2) { toast("Write your name (at least 2 letters).", "x"); return; }
     if (!S.uid) return;
+    if (S.me && S.me.name && nm !== S.me.name && !shSpend(PROFILE_CHANGE_XP, {}, "Name changed")) return;
     S.me = Object.assign({}, S.me, { name: nm });
     write(function () { return S.db.doc("students/" + S.uid).update({ name: nm }); }).then(function () { toast("Name saved", "check"); }).catch(function () { toast("Saved on this phone: it will be sent when you are online.", "check"); });
     try { write(function () { return S.db.doc("board/" + S.uid).update({ name: nm }); }).catch(function () {}); } catch (x) {}
@@ -21764,6 +21769,25 @@ openQuotedStory = async function (sid, w, snap) {
     var idx = h.lastIndexOf("</div>");
     return idx < 0 ? h : h.slice(0, idx) + block + h.slice(idx);
   };
+})();
+
+/* ---- app-v5-zzzzzzzzzzzk-friend-tap.js ---- */
+/* Liste des camarades / amis (comme WhatsApp) : taper la photo ouvre le PROFIL, même si la personne a mis une story.
+   La story ne s'ouvre que depuis l'anneau de story (bulles en haut de l'accueil). Taper le reste de la ligne ouvre la discussion. */
+(function () {
+  document.addEventListener("click", function (e) {
+    var av = e.target.closest && e.target.closest(".av");
+    var row = av && av.closest('[data-a="openPeer"][data-id]');
+    if (!row || !S.uid) return;
+    var id = row.dataset.id;
+    e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation();
+    // ferme un visionneur de story déjà ouvert par un autre écouteur sur ce même tap
+    if (F.sv) { clearTimeout(F.svT); F.sv = null; }
+    S.view = { type: "person", id: id }; S.animate = true; scrollTo(0, 0);
+    render();
+    // au cas où un autre gestionnaire ouvre la story pendant ce tap
+    setTimeout(function () { if (F.sv && F.sv.gi >= 0) { clearTimeout(F.svT); F.sv = null; feedSync(); render(); } }, 0);
+  }, true);
 })();
 
 /* ==== v4 END ==== */

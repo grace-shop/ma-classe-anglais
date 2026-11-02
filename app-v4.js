@@ -811,6 +811,8 @@ const BOOSTS=[{id:"boost30",t:"Turbo XP ×2 · 30 min",min:30,price:250},{id:"bo
 const boostLeft=()=>Math.max(0,((S.me&&S.me.boostUntil)||0)-Date.now());
 const spotLeft=m=>Math.max(0,((m&&m.spotUntil)||0)-Date.now());
 const shCoins=()=>coinsOf(S.me);
+/* modifier son profil (nom, bio, photo, couverture) coûte des XP ; la première mise en place du nom est gratuite */
+const PROFILE_CHANGE_XP=100;
 function shSpend(price,patch,msg){const m=S.me;if(!m)return false;if(shCoins()<price){toast("Not enough XP yet: keep working!","x");return false}
   meWrite({spent:(m.spent||0)+price,...patch});beep("win");if(!LITE)confetti();toast(msg+` (−${price} XP)`,"bag");return true}
 /* XP doublés pendant le turbo */
