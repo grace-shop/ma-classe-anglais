@@ -4,7 +4,7 @@
    (chargement en cours, ou pas encore chargée), le message « statut expiré » s'affichait à tort.
    Maintenant on demande la liste à jour, et « expiré » n'apparaît que si le statut n'y est plus.
    ===================================================================== */
-openQuotedStory = async function (sid, w) {
+openQuotedStory = async function (sid, w, snap) {
   if (!sid) return;
   var find = function () { return (F.stories || []).find(function (x) { return x.id === sid; }); };
   var s = find();
@@ -20,6 +20,14 @@ openQuotedStory = async function (sid, w) {
     var n = (F.stories || []).length;
     return "Status not shown (" + step + "). Loaded: " + n + ". Id: " + String(sid).slice(0, 8);
   };
+  if (!s && snap && snap.t != null) {
+    // Fallback: the server did not return the status, but the reply kept a copy of it.
+    var copy = { id: sid, author: w, who: { name: snap.n || "Student" }, created_at: new Date().toISOString(),
+                 body: snap.t, media: snap.p ? { p: snap.p } : null, bg: snap.bg || null, snapshot: true };
+    F.sv = { G: [{ uid: w, who: copy.who, list: [copy] }], gi: 0, si: 0, t0: Date.now(), views: false };
+    fShow();
+    return;
+  }
   if (!s) { toast(why("not in the 24 h list"), "x"); return; }
   var G = fGroups(), gi = G.findIndex(function (x) { return x.uid === (s.author || w); });
   if (gi < 0) { toast(why("author group missing"), "x"); return; }
