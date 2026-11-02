@@ -499,7 +499,13 @@
   };
   const setUpd = (txt, pct) => { const t = document.getElementById("updTxt"); if (t && txt) t.innerHTML = txt; const b = document.getElementById("updBar"); if (b && pct != null) { b.style.display = "block"; b.firstElementChild.style.width = Math.round(pct) + "%"; } };
   // La mise à jour reste dans l'application : téléchargement, puis l'installeur Android s'ouvre (jamais le navigateur)
+  // un seul téléchargement à la fois : un second tap ne lance pas une deuxième copie sur le même fichier
   async function installApk(url) {
+    if (UPD.busy) { setUpd("The update is already downloading. Please wait…", null); return; }
+    UPD.busy = true;
+    try { return await installApkRun(url); } finally { UPD.busy = false; }
+  }
+  async function installApkRun(url) {
     const FS = plug("Filesystem"), AI = plug("ApkInstaller"), H = plug("CapacitorHttp");
     const failed = (why) => setUpd("The update did not finish" + (why ? " (" + String(why).slice(0, 90) + ")" : "") + ". Stay connected and tap “Update now” again: it resumes by itself.", null);
     const permMsg = "Allow installs for English Classes on the screen that opens, come back here, then tap “Update now” again.";

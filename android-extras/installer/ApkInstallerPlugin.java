@@ -29,8 +29,12 @@ import java.util.zip.ZipFile;
 @CapacitorPlugin(name = "ApkInstaller")
 public class ApkInstallerPlugin extends Plugin {
 
-    private static boolean isZipOk(File f) {
-        try { new ZipFile(f).close(); return true; } catch (Exception e) { return false; }
+    // une seule mise à jour à la fois : deux téléchargements sur le même fichier se le suppriment l'un à l'autre
+    private static final Object DL_LOCK = new Object();
+
+    /** null si le fichier est un zip lisible, sinon la raison exacte */
+    private static String zipProblem(File f) {
+        try { new ZipFile(f).close(); return null; } catch (Exception e) { return e.getClass().getSimpleName() + ": " + e.getMessage(); }
     }
 
     @PluginMethod
@@ -40,71 +44,85 @@ public class ApkInstallerPlugin extends Plugin {
         if (url == null || !url.startsWith("https://")) { call.reject("bad address"); return; }
         new Thread(new Runnable() {
             @Override public void run() {
-                try {
-                    File dir = new File(getContext().getCacheDir(), "apk");
-                    dir.mkdirs();
-                    File out = new File(dir, name.replaceAll("[^A-Za-z0-9._-]", "_"));
-                    if (out.exists()) out.delete();
-                    long have = 0, total = 0, lastNote = 0;
-                    int fails = 0;
-                    while (true) {
-                        HttpURLConnection c = null;
-                        try {
-                            c = (HttpURLConnection) new URL(url).openConnection();
-                            c.setConnectTimeout(30000);
-                            c.setReadTimeout(60000);
-                            c.setInstanceFollowRedirects(true);
-                            c.setRequestProperty("Accept-Encoding", "identity");
-                            c.setRequestProperty("User-Agent", "EnglishClasses-Updater");
-                            if (have > 0) c.setRequestProperty("Range", "bytes=" + have + "-");
-                            int code = c.getResponseCode();
-                            if (code == 200 && have > 0) { have = 0; out.delete(); }   // the server ignored the resume: start again
-                            if (code != 200 && code != 206) throw new java.io.IOException("http " + code);
-                            if (code == 206) {
-                                String cr = c.getHeaderField("Content-Range");
-                                if (cr != null && cr.indexOf('/') > 0) total = Long.parseLong(cr.substring(cr.lastIndexOf('/') + 1).trim());
-                            } else {
-                                total = c.getContentLengthLong();
-                            }
-                            InputStream in = c.getInputStream();
-                            FileOutputStream fo = new FileOutputStream(out, have > 0);
+                synchronized (DL_LOCK) {
+                    try {
+                        File dir = new File(getContext().getCacheDir(), "apk");
+                        dir.mkdirs();
+                        // un fichier par tentative : aucune autre tentative ne peut écraser celui-ci
+                        long now = System.currentTimeMillis();
+                        File[] old = dir.listFiles();
+                        if (old != null) for (File o : old) if (now - o.lastModified() > 3600000L) o.delete();
+                        File out = new File(dir, now + "-" + name.replaceAll("[^A-Za-z0-9._-]", "_"));
+                        long have = 0, total = 0, lastNote = 0;
+                        int fails = 0;
+                        String validator = null;   // ETag (ou Last-Modified) : la reprise ne reprend que le même fichier
+                        while (true) {
+                            HttpURLConnection c = null;
                             try {
-                                byte[] buf = new byte[65536];
-                                int n;
-                                while ((n = in.read(buf)) > 0) {
-                                    fo.write(buf, 0, n);
-                                    have += n;
-                                    long now = System.currentTimeMillis();
-                                    if (now - lastNote > 250) {
-                                        lastNote = now;
-                                        JSObject p = new JSObject();
-                                        p.put("bytes", have);
-                                        p.put("total", total);
-                                        notifyListeners("progress", p);
-                                    }
+                                c = (HttpURLConnection) new URL(url).openConnection();
+                                c.setConnectTimeout(30000);
+                                c.setReadTimeout(60000);
+                                c.setInstanceFollowRedirects(true);
+                                c.setRequestProperty("Accept-Encoding", "identity");
+                                c.setRequestProperty("User-Agent", "EnglishClasses-Updater");
+                                if (have > 0) {
+                                    c.setRequestProperty("Range", "bytes=" + have + "-");
+                                    if (validator != null) c.setRequestProperty("If-Range", validator);
                                 }
+                                int code = c.getResponseCode();
+                                if (validator == null) {
+                                    validator = c.getHeaderField("ETag");
+                                    if (validator == null) validator = c.getHeaderField("Last-Modified");
+                                }
+                                if (code == 200 && have > 0) { have = 0; out.delete(); }   // le fichier a changé ou le serveur ignore la reprise : on recommence
+                                if (code != 200 && code != 206) throw new java.io.IOException("http " + code);
+                                if (code == 206) {
+                                    String cr = c.getHeaderField("Content-Range");
+                                    if (cr != null && cr.indexOf('/') > 0) total = Long.parseLong(cr.substring(cr.lastIndexOf('/') + 1).trim());
+                                } else {
+                                    total = c.getContentLengthLong();
+                                }
+                                InputStream in = c.getInputStream();
+                                FileOutputStream fo = new FileOutputStream(out, have > 0);
+                                try {
+                                    byte[] buf = new byte[65536];
+                                    int n;
+                                    while ((n = in.read(buf)) > 0) {
+                                        fo.write(buf, 0, n);
+                                        have += n;
+                                        long t = System.currentTimeMillis();
+                                        if (t - lastNote > 250) {
+                                            lastNote = t;
+                                            JSObject p = new JSObject();
+                                            p.put("bytes", have);
+                                            p.put("total", total);
+                                            notifyListeners("progress", p);
+                                        }
+                                    }
+                                } finally {
+                                    try { fo.close(); } catch (Exception e) {}
+                                    try { in.close(); } catch (Exception e) {}
+                                }
+                            } catch (Exception e) {
+                                if (++fails > 10) throw e;
+                                Thread.sleep(1500);
+                                continue;   // coupure : on reprend à partir de ce qui est déjà enregistré
                             } finally {
-                                try { fo.close(); } catch (Exception e) {}
-                                try { in.close(); } catch (Exception e) {}
+                                if (c != null) c.disconnect();
                             }
-                        } catch (Exception e) {
-                            if (++fails > 10) throw e;
-                            Thread.sleep(1500);
-                            continue;   // the connection was cut: resume from what is already saved
-                        } finally {
-                            if (c != null) c.disconnect();
+                            if (total <= 0 || have >= total) break;
+                            if (++fails > 10) throw new java.io.IOException("incomplete: " + have + " of " + total);
                         }
-                        if (total <= 0 || have >= total) break;
-                        if (++fails > 10) throw new java.io.IOException("incomplete: " + have + " of " + total);
+                        if (have < 2000000L || (total > 0 && have != total)) { out.delete(); call.reject("incomplete file: " + have + " of " + total); return; }
+                        String bad = zipProblem(out);
+                        if (bad != null) { out.delete(); call.reject("corrupt file (" + have + " bytes, " + bad + ")"); return; }
+                        JSObject r = new JSObject();
+                        r.put("path", out.getAbsolutePath());
+                        r.put("size", have);
+                        call.resolve(r);
+                    } catch (Exception e) {
+                        call.reject("download failed: " + e.getMessage());
                     }
-                    if (have < 2000000L || (total > 0 && have != total)) { out.delete(); call.reject("incomplete file: " + have + " of " + total); return; }
-                    if (!isZipOk(out)) { out.delete(); call.reject("corrupt file"); return; }
-                    JSObject r = new JSObject();
-                    r.put("path", out.getAbsolutePath());
-                    r.put("size", have);
-                    call.resolve(r);
-                } catch (Exception e) {
-                    call.reject("download failed: " + e.getMessage());
                 }
             }
         }).start();
@@ -120,7 +138,7 @@ public class ApkInstallerPlugin extends Plugin {
         Context ctx = getContext();
         long expected = call.getData().optLong("size", 0L);
         if (expected > 0 && f.length() != expected) { f.delete(); call.reject("incomplete file: " + f.length() + " of " + expected); return; }
-        if (!isZipOk(f)) { f.delete(); call.reject("corrupt file"); return; }
+        String bad = zipProblem(f); if (bad != null) { f.delete(); call.reject("corrupt file (" + f.length() + " bytes, " + bad + ")"); return; }
         try {
             // only a clear mismatch stops here; if the phone cannot read the file info, the system installer decides
             android.content.pm.PackageInfo pi = ctx.getPackageManager().getPackageArchiveInfo(f.getAbsolutePath(), 0);
