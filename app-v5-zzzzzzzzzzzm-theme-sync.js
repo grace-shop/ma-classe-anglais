@@ -14,6 +14,7 @@
 .pg-review:disabled{opacity:.45!important}
 .pg-goal small{color:var(--muted)!important}
 .pg-goal b{color:var(--fg)!important}
+body nav.tabs .lk-logo{background:var(--grad)!important;color:var(--on-ink)!important;box-shadow:0 6px 16px -8px var(--ink)!important}
 #zzBc .zz-bct{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--ink)!important;box-shadow:0 8px 20px -10px var(--ink)!important}
 #zzBc .zz-bcbox{background:var(--surface)!important;border-color:var(--line2)!important;color:var(--fg)!important}
 #zzBc .zz-bcto{color:var(--muted)!important;opacity:1!important}

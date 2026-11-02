@@ -516,7 +516,7 @@
   var st = document.createElement("style");
   st.id = "zzzzzuPhotoEdit";
   st.textContent = `
-#zzPe{position:fixed;inset:0;z-index:10010;background:#07080F;color:#EDEEF3;display:flex;flex-direction:column;font:600 .85rem system-ui,sans-serif}
+#zzPe{position:fixed;inset:0;z-index:10200;background:#07080F;color:#EDEEF3;display:flex;flex-direction:column;font:600 .85rem system-ui,sans-serif}
 #zzPe .zz-pebar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:#11131F}
 #zzPe .zz-pebar b{font-size:.95rem}
 #zzPe .zz-pebar button{border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:8px 14px;font:700 .85rem system-ui,sans-serif;cursor:pointer}
