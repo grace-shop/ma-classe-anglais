@@ -1219,7 +1219,8 @@ function feedView(embedded){if(!F.loaded&&!F.loading)feedLoad();try{localStorage
   </div>`}
 /* story viewer */
 function fOpenStory(uid){const G=fGroups(),gi=G.findIndex(x=>x.uid===uid);if(gi<0)return;const g=G[gi];let si=g.list.findIndex(s=>!F.seen.has(s.id));if(si<0||uid===S.uid)si=0;F.sv={G,gi,si,t0:Date.now(),views:false};fShow()}
-function fCur(){const v=F.sv;if(!v)return null;const g=v.G[v.gi];return g?{g,s:g.list[v.si]}:null}
+function fReplyCtx(f){const sid=f&&f.dataset&&f.dataset.sid,uid=f&&f.dataset&&f.dataset.uid;if(sid){const s=F.stories.find(x=>x.id===sid);if(s)return{g:{uid:s.author||uid},s}}return fCur()}
+function fCur(){const v=F.sv;if(!v)return null;const g=v.G[v.gi];if(!g||!g.list.length)return null;if(v.si>=g.list.length)v.si=g.list.length-1;if(v.si<0)v.si=0;return{g,s:g.list[v.si]}}
 function fShow(){const c=fCur();if(!c){F.sv=null;feedSync();return}const s=c.s;F.sv.t0=Date.now();
   if(c.g.uid!==S.uid&&!F.seen.has(s.id)){F.seen.add(s.id);window.__feed.viewStory(s.id).catch(()=>{})}
   clearTimeout(F.svT);if(!F.sv.views&&!F.sv.typing&&!F.share)F.svT=setTimeout(()=>fStep(1),fSdur(s)*1000+(fIsVid(s)?2500:0));feedSync();fVidStart();
@@ -1236,7 +1237,7 @@ function fStoryHTML(){const c=fCur();if(!c)return"";const{g,s}=c,mine=g.uid===S.
   ${s.body?`<div class="fsv-text${s.media?" cap":""}">${fText(s.body)}</div>`:""}
   <button type="button" class="fsv-nav l" data-v4="fSvPrev" aria-label="Previous"></button><button type="button" class="fsv-nav r" data-v4="fSvNext" aria-label="Next"></button>
   <div class="fsv-bot">${mine||fStaff()?`<button type="button" class="btn ghost sm" data-v4="fSvViews">${ic("eye")}${views.length}${rxs.length?` · ${[...new Set(rxs.map(x=>x.e))].slice(0,3).map(e=>E(e)).join("")} ${rxs.length}`:""}</button>${mine?"":fSvReactBtns(s)}<button type="button" class="btn ghost sm" data-v4="fShare" data-k="story" data-id="${esc(s.id)}">${ic("send")}Share</button><button type="button" class="btn ghost sm" data-v4="fSvDel">${ic("trash")}Delete</button>`
-    :`${fSvReactBtns(s)}${S.mode==="student"&&peerOn()&&g.who?.role==="student"?`<form class="fsv-reply" data-ff="srep"><input id="fsv_rep" placeholder="Reply to ${esc(String(g.who?.name||"").split(" ")[0])}…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}<button type="button" class="btn ghost sm fsv-sh" data-v4="fShare" data-k="story" data-id="${esc(s.id)}" aria-label="Share">${ic("send")}</button>`}</div>
+    :`${fSvReactBtns(s)}${S.mode==="student"&&peerOn()&&g.who?.role==="student"?`<form class="fsv-reply" data-ff="srep" data-sid="${esc(s.id)}" data-uid="${esc(g.uid)}"><input id="fsv_rep" placeholder="Reply to ${esc(String(g.who?.name||"").split(" ")[0])}…" maxlength="1000" autocomplete="off"><button class="btn sm" type="submit" aria-label="Send">${ic("send")}</button></form>`:""}<button type="button" class="btn ghost sm fsv-sh" data-v4="fShare" data-k="story" data-id="${esc(s.id)}" aria-label="Share">${ic("send")}</button>`}</div>
   ${v.views?`<div class="v4sheet fsv-views"><b>Seen by ${views.length}</b>${views.length?views.map(x=>{const r=rxs.find(y=>y.uid===x.uid);return`<div class="row">${whoAva(x.who,x.uid,30)}<span>${esc(x.who?.name||"Student")}</span>${r?`<span class="fsv-vr">${E(r.e)}</span>`:""}<small class="muted" style="margin-left:auto">${ago(+new Date(x.at))}</small></div>`}).join(""):`<p class="small muted">Nobody yet.</p>`}<button type="button" class="v4cancel" data-v4="fSvViewsX">Close</button></div>`:""}
   </div>`}
 /* story composer */
@@ -1303,7 +1304,7 @@ document.addEventListener("change",e=>{const el=e.target;if(!el||!el.id)return;
 document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||!["post","com","srep"].includes(f.dataset.ff))return;e.preventDefault();e.stopImmediatePropagation();
   if(f.dataset.ff==="post")fPost();
   else if(f.dataset.ff==="com")fComment(f.dataset.id,f.querySelector("input"));
-  else if(f.dataset.ff==="srep"){const c=fCur(),inp=f.querySelector("input")||document.getElementById("fsv_rep"),t=(inp&&inp.value||"").trim();if(!c){toast("This status is closed.","x");return}if(!t)return;inp.value="";if(S.drafts)delete S.drafts[inp.id||"fsv_rep"];
+  else if(f.dataset.ff==="srep"){const c=fReplyCtx(f),inp=f.querySelector("input")||document.getElementById("fsv_rep"),t=(inp&&inp.value||"").trim();if(!c){toast("This status is closed.","x");return}if(!t)return;inp.value="";if(S.drafts)delete S.drafts[inp.id||"fsv_rep"];
     const what=c.s.body?v4Plain(c.s.body).slice(0,100):"📷 Photo";
     (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story:"+c.s.id,t:what,w:c.g.uid,p:(c.s.media&&c.s.media.p)||null,bg:c.s.bg||null}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}F.sv&&(F.sv.typing=false);fShow()})()}},true);
 document.addEventListener("focusin",e=>{if(e.target&&e.target.id==="fsv_rep"&&F.sv){F.sv.typing=true;clearTimeout(F.svT);feedSync()}});
