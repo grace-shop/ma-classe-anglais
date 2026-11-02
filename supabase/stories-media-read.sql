@@ -18,9 +18,9 @@ create policy "chat_read" on storage.objects for select to authenticated
            public.my_level() >= 2
            or (public.feed_ok() and exists (
                  select 1 from public.stories s
-                 where s.media->>'p' = storage.objects.name
-                    or s.media->'poster'->>'p' = storage.objects.name
-                    or s.music->>'b' = storage.objects.name
-                 and s.deleted_at is null
-                 and (s.hide is null or s.hide <> auth.uid())
-                 and s.created_at > now() - interval '24 hours')) ));
+                 where (s.media->>'p' = storage.objects.name
+                        or s.media->'poster'->>'p' = storage.objects.name
+                        or s.music->>'b' = storage.objects.name)
+                   and s.deleted_at is null
+                   and (s.hide is null or s.hide <> auth.uid())
+                   and s.created_at > now() - interval '24 hours')) ));
