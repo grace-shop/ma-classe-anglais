@@ -21667,9 +21667,14 @@ openQuotedStory = async function (sid, w) {
     } catch (e) { toast("Could not open this status. Try again.", "x"); return; }
     s = find();
   }
-  if (!s) { toast("This status has expired", "x"); return; }
+  // Diagnostic: say exactly why the status is not shown (no guessing).
+  var why = function (step) {
+    var n = (F.stories || []).length;
+    return "Status not shown (" + step + "). Loaded: " + n + ". Id: " + String(sid).slice(0, 8);
+  };
+  if (!s) { toast(why("not in the 24 h list"), "x"); return; }
   var G = fGroups(), gi = G.findIndex(function (x) { return x.uid === (s.author || w); });
-  if (gi < 0) { toast("This status has expired", "x"); return; }
+  if (gi < 0) { toast(why("author group missing"), "x"); return; }
   var si = Math.max(0, G[gi].list.findIndex(function (x) { return x.id === sid; }));
   F.sv = { G: G, gi: gi, si: si, t0: Date.now(), views: false };
   fShow();
