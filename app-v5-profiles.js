@@ -123,6 +123,8 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
     if(!S.uid||S.mode!=="student"){toast("Only students can save an avatar.","x");return}
     if(nm.length<2){toast("Write your name (at least 2 letters).","x");return}
     const ps=(({g,skin,hair,hairCol,eyes,mouth,brow,outfit,cut,acc,bg})=>({g,skin,hair,hairCol,eyes,mouth,brow,outfit,cut,acc,bg}))(avt);
+    const was=S.me||{};const first=!was.name;const changed=nm!==(was.name||"")||b!==(was.bio||"")||JSON.stringify(ps)!==JSON.stringify(was.avt||null);
+    if(changed&&!first&&!shSpend(PROFILE_CHANGE_XP,{},"Profile changed")) return;
     S.me={...(S.me||{}),avt:ps,bio:b,name:nm};
     write(()=>S.db.doc("students/"+S.uid).update({avt:ps,bio:b,name:nm})).then(()=>{toast("Profile saved","check")}).catch(()=>toast("Saved on this phone: it will be sent when you are online.","check"));
     // the leaderboard copy of the name (if it exists yet)
@@ -185,7 +187,7 @@ function covBanner(url,editable){
 {const _pf=profileView;profileView=function(){const url=S.me&&S.me.cover;return`<div class="section av3-wrap" style="max-width:720px;margin-inline:auto;gap:0">${covBanner(url,true)}</div>`+_pf()}}
 {const _pv2=personView;personView=function(){const id=S.view&&S.view.id;covLoad(id);const h=_pv2();const url=id&&AV.covers[id];
   return url?h.replace('<div class="section av3-wrap" style="max-width:720px;margin-inline:auto">',`<div class="section av3-wrap" style="max-width:720px;margin-inline:auto">${covBanner(url,false)}`):h}}
-async function covSet(url){if(!S.uid||S.mode!=="student")return;S.me={...(S.me||{}),cover:url||""};
+async function covSet(url){if(!S.uid||S.mode!=="student")return;if((url||"")!==((S.me&&S.me.cover)||"")&&!shSpend(PROFILE_CHANGE_XP,{},"Cover changed"))return;S.me={...(S.me||{}),cover:url||""};
   await write(()=>S.db.doc("students/"+S.uid).update({cover:url||""}));render()}
 document.addEventListener("change",async e=>{const el=e.target;if(!el||el.id!=="covFile")return;const f=el.files&&el.files[0];el.value="";if(!f)return;
   if(!navigator.onLine){toast("No network: try again when you are online.","x");return}
