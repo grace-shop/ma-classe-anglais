@@ -26,3 +26,35 @@
     } else decide(id, img);
   }, true);
 })();
+
+/* Anneau autour du rond d'un camarade qui a mis une story (24 h) :
+   coloré si une story n'est pas encore vue, gris si toutes sont vues. Liste et fiche profil. */
+(function () {
+  var st = document.createElement("style");
+  st.textContent = ".av.zz-ring{position:relative;isolation:isolate}" +
+    ".av.zz-ring::before{content:\"\";position:absolute;inset:-4px;border-radius:50%;background:var(--grad);z-index:-1;pointer-events:none}" +
+    ".av.zz-ring.zz-seen::before{background:var(--line2,#6b7280)}";
+  document.head.appendChild(st);
+  function storiesOf(id) {
+    var now = Date.now();
+    return (F.stories || []).filter(function (s) {
+      return s.author === id && !s.deleted_at && now - new Date(s.created_at).getTime() < 864e5;
+    });
+  }
+  function ringOn(av, id) {
+    var list = storiesOf(id);
+    if (!list.length) { av.classList.remove("zz-ring", "zz-seen"); return; }
+    av.classList.add("zz-ring");
+    av.classList.toggle("zz-seen", list.every(function (s) { return F.seen.has(s.id); }));
+  }
+  function zzRings() {
+    document.querySelectorAll('[data-a="openPeer"][data-id]').forEach(function (row) {
+      var av = row.querySelector(".av");
+      if (av) ringOn(av, row.dataset.id);
+    });
+    var stage = document.querySelector(".av3-stage .av");
+    if (stage && S.view && S.view.type === "person") ringOn(stage, S.view.id);
+  }
+  var _rr = render;
+  render = function () { var o = _rr.apply(this, arguments); try { zzRings(); } catch (e) {} return o; };
+})();
