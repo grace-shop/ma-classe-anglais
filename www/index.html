@@ -21781,22 +21781,32 @@ openQuotedStory = async function (sid, w, snap) {
 })();
 
 /* ---- app-v5-zzzzzzzzzzzk-friend-tap.js ---- */
-/* Liste des camarades / amis (comme WhatsApp) : taper la photo ouvre le PROFIL, même si la personne a mis une story.
-   La story ne s'ouvre que depuis l'anneau de story (bulles en haut de l'accueil). Taper le reste de la ligne ouvre la discussion. */
+/* Liste des camarades / amis : taper le ROND d'un camarade
+   - il a mis une story (dans les 24 h) : la story s'ouvre directement
+   - sinon : seule la photo de profil s'ouvre en grand (on n'entre pas sur son profil)
+   Le reste de la ligne ouvre la discussion comme avant. */
 (function () {
-  // window + capture : passe avant tous les autres gestionnaires, donc aucun ne peut ouvrir la story sur ce tap
+  function hasStory(id) {
+    var now = Date.now();
+    return (F.stories || []).some(function (s) {
+      return s.author === id && !s.deleted_at && now - new Date(s.created_at).getTime() < 864e5;
+    });
+  }
+  function decide(id, img) {
+    if (hasStory(id)) { fOpenStory(id); return; }
+    if (img && img.src && typeof pzOpen === "function") pzOpen(img.src);
+  }
+  // window + capture : passe avant tous les autres gestionnaires, donc rien d'autre ne réagit à ce tap
   window.addEventListener("click", function (e) {
     var av = e.target.closest && e.target.closest(".av");
     var row = av && av.closest('[data-a="openPeer"][data-id]');
     if (!row || !S.uid) return;
-    var id = row.dataset.id;
+    var id = row.dataset.id, img = av.querySelector("img");
     e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation();
-    // ferme un visionneur de story déjà ouvert par un autre écouteur sur ce même tap
-    if (F.sv) { clearTimeout(F.svT); F.sv = null; }
-    S.view = { type: "person", id: id }; S.animate = true; scrollTo(0, 0);
-    render();
-    // au cas où un autre gestionnaire ouvre la story pendant ce tap
-    setTimeout(function () { if (F.sv && F.sv.gi >= 0) { clearTimeout(F.svT); F.sv = null; feedSync(); render(); } }, 0);
+    // les stories doivent être chargées pour savoir si elle existe
+    if (!F.loaded && !F.loading && typeof feedLoad === "function") {
+      Promise.resolve(feedLoad()).then(function () { decide(id, img); }).catch(function () { decide(id, img); });
+    } else decide(id, img);
   }, true);
 })();
 
