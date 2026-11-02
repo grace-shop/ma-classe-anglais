@@ -21814,9 +21814,9 @@ openQuotedStory = async function (sid, w, snap) {
    coloré si une story n'est pas encore vue, gris si toutes sont vues. Liste et fiche profil. */
 (function () {
   var st = document.createElement("style");
-  st.textContent = ".av.zz-ring{position:relative;isolation:isolate}" +
-    ".av.zz-ring::before{content:\"\";position:absolute;inset:-4px;border-radius:50%;background:var(--grad);z-index:-1;pointer-events:none}" +
-    ".av.zz-ring.zz-seen::before{background:var(--line2,#6b7280)}";
+  // box-shadow (et non ::before) : .av.photo a overflow:hidden, un pseudo-élément hors du rond serait coupé
+  st.textContent = ".av.zz-ring{box-shadow:0 0 0 2px var(--bg),0 0 0 4.5px #8EA0FF}" +
+    ".av.zz-ring.zz-seen{box-shadow:0 0 0 2px var(--bg),0 0 0 4.5px #6b7280}";
   document.head.appendChild(st);
   function storiesOf(id) {
     var now = Date.now();
