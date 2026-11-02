@@ -505,7 +505,7 @@
     UPD.busy = true;
     try { return await installApkRun(url); } finally { UPD.busy = false; }
   }
-  async function installApkRun(url) {
+  async function installApkRun(url, again) {
     const FS = plug("Filesystem"), AI = plug("ApkInstaller"), H = plug("CapacitorHttp");
     const failed = (why) => setUpd("The update did not finish" + (why ? " (" + String(why).slice(0, 90) + ")" : "") + ". Stay connected and tap “Update now” again: it resumes by itself.", null);
     const permMsg = "Allow installs for English Classes on the screen that opens, come back here, then tap “Update now” again.";
@@ -542,7 +542,10 @@
       setUpd("Tap “Install” on the Android screen. Your data is kept.", 100);
     } catch (e) {
       try { h && h.remove(); } catch (x) {}
-      failed((e && (e.message || e)) || "");
+      const why = String((e && (e.message || e)) || "");
+      // the downloaded file vanished before install: download it once more, from the start
+      if (!again && /file missing|incomplete file/i.test(why)) return installApkRun(url, true);
+      failed(why);
     }
   }
   async function checkNativeUpdate(manual) {
