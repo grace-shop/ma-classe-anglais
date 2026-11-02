@@ -21876,6 +21876,19 @@ openQuotedStory = async function (sid, w) {
 .pg-review:disabled{opacity:.45!important}
 .pg-goal small{color:var(--muted)!important}
 .pg-goal b{color:var(--fg)!important}
+.pg-panel{background:var(--surface)!important;border-color:var(--line2)!important;color:var(--fg)!important;box-shadow:0 18px 40px -22px var(--ink)!important}
+.pg-panel small,.pg-badge small,.pg-note{color:var(--muted)!important;opacity:1!important}
+.pg-bar{background:var(--surface2)!important}
+.pg-bar i{background:var(--grad)!important;box-shadow:0 0 12px var(--ink)!important}
+.pg-set{border-top-color:var(--line)!important;color:var(--fg)!important}
+.pg-time input{background:var(--surface2)!important;color:var(--fg)!important;border-color:var(--line2)!important}
+.pg-set .btn,.pg-set button{color:var(--fg)}
+.pg-badge{background:var(--surface2)!important;border-color:var(--line2)!important;color:var(--fg)!important;opacity:1!important}
+.pg-badge b{color:var(--fg)!important}
+.pg-badge i{background:var(--surface)!important;color:var(--muted)!important;font-size:0!important;display:grid!important;place-items:center}
+.pg-badge i svg{width:20px;height:20px}
+.pg-badge.on{border-color:var(--ink)!important;box-shadow:0 0 22px -8px var(--ink)!important}
+.pg-badge.on i{background:var(--grad)!important;color:var(--on-ink)!important;box-shadow:0 0 16px -4px var(--ink)!important}
 #zzBc .zz-bct{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--ink)!important;box-shadow:0 8px 20px -10px var(--ink)!important}
 #zzBc .zz-bcbox{background:var(--surface)!important;border-color:var(--line2)!important;color:var(--fg)!important}
 #zzBc .zz-bcto{color:var(--muted)!important;opacity:1!important}
@@ -22210,18 +22223,23 @@ var AR_TITLE={"ch-mix":"Mixed Review","ch-sprint":"Grammar Sprint","ch-vocab":"V
         if(typeof toast==="function") toast("Lessons ready offline","check"); if(typeof arHome==="function"&&AR.mode===null){ try{ var p=document.querySelector("#arBody .pg-panel"); if(p) p.outerHTML=panelHTML(); }catch(x){} } }
     });
   });
+  var SVG_A='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">';
+  var STAR_SVG=SVG_A+'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" fill="currentColor"/></svg>';
+  var SPARK_SVG=SVG_A+'<path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z" fill="currentColor"/></svg>';
+  var CHECK_SVG=SVG_A+'<path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var LOCK_SVG=SVG_A+'<rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>';
   function panelHTML(){
     var best=load("ar_best",{}), played=Object.keys(best).length, cleared=load("ar_cleared",0), n=week().n, m=mistakes().length;
     var badges=[
-      {t:"Explorer",have:played,need:3,ic:"\u2605"},
-      {t:"All-rounder",have:played,need:AR_MODES.length,ic:"\u2726"},
-      {t:"Mistake master",have:cleared,need:10,ic:"\u2714"}
+      {t:"Explorer",have:played,need:3,ic:STAR_SVG},
+      {t:"All-rounder",have:played,need:AR_MODES.length,ic:SPARK_SVG},
+      {t:"Mistake master",have:cleared,need:10,ic:CHECK_SVG}
     ];
     var goal=Math.min(n,5);
     return '<section class="pg-panel" aria-label="Your progress">'
       +'<div class="pg-row"><div class="pg-goal"><small>Weekly goal</small><b>'+goal+'/5 games</b><div class="pg-bar"><i style="width:'+(goal*20)+'%"></i></div></div>'
       +'<button type="button" class="pg-review" data-ar="start" data-m="ch-review"'+(m?'':' disabled')+'>Review my mistakes <span>'+m+'</span></button></div>'
-      +'<div class="pg-badges">'+badges.map(function(b){var ok=b.have>=b.need;return '<div class="pg-badge'+(ok?' on':'')+'"><i>'+(ok?b.ic:'\u2022')+'</i><b>'+b.t+'</b><small>'+Math.min(b.have,b.need)+'/'+b.need+'</small></div>'}).join("")+'</div>'+settingsRowHTML()+'</section>';
+      +'<div class="pg-badges">'+badges.map(function(b){var ok=b.have>=b.need;return '<div class="pg-badge'+(ok?' on':'')+'"><i>'+(ok?b.ic:LOCK_SVG)+'</i><b>'+b.t+'</b><small>'+Math.min(b.have,b.need)+'/'+b.need+'</small></div>'}).join("")+'</div>'+settingsRowHTML()+'</section>';
   }
   var _home=arHome;
   arHome=function(){

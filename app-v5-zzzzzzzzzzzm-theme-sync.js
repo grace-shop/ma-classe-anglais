@@ -14,6 +14,19 @@
 .pg-review:disabled{opacity:.45!important}
 .pg-goal small{color:var(--muted)!important}
 .pg-goal b{color:var(--fg)!important}
+.pg-panel{background:var(--surface)!important;border-color:var(--line2)!important;color:var(--fg)!important;box-shadow:0 18px 40px -22px var(--ink)!important}
+.pg-panel small,.pg-badge small,.pg-note{color:var(--muted)!important;opacity:1!important}
+.pg-bar{background:var(--surface2)!important}
+.pg-bar i{background:var(--grad)!important;box-shadow:0 0 12px var(--ink)!important}
+.pg-set{border-top-color:var(--line)!important;color:var(--fg)!important}
+.pg-time input{background:var(--surface2)!important;color:var(--fg)!important;border-color:var(--line2)!important}
+.pg-set .btn,.pg-set button{color:var(--fg)}
+.pg-badge{background:var(--surface2)!important;border-color:var(--line2)!important;color:var(--fg)!important;opacity:1!important}
+.pg-badge b{color:var(--fg)!important}
+.pg-badge i{background:var(--surface)!important;color:var(--muted)!important;font-size:0!important;display:grid!important;place-items:center}
+.pg-badge i svg{width:20px;height:20px}
+.pg-badge.on{border-color:var(--ink)!important;box-shadow:0 0 22px -8px var(--ink)!important}
+.pg-badge.on i{background:var(--grad)!important;color:var(--on-ink)!important;box-shadow:0 0 16px -4px var(--ink)!important}
 #zzBc .zz-bct{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--ink)!important;box-shadow:0 8px 20px -10px var(--ink)!important}
 #zzBc .zz-bcbox{background:var(--surface)!important;border-color:var(--line2)!important;color:var(--fg)!important}
 #zzBc .zz-bcto{color:var(--muted)!important;opacity:1!important}
