@@ -22,8 +22,12 @@ openQuotedStory = async function (sid, w, snap) {
   };
   if (!s && snap && snap.t != null) {
     // Fallback: the server did not return the status, but the reply kept a copy of it.
+    var mt = snap.mt || "";
+    if (snap.p && !mt) {                                   // old replies have no type: read it from the stored file
+      try { var bl = await srcBlob({ k: "m", id: snap.p, t: "" }); mt = (bl && bl.type) || ""; } catch (e) {}
+    }
     var copy = { id: sid, author: w, who: { name: snap.n || "Student" }, created_at: new Date().toISOString(),
-                 body: snap.t, media: snap.p ? { p: snap.p } : null, bg: snap.bg || null, snapshot: true };
+                 body: snap.t, media: snap.p ? { p: snap.p, t: mt || "image/jpeg" } : null, bg: snap.bg || null, snapshot: true };
     F.sv = { G: [{ uid: w, who: copy.who, list: [copy] }], gi: 0, si: 0, t0: Date.now(), views: false };
     fShow();
     return;

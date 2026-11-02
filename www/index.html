@@ -3771,7 +3771,7 @@ function v4MsgHTML(kind,m,c){const a=m.att,once=!!(a&&a.o)&&!m.del,stk=a&&a.k===
       :m.opened?`<div class="v4once off">${ob}<b>Opened</b></div>`
       :`<button type="button" class="v4once" data-v4="once" data-k="${kind}" data-id="${esc(m.id)}">${ob}<b>Photo</b><small>Tap to view once</small></button>`}
   else body=msgBodyHTML(m.text,a);
-  const isSt=!!m.re&&String(m.re.id||"").indexOf("story:")===0;const reThumb=isSt&&m.re.p&&V4.obj&&V4.obj[m.re.p];const re=m.re&&!m.del?(isSt?`<div class="v4quote v4qs" data-v4="jump" data-id="${esc(m.re.id)}" data-w="${esc(m.re.w||"")}" data-t="${esc(m.re.t||"")}" data-p="${esc(m.re.p||"")}" data-bg="${esc(m.re.bg||"")}" data-n="${esc(String(v4Who(kind,m.re.w,c)||"").split(" ")[0])}"><span class="v4q-th" style="${reThumb?"":"background:"+sbg(m.re.bg)}">${reThumb?`<img src="${reThumb}" alt="">`:""}</span><span class="v4q-tx"><span class="v4q-w">Statut de ${esc(String(v4Who(kind,m.re.w,c)||"").split(" ")[0])}</span><span class="v4q-t">${esc(String(m.re.t||"").slice(0,100))}</span></span></div>`:`<div class="v4quote" data-v4="jump" data-id="${esc(m.re.id||"")}"><div class="v4q-w">${esc(v4Who(kind,m.re.w,c))}</div><div class="v4q-t">${esc(m.re.t||"")}</div></div>`):"";
+  const isSt=!!m.re&&String(m.re.id||"").indexOf("story:")===0;const reThumb=isSt&&m.re.p&&V4.obj&&V4.obj[m.re.p];const re=m.re&&!m.del?(isSt?`<div class="v4quote v4qs" data-v4="jump" data-id="${esc(m.re.id)}" data-w="${esc(m.re.w||"")}" data-t="${esc(m.re.t||"")}" data-p="${esc(m.re.p||"")}" data-mt="${esc(m.re.mt||"")}" data-bg="${esc(m.re.bg||"")}" data-n="${esc(String(v4Who(kind,m.re.w,c)||"").split(" ")[0])}"><span class="v4q-th" style="${reThumb?"":"background:"+sbg(m.re.bg)}">${reThumb?`<img src="${reThumb}" alt="">`:""}</span><span class="v4q-tx"><span class="v4q-w">Statut de ${esc(String(v4Who(kind,m.re.w,c)||"").split(" ")[0])}</span><span class="v4q-t">${esc(String(m.re.t||"").slice(0,100))}</span></span></div>`:`<div class="v4quote" data-v4="jump" data-id="${esc(m.re.id||"")}"><div class="v4q-w">${esc(v4Who(kind,m.re.w,c))}</div><div class="v4q-t">${esc(m.re.t||"")}</div></div>`):"";
   const rx=Object.values(m.react||{}).filter(Boolean),rxh=rx.length&&!m.del?`<div class="v4rx">${[...new Set(rx)].map(e=>`<span class="v4emo">${e}</span>`).join("")}${rx.length>1?`<b>${rx.length}</b>`:""}</div>`:"";
   const tick=m.mine&&!m.del&&kind!=="x"?`<i class="v4tick${m.read?" rd":""}" aria-label="${m.read?"Read":"Sent"}">${m.read?"✓✓":"✓"}</i>`:"";
   return`<div class="msg ${m.pin?"zz-pn ":""}${m.mine?"mine":""}${stk?" stk":""}${m.del?" del":""}${rxh?" hasrx":""}" data-mid="${esc(m.id)}" data-k="${kind}" id="m-${esc(m.id)}">${re}${body}<span>${fmtTime(m.at)}${tick}</span>${rxh}</div>`}
@@ -4028,7 +4028,7 @@ document.addEventListener("submit",e=>{const f=e.target;if(!f||!f.dataset||!["po
   else if(f.dataset.ff==="com")fComment(f.dataset.id,f.querySelector("input"));
   else if(f.dataset.ff==="srep"){const c=fReplyCtx(f),inp=f.querySelector("input")||document.getElementById("fsv_rep"),t=(inp&&inp.value||"").trim();if(!c){toast("This status is closed.","x");return}if(!t)return;inp.value="";if(S.drafts)delete S.drafts[inp.id||"fsv_rep"];
     const what=c.s.body?v4Plain(c.s.body).slice(0,100):"📷 Photo";
-    (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story:"+c.s.id,t:what,w:c.g.uid,p:(c.s.media&&c.s.media.p)||null,bg:c.s.bg||null}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}F.sv&&(F.sv.typing=false);fShow()})()}},true);
+    (async()=>{try{let text=t;if(v4NeedFix(t)){const r=await v4Check(t);if(r)text=v4Pack(t,r.en,r.k)}await window.__peer.send(c.g.uid,text,null,{re:{id:"story:"+c.s.id,t:what,w:c.g.uid,p:(c.s.media&&c.s.media.p)||null,mt:(c.s.media&&c.s.media.t)||null,bg:c.s.bg||null}});toast("Reply sent","send")}catch(er){toast(er.message||"Could not send","x")}F.sv&&(F.sv.typing=false);fShow()})()}},true);
 document.addEventListener("focusin",e=>{if(e.target&&e.target.id==="fsv_rep"&&F.sv){F.sv.typing=true;clearTimeout(F.svT);feedSync()}});
 document.addEventListener("keydown",e=>{if(!F.sv&&!F.sc)return;if(e.key==="Escape"){if(F.sc){F.sc=null;feedSync()}else fCloseStory()}else if(F.sv&&!F.sv.typing&&e.key==="ArrowRight")fStep(1);else if(F.sv&&!F.sv.typing&&e.key==="ArrowLeft")fStep(-1)});
 {const _l=v4ChatLayout;v4ChatLayout=function(){_l();if(F.sv||F.sc||F.share||document.getElementById("fsvhost")?._h)feedSync();nBell()}}
@@ -21674,8 +21674,12 @@ openQuotedStory = async function (sid, w, snap) {
   };
   if (!s && snap && snap.t != null) {
     // Fallback: the server did not return the status, but the reply kept a copy of it.
+    var mt = snap.mt || "";
+    if (snap.p && !mt) {                                   // old replies have no type: read it from the stored file
+      try { var bl = await srcBlob({ k: "m", id: snap.p, t: "" }); mt = (bl && bl.type) || ""; } catch (e) {}
+    }
     var copy = { id: sid, author: w, who: { name: snap.n || "Student" }, created_at: new Date().toISOString(),
-                 body: snap.t, media: snap.p ? { p: snap.p } : null, bg: snap.bg || null, snapshot: true };
+                 body: snap.t, media: snap.p ? { p: snap.p, t: mt || "image/jpeg" } : null, bg: snap.bg || null, snapshot: true };
     F.sv = { G: [{ uid: w, who: copy.who, list: [copy] }], gi: 0, si: 0, t0: Date.now(), views: false };
     fShow();
     return;
