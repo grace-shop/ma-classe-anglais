@@ -1,7 +1,8 @@
 /* Liste des camarades / amis (comme WhatsApp) : taper la photo ouvre le PROFIL, même si la personne a mis une story.
    La story ne s'ouvre que depuis l'anneau de story (bulles en haut de l'accueil). Taper le reste de la ligne ouvre la discussion. */
 (function () {
-  document.addEventListener("click", function (e) {
+  // window + capture : passe avant tous les autres gestionnaires, donc aucun ne peut ouvrir la story sur ce tap
+  window.addEventListener("click", function (e) {
     var av = e.target.closest && e.target.closest(".av");
     var row = av && av.closest('[data-a="openPeer"][data-id]');
     if (!row || !S.uid) return;
