@@ -844,7 +844,7 @@ const S={liveSeen:{},db:null,user:null,room:null,uid:null,isOwner:false,mode:"st
   offline:false,writeBlocked:false,animate:true,sound:true,msgs:[],chatFor:null,chatUnsub:null,editing:null,dl:undefined,eps:[],corriges:{},epFilter:"",epTimer:null,assets:null,showAll:false,profFilter:"",parents:[],who:null,scan:{},progClass:null,lessonFilter:"",access:{},myAccess:null,staff:[],staffLoaded:false,isStaff:false,canEdit:false,allPeople:[],reqs:[],myReq:null};
 try{S.sound=localStorage.getItem("mca_sound")!=="0"}catch(e){}
 /* ===== Mode économie de données ===== */
-function autoLite(){try{const c=navigator.connection;if(c&&(c.saveData||/(^|-)2g|3g/.test(c.effectiveType||"")))return true}catch(e){}if((navigator.deviceMemory||8)<=3)return true;if((navigator.hardwareConcurrency||8)<=4)return true;return false}
+function autoLite(){try{const cp=window.Capacitor;if(cp&&((cp.isNativePlatform&&cp.isNativePlatform())||(cp.getPlatform&&cp.getPlatform()!=="web")))return true}catch(e){}try{const c=navigator.connection;if(c&&(c.saveData||/(^|-)2g|3g/.test(c.effectiveType||"")))return true}catch(e){}if((navigator.deviceMemory||8)<=3)return true;if((navigator.hardwareConcurrency||8)<=4)return true;return false}
 let LITE=true,LITE_SRC="default";try{if(localStorage.getItem("mca_lite")==="1"){LITE=true;LITE_SRC="user"}else if(localStorage.getItem("mca_lite")==="0"){LITE=false;LITE_SRC="user"}}catch(e){}if(LITE_SRC!=="user"&&autoLite()){LITE=true;LITE_SRC="auto"}
 document.documentElement.setAttribute("data-lite",LITE?"1":"0");
 let threeState="idle";function loadThree(){if(LITE||threeState!=="idle")return;threeState="loading";const sc=document.createElement("script");sc.src=(window.__THREE_URL||"https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js");sc.onload=()=>{threeState="ready";try{initBg3d()}catch(e){console.warn(e)}try{initMascot()}catch(e){console.warn(e)}if(typeof render==="function")render()};sc.onerror=()=>{if(window.__THREE_URL){window.__THREE_URL=null;threeState="idle";loadThree()}else threeState="failed"};document.head.appendChild(sc)}
@@ -21895,6 +21895,26 @@ openQuotedStory = async function (sid, w) {
 #zzRcp .zz-rci.on .zz-rcc::after{border-color:var(--on-ink)!important}
 #zzRcp .zz-rca{background:var(--grad)!important;color:var(--on-ink)!important}
 #zzRcp .zz-rcok{background:var(--grad)!important;color:var(--on-ink)!important}
+`;
+  document.head.appendChild(st);
+})();
+
+/* ---- app-v5-zzzzzzzzzzzn-logo-duo.js ---- */
+/* =====================================================================
+   v5 · Le logo 3D prend toujours la couleur du thème choisi.
+   Avant, il était décalé de teinte par thème (une approximation, qui tombait
+   souvent à côté). Maintenant une couche du dégradé du thème est posée sur le logo
+   en mode « couleur » : la couleur vient du thème, le relief du logo est gardé.
+   La couche suit la forme du logo (son masque), donc rien ne déborde.
+   ===================================================================== */
+(function () {
+  var st = document.createElement("style");
+  st.id = "zzLogoDuo";
+  st.textContent = `
+header.top .logo.lg3d img,.logo.lg3d img{filter:none!important}
+.logo.lg3d{background:none!important;isolation:isolate;position:relative}
+.logo.lg3d::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:var(--grad);mix-blend-mode:color;
+  -webkit-mask:url(icons/logo-3d.png) center/contain no-repeat;mask:url(icons/logo-3d.png) center/contain no-repeat}
 `;
   document.head.appendChild(st);
 })();
