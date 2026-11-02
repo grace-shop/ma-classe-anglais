@@ -21688,7 +21688,7 @@ openQuotedStory = async function (sid, w, snap) {
   if (!s) { toast(why("not in the 24 h list"), "x"); return; }
   var G = fGroups(), gi = G.findIndex(function (x) { return x.uid === (s.author || w); });
   if (gi < 0) { toast(why("author group missing"), "x"); return; }
-  var si = Math.max(0, G[gi].list.findIndex(function (x) { return x.id === sid; }));
+  var si = Math.max(0, G[gi].list.findIndex(function (x) { return x.id === s.id; }));   // s is the resolved status (full id), even when the quote id was truncated
   F.sv = { G: G, gi: gi, si: si, t0: Date.now(), views: false };
   fShow();
 };
