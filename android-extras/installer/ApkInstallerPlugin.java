@@ -19,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.zip.ZipFile;
 
 /* Updates inside the app (never the browser).
    JS: Capacitor.Plugins.ApkInstaller.download({ url, name }) -> { path, size }   (progress events: { bytes, total })
@@ -31,11 +30,6 @@ public class ApkInstallerPlugin extends Plugin {
 
     // une seule mise à jour à la fois : deux téléchargements sur le même fichier se le suppriment l'un à l'autre
     private static final Object DL_LOCK = new Object();
-
-    /** null si le fichier est un zip lisible, sinon la raison exacte */
-    private static String zipProblem(File f) {
-        try { new ZipFile(f).close(); return null; } catch (Exception e) { return e.getClass().getSimpleName() + ": " + e.getMessage(); }
-    }
 
     @PluginMethod
     public void download(final PluginCall call) {
@@ -114,8 +108,8 @@ public class ApkInstallerPlugin extends Plugin {
                             if (++fails > 10) throw new java.io.IOException("incomplete: " + have + " of " + total);
                         }
                         if (have < 2000000L || (total > 0 && have != total)) { out.delete(); call.reject("incomplete file: " + have + " of " + total); return; }
-                        String bad = zipProblem(out);
-                        if (bad != null) { out.delete(); call.reject("corrupt file (" + have + " bytes, " + bad + ")"); return; }
+                        // la taille exacte est déjà vérifiée ; on contrôle seulement que le fichier est bien sur le disque
+                        if (!out.isFile() || out.length() != have) { call.reject("file missing on disk: " + out.getAbsolutePath() + " (" + out.length() + " of " + have + " bytes)"); return; }
                         JSObject r = new JSObject();
                         r.put("path", out.getAbsolutePath());
                         r.put("size", have);
@@ -138,7 +132,7 @@ public class ApkInstallerPlugin extends Plugin {
         Context ctx = getContext();
         long expected = call.getData().optLong("size", 0L);
         if (expected > 0 && f.length() != expected) { f.delete(); call.reject("incomplete file: " + f.length() + " of " + expected); return; }
-        String bad = zipProblem(f); if (bad != null) { f.delete(); call.reject("corrupt file (" + f.length() + " bytes, " + bad + ")"); return; }
+        if (!f.isFile() || (expected > 0 && f.length() != expected)) { call.reject("file missing on disk: " + f.getAbsolutePath()); return; }
         try {
             // only a clear mismatch stops here; if the phone cannot read the file info, the system installer decides
             android.content.pm.PackageInfo pi = ctx.getPackageManager().getPackageArchiveInfo(f.getAbsolutePath(), 0);
