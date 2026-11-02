@@ -6,7 +6,8 @@
    ===================================================================== */
 openQuotedStory = async function (sid, w, snap) {
   if (!sid) return;
-  var find = function () { return (F.stories || []).find(function (x) { return x.id === sid; }); };
+  // Older quotes kept only the first 40 characters of the id, so also accept a prefix match.
+  var find = function () { return (F.stories || []).find(function (x) { return x.id === sid || (sid.length >= 8 && String(x.id).indexOf(sid) === 0); }); };
   var s = find();
   if (!s) {
     try {
