@@ -50,9 +50,9 @@
     var el = document.getElementById("pfName"), nm = String(el ? el.value : "").replace(/\s+/g, " ").trim().slice(0, 40);
     if (nm.length < 2) { toast("Write your name (at least 2 letters).", "x"); return; }
     if (!S.uid) return;
-    if (S.me && S.me.name && nm !== S.me.name && !shSpend(PROFILE_CHANGE_XP, {}, "Name changed")) return;
+    var nameChanged = !!(S.me && S.me.name && nm !== S.me.name); if (nameChanged && !pcAffordable()) return;
     S.me = Object.assign({}, S.me, { name: nm });
-    write(function () { return S.db.doc("students/" + S.uid).update({ name: nm }); }).then(function () { toast("Name saved", "check"); }).catch(function () { toast("Saved on this phone: it will be sent when you are online.", "check"); });
+    write(function () { return S.db.doc("students/" + S.uid).update({ name: nm }); }).then(function () { if (nameChanged) pcCharge("Name changed"); toast("Name saved", "check"); }).catch(function () { toast("Saved on this phone: it will be sent when you are online.", "check"); });
     try { write(function () { return S.db.doc("board/" + S.uid).update({ name: nm }); }).catch(function () {}); } catch (x) {}
     render();
   }, true);

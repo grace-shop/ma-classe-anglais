@@ -813,6 +813,8 @@ const spotLeft=m=>Math.max(0,((m&&m.spotUntil)||0)-Date.now());
 const shCoins=()=>coinsOf(S.me);
 /* modifier son profil (nom, bio, photo, couverture) coûte des XP ; la première mise en place du nom est gratuite */
 const PROFILE_CHANGE_XP=100;
+function pcAffordable(){if(coinsOf(S.me)>=PROFILE_CHANGE_XP)return true;toast("Not enough XP yet: keep working!","x");return false}
+function pcCharge(msg){meWrite({spent:((S.me&&S.me.spent)||0)+PROFILE_CHANGE_XP});toast(msg+` (−${PROFILE_CHANGE_XP} XP)`,"bag")}
 function shSpend(price,patch,msg){const m=S.me;if(!m)return false;if(shCoins()<price){toast("Not enough XP yet: keep working!","x");return false}
   meWrite({spent:(m.spent||0)+price,...patch});beep("win");if(!LITE)confetti();toast(msg+` (−${price} XP)`,"bag");return true}
 /* XP doublés pendant le turbo */
