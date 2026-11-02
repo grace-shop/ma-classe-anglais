@@ -161,7 +161,7 @@ begin
   if p_meta is not null and jsonb_typeof(p_meta) = 'object' then
     mt := '{}'::jsonb;
     if jsonb_typeof(p_meta->'re') = 'object' then
-      mt := mt || jsonb_build_object('re', jsonb_build_object('id', left(coalesce(p_meta->'re'->>'id', ''), 40), 't', left(coalesce(p_meta->'re'->>'t', ''), 140), 'w', left(coalesce(p_meta->'re'->>'w', ''), 40)));
+      mt := mt || jsonb_build_object('re', jsonb_build_object('id', left(coalesce(p_meta->'re'->>'id', ''), 80), 't', left(coalesce(p_meta->'re'->>'t', ''), 140), 'w', left(coalesce(p_meta->'re'->>'w', ''), 40)));
     end if;
     -- the battle room this message belongs to (the discussion of the arena)
     if coalesce(p_meta->>'room', '') <> '' then
