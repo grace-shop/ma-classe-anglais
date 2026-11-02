@@ -60,9 +60,11 @@ function grRestore(){try{const c=JSON.parse(localStorage.getItem(grKey())||"null
 
 /* ---------------- loading + realtime ---------------- */
 async function grLoad(){if(!grOn())return;GR.at=Date.now();
+  var before=JSON.stringify([GR.list,GR.err]);
   try{const{data,error}=await grSB().rpc("my_groups");if(error)throw grErr(error);GR.list=(data||[]).map(g=>({...g,last:g.last?grRow(g.last):null}));GR.loaded=true;GR.err="";for(const g of GR.list)GR.names[g.id]=g.name;grSave()}
   catch(e){GR.loaded=true;GR.err=navigator.onLine?(e.message||"Cannot load groups."):"You are offline: groups saved on this phone are shown."}
-  render()}
+  // redraw only when something changed: a full redraw every few seconds makes the screen blink
+  if(JSON.stringify([GR.list,GR.err])!==before)render()}
 async function grLoadMsgs(gid){if(!navigator.onLine||GR.loadingMsgs[gid])return;GR.loadingMsgs[gid]=1;
   try{const{data,error}=await grSB().from("group_messages").select("*").eq("group_id",gid).order("created_at",{ascending:false}).limit(200);if(error)throw error;
     const pend=(GR.msgs[gid]||[]).filter(m=>m.pending);GR.msgs[gid]=(data||[]).map(grRow).reverse().concat(pend.filter(p=>!(data||[]).some(d=>d.id===p.id)));grSave()}catch(e){}

@@ -2226,11 +2226,11 @@ async function submitCopy(kind,f){const isEp=kind==="ep",id=f.dataset.id,key=kin
     if(r.item&&r.item.autoCorrect&&navigator.onLine)autoCorrect(kind,id)}
   catch(e){if(pend.length&&netErr(e)&&window.__outbox){await toOutbox();return}toast("Cannot send: "+((e&&e.message)||"try again"),"x");if(btn)btn.disabled=false}}
 let flushingOb=false;
-async function flushOutbox(){if(flushingOb||!window.__outbox||!S.me||S.mode!=="student"||!navigator.onLine)return;flushingOb=true;
+async function flushOutbox(){if(flushingOb||!window.__outbox||!S.me||S.mode!=="student"||!navigator.onLine)return;flushingOb=true;const was=S.outboxN;
   try{const all=await window.__outbox.all();S.outboxN=all.length;
     for(const it of all){try{const files=it.files.map(x=>new File([x.blob],x.name,{type:x.type})),r=await sendCopy(it.kind,it.id,it.text,files,null);
       await window.__outbox.del(it.k);toast("Work sent: "+(r.item?.title||""),"send");if(r.item&&r.item.autoCorrect)autoCorrect(it.kind,it.id)}catch(e){break}}
-    S.outboxN=(await window.__outbox.all()).length}catch(e){}finally{flushingOb=false;render()}}
+    S.outboxN=(await window.__outbox.all()).length}catch(e){}finally{flushingOb=false;if(was!==S.outboxN)render()}}   // redraw only when the queue changed (it ran every 30 s before)
 addEventListener("online",()=>{render();flushOutbox()});addEventListener("offline",()=>render());
 addEventListener("mca-queue",()=>{S.qN=window.__queueLen?window.__queueLen():0;render()});
 setInterval(flushOutbox,30000);setTimeout(flushOutbox,5000);
@@ -6639,9 +6639,11 @@ function grRestore(){try{const c=JSON.parse(localStorage.getItem(grKey())||"null
 
 /* ---------------- loading + realtime ---------------- */
 async function grLoad(){if(!grOn())return;GR.at=Date.now();
+  var before=JSON.stringify([GR.list,GR.err]);
   try{const{data,error}=await grSB().rpc("my_groups");if(error)throw grErr(error);GR.list=(data||[]).map(g=>({...g,last:g.last?grRow(g.last):null}));GR.loaded=true;GR.err="";for(const g of GR.list)GR.names[g.id]=g.name;grSave()}
   catch(e){GR.loaded=true;GR.err=navigator.onLine?(e.message||"Cannot load groups."):"You are offline: groups saved on this phone are shown."}
-  render()}
+  // redraw only when something changed: a full redraw every few seconds makes the screen blink
+  if(JSON.stringify([GR.list,GR.err])!==before)render()}
 async function grLoadMsgs(gid){if(!navigator.onLine||GR.loadingMsgs[gid])return;GR.loadingMsgs[gid]=1;
   try{const{data,error}=await grSB().from("group_messages").select("*").eq("group_id",gid).order("created_at",{ascending:false}).limit(200);if(error)throw error;
     const pend=(GR.msgs[gid]||[]).filter(m=>m.pending);GR.msgs[gid]=(data||[]).map(grRow).reverse().concat(pend.filter(p=>!(data||[]).some(d=>d.id===p.id)));grSave()}catch(e){}
