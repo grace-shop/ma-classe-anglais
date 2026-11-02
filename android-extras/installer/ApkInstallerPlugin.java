@@ -40,7 +40,7 @@ public class ApkInstallerPlugin extends Plugin {
             @Override public void run() {
                 synchronized (DL_LOCK) {
                     try {
-                        File dir = new File(getContext().getCacheDir(), "apk");
+                        File dir = new File(getContext().getFilesDir(), "apk");   // stockage de l'app : le système ne vide pas ce dossier comme le cache
                         dir.mkdirs();
                         // un fichier par tentative : aucune autre tentative ne peut écraser celui-ci
                         long now = System.currentTimeMillis();

@@ -122,7 +122,7 @@ if (existsSync("android-extras/installer")) {
   mkdirSync(dir, { recursive: true });
   for (const f of readdirSync("android-extras/installer")) cp("android-extras/installer/" + f, dir + "/" + f);
   mkdirSync("android/app/src/main/res/xml", { recursive: true });
-  writeFileSync("android/app/src/main/res/xml/apk_paths.xml", '<?xml version="1.0" encoding="utf-8"?>\n<paths><cache-path name="apk" path="." /></paths>\n');
+  writeFileSync("android/app/src/main/res/xml/apk_paths.xml", '<?xml version="1.0" encoding="utf-8"?>\n<paths><files-path name="apk_files" path="apk/" /><cache-path name="apk" path="." /></paths>\n');
   const mf = "android/app/src/main/AndroidManifest.xml";
   let m = readFileSync(mf, "utf8");
   if (!m.includes("apkprovider")) {
