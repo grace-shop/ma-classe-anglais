@@ -262,17 +262,12 @@
     panel.querySelector(".zz-bcto-btn").addEventListener("click", openSheet);
     panel.querySelector(".zz-bcf").addEventListener("submit", function (e) {
       e.preventDefault();
-      var i = panel.querySelector("#zzBci");
+      var i = document.getElementById("zzBci");
       if (!i) return;
-      var said = i.value;
-      lastSaid = said;
-      i.value = "";
-      try { i.blur(); } catch (x) {}
-      var fresh = i.cloneNode(false);
-      fresh.value = "";
-      i.parentNode.replaceChild(fresh, i);
+      var said = String(i.value || "");
+      if (!said.trim()) return;
+      forgetSent(said);
       send(said);
-      guardField();
     });
     return panel;
   }
@@ -289,14 +284,26 @@
     if (open) { paintTo(); paintList(); }
   }
 
-  // ---- the text just sent must not come back in the field ----
-  // the phone keyboard can write the sent text back into the field (on tap or later);
-  // while the field holds exactly that text it is emptied. Any other text is left alone.
-  var lastSaid = "";
+  // ---- the text just sent must leave the field, for good ----
+  // The phone keyboard can write the sent text back into the field a moment later
+  // (after Enter, on tap, or when the word is committed). So the field is emptied at once
+  // and again at a few moments after sending, as long as it still holds exactly that text.
+  // Any other text the person types is never touched.
+  var sentText = "";
   function guardField() {
-    if (!lastSaid) return;
+    if (!sentText) return;
     var el = document.getElementById("zzBci");
-    if (el && el.value.trim() === lastSaid.trim()) el.value = "";
+    if (el && el.value.trim() === sentText.trim()) {
+      el.value = "";
+      try { el.dispatchEvent(new Event("input", { bubbles: true })); } catch (x) {}
+    }
+  }
+  function forgetSent(text) {
+    sentText = text;
+    var el = document.getElementById("zzBci");
+    if (el) el.value = "";
+    guardField();
+    [0, 120, 300, 700, 1300, 2500].forEach(function (ms) { setTimeout(guardField, ms); });
   }
   setInterval(guardField, 1000);
   ["focusin", "input", "keyup", "compositionupdate", "compositionend", "pointerup"].forEach(function (ev) {
