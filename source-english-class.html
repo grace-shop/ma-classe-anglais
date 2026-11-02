@@ -3939,7 +3939,7 @@ function fCur(){const v=F.sv;if(!v)return null;const g=v.G[v.gi];if(!g||!g.list.
 function fShow(){const c=fCur();if(!c){F.sv=null;feedSync();return}const s=c.s;F.sv.t0=Date.now();
   if(c.g.uid!==S.uid&&!F.seen.has(s.id)){F.seen.add(s.id);window.__feed.viewStory(s.id).catch(()=>{})}
   clearTimeout(F.svT);if(!F.sv.views&&!F.sv.typing&&!F.share)F.svT=setTimeout(()=>fStep(1),fSdur(s)*1000+(fIsVid(s)?2500:0));feedSync();fVidStart();
-  if(s.media&&s.media.p&&!fIsVid(s)&&!V4.obj[s.media.p])srcBlob({k:"m",id:s.media.p,t:s.media.t}).then(b=>{V4.obj[s.media.p]=URL.createObjectURL(b);if(fCur()&&fCur().s.id===s.id)fShow()}).catch(()=>{})}
+  if(s.media&&s.media.p&&!fIsVid(s)&&!V4.obj[s.media.p])srcBlob({k:"m",id:s.media.p,t:s.media.t}).then(b=>{V4.obj[s.media.p]=URL.createObjectURL(b);if(fCur()&&fCur().s.id===s.id)fShow()}).catch(e=>{F.svErr={id:s.id,m:String((e&&e.message)||e||"error")};feedSync()})}
 function fStep(d){const v=F.sv;if(!v)return;const g=v.G[v.gi];v.si+=d;if(v.si>=g.list.length){v.gi++;v.si=0}else if(v.si<0){v.gi--;if(v.gi<0){v.gi=0;v.si=0}else v.si=v.G[v.gi].list.length-1}
   if(v.gi>=v.G.length){fCloseStory();return}fShow()}
 function fCloseStory(){clearTimeout(F.svT);F.sv=null;feedSync();render()}
@@ -3948,7 +3948,7 @@ function fStoryHTML(){const c=fCur();if(!c)return"";const{g,s}=c,mine=g.uid===S.
   return`<div class="fsv" style="${s.media?"":`background:${sbg(s.bg)}`}">
   <div class="fsv-bars">${g.list.map((x,i)=>`<i class="${i<v.si?"done":i===v.si?(v.views||v.typing?"run paused":"run"):""}" style="--d:${dur}s"></i>`).join("")}</div>
   <div class="fsv-top">${whoAva(g.who,g.uid,36)}<div><b>${esc(mine?"My story":g.who?.name||"Student")}</b><small>${ago(+new Date(s.created_at))}${mine&&s.hide?" · hidden from one person":""}</small></div><button type="button" class="iconbtn" data-v4="fSvClose" aria-label="Close">${ic("x")}</button></div>
-  ${s.media?`<div class="fsv-media">${fIsVid(s)?(F.svUrl&&F.svUrl.id===s.id?`<video id="fsvVid" src="${F.svUrl.url}" autoplay playsinline ${F.svMute?"muted":""}></video>${F.svMute?`<button type="button" class="fsv-snd" data-v4="fSvSnd">🔇 Tap for sound</button>`:""}`:`<div class="v4spin"></div>`):img?`<img src="${img}" alt="Story photo">`:`<div class="v4spin"></div>`}</div>`:""}
+  ${s.media?`<div class="fsv-media">${F.svErr&&F.svErr.id===s.id?`<div class="fsv-err" style="padding:24px;text-align:center;color:#fff">Média indisponible<br><small>${esc(F.svErr.m)}</small></div>`:""}${fIsVid(s)?(F.svUrl&&F.svUrl.id===s.id?`<video id="fsvVid" src="${F.svUrl.url}" autoplay playsinline ${F.svMute?"muted":""}></video>${F.svMute?`<button type="button" class="fsv-snd" data-v4="fSvSnd">🔇 Tap for sound</button>`:""}`:`<div class="v4spin"></div>`):img?`<img src="${img}" alt="Story photo">`:`<div class="v4spin"></div>`}</div>`:""}
   ${s.body?`<div class="fsv-text${s.media?" cap":""}">${fText(s.body)}</div>`:""}
   <button type="button" class="fsv-nav l" data-v4="fSvPrev" aria-label="Previous"></button><button type="button" class="fsv-nav r" data-v4="fSvNext" aria-label="Next"></button>
   <div class="fsv-bot">${mine||fStaff()?`<button type="button" class="btn ghost sm" data-v4="fSvViews">${ic("eye")}${views.length}${rxs.length?` · ${[...new Set(rxs.map(x=>x.e))].slice(0,3).map(e=>E(e)).join("")} ${rxs.length}`:""}</button>${mine?"":fSvReactBtns(s)}<button type="button" class="btn ghost sm" data-v4="fShare" data-k="story" data-id="${esc(s.id)}">${ic("send")}Share</button><button type="button" class="btn ghost sm" data-v4="fSvDel">${ic("trash")}Delete</button>`
@@ -4100,7 +4100,7 @@ async function vPlay(p,t,e){const zzEd=e&&zzVidEditParse(e);if(zzEd)return zzVid
   catch(e){ov.querySelector(".v4spin").replaceWith(Object.assign(document.createElement("p"),{textContent:navigator.onLine?"Cannot play this video.":"No network: the video needs internet."}))}}
 /* story video */
 async function fVidStart(){const c=fCur();if(!c||!fIsVid(c.s))return;const s=c.s;
-  if(!F.svUrl||F.svUrl.id!==s.id){F.svMute=false;try{const u=await srcURL({k:"m",id:s.media.p,t:s.media.t});if(fCur()?.s.id!==s.id)return;F.svUrl={id:s.id,url:u};feedSync()}catch(e){return}}
+  if(!F.svUrl||F.svUrl.id!==s.id){F.svMute=false;try{const u=await srcURL({k:"m",id:s.media.p,t:s.media.t});if(fCur()?.s.id!==s.id)return;F.svUrl={id:s.id,url:u};feedSync()}catch(e){F.svErr={id:s.id,m:String((e&&e.message)||e||"error")};feedSync();return}}
   const v=document.getElementById("fsvVid");if(!v||v._ok)return;v._ok=1;v.onended=()=>{if(fCur()?.s.id===s.id&&!F.sv.views&&!F.share)fStep(1)};
   v.play().catch(()=>{if(!F.svMute){F.svMute=true;feedSync();const v2=document.getElementById("fsvVid");if(v2){v2._ok=1;v2.muted=true;v2.onended=v.onended;v2.play().catch(()=>{})}}})}
 function fSvReactBtns(s){const my=(F.reacts.find(x=>x.story_id===s.id&&x.uid===S.uid)||{}).e;
