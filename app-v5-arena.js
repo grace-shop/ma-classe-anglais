@@ -155,6 +155,9 @@ AR_G.push(
 );
 const AR_LV={easy:1,medium:2,hard:3};
 function arLv(){return AR_LV[AR.level||"easy"]||1}
+function arMix(q){if(!q||!Array.isArray(q.o)||typeof q.a!=="number")return q;
+  const ord=q.o.map((_,i)=>i);for(let i=ord.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ord[i],ord[j]]=[ord[j],ord[i]]}
+  return Object.assign({},q,{o:ord.map(i=>q.o[i]),a:ord.indexOf(q.a)})}
 function arPool(arr,n){const L=arLv();let p=arr.filter(x=>(x.lv||1)===L);if(p.length<n)p=arr.filter(x=>(x.lv||1)<=L);if(p.length<n)p=arr.slice();return arShuf(p)}
 
 const AR_MODES=[
@@ -196,8 +199,8 @@ try{AR.best=JSON.parse(localStorage.getItem("ar_best")||"{}")||{};AR.level=local
 @keyframes arFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 #arena{position:fixed;inset:0;z-index:9800;color:#EAF0FF;overflow:auto;background:radial-gradient(120% 70% at 50% -10%,#1E2766 0%,#0B0E20 50%,#06070F 100%);-webkit-overflow-scrolling:touch;perspective:1200px}
 #arena[hidden]{display:none!important}
-#arena::before{content:"";position:fixed;inset:-64px 0 0;pointer-events:none;background-image:linear-gradient(rgba(94,234,212,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(129,140,248,.09) 1px,transparent 1px);background-size:64px 64px;transform:rotateX(62deg) translateY(-30%);transform-origin:50% 0;animation:arGrid 6s linear infinite;opacity:.6;mask-image:linear-gradient(transparent,#000 40%)}
-.ar-orb{position:fixed;border-radius:50%;filter:blur(40px);pointer-events:none;animation:arOrb 12s ease-in-out infinite}
+#arena::before{content:"";position:fixed;inset:-64px 0 0;pointer-events:none;background-image:linear-gradient(rgba(94,234,212,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(129,140,248,.09) 1px,transparent 1px);background-size:64px 64px;transform:rotateX(62deg) translateY(-30%);transform-origin:50% 0;opacity:.6;mask-image:linear-gradient(transparent,#000 40%)}
+.ar-orb{position:fixed;border-radius:50%;filter:blur(40px);pointer-events:none}
 .ar-orb.o1{width:260px;height:260px;left:-80px;top:-60px;background:rgba(94,234,212,.35)}
 .ar-orb.o2{width:300px;height:300px;right:-120px;top:30%;background:rgba(129,140,248,.4);animation-delay:-4s}
 .ar-orb.o3{width:220px;height:220px;left:20%;bottom:-80px;background:rgba(244,114,182,.28);animation-delay:-8s}
@@ -335,12 +338,12 @@ function arHome(){arStopT();AR.mode=null;
       <div class="ar-seg" role="group" aria-label="Level">${["easy","medium","hard"].map(l=>`<button class="${AR.level===l?"on":""}" data-ar="level" data-l="${l}" aria-pressed="${AR.level===l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join("")}</div>
       <button class="ar-go" data-ar="board">Class board</button>
     </div>`)}
-function arPlay(mode){AR.mode=mode;if(mode==="quiz"||mode==="odd"||mode==="traps"){AR.qs=arPool(mode==="odd"?AR_ODD:mode==="traps"?AR_TRAP:AR_Q,10).slice(0,10);AR.i=0;AR.score=0;AR.streak=0;return arQuiz()}
+function arPlay(mode){AR.mode=mode;if(mode==="quiz"||mode==="odd"||mode==="traps"){AR.qs=arPool(mode==="odd"?AR_ODD:mode==="traps"?AR_TRAP:AR_Q,10).slice(0,10).map(arMix);AR.i=0;AR.score=0;AR.streak=0;return arQuiz()}
   if(mode==="guess"){const w=arPool(AR_G,1)[0];AR.word=w;AR.guessed=[];AR.lives=6;arTimer(90,()=>arGuessEnd(false));return arGuess()}
   if(mode==="fill"){AR.items=arPool(AR_F,8).slice(0,8);AR.i=0;AR.score=0;return arFill()}
   if(mode==="order"){AR.items=arPool(AR_O,6).slice(0,6);AR.i=0;AR.score=0;return arOrder()}
   if(mode==="cards"){AR.deck=arShuf(AR_C);AR.total=AR.deck.length;AR.known=0;return arCards()}
-  if(mode==="clock"){AR.qs=arPool(AR_Q,20).concat(arPool(AR_Q,20));AR.i=0;AR.score=0;arTimer(60,()=>arEnd("clock",AR.score,30));return arClock()}}
+  if(mode==="clock"){AR.qs=arPool(AR_Q,20).concat(arPool(AR_Q,20)).map(arMix);AR.i=0;AR.score=0;arTimer(60,()=>arEnd("clock",AR.score,30));return arClock()}}
 
 /* quiz */
 function arQuiz(){if(AR.i>=AR.qs.length)return arEnd(AR.mode,AR.score,AR.qs.length*40);
