@@ -155,7 +155,7 @@ AR_G.push(
 );
 const AR_LV={easy:1,medium:2,hard:3};
 function arLv(){return AR_LV[AR.level||"easy"]||1}
-function arPool(arr,n){const L=arLv();let p=arr.filter(x=>(x.lv||1)===L);if(p.length<n)p=arr.filter(x=>(x.lv||1)<=L);return arShuf(p)}
+function arPool(arr,n){const L=arLv();let p=arr.filter(x=>(x.lv||1)===L);if(p.length<n)p=arr.filter(x=>(x.lv||1)<=L);if(p.length<n)p=arr.slice();return arShuf(p)}
 
 const AR_MODES=[
  {id:"quiz",t:"Quiz Blitz",d:"10 questions · 15 s each",ic:"bolt",max:400},
