@@ -5047,11 +5047,18 @@ try{AR.best=JSON.parse(localStorage.getItem("ar_best")||"{}")||{};AR.level=local
 @media (prefers-reduced-motion:reduce){#arena *,#arena::before,.ar-orb{animation:none!important;transition:none!important}}
 `;document.head.appendChild(st)}
 
+/* diagnostic (teachers only): the last clicks the Arena received, shown under the screen */
+const AR_DG=[];
+function arDiag(t){try{AR_DG.push(new Date().toLocaleTimeString()+" "+t);if(AR_DG.length>8)AR_DG.shift();
+  const d=document.getElementById("arDiag");if(d)d.textContent=AR_DG.join("\n");}catch(e){}}
 function arRoot(){let r=document.getElementById("arena");if(r)return r;
   r=document.createElement("div");r.id="arena";r.hidden=true;r.setAttribute("role","dialog");r.setAttribute("aria-label","Arena");
   r.innerHTML=`<div class="ar-orb o1"></div><div class="ar-orb o2"></div><div class="ar-orb o3"></div><div class="ar-body" id="arBody"></div>`;
   document.body.appendChild(r);
   r.addEventListener("click",arClick);
+  if(S&&S.mode==="teacher"){const d=document.createElement("pre");d.id="arDiag";
+    d.style.cssText="position:fixed;left:0;right:0;bottom:0;margin:0;z-index:9801;pointer-events:none;font:11px/1.3 monospace;background:rgba(0,0,0,.8);color:#8EF6E4;padding:4px 8px;max-height:30vh;overflow:hidden;white-space:pre-wrap";
+    r.appendChild(d)}
   r.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target&&e.target.id==="arIn"){e.preventDefault();if(AR.mode==="fill"&&!AR.locked)arFillAns(e.target.value)}if(e.key==="Escape")arClose()});
   return r}
 function arFab(){if(document.getElementById("arFab"))return;const b=document.createElement("button");b.id="arFab";b.className="ar-fab";b.type="button";b.setAttribute("aria-label","Open the Arena");
@@ -5106,7 +5113,7 @@ function arQAnswer(k){if(AR.locked)return;AR.locked=true;arStopT();const q=AR.qs
   document.querySelectorAll(".ar-opt").forEach((b,j)=>{b.disabled=true;if(j===q.a)b.classList.add("ok");else if(j===k)b.classList.add("bad")});
   const fb=document.getElementById("arFb");
   if(fb)fb.innerHTML=`<div class="ar-note ${ok?"good":"bad"}"><b>${ok?"Correct!":(k<0?"Time's up!":"Not quite.")}</b> ${arEsc(q.e)}</div><div style="height:12px"></div><button class="ar-go" data-ar="next" style="width:100%">Next →</button>`}
-function arNext(){if(AR.mode==="quiz"||AR.mode==="odd"||AR.mode==="traps"){AR.i++;arQuiz()}else if(AR.mode==="fill"){AR.i++;arFill()}else if(AR.mode==="order"){AR.i++;arOrder()}}
+function arNext(){arDiag("next: mode="+AR.mode+" q="+(AR.i+1)+"/"+(AR.qs?AR.qs.length:0)+" locked="+AR.locked);if(AR.mode==="quiz"||AR.mode==="odd"||AR.mode==="traps"){AR.i++;arQuiz()}else if(AR.mode==="fill"){AR.i++;arFill()}else if(AR.mode==="order"){AR.i++;arOrder()}}
 
 /* guess the word */
 function arGuess(){const w=AR.word.w;const lost=AR.guessed.filter(c=>!w.includes(c)).length;AR.lives=Math.max(0,6-lost);
@@ -5201,7 +5208,7 @@ function arEnd(mode,score,max,msg){arStopT();AR.mode=null;
         <button class="ar-go ghost" data-ar="home">Arena</button></div></div>`)}
 
 /* clicks */
-function arClick(e){const b=e.target.closest&&e.target.closest("[data-ar]");if(!b)return;const a=b.dataset.ar;
+function arClick(e){const b=e.target.closest&&e.target.closest("[data-ar]");if(!b)return;const a=b.dataset.ar;arDiag("click: "+a);
   if(a.indexOf("bt-")===0)return btClick(b);
   if(a==="close")return arClose();
   if(a==="home")return arHome();
@@ -5259,6 +5266,7 @@ arRoot();arFab();
 .ar-row b{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ar-rs{font-weight:900;font-variant-numeric:tabular-nums;color:#8EF6E4;font-size:1.1rem}
 `;document.head.appendChild(st)}
+window.addEventListener("error",function(e){arDiag("js error: "+(e&&e.message||"?"))});
 
 /* ---- app-v5-arena2.js ---- */
 /* =====================================================================
