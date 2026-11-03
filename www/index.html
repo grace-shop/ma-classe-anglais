@@ -5120,7 +5120,7 @@ function arQAnswer(k){if(AR.locked)return;AR.locked=true;arStopT();const q=AR.qs
   document.querySelectorAll(".ar-opt").forEach((b,j)=>{b.disabled=true;if(j===q.a)b.classList.add("ok");else if(j===k)b.classList.add("bad")});
   const fb=document.getElementById("arFb");
   if(fb)fb.innerHTML=`<div class="ar-note ${ok?"good":"bad"}"><b>${ok?"Correct!":(k<0?"Time's up!":"Not quite.")}</b> ${arEsc(q.e)}</div><div style="height:12px"></div><button class="ar-go" data-ar="next" style="width:100%">Next →</button>`}
-function arNext(){arDiag("next: mode="+AR.mode+" q="+(AR.i+1)+"/"+(AR.qs?AR.qs.length:0)+" locked="+AR.locked);if(AR.mode==="quiz"||AR.mode==="odd"||AR.mode==="traps"){AR.i++;arQuiz()}else if(AR.mode==="fill"){AR.i++;arFill()}else if(AR.mode==="order"){AR.i++;arOrder()}}
+function arNext(){arDiag("next: mode="+AR.mode+" q="+(AR.i+1)+"/"+(AR.qs?AR.qs.length:0)+" locked="+AR.locked);if(AR.mode==="quiz"||AR.mode==="odd"||AR.mode==="traps"||String(AR.mode).indexOf("ch-")===0){AR.i++;arQuiz()}else if(AR.mode==="fill"){AR.i++;arFill()}else if(AR.mode==="order"){AR.i++;arOrder()}}
 
 /* guess the word */
 function arGuess(){const w=AR.word.w;const lost=AR.guessed.filter(c=>!w.includes(c)).length;AR.lives=Math.max(0,6-lost);
