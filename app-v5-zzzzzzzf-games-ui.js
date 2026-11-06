@@ -16,7 +16,7 @@
   var TIMER = 0;
   var PICKCB = null, PICKBACK = null;
 
-  var NAMES = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", rope: "Rope Bros" };
+  var NAMES = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", rope: "Rope Bros", pool: "Pool" };
   var GLYPH = { K: "♚", Q: "♛", R: "♜", B: "♝", N: "♞", P: "♟" };
   /* Pièces d'échecs : silhouettes classiques à contour fin (jeu "cburnett" de Colin M. L. Burnett,
      licence BSD / GPL v2+). F = couleur de remplissage, D = couleur des traits de détail. */
@@ -189,6 +189,7 @@
         card("chess", "Chess", "Castling, en passant, promotion", '<div class="pv pv-chess"><i class="w"></i><i class="b"></i><i class="b"></i><i class="w"></i></div>') +
         card("ludo", "Ludo", "2 to 4 players", '<div class="pv pv-ludo"><i class="red"></i><i class="green"></i><i class="blue"></i><i class="yellow"></i></div>') +
         card("morris", "Three men's morris", "Mills, step by step", '<div class="pv pv-morris"><b></b><b class="bk"></b><b></b></div>') +
+        card("pool", "Pool", "8-ball · 2 players or vs computer", '<div class="pv pv-pool">' + (window.ZPool && window.ZPool.pic ? window.ZPool.pic() : "") + '</div>') +
         card("rope", "Rope Bros", "Two friends, one rope", '<div class="pv pv-rope">' + (window.ZRope && window.ZRope.pic ? window.ZRope.pic() : "") + '</div>') +
       '</div>' +
       (PLACE === "battle" ? '<div class="zg-inbox" id="zgInboxHost"></div>' : "");
@@ -984,6 +985,7 @@
     if ((b = t.closest("[data-zgh]"))) {
       e.preventDefault();
       var gid = b.getAttribute("data-zgh");
+      if (gid === "pool" && window.ZPool) { G = null; clearTimeout(TIMER); TIMER = 0; window.ZPool.open(host()); return; }
       if (gid === "rope" && window.ZRope) { G = null; clearTimeout(TIMER); TIMER = 0; window.ZRope.open(host()); return; }
       setup(gid); return;
     }
