@@ -36,6 +36,7 @@
   // la partie de départ, avec les couleurs de l'hôte (cols[0]) ; le second joueur choisit à l'acceptation
   function initial(game, cols, level) {
     if (game === "rope") return { v: 1, cols: [0, 1], level: +level || 0 };
+    if (game === "pool") return { st: { g: window.ZPool.newState() }, v: 1, cols: [0, 1] };
     if (game === "chess") return { st: ZG.chess.start(), v: 1, cols: [cols[0], cols[0] === "w" ? "b" : "w"] };
     if (game === "morris") return { st: ZG.morris.start(), v: 1, cols: [cols[0], cols[0] === 0 ? 1 : 0] };
     var other = (cols[0] + 2) % 4; // two players face each other
@@ -175,7 +176,7 @@
     var r = await sb().rpc("game_list");
     if (!r || r.error || !r.data || !r.data.length) { box.remove(); return; }
     var uid = await myUid();
-    var names = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", rope: "Rope Bros" };
+    var names = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", rope: "Rope Bros", pool: "Pool" };
     function other(row) { return row.host === uid ? row.guest : row.host; }
     box.innerHTML = '<div class="zg-label" style="margin:6px 0 0">Invitations and games</div>' + r.data.filter(function (g) { return names[g.kind]; }).map(function (g) {
       var nm = nameOf(other(g));
@@ -217,6 +218,7 @@
           // mon choix part vers l'hôte avec le premier coup de la partie
           if (window.zgPush) window.zgPush(ZGUI.current());
         };
+        if (row.kind === "pool") { ZGUI.open({ game: "pool", mode: "online", you: 1, id: id, v: row.state.v, st: row.state.st, cols: [0, 1], oppName: nameOf(row.host), oppUid: row.host }); return; }
         if (row.kind === "rope") { ZGUI.open({ game: "rope", mode: "online", you: 1, id: id, v: row.state.v, oppName: nameOf(row.host), oppUid: row.host, level: row.state.level }); return; }
         if (row.kind === "chess") { openAs([hostCols[0], hostCols[0] === "w" ? "b" : "w"], row.state.st); return; }
         if (row.kind === "ludo") { var lc = [hostCols[0], (hostCols[0] + 2) % 4]; openAs(lc, ZG.ludo.start(2, lc)); return; }
