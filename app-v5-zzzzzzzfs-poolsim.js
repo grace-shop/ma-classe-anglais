@@ -238,7 +238,7 @@
   function newGame(seed) {
     var rng = mulberry(seed == null ? (Date.now() & 0xffffff) : seed);
     var G = { S: makeSim(), rng: rng, turn: 0, group: [null, null], hand: true, kitchen: true, breakShot: true,
-      over: false, winner: -1, last: null, shotActive: false, settle: 0, remainBefore: 0, wasOpen: true, shots: 0, acc: 0 };
+      over: false, winner: -1, last: null, shotActive: false, settle: 0, remainBefore: 0, wasOpen: true, shots: 0, acc: 0, call: null };
     rack(G.S, rng);
     return G;
   }
@@ -316,8 +316,11 @@
     var eight = objPot.indexOf(8) >= 0;
     if (eight) {
       if (G.breakShot) { res.respotted8 = true; }
-      else if (!wasOpen && cleared && !res.foul) res.win = p;
-      else { res.win = o; res.reason = res.reason || "The 8 ball went in too early"; if (!res.foul) res.reason = "The 8 ball went in too early"; }
+      else if (!wasOpen && cleared && !res.foul && (G.call == null || S.balls[8].pocket === G.call)) res.win = p;
+      else {
+        res.win = o; res.reason = res.reason || "The 8 ball went in too early";
+        if (!res.foul) res.reason = (!wasOpen && cleared) ? "The 8 ball went in the wrong pocket" : "The 8 ball went in too early";
+      }
     }
 
     if (res.respotted8) {
@@ -327,7 +330,7 @@
     }
 
     if (res.win < 0 && !res.foul) {
-      if (wasOpen && !G.breakShot && objPot.length) {                   // la table s'ouvre : la première bille rentrée choisit les groupes
+      if (wasOpen && objPot.length) {                   // la table s'ouvre : la première bille rentrée choisit les groupes
         var first = null; for (var k = 0; k < objPot.length; k++) if (objPot[k] !== 8) { first = objPot[k]; break; }
         if (first != null) { G.group[p] = gid(first); G.group[o] = 1 - gid(first); res.assigned = true; }
       }
@@ -343,7 +346,7 @@
     if (res.win >= 0) { G.over = true; G.winner = res.win; }
     else if (res.foul) { G.turn = o; G.hand = true; G.kitchen = false; }
     else if (!res.keep) { G.turn = o; }
-    G.breakShot = false;
+    G.breakShot = false; G.call = null;
     G.shotActive = false; S.shot = false;
     G.last = res;
     return res;
@@ -360,6 +363,23 @@
       if (stopped(S)) { G.settle += SUB; if (G.settle > 0.18) { out = resolve(G); G.acc = 0; break; } } else G.settle = 0;
     }
     return out;
+  }
+
+  /* l'état de la partie en objet simple (pour l'envoyer à l'autre joueur) et retour */
+  function ser(G) {
+    return { b: G.S.balls.map(function (b) { return [+b.x.toFixed(3), +b.y.toFixed(3), +b.vx.toFixed(3), +b.vy.toFixed(3), b.on ? 1 : 0, b.pocket]; }),
+      p: G.S.potted.slice(), f: G.S.first, r: G.S.rail, t: G.turn, g: G.group.slice(), h: G.hand ? 1 : 0, k: G.kitchen ? 1 : 0,
+      bs: G.breakShot ? 1 : 0, o: G.over ? 1 : 0, w: G.winner, wo: G.wasOpen ? 1 : 0, rb: G.remainBefore, n: G.shots, c: G.call,
+      why: G.last ? G.last.reason : "" };
+  }
+  function des(o) {
+    var G = newGame(0), S = G.S;
+    o.b.forEach(function (a, i) { var b = S.balls[i]; b.x = a[0]; b.y = a[1]; b.vx = a[2]; b.vy = a[3]; b.on = !!a[4]; b.pocket = a[5]; });
+    S.potted = o.p.slice(); S.first = o.f; S.rail = !!o.r; S.shot = false; S.ev = [];
+    G.turn = o.t; G.group = o.g.slice(); G.hand = !!o.h; G.kitchen = !!o.k; G.breakShot = !!o.bs; G.over = !!o.o; G.winner = o.w;
+    G.wasOpen = !!o.wo; G.remainBefore = o.rb; G.shots = o.n; G.call = o.c == null ? null : o.c;
+    G.last = o.why ? { reason: o.why } : null;
+    return G;
   }
 
   function cloneGame(G) {
@@ -534,7 +554,7 @@
   root.ZPoolSim = {
     W: W, H: H, R: R, HEAD_Y: HEAD_Y, FOOT: FOOT, POCKETS: POCKETS, SEGS: SEGS, MAXV: MAXV, SUB: SUB,
     mulberry: mulberry, gid: gid, makeSim: makeSim, rack: rack, step: step, stopped: stopped, shoot: shoot, predict: predict,
-    newGame: newGame, takeShot: takeShot, advance: advance, resolve: resolve, cloneGame: cloneGame, simulate: simulate,
+    newGame: newGame, ser: ser, des: des, takeShot: takeShot, advance: advance, resolve: resolve, cloneGame: cloneGame, simulate: simulate,
     canPlace: canPlace, place: place, freeSpot: freeSpot, targets: targets, ballsLeft: ballsLeft,
     potShots: potShots, powerToPot: powerToPot, chooseShot: chooseShot, chooseHand: chooseHand, LEVELS: LEVELS
   };

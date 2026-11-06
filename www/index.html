@@ -18512,7 +18512,8 @@ async function zzBakeEntries(entries){
   function open(opts) {
     css();
     clearTimeout(TIMER); TIMER = 0; stopFire();
-    if (opts.game === "rope" && window.ZRope && window.ZRope.openOnline) { G = null; window.ZRope.openOnline(host(), opts); return; }
+    if (opts.game === "pool" && window.ZPool && window.ZPool.openOnline) { G = null; window.ZPool.openOnline(host(), opts); return; }
+  if (opts.game === "rope" && window.ZRope && window.ZRope.openOnline) { G = null; window.ZRope.openOnline(host(), opts); return; }
     G = { game: opts.game, mode: opts.mode, diff: opts.diff || "medium", you: opts.you == null ? 0 : opts.you, sel: null, busy: false, over: false,
       id: opts.id || null, v: opts.v || 1, oppName: opts.oppName || "Classmate", oppUid: opts.oppUid || null, anim: false, last: null, rolling: false, rollAnim: null,
       cols: opts.cols || null, caps: [[], []], lastDie: [1, 1, 1, 1] };
@@ -20464,7 +20465,7 @@ async function zzBakeEntries(entries){
   function newGame(seed) {
     var rng = mulberry(seed == null ? (Date.now() & 0xffffff) : seed);
     var G = { S: makeSim(), rng: rng, turn: 0, group: [null, null], hand: true, kitchen: true, breakShot: true,
-      over: false, winner: -1, last: null, shotActive: false, settle: 0, remainBefore: 0, wasOpen: true, shots: 0, acc: 0 };
+      over: false, winner: -1, last: null, shotActive: false, settle: 0, remainBefore: 0, wasOpen: true, shots: 0, acc: 0, call: null };
     rack(G.S, rng);
     return G;
   }
@@ -20542,8 +20543,11 @@ async function zzBakeEntries(entries){
     var eight = objPot.indexOf(8) >= 0;
     if (eight) {
       if (G.breakShot) { res.respotted8 = true; }
-      else if (!wasOpen && cleared && !res.foul) res.win = p;
-      else { res.win = o; res.reason = res.reason || "The 8 ball went in too early"; if (!res.foul) res.reason = "The 8 ball went in too early"; }
+      else if (!wasOpen && cleared && !res.foul && (G.call == null || S.balls[8].pocket === G.call)) res.win = p;
+      else {
+        res.win = o; res.reason = res.reason || "The 8 ball went in too early";
+        if (!res.foul) res.reason = (!wasOpen && cleared) ? "The 8 ball went in the wrong pocket" : "The 8 ball went in too early";
+      }
     }
 
     if (res.respotted8) {
@@ -20553,7 +20557,7 @@ async function zzBakeEntries(entries){
     }
 
     if (res.win < 0 && !res.foul) {
-      if (wasOpen && !G.breakShot && objPot.length) {                   // la table s'ouvre : la première bille rentrée choisit les groupes
+      if (wasOpen && objPot.length) {                   // la table s'ouvre : la première bille rentrée choisit les groupes
         var first = null; for (var k = 0; k < objPot.length; k++) if (objPot[k] !== 8) { first = objPot[k]; break; }
         if (first != null) { G.group[p] = gid(first); G.group[o] = 1 - gid(first); res.assigned = true; }
       }
@@ -20569,7 +20573,7 @@ async function zzBakeEntries(entries){
     if (res.win >= 0) { G.over = true; G.winner = res.win; }
     else if (res.foul) { G.turn = o; G.hand = true; G.kitchen = false; }
     else if (!res.keep) { G.turn = o; }
-    G.breakShot = false;
+    G.breakShot = false; G.call = null;
     G.shotActive = false; S.shot = false;
     G.last = res;
     return res;
@@ -20586,6 +20590,23 @@ async function zzBakeEntries(entries){
       if (stopped(S)) { G.settle += SUB; if (G.settle > 0.18) { out = resolve(G); G.acc = 0; break; } } else G.settle = 0;
     }
     return out;
+  }
+
+  /* l'état de la partie en objet simple (pour l'envoyer à l'autre joueur) et retour */
+  function ser(G) {
+    return { b: G.S.balls.map(function (b) { return [+b.x.toFixed(3), +b.y.toFixed(3), +b.vx.toFixed(3), +b.vy.toFixed(3), b.on ? 1 : 0, b.pocket]; }),
+      p: G.S.potted.slice(), f: G.S.first, r: G.S.rail, t: G.turn, g: G.group.slice(), h: G.hand ? 1 : 0, k: G.kitchen ? 1 : 0,
+      bs: G.breakShot ? 1 : 0, o: G.over ? 1 : 0, w: G.winner, wo: G.wasOpen ? 1 : 0, rb: G.remainBefore, n: G.shots, c: G.call,
+      why: G.last ? G.last.reason : "" };
+  }
+  function des(o) {
+    var G = newGame(0), S = G.S;
+    o.b.forEach(function (a, i) { var b = S.balls[i]; b.x = a[0]; b.y = a[1]; b.vx = a[2]; b.vy = a[3]; b.on = !!a[4]; b.pocket = a[5]; });
+    S.potted = o.p.slice(); S.first = o.f; S.rail = !!o.r; S.shot = false; S.ev = [];
+    G.turn = o.t; G.group = o.g.slice(); G.hand = !!o.h; G.kitchen = !!o.k; G.breakShot = !!o.bs; G.over = !!o.o; G.winner = o.w;
+    G.wasOpen = !!o.wo; G.remainBefore = o.rb; G.shots = o.n; G.call = o.c == null ? null : o.c;
+    G.last = o.why ? { reason: o.why } : null;
+    return G;
   }
 
   function cloneGame(G) {
@@ -20760,7 +20781,7 @@ async function zzBakeEntries(entries){
   root.ZPoolSim = {
     W: W, H: H, R: R, HEAD_Y: HEAD_Y, FOOT: FOOT, POCKETS: POCKETS, SEGS: SEGS, MAXV: MAXV, SUB: SUB,
     mulberry: mulberry, gid: gid, makeSim: makeSim, rack: rack, step: step, stopped: stopped, shoot: shoot, predict: predict,
-    newGame: newGame, takeShot: takeShot, advance: advance, resolve: resolve, cloneGame: cloneGame, simulate: simulate,
+    newGame: newGame, ser: ser, des: des, takeShot: takeShot, advance: advance, resolve: resolve, cloneGame: cloneGame, simulate: simulate,
     canPlace: canPlace, place: place, freeSpot: freeSpot, targets: targets, ballsLeft: ballsLeft,
     potShots: potShots, powerToPot: powerToPot, chooseShot: chooseShot, chooseHand: chooseHand, LEVELS: LEVELS
   };
@@ -21065,19 +21086,20 @@ async function zzBakeEntries(entries){
         (ai ? '<div class="zg-label">Level</div><div class="seg">' +
           ["easy", "medium", "hard"].map(function (l) { return '<button type="button" class="' + (ST.level === l ? "on" : "") + '" data-zp="level" data-v="' + l + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join("") + '</div>' : '') +
         '<p class="zp-how">' + (ai ? '<b>You</b> break first. ' : '<b>Pass the phone</b> after each turn. ') +
-          'Drag on the table to aim: the further from the white ball, the finer the aim. Pull the bar on the right down and let go to shoot. Tap the white ball on the right to add spin. Pot all your balls (solids 1–7 or stripes 9–15), then the black 8.</p>' +
+          'Drag on the table to aim: the further from the white ball, the finer the aim. Pull the bar on the right down and let go to shoot. Tap the white ball on the right to add spin. Pot all your balls (solids 1–7 or stripes 9–15). Then tap the pocket where the black 8 will go, and shoot.</p>' +
         '<button class="zg-big alt2" data-zp="start">Play</button>' +
+        '<button class="zg-big alt" data-zp="classmate">Play a classmate online</button>' +
       '</div>';
   }
 
   var HUD_NAMES = ["You", "Computer"];
   function buildGame(h) {
     var G = ST.G;
-    var sub = ST.mode === "ai" ? "vs computer · " + ST.level : "2 players";
+    var sub = ST.mode === "ai" ? "vs computer · " + ST.level : ST.mode === "online" ? "vs " + ST.match.oppName + " · online" : "2 players";
     h.className = "zg-page pool play";
     h.innerHTML =
       '<div class="zg-head"><button class="zg-x" data-zp="menu" aria-label="Menu">‹ Menu</button><div><b>Pool</b><small>8-ball · ' + esc(sub) + '</small></div>' +
-        '<button class="zg-snd" data-zp="restart" aria-label="Restart" title="Restart">↻</button>' + sndBtn() + '</div>' +
+        (ST.mode === "online" ? "" : '<button class="zg-snd" data-zp="restart" aria-label="Restart" title="Restart">↻</button>') + sndBtn() + '</div>' +
       '<div class="zp-hud">' + [0, 1].map(function (p) {
         return '<div class="zp-pl p' + p + '" data-zp-pl="' + p + '"><div class="zp-av">' + (ST.mode === "ai" && p === 1 ? robot() : esc(ST.names[p].charAt(0).toUpperCase())) + '</div>' +
           '<div class="zp-nm"><b>' + esc(ST.names[p]) + '</b><small data-zp-grp="' + p + '">Open table</small><div class="zp-balls" data-zp-balls="' + p + '"></div></div></div>';
@@ -21154,7 +21176,21 @@ async function zzBakeEntries(entries){
     bindInputs();
   }
 
-  function humanTurn() { return ST.mode === "two" || ST.G.turn === 0; }
+  function humanTurn() {
+    if (ST.mode === "two") return true;
+    if (ST.mode === "online") return ST.G.turn === ST.you;
+    return ST.G.turn === 0;
+  }
+  // le joueur a rentré toutes ses billes : il doit annoncer la poche de la noire
+  function needCall() { var G = ST.G; return !!G && !G.over && !G.breakShot && G.group[G.turn] != null && P.ballsLeft(G, G.turn) === 0; }
+  var POCKET_NAMES = ["top left", "top right", "middle left", "middle right", "bottom left", "bottom right"];
+  function pocketAt(w) { var best = -1, bd = 1e9; PKV.forEach(function (p, k) { var d = Math.hypot(w.x - p.x, w.y - p.y); if (d < p.r + 12 && d < bd) { bd = d; best = k; } }); return best; }
+  function tryStrike() {
+    var G = ST.G;
+    if (!canAct() || ST.power <= 0.04) return false;
+    if (needCall() && G.call == null) { say("Tap a pocket to call the 8 ball first", "bad", 2); return false; }
+    strike(ST.power, ST.sx, ST.sy, ST.aim); return true;
+  }
   function canAct() { return ST.playing && ST.phase === "aim" && humanTurn() && !ST.G.over; }
 
   function defaultAim() {
@@ -21195,8 +21231,10 @@ async function zzBakeEntries(entries){
   function beginTurnText(first) {
     var G = ST.G, nm = ST.names[G.turn];
     if (G.over) return;
-    if (!humanTurn()) { status("Computer is thinking…"); return; }
-    if (ST.mode === "ai") status(G.hand ? "Drag the white ball where you want it, then aim" : first ? "Break! Drag to aim, pull the bar to shoot" : "Your shot");
+    if (!humanTurn()) { status(ST.mode === "ai" ? "Computer is thinking…" : "Waiting for " + nm + "…"); return; }
+    if (needCall()) { status("Tap a pocket to call the 8 ball"); return; }
+    if (ST.mode === "online") status(G.hand ? "Place the white ball, then aim" : first ? "Break! Drag to aim, pull the bar to shoot" : "Your shot");
+    else if (ST.mode === "ai") status(G.hand ? "Drag the white ball where you want it, then aim" : first ? "Break! Drag to aim, pull the bar to shoot" : "Your shot");
     else status(nm + (G.hand ? " · place the white ball, then aim" : first ? " · break shot" : " · your shot"));
   }
 
@@ -21207,9 +21245,12 @@ async function zzBakeEntries(entries){
     updateHud();
     if (G.over) return;
     ST.cueFade = 0;
-    if (humanTurn()) { ST.phase = "aim"; ST.ai = null; } else { ST.phase = "ai"; ST.ai = { step: "think", t: 0 }; }
+    G.call = null;
+    if (humanTurn()) { ST.phase = "aim"; ST.ai = null; }
+    else if (ST.mode === "ai") { ST.phase = "ai"; ST.ai = { step: "think", t: 0 }; }
+    else { ST.phase = "wait"; ST.ai = null; }
     beginTurnText(false);
-    if (ST.mode === "two") snd("turn");
+    if (ST.mode === "two" || (ST.mode === "online" && humanTurn())) snd("turn");
   }
 
   function strike(power, sx, sy, angle) {
@@ -21217,12 +21258,14 @@ async function zzBakeEntries(entries){
   }
 
   function onShotEnd(res) {
+    if (ST.mode === "online" && res.player !== ST.you && ST.remote) { ST.G = P.des(ST.remote.auth); ST.remote = null; }   // on prend l'état officiel
     var G = ST.G, who = res.player, nm = ST.names;
     ST.phase = "turn"; ST.strike = null;
     syncPrev();
     updateHud();
+    if (ST.mode === "online" && res.player === ST.you) pushState();
     if (G.over) {
-      var humanWon = ST.mode === "two" || G.winner === 0;
+      var humanWon = ST.mode === "two" || (ST.mode === "online" ? G.winner === ST.you : G.winner === 0);
       snd(humanWon ? "win" : "foul");
       ST.phase = "over"; ST.endT = 1.1; spawnConfetti();
       say(res.reason ? res.reason : "", "bad", 3);
@@ -21235,7 +21278,7 @@ async function zzBakeEntries(entries){
     else if (res.assigned) { msg = nm[who] + (ST.mode === "ai" && who === 0 ? ": " : " has ") + groupName(G.group[who]).toLowerCase(); }
     else if (res.keep && res.potted.length) { msg = res.potted.length > 1 ? "Great shot!" : "Nice shot!"; }
     if (msg) say(msg, tone, 2.6);
-    if (res.foul && G.hand) { var nx = G.turn; say(msg + " · " + nm[nx] + " has the ball in hand", "bad", 3); }
+    if (res.foul && G.hand) { var nx = G.turn; say(msg + " · ball in hand for " + (nx === ST.you || (ST.mode === "ai" && nx === 0) ? "you" : nm[nx]), "bad", 3); }
     beginTurn();
   }
 
@@ -21268,7 +21311,16 @@ async function zzBakeEntries(entries){
     }
   }
   function aiPlan() {
-    var G = ST.G, A = ST.ai, sh = P.chooseShot(G, ST.level);
+    var G = ST.G, A = ST.ai, sh;
+    if (needCall()) {
+      var ps = P.potShots(G, G.turn).filter(function (q) { return q.id === 8; });
+      if (ps.length) { G.call = ps[0].pocket; sh = { angle: ps[0].angle, power: clamp((P.powerToPot(ps[0].d1, ps[0].d2, ps[0].cos) || 0.8), 0.25, 1), sx: 0, sy: 0 }; }
+      else {
+        var b8 = G.S.balls[8], bk = 1e9; G.call = 0;
+        P.POCKETS.forEach(function (pk, k) { var q = (pk.x - b8.x) * (pk.x - b8.x) + (pk.y - b8.y) * (pk.y - b8.y); if (q < bk) { bk = q; G.call = k; } });
+        sh = P.chooseShot(G, ST.level);
+      }
+    } else sh = P.chooseShot(G, ST.level);
     var from = ST.aim, to = sh.angle, d = to - from;
     while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2;
     A.sh = sh; A.from = from; A.to = from + d; A.dur = 0.45 + 0.5 * Math.min(1, Math.abs(d) / Math.PI);
@@ -21286,6 +21338,7 @@ async function zzBakeEntries(entries){
   }
   function update(dt) {
     var G = ST.G; if (!G) return;
+    if (ST.pending && (ST.phase === "wait" || ST.phase === "aim")) { var pr = ST.pending; ST.pending = null; onRow(pr); G = ST.G; }
     ST.t += dt;
     if (ST.msgT > 0) { ST.msgT -= dt; if (ST.msgT <= 0 && ST.elMsg) ST.elMsg.className = "zp-msg"; }
     if (ST.phase === "ai") aiUpdate(dt);
@@ -21295,10 +21348,11 @@ async function zzBakeEntries(entries){
       ST.power = ST.strike.p * (1 - ease(k)); ST.thrust = k;
       if (k >= 1) {
         var s = ST.strike;
+        ST.lastShot = { a: s.a, p: s.p, sx: s.sx, sy: s.sy, call: G.call, hp: G.hand ? { x: G.S.balls[0].x, y: G.S.balls[0].y } : null };
         P.takeShot(G, s.a, s.p, s.sx, s.sy);
         ST.evi = 0; ST.phase = "roll"; ST.cueFade = 1; ST.pwDrag = false;
         ST.power = 0; setPowerUi(0);
-        status(humanTurn() || ST.mode === "two" ? "…" : "Computer plays");
+        status(ST.mode === "ai" && !humanTurn() ? "Computer plays" : "…");
       }
     }
     if (ST.phase === "roll") {
@@ -21372,6 +21426,15 @@ async function zzBakeEntries(entries){
       drawBall(g, a.id, x, y, 1 - 0.42 * k2, 0.75 * k2);
     });
     if (ST.dragCue && ST.dragCue.bad) { g.strokeStyle = "rgba(255,80,80,.9)"; g.lineWidth = 2; g.beginPath(); g.arc(ST.dragCue.x, ST.dragCue.y, R + 1, 0, 7); g.stroke(); }
+    if (aiming && needCall()) {
+      var pulse2 = 0.5 + 0.5 * Math.sin(ST.t * 6);
+      PKV.forEach(function (p, k) {
+        g.beginPath(); g.arc(p.x, p.y, p.r - 2, 0, 7);
+        g.lineWidth = k === G.call ? 3.2 : 2;
+        g.strokeStyle = k === G.call ? "rgba(255,206,60,.95)" : "rgba(255,255,255," + (0.25 + 0.35 * pulse2) + ")";
+        g.stroke();
+      });
+    }
     /* la visée et la queue */
     if ((ST.phase === "aim" && humanTurn()) || ST.phase === "ai" || ST.phase === "strike") {
       if (B[0].on && !(ST.ai && ST.ai.step === "hand") && !(ST.dragCue)) { drawGuide(g); drawCue(g, 1); }
@@ -21436,13 +21499,13 @@ async function zzBakeEntries(entries){
 
   function showEnd() {
     var G = ST.G, nm = ST.names, w = G.winner, r = G.last && G.last.reason;
-    var you = ST.mode === "ai" && w === 0, lose = ST.mode === "ai" && w === 1;
+    var you = (ST.mode === "ai" && w === 0) || (ST.mode === "online" && w === ST.you), lose = (ST.mode === "ai" && w === 1) || (ST.mode === "online" && w !== ST.you);
     var el = document.createElement("div"); el.id = "zgend"; el.className = "zg-end";
     el.innerHTML = '<div class="zg-endcard"><div class="zp-trophy">' +
       '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20 8h24v14a12 12 0 0 1-24 0z" fill="#f6c90e" stroke="#a87800" stroke-width="2"/><path d="M20 12h-8c0 10 4 14 10 15M44 12h8c0 10-4 14-10 15" fill="none" stroke="#f6c90e" stroke-width="3"/><rect x="28" y="34" width="8" height="10" fill="#d9a800"/><rect x="20" y="44" width="24" height="7" rx="2" fill="#a87800"/><path d="M26 14c0 6 2 9 4 10" stroke="#fff6c8" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>' +
       '<b>' + (you ? "You win!" : lose ? "The computer wins" : esc(nm[w]) + " wins!") + '</b>' +
       '<small>' + (r ? esc(r) : (you ? "Great game." : "Good game.")) + '</small>' +
-      '<button class="zg-big" data-zp="restart">Play again</button>' +
+      (ST.mode === "online" ? "" : '<button class="zg-big" data-zp="restart">Play again</button>') +
       '<button class="zg-big alt" data-zp="menu">Menu</button>' +
       '<button class="zg-big alt2" data-zg="close">Quit</button></div>';
     ST.host.appendChild(el);
@@ -21506,6 +21569,7 @@ async function zzBakeEntries(entries){
     if (sp) { ST.spinDrag = e.pointerId; try { sp.setPointerCapture(e.pointerId); } catch (x) {} spinFrom(e); return; }
     if (pw) { ST.pwDrag = e.pointerId; try { pw.setPointerCapture(e.pointerId); } catch (x) {} powerFrom(e); return; }
     var w = toWorld(e), c = G.S.balls[0];
+    if (needCall()) { var pk = pocketAt(w); if (pk >= 0) { G.call = pk; say("Called: " + POCKET_NAMES[pk], "ok", 2); return; } }
     if (G.hand && Math.hypot(w.x - c.x, w.y - c.y) < R * 2.6) {
       ST.dragCue = { id: e.pointerId, x: c.x, y: c.y, bad: false, dx: c.x - w.x, dy: c.y - w.y };
       try { cvEl.setPointerCapture(e.pointerId); } catch (x) {}
@@ -21555,8 +21619,7 @@ async function zzBakeEntries(entries){
     if (ST.spinDrag === e.pointerId) { ST.spinDrag = null; return; }
     if (ST.pwDrag === e.pointerId) {
       ST.pwDrag = false;
-      if (canAct() && ST.power > 0.04) strike(ST.power, ST.sx, ST.sy, ST.aim);
-      else { ST.power = 0; setPowerUi(0); }
+      if (!tryStrike()) { ST.power = 0; setPowerUi(0); }
       return;
     }
     if (ST.dragCue && ST.dragCue.id === e.pointerId) {
@@ -21572,7 +21635,7 @@ async function zzBakeEntries(entries){
     else if (e.code === "ArrowRight") { ST.aim += step; e.preventDefault(); }
     else if (e.code === "ArrowUp") { ST.power = clamp(ST.power - 0.04, 0, 1); setPowerUi(ST.power); e.preventDefault(); }
     else if (e.code === "ArrowDown") { ST.power = clamp(ST.power + 0.04, 0, 1); setPowerUi(ST.power); e.preventDefault(); }
-    else if (e.code === "Space" || e.code === "Enter") { if (ST.power > 0.04) strike(ST.power, ST.sx, ST.sy, ST.aim); e.preventDefault(); }
+    else if (e.code === "Space" || e.code === "Enter") { tryStrike(); e.preventDefault(); }
   }
 
   /* ---------- les clics (menu, boutons) ---------- */
@@ -21586,6 +21649,7 @@ async function zzBakeEntries(entries){
     if (a === "mode") { ST.mode = b.getAttribute("data-v"); remember(); menu(h); }
     else if (a === "level") { ST.level = b.getAttribute("data-v"); remember(); menu(h); }
     else if (a === "start" || a === "restart") startGame();
+    else if (a === "classmate") { if (window.zgOnlineStart) window.zgOnlineStart({ game: "pool", cols: [0, 1] }); }
     else if (a === "menu") { var en = document.getElementById("zgend"); if (en) en.remove(); menu(h); }
     else if (a === "snd") {
       try { localStorage.setItem("ec_game_mute", muted() ? "0" : "1"); } catch (x) {}
@@ -21594,8 +21658,113 @@ async function zzBakeEntries(entries){
     }
   }, true);
 
+  /* ====================================================================
+     EN LIGNE (un camarade) : chaque coup est envoyé à la base ; l'autre
+     téléphone rejoue le même coup, puis prend l'état officiel envoyé.
+     ==================================================================== */
+  function newState() { return P.ser(P.newGame(Math.floor(Math.random() * 1e9))); }
+  function oppName() { return ST.match ? ST.match.oppName : "Classmate"; }
+
+  // on rejoue le coup de l'autre joueur (même animation que l'ordinateur)
+  function playRemote(sh) {
+    var G = ST.G;
+    if (sh.hp) P.place(G, sh.hp.x, sh.hp.y);
+    G.call = sh.call == null ? null : sh.call;
+    var d = sh.a - ST.aim; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2;
+    ST.phase = "ai"; ST.power = 0;
+    ST.ai = { step: "aim", t: 0, from: ST.aim, to: ST.aim + d, dur: 0.5 + 0.5 * Math.min(1, Math.abs(d) / Math.PI), sh: { power: sh.p, sx: sh.sx, sy: sh.sy, angle: sh.a } };
+    ST.sx = sh.sx; ST.sy = sh.sy; setSpinUi();
+    status(oppName() + " is shooting…");
+  }
+
+  // mon coup est fini : je l'envoie avec l'état officiel
+  function pushState() {
+    var M = ST.match, sb = window.__sb; if (!M || !sb) return;
+    ST.v += 1;
+    var body = { st: { g: P.ser(ST.G), sh: ST.lastShot }, v: ST.v, cols: [0, 1] };
+    var bad = function () { say("The move could not be sent. Check the connection.", "bad", 3); };
+    try {
+      var q = sb.rpc("game_play", { p_id: M.id, p_state: body, p_status: ST.G.over ? "over" : "playing" });
+      if (q && q.then) q.then(function (r) { if (r && r.error) bad(); }, bad);
+    } catch (e) { bad(); }
+  }
+
+  // une nouvelle version de la partie arrive (direct ou par la vérification régulière)
+  function onRow(row) {
+    if (!ST.playing || ST.mode !== "online" || !ST.match || !row || row.id !== ST.match.id) return;
+    var st = row.state || {}, G = ST.G;
+    var hasShot = !!(st.st && st.st.sh);
+    if (row.status === "over" && !hasShot && !G.over) {                       // l'autre joueur a quitté la partie
+      G.over = true; G.winner = ST.you; G.last = { reason: oppName() + " left the game" };
+      ST.phase = "over"; ST.endT = 0.8; say(oppName() + " left the game", "bad", 4);
+      status("You win by forfeit"); updateHud();
+      return;
+    }
+    if (!(st.v && st.v > ST.v && st.st && st.st.g)) return;
+    if (ST.phase !== "wait" && ST.phase !== "aim") { ST.pending = row; return; }
+    var consecutive = st.v === ST.v + 1 && hasShot && ST.phase === "wait" && !humanTurn();
+    ST.v = st.v;
+    if (consecutive) { ST.remote = { auth: st.st.g }; playRemote(st.st.sh); return; }
+    ST.remote = null; ST.G = P.des(st.st.g); syncPrev(); ST.aim = defaultAim();
+    if (ST.G.over) { ST.phase = "over"; ST.endT = 0.9; updateHud(); return; }
+    beginTurn(); beginTurnText(false);
+  }
+
+  // on s'abonne aux mises à jour de la partie (direct + vérification toutes les 0,9 s)
+  function subscribe() {
+    var M = ST.match, sb = window.__sb;
+    try {
+      M.ch = sb.channel("pool-" + M.id + "-" + Math.random().toString(36).slice(2, 6))
+        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "game_matches", filter: "id=eq." + M.id }, function (pl) { try { onRow(pl && pl.new); } catch (e) {} })
+        .subscribe();
+    } catch (e) { M.ch = null; }
+    M.poll = setInterval(async function () {
+      if (ST.match !== M || !ST.playing) return;
+      try { var r = await sb.from("game_matches").select("*").eq("id", M.id).single(); if (r && r.data && ST.match === M) onRow(r.data); } catch (e) {}
+    }, 900);
+  }
+
+  function openOnline(h, opts) {
+    stop();
+    var sb = window.__sb;
+    if (!sb || !opts || !opts.st || !opts.st.g) { return; }
+    ST.lastLocal = ST.mode; ST.mode = "online";
+    ST.host = h;
+    ST.match = { id: opts.id, oppName: opts.oppName || "Classmate", poll: 0, ch: null };
+    ST.you = +opts.you ? 1 : 0;
+    ST.names = ST.you === 0 ? ["You", ST.match.oppName] : [ST.match.oppName, "You"];
+    ST.G = P.des(opts.st.g); ST.v = +opts.v || 1; ST.remote = null; ST.pending = null; ST.lastShot = null;
+    ST.potAnim = []; ST.tray = []; ST.parts = []; ST.evi = 0; ST.msgT = 0; ST.msgText = ""; ST.t = 0; ST.endT = 0; ST.cueFade = 0;
+    ST.power = 0; ST.sx = 0; ST.sy = 0; ST.strike = null; ST.ai = null; ST.dragCue = null; ST.aimDrag = null; ST.pwDrag = false; ST.spinDrag = null; ST.k = 0;
+    var en = document.getElementById("zgend"); if (en) en.remove();
+    buildGame(h);
+    newViews(); syncPrev();
+    ST.playing = true;
+    layout();
+    ST.aim = defaultAim();
+    updateHud(); updateTray(); setSpinUi(); setPowerUi(0);
+    beginTurn(); beginTurnText(ST.G.breakShot);
+    if (ST.G.over) { ST.phase = "over"; ST.endT = 0.3; }
+    ST.last = 0; ST.raf = requestAnimationFrame(frame);
+    if (!ST.ro && window.ResizeObserver) { ST.ro = new ResizeObserver(function () { layout(); }); }
+    if (ST.ro) { try { ST.ro.disconnect(); ST.ro.observe(ST.board); } catch (e2) {} }
+    bindInputs();
+    subscribe();
+  }
+
   function stopLoop() { cancelAnimationFrame(ST.raf); ST.raf = 0; }
   function stop() {
+    var M = ST.match;
+    if (M) {
+      if (M.poll) clearInterval(M.poll);
+      if (M.ch && window.__sb) { try { window.__sb.removeChannel(M.ch); } catch (e) {} }
+      // on quitte une partie en cours : l'autre joueur gagne par forfait
+      if (ST.playing && ST.G && !ST.G.over && window.__sb) {
+        try { var q = window.__sb.rpc("game_play", { p_id: M.id, p_state: { st: { g: P.ser(ST.G) }, v: ST.v + 1, cols: [0, 1] }, p_status: "over" }); if (q && q.then) q.then(function () {}, function () {}); } catch (e) {}
+      }
+      ST.match = null;
+    }
+    if (ST.mode === "online") ST.mode = ST.lastLocal || "ai";
     stopLoop(); unbind(); ST.playing = false; ST.phase = "menu";
     if (ST.ro) { try { ST.ro.disconnect(); } catch (e) {} }
     ST.dragCue = ST.aimDrag = null; ST.pwDrag = false; ST.spinDrag = null;
@@ -21647,7 +21816,7 @@ async function zzBakeEntries(entries){
   })();
 
   window.ZPool = {
-    open: menu, pic: pic, stop: stop,
+    open: menu, pic: pic, stop: stop, openOnline: openOnline, newState: newState,
     debug: { st: function () { return ST; }, strike: strike, start: startGame, sim: P }
   };
 })();
@@ -21691,6 +21860,7 @@ async function zzBakeEntries(entries){
   // la partie de départ, avec les couleurs de l'hôte (cols[0]) ; le second joueur choisit à l'acceptation
   function initial(game, cols, level) {
     if (game === "rope") return { v: 1, cols: [0, 1], level: +level || 0 };
+    if (game === "pool") return { st: { g: window.ZPool.newState() }, v: 1, cols: [0, 1] };
     if (game === "chess") return { st: ZG.chess.start(), v: 1, cols: [cols[0], cols[0] === "w" ? "b" : "w"] };
     if (game === "morris") return { st: ZG.morris.start(), v: 1, cols: [cols[0], cols[0] === 0 ? 1 : 0] };
     var other = (cols[0] + 2) % 4; // two players face each other
@@ -21830,7 +22000,7 @@ async function zzBakeEntries(entries){
     var r = await sb().rpc("game_list");
     if (!r || r.error || !r.data || !r.data.length) { box.remove(); return; }
     var uid = await myUid();
-    var names = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", rope: "Rope Bros" };
+    var names = { chess: "Chess", ludo: "Ludo", morris: "Three men's morris", rope: "Rope Bros", pool: "Pool" };
     function other(row) { return row.host === uid ? row.guest : row.host; }
     box.innerHTML = '<div class="zg-label" style="margin:6px 0 0">Invitations and games</div>' + r.data.filter(function (g) { return names[g.kind]; }).map(function (g) {
       var nm = nameOf(other(g));
@@ -21872,6 +22042,7 @@ async function zzBakeEntries(entries){
           // mon choix part vers l'hôte avec le premier coup de la partie
           if (window.zgPush) window.zgPush(ZGUI.current());
         };
+        if (row.kind === "pool") { ZGUI.open({ game: "pool", mode: "online", you: 1, id: id, v: row.state.v, st: row.state.st, cols: [0, 1], oppName: nameOf(row.host), oppUid: row.host }); return; }
         if (row.kind === "rope") { ZGUI.open({ game: "rope", mode: "online", you: 1, id: id, v: row.state.v, oppName: nameOf(row.host), oppUid: row.host, level: row.state.level }); return; }
         if (row.kind === "chess") { openAs([hostCols[0], hostCols[0] === "w" ? "b" : "w"], row.state.st); return; }
         if (row.kind === "ludo") { var lc = [hostCols[0], (hostCols[0] + 2) % 4]; openAs(lc, ZG.ludo.start(2, lc)); return; }
