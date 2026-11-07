@@ -1153,7 +1153,7 @@ function render(){
   if(S.offline)h=offlineView();
   else if(S.mode==="student")h=!S.uid?noAccessView():!S.meLoaded?`<div class="empty">Loading…</div>`:(devBlocked()||(S.myAccess&&S.myAccess.status==="blocked"))?blockedView():(!S.me&&S.myReq)?pendingTeacherView():!S.me?(S.settings.closed&&!S.isOwner&&!S.isStaff?closedView():joinView()):stOf(S.me)==="pending"?waitingView():stOf(S.me)==="blocked"?blockedView():stOf(S.me)==="refused"?refusedView():studentView();
   else h=teacherView();
-  if(S.micHelp&&S.mode==="student")h=micHelpHTML()+h;const main=$("#main");document.body.dataset.mode=S.mode||"";const same=!S.animate&&main.__ok&&main.__h===h;main.className=S.animate?"enter":"";if(!same){const sy=window.scrollY;main.innerHTML=h;main.__h=h;main.__ok=1;if(sy>0)window.scrollTo(0,sy)}S.animate=false;
+  if(S.micHelp&&S.mode==="student")h=micHelpHTML()+h;const main=$("#main");document.body.dataset.mode=S.mode||"";const same=main.__ok&&main.__h===h;if(!same){main.className=S.animate?"enter":"";const sy=window.scrollY;main.innerHTML=h;main.__h=h;main.__ok=1;if(sy>0)window.scrollTo(0,sy)}S.animate=false;
   const slot=$("#mascotSlot");if(slot&&mascot.canvas)slot.appendChild(mascot.canvas);upgradeIcons(main);
   renderAI(true);
   if(S.offline||S.mode==="teacher"||S.meLoaded)hideSplash();
@@ -1625,7 +1625,7 @@ const cap1=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const nounSent=(x,w)=>{w=w||x.en;return x.f==="p"?`They are ${w}.`:x.f==="u"?`It's ${w}.`:`It's ${art(w)} ${w}.`};
 const normPic=s=>norm(s).replace(/\b(he|she|it|they|that|this|what)'s\b/g,"$1 is").replace(/\b(they|we|you)'re\b/g,"$1 are").replace(/\bi'm\b/g,"i am").replace(/\b(a|an|the)\b/g," ").replace(/[.!?,;:]/g," ").replace(/\s+/g," ").trim();
 const picLvlMax=()=>({primaire:1,college:2}[S.me?.profile]||3);
-const picHardDefault=()=>!["primaire","college"].includes(S.me?.profile||"college");
+const picHardDefault=()=>true;
 const PIC_MODES=[
  {k:"nouns",t:"Name the thing",en:"What is it?",d:"Guess the name of the animal, object or food.",pic:"🦁"},
  {k:"actions",t:"Actions",en:"What is she doing?",d:"Look at the picture and say what the person is doing.",pic:"🏃‍♀️"},
@@ -2085,7 +2085,7 @@ function cleanGenQuestions(arr){if(!Array.isArray(arr))return[];const out=[];for
   const order=shuffle([...ch.keys()]);out.push({q:x.q.trim(),choices:order.map(i=>ch[i]),answer:order.indexOf(ans),explain})}return out}
 async function aiGenQuiz(topic,n){if(!AI.sample||S.gen?.busy)return;S.gen={busy:true};render();const m=S.me||{};
   const prompt=`Create an English exercise with EXACTLY ${n} questions (never fewer than ${n}) for a learner in Togo: ${PROFILES[m.profile]||"student"}${m.classe?" ("+m.classe+")":""}, level ${m.level||"A2"} (${LEVEL_NAMES[m.level]||""}). Topic: ${topic}.
-About 70% multiple-choice questions (4 options, only one correct, plausible distractors) and 30% short written-answer questions (one word or a few words, listing all accepted correct variants, including contractions). Vary the forms: sentence to complete with ___, vocabulary, definitions, find the mistake, mini reading comprehension. Use situations from life in Togo. Everything must be ONLY in English: instructions in very simple English (A1–A2 level), never in French. Each question is a full sentence or short text, never a one-word question. Check carefully that each correct answer is really correct and that only one option is right. For each question, the "explain" field gives the full correct sentence and, for a grammar or vocabulary topic, the RULE as a formula first (for example: Subject + verb + -s for he, she, it in the present simple; Subject + am/is/are + verb-ing for the present continuous), then a short example. Keep the explanation in very simple English.
+About 70% multiple-choice questions (4 options, only one correct, plausible distractors) and 30% short written-answer questions (one word or a few words, listing all accepted correct variants, including contractions). Vary the forms: sentence to complete with ___, vocabulary, definitions, find the mistake, mini reading comprehension. Use situations from life in Togo. Make it genuinely challenging: set the difficulty clearly ABOVE the usual level for ${m.level||"A2"}; every wrong option must be close to the right one (same tense, same word family or a near-synonym) so the learner really has to know the rule; no obvious answers and no hint inside the sentence; at least half of the questions need a rule applied in a new context, not just recognised. Everything must be ONLY in English: instructions in very simple English (A1–A2 level), never in French. Each question is a full sentence or short text, never a one-word question. Check carefully that each correct answer is really correct and that only one option is right. For each question, the "explain" field gives the full correct sentence and, for a grammar or vocabulary topic, the RULE as a formula first (for example: Subject + verb + -s for he, she, it in the present simple; Subject + am/is/are + verb-ing for the present continuous), then a short example. Keep the explanation in very simple English.
 Answer only with a JSON array, for example: [{"q":"She ___ to school every day.","choices":["go","goes","going","gone"],"answer":1,"explain":"With she, the present simple takes an -s."},{"q":"You need food. Complete: I ___ hungry.","type":"type","accept":["am","'m"],"explain":"We use the verb to be: I am hungry."}]`;
   try{const arr=await AI.sample.json(prompt,{cache:false});const qs=cleanGenQuestions(arr).slice(0,n);if(qs.length<3)throw{code:"empty_completion"};
     S.gen=null;S.view=null;S.run={temp:{id:"ai-"+Date.now(),title:"Nova · "+topic,kind:"ai",topic,n,questions:qs},quizId:"ai",i:0,picked:null,score:0,answers:[],wrong:[],combo:0,best:0};S.animate=true;scrollTo(0,0);touch("Nova quiz: "+topic)}
@@ -23691,12 +23691,12 @@ var AR_TITLE={"ch-mix":"Mixed Review","ch-sprint":"Grammar Sprint","ch-vocab":"V
   if(typeof ROYALE_CH==="undefined"||typeof royalePool!=="function"||typeof royaleQs!=="function") return;
   var BANK_KEY={"ch-mix":"mix","ch-sprint":"sprint","ch-vocab":"vocab","ch-2nde":"ch-2nde","ch-1re":"ch-1re","ch-tle":"ch-tle"};
   Array.prototype.splice.apply(ROYALE_CH,[1,0].concat([
-    {t:"Mixed review battle", d:"Grammar and vocabulary, every level", lv:"medium", kind:"ch-mix", n:15},
-    {t:"Grade 10 battle",     d:"Grade 10 syllabus (2nde), medium", lv:"medium", kind:"ch-2nde",  n:12},
-    {t:"Grade 11 battle",     d:"Grade 11 syllabus (1re), medium",  lv:"medium", kind:"ch-1re",   n:12},
+    {t:"Mixed review battle", d:"Grammar and vocabulary, every level", lv:"hard", kind:"ch-mix", n:15},
+    {t:"Grade 10 battle",     d:"Grade 10 syllabus (2nde), hard", lv:"hard", kind:"ch-2nde",  n:12},
+    {t:"Grade 11 battle",     d:"Grade 11 syllabus (1re), hard",  lv:"hard", kind:"ch-1re",   n:12},
     {t:"Grade 12 battle",     d:"Grade 12 syllabus (Tle), hard",    lv:"hard",   kind:"ch-tle",   n:15},
-    {t:"Grammar sprint battle",d:"Lycée grammar, medium",           lv:"medium", kind:"ch-sprint",n:15},
-    {t:"Vocabulary battle",   d:"Word meanings, easy",              lv:"easy",   kind:"ch-vocab", n:15},
+    {t:"Grammar sprint battle",d:"Lycée grammar, hard",           lv:"hard", kind:"ch-sprint",n:15},
+    {t:"Vocabulary battle",   d:"Word meanings, hard",              lv:"hard",   kind:"ch-vocab", n:15},
     {t:"Vocabulary battle: hard", d:"Precise meanings",             lv:"hard",   kind:"ch-vocab", n:15}
   ]));
   var _pool=royalePool;
