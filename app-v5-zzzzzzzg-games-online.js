@@ -118,21 +118,20 @@
     })();
   }
 
-  /* ---- rejouer en ligne : nouvelle invitation au même camarade, même jeu ---- */
+  /* ---- rejouer en ligne : la partie repart à zéro avec le même camarade (pas de nouvelle invitation) ---- */
   document.addEventListener("click", async function (e) {
     var b = e.target.closest && e.target.closest('[data-zg="rematch"]');
     if (!b) return;
     e.preventDefault();
     var G = ZGUI.current && ZGUI.current();
-    if (!G || G.mode !== "online" || !G.oppUid) return;
-    var kind = G.game, uid = G.oppUid, name = G.oppName || "Classmate";
-    var cols = kind === "chess" ? ["w", "b"] : [0, 1];
+    if (!G || G.mode !== "online" || !G.oppUid || !G.id) return;
     if (!sb()) { note("Connect to play remotely.", "x"); return; }
-    ZGUI.close();
+    var kind = G.game, cols = kind === "chess" ? ["w", "b"] : [0, 1];
     var init = initial(kind, cols);
-    var r = await sb().rpc("game_invite", { p_to: uid, p_kind: kind, p_state: init });
-    if (r.error) { note(fail(r.error), "x"); return; }
-    waitCard(r.data, kind, name, init.cols);
+    var nv = (G.v || 1) + 1;
+    var r = await sb().rpc("game_play", { p_id: G.id, p_state: { st: init.st, v: nv, cols: init.cols }, p_status: "playing" });
+    if (r && r.error) { note(fail(r.error), "x"); return; }
+    ZGUI.open({ game: kind, mode: "online", you: G.you, id: G.id, v: nv, st: init.st, cols: init.cols, oppName: G.oppName, oppUid: G.oppUid });
   }, true);
 
   /* ---- choisir le camarade (les couleurs sont choisies avant, dans la page de jeu) ---- */

@@ -715,7 +715,7 @@
       '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20 8h24v14a12 12 0 0 1-24 0z" fill="#f6c90e" stroke="#a87800" stroke-width="2"/><path d="M20 12h-8c0 10 4 14 10 15M44 12h8c0 10-4 14-10 15" fill="none" stroke="#f6c90e" stroke-width="3"/><rect x="28" y="34" width="8" height="10" fill="#d9a800"/><rect x="20" y="44" width="24" height="7" rx="2" fill="#a87800"/><path d="M26 14c0 6 2 9 4 10" stroke="#fff6c8" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>' +
       '<b>' + (you ? "You win!" : lose ? "The computer wins" : esc(nm[w]) + " wins!") + '</b>' +
       '<small>' + (r ? esc(r) : (you ? "Great game." : "Good game.")) + '</small>' +
-      (ST.mode === "online" ? "" : '<button class="zg-big" data-zp="restart">Play again</button>') +
+      (ST.mode === "online" ? '<button class="zg-big" data-zp="restartOnline">Play again</button>' : '<button class="zg-big" data-zp="restart">Play again</button>') +
       '<button class="zg-big alt" data-zp="menu">Menu</button>' +
       '<button class="zg-big alt2" data-zg="close">Quit</button></div>';
     ST.host.appendChild(el);
@@ -859,6 +859,7 @@
     if (a === "mode") { ST.mode = b.getAttribute("data-v"); remember(); menu(h); }
     else if (a === "level") { ST.level = b.getAttribute("data-v"); remember(); menu(h); }
     else if (a === "start" || a === "restart") startGame();
+    else if (a === "restartOnline") restartOnline();
     else if (a === "classmate") { if (window.zgOnlineStart) window.zgOnlineStart({ game: "pool", cols: [0, 1] }); }
     else if (a === "menu") { var en = document.getElementById("zgend"); if (en) en.remove(); menu(h); }
     else if (a === "snd") {
@@ -916,6 +917,7 @@
     ST.v = st.v;
     if (consecutive) { ST.remote = { auth: st.st.g }; playRemote(st.st.sh); return; }
     ST.remote = null; ST.G = P.des(st.st.g); syncPrev(); ST.aim = defaultAim();
+    if (!ST.G.S.potted.length && !ST.G.over) { var en = document.getElementById("zgend"); if (en) en.remove(); ST.tray = []; ST.potAnim = []; ST.parts = []; updateTray(); }
     if (ST.G.over) { ST.phase = "over"; ST.endT = 0.9; updateHud(); return; }
     beginTurn(); beginTurnText(false);
   }
@@ -960,6 +962,22 @@
     if (ST.ro) { try { ST.ro.disconnect(); ST.ro.observe(ST.board); } catch (e2) {} }
     bindInputs();
     subscribe();
+  }
+
+  // « Rejouer » en ligne : même camarade, partie à zéro, sans nouvelle invitation.
+  // La graine dépend de la version : les deux téléphones partent de la même table.
+  function restartOnline() {
+    var M = ST.match, sb = window.__sb; if (!M || !sb) return;
+    var en = document.getElementById("zgend"); if (en) en.remove();
+    ST.v += 1;
+    ST.G = P.des(P.ser(P.newGame(ST.v * 7919 + 13)));
+    ST.remote = null; ST.pending = null; ST.lastShot = null; ST.potAnim = []; ST.tray = []; ST.parts = [];
+    ST.evi = 0; ST.power = 0; ST.sx = 0; ST.sy = 0; ST.strike = null; ST.ai = null; ST.dragCue = null; ST.aimDrag = null; ST.pwDrag = false; ST.spinDrag = null;
+    newViews(); syncPrev();
+    ST.aim = defaultAim(); updateHud(); updateTray(); setSpinUi(); setPowerUi(0);
+    beginTurn(); beginTurnText(true);
+    var body = { st: { g: P.ser(ST.G), sh: null }, v: ST.v, cols: [0, 1] };
+    try { var q = sb.rpc("game_play", { p_id: M.id, p_state: body, p_status: "playing" }); if (q && q.then) q.then(function (r) { if (r && r.error) say("The game could not be restarted. Check the connection.", "bad", 3); }, function () {}); } catch (e) {}
   }
 
   function stopLoop() { cancelAnimationFrame(ST.raf); ST.raf = 0; }
