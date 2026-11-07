@@ -21498,7 +21498,7 @@ async function zzBakeEntries(entries){
       '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20 8h24v14a12 12 0 0 1-24 0z" fill="#f6c90e" stroke="#a87800" stroke-width="2"/><path d="M20 12h-8c0 10 4 14 10 15M44 12h8c0 10-4 14-10 15" fill="none" stroke="#f6c90e" stroke-width="3"/><rect x="28" y="34" width="8" height="10" fill="#d9a800"/><rect x="20" y="44" width="24" height="7" rx="2" fill="#a87800"/><path d="M26 14c0 6 2 9 4 10" stroke="#fff6c8" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>' +
       '<b>' + (you ? "You win!" : lose ? "The computer wins" : esc(nm[w]) + " wins!") + '</b>' +
       '<small>' + (r ? esc(r) : (you ? "Great game." : "Good game.")) + '</small>' +
-      (ST.mode === "online" ? "" : '<button class="zg-big" data-zp="restart">Play again</button>') +
+      (ST.mode === "online" ? '<button class="zg-big" data-zg="rematch">Play again</button>' : '<button class="zg-big" data-zp="restart">Play again</button>') +
       '<button class="zg-big alt" data-zp="menu">Menu</button>' +
       '<button class="zg-big alt2" data-zg="close">Quit</button></div>';
     ST.host.appendChild(el);
@@ -21723,7 +21723,7 @@ async function zzBakeEntries(entries){
     if (!sb || !opts || !opts.st || !opts.st.g) { return; }
     ST.lastLocal = ST.mode; ST.mode = "online";
     ST.host = h;
-    ST.match = { id: opts.id, oppName: opts.oppName || "Classmate", poll: 0, ch: null };
+    ST.match = { id: opts.id, oppName: opts.oppName || "Classmate", oppUid: opts.oppUid || null, poll: 0, ch: null };
     ST.you = +opts.you ? 1 : 0;
     ST.names = ST.you === 0 ? ["You", ST.match.oppName] : [ST.match.oppName, "You"];
     ST.G = P.des(opts.st.g); ST.v = +opts.v || 1; ST.remote = null; ST.pending = null; ST.lastShot = null;
@@ -21810,6 +21810,7 @@ async function zzBakeEntries(entries){
 
   window.ZPool = {
     open: menu, pic: pic, stop: stop, openOnline: openOnline, newState: newState,
+    matchInfo: function () { var M = ST.match; return M && M.oppUid ? { kind: "pool", uid: M.oppUid, name: M.oppName } : null; },
     debug: { st: function () { return ST; }, strike: strike, start: startGame, sim: P }
   };
 })();
@@ -21940,9 +21941,12 @@ async function zzBakeEntries(entries){
     var b = e.target.closest && e.target.closest('[data-zg="rematch"]');
     if (!b) return;
     e.preventDefault();
-    var G = ZGUI.current && ZGUI.current();
-    if (!G || G.mode !== "online" || !G.oppUid) return;
-    var kind = G.game, uid = G.oppUid, name = G.oppName || "Classmate";
+    var G = ZGUI.current && ZGUI.current(), info = null;
+    if (G && G.mode === "online" && G.oppUid) info = { kind: G.game, uid: G.oppUid, name: G.oppName || "Classmate" };
+    else if (window.ZPool && window.ZPool.matchInfo) info = window.ZPool.matchInfo();
+    if (!info) return;
+    if (info.kind === "pool") window.ZPool.stop();
+    var kind = info.kind, uid = info.uid, name = info.name || "Classmate";
     var cols = kind === "chess" ? ["w", "b"] : [0, 1];
     if (!sb()) { note("Connect to play remotely.", "x"); return; }
     ZGUI.close();

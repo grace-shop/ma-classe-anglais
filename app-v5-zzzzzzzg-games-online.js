@@ -123,9 +123,12 @@
     var b = e.target.closest && e.target.closest('[data-zg="rematch"]');
     if (!b) return;
     e.preventDefault();
-    var G = ZGUI.current && ZGUI.current();
-    if (!G || G.mode !== "online" || !G.oppUid) return;
-    var kind = G.game, uid = G.oppUid, name = G.oppName || "Classmate";
+    var G = ZGUI.current && ZGUI.current(), info = null;
+    if (G && G.mode === "online" && G.oppUid) info = { kind: G.game, uid: G.oppUid, name: G.oppName || "Classmate" };
+    else if (window.ZPool && window.ZPool.matchInfo) info = window.ZPool.matchInfo();
+    if (!info) return;
+    if (info.kind === "pool") window.ZPool.stop();
+    var kind = info.kind, uid = info.uid, name = info.name || "Classmate";
     var cols = kind === "chess" ? ["w", "b"] : [0, 1];
     if (!sb()) { note("Connect to play remotely.", "x"); return; }
     ZGUI.close();
