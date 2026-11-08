@@ -18635,12 +18635,29 @@ async function zzBakeEntries(entries){
   }
   function sendMove() { if (G && G.mode === "online" && window.zgPush) window.zgPush(G); }
   // le coup de l'autre joueur (à distance)
+  // le coup de l'adversaire (case de départ et d'arrivée), déduit des deux échiquiers
+  function chessLastFromDiff(o, n) {
+    if (!o || !n || !o.b || !n.b) return null;
+    var side = o.turn === "w";
+    var froms = [], tos = [];
+    for (var i = 0; i < 64; i++) {
+      var a = o.b[i], b = n.b[i];
+      if (a === b) continue;
+      if (a && ZG.chess.white(a) === side) froms.push(i);
+      if (b && ZG.chess.white(b) === side) tos.push(i);
+    }
+    var f = froms.filter(function (k) { return !n.b[k]; })[0];
+    var t = tos.filter(function (k) { return !o.b[k] || ZG.chess.white(o.b[k]) !== side; })[0];
+    if (f == null || t == null) return null;
+    return { f: f, t: t };
+  }
   function adopt(st, v, cols) {
     if (!G) return;
     var mover = sideOfTurn(G.st);
     var caps = diffCaps(G.st, st, mover);
     caps.forEach(function (c) { (G.caps[mover] = G.caps[mover] || []).push(c); });
     if (caps.length) SFX.capture(); else SFX.move();
+    if (G.game === "chess") { var lm = chessLastFromDiff(G.st, st); if (lm) G.last = lm; }
     G.st = st; G.v = v; G.sel = null; G.anim = true;
     if (cols) G.cols = cols;
     var end = endInfo();
