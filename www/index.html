@@ -21349,6 +21349,7 @@ async function zzBakeEntries(entries){
       if (k >= 1) {
         var s = ST.strike;
         ST.lastShot = { a: s.a, p: s.p, sx: s.sx, sy: s.sy, call: G.call, hp: G.hand ? { x: G.S.balls[0].x, y: G.S.balls[0].y } : null };
+        if (ST.mode === "online") pushShot(G);   // en direct : l'autre voit le coup au moment où je tire
         P.takeShot(G, s.a, s.p, s.sx, s.sy);
         ST.evi = 0; ST.phase = "roll"; ST.cueFade = 1; ST.pwDrag = false;
         ST.power = 0; setPowerUi(0);
@@ -21678,16 +21679,25 @@ async function zzBakeEntries(entries){
     status(oppName() + " is shooting…");
   }
 
-  // mon coup est fini : je l'envoie avec l'état officiel
-  function pushState() {
+  function sendPlay(body, status) {
     var M = ST.match, sb = window.__sb; if (!M || !sb) return;
-    ST.v += 1;
-    var body = { st: { g: P.ser(ST.G), sh: ST.lastShot }, v: ST.v, cols: [0, 1] };
     var bad = function () { say("The move could not be sent. Check the connection.", "bad", 3); };
     try {
-      var q = sb.rpc("game_play", { p_id: M.id, p_state: body, p_status: ST.G.over ? "over" : "playing" });
+      var q = sb.rpc("game_play", { p_id: M.id, p_state: body, p_status: status });
       if (q && q.then) q.then(function (r) { if (r && r.error) bad(); }, bad);
     } catch (e) { bad(); }
+  }
+  // je tire : l'autre joue le coup tout de suite (état d'avant le tir + le tir)
+  function pushShot(G) {
+    if (!ST.match || !window.__sb) return;
+    ST.v += 1;
+    sendPlay({ st: { g: P.ser(G), sh: ST.lastShot }, v: ST.v, cols: [0, 1] }, "playing");
+  }
+  // mon tir est fini : état officiel (done = fin de coup, pas un départ)
+  function pushState() {
+    if (!ST.match || !window.__sb) return;
+    ST.v += 1;
+    sendPlay({ st: { g: P.ser(ST.G), sh: null, done: true }, v: ST.v, cols: [0, 1] }, ST.G.over ? "over" : "playing");
   }
 
   // une nouvelle version de la partie arrive (direct ou par la vérification régulière)
@@ -21695,7 +21705,7 @@ async function zzBakeEntries(entries){
     if (!ST.playing || ST.mode !== "online" || !ST.match || !row || row.id !== ST.match.id) return;
     var st = row.state || {}, G = ST.G;
     var hasShot = !!(st.st && st.st.sh);
-    if (row.status === "over" && !hasShot && !G.over) {                       // l'autre joueur a quitté la partie
+    if (row.status === "over" && !hasShot && !st.done && !G.over) {                       // l'autre joueur a quitté la partie
       G.over = true; G.winner = ST.you; G.last = { reason: oppName() + " left the game" };
       ST.phase = "over"; ST.endT = 0.8; say(oppName() + " left the game", "bad", 4);
       status("You win by forfeit"); updateHud();
@@ -21705,7 +21715,7 @@ async function zzBakeEntries(entries){
     if (ST.phase !== "wait" && ST.phase !== "aim") { ST.pending = row; return; }
     var consecutive = st.v === ST.v + 1 && hasShot && ST.phase === "wait" && !humanTurn();
     ST.v = st.v;
-    if (consecutive) { ST.remote = { auth: st.st.g }; playRemote(st.st.sh); return; }
+    if (consecutive) { ST.remote = null; playRemote(st.st.sh); return; }
     ST.remote = null; ST.G = P.des(st.st.g); syncPrev(); ST.aim = defaultAim();
     if (!ST.G.S.potted.length && !ST.G.over) { var en = document.getElementById("zgend"); if (en) en.remove(); ST.tray = []; ST.potAnim = []; ST.parts = []; updateTray(); }
     if (ST.G.over) { ST.phase = "over"; ST.endT = 0.9; updateHud(); return; }
