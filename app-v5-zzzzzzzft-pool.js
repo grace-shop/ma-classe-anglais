@@ -548,6 +548,10 @@
   }
   function update(dt) {
     var G = ST.G; if (!G) return;
+    if (ST.mode === "online" && ST.phase === "aim" && humanTurn()) {
+      ST.bcT = (ST.bcT || 0) + dt;
+      if (ST.bcT >= 0.12) { ST.bcT = 0; sendBc("aim", { a: ST.aim, p: ST.power, sx: ST.sx, sy: ST.sy }); }
+    }
     if (ST.pending && (ST.phase === "wait" || ST.phase === "aim")) { var pr = ST.pending; ST.pending = null; onRow(pr); G = ST.G; }
     ST.t += dt;
     if (ST.msgT > 0) { ST.msgT -= dt; if (ST.msgT <= 0 && ST.elMsg) ST.elMsg.className = "zp-msg"; }
@@ -649,7 +653,8 @@
     /* la visée et la queue */
     if ((ST.phase === "aim" && humanTurn()) || ST.phase === "ai" || ST.phase === "strike") {
       if (B[0].on && !(ST.ai && ST.ai.step === "hand") && !(ST.dragCue)) { drawGuide(g); drawCue(g, 1); }
-    } else if (ST.cueFade > 0) drawCue(g, ST.cueFade);
+    } else if (ST.mode === "online" && ST.phase === "wait" && ST.remoteAim && Date.now() - ST.remoteAim.t < 1500) drawCue(g, 1, ST.remoteAim);
+    else if (ST.cueFade > 0) drawCue(g, ST.cueFade);
     /* les confettis */
     ST.parts.forEach(function (p) {
       g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.globalAlpha = Math.min(1, p.life); g.fillStyle = p.c; g.fillRect(-3, -1.8, 6, 3.6); g.restore();
@@ -679,10 +684,11 @@
   }
 
   /* la queue : un bâton effilé derrière la blanche, qui recule avec la puissance */
-  function drawCue(g, alpha) {
-    var cue = ST.G.S.balls[0], a = ST.aim, dx = Math.cos(a), dy = Math.sin(a);
-    var pull = ST.power * 80, gap = R + 4 + pull - (ST.phase === "strike" ? 0 : 0);
-    var off = ST.sx * R * 0.5, rx = -dy, ry = dx;
+  function drawCue(g, alpha, o) {
+    var cue = ST.G.S.balls[0], a = o ? o.a : ST.aim, dx = Math.cos(a), dy = Math.sin(a);
+    var pw = o ? o.p : ST.power, sxx = o ? o.sx : ST.sx;
+    var pull = pw * 80, gap = R + 4 + pull;
+    var off = sxx * R * 0.5, rx = -dy, ry = dx;
     var tx = cue.x - dx * gap + rx * off, ty = cue.y - dy * gap + ry * off, L = 330;
     g.save(); g.globalAlpha = alpha;
     g.translate(tx, ty); g.rotate(Math.atan2(dy, dx));
@@ -880,6 +886,7 @@
   // on rejoue le coup de l'autre joueur (même animation que l'ordinateur)
   function playRemote(sh) {
     var G = ST.G;
+    if (ST.remoteAim) { ST.aim = ST.remoteAim.a; ST.remoteAim = null; }
     if (sh.hp) P.place(G, sh.hp.x, sh.hp.y);
     G.call = sh.call == null ? null : sh.call;
     var d = sh.a - ST.aim; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2;
@@ -897,10 +904,21 @@
       if (q && q.then) q.then(function (r) { if (r && r.error) bad(); }, bad);
     } catch (e) { bad(); }
   }
+  // envoi direct sur le canal (le délai de la base n'intervient pas)
+  function sendBc(event, payload) { try { var M = ST.match; if (M && M.ch) M.ch.send({ type: "broadcast", event: event, payload: payload }); } catch (e) {} }
+  // visée de l'autre : je montre mon bâton pendant que je vise
+  function onAim(p) { if (!p || ST.mode !== "online" || !ST.playing || ST.phase !== "wait") return; ST.remoteAim = { a: p.a, p: p.p, sx: p.sx, t: Date.now() }; }
+  // tir de l'autre : je le rejoue tout de suite ; la base confirmera le même numéro de version
+  function onShotBc(p) {
+    if (!p || ST.mode !== "online" || !ST.playing || !ST.match) return;
+    if (ST.phase !== "wait" || humanTurn() || p.v !== ST.v + 1 || !p.sh) return;
+    ST.v = p.v; playRemote(p.sh);
+  }
   // je tire : l'autre joue le coup tout de suite (état d'avant le tir + le tir)
   function pushShot(G) {
     if (!ST.match || !window.__sb) return;
     ST.v += 1;
+    sendBc("shot", { v: ST.v, sh: ST.lastShot });
     sendPlay({ st: { g: P.ser(G), sh: ST.lastShot }, v: ST.v, cols: [0, 1] }, "playing");
   }
   // mon tir est fini : état officiel (done = fin de coup, pas un départ)
@@ -937,6 +955,8 @@
     var M = ST.match, sb = window.__sb;
     try {
       M.ch = sb.channel("pool-" + M.id + "-" + Math.random().toString(36).slice(2, 6))
+        .on("broadcast", { event: "aim" }, function (m) { try { onAim(m && m.payload); } catch (e) {} })
+        .on("broadcast", { event: "shot" }, function (m) { try { onShotBc(m && m.payload); } catch (e) {} })
         .on("postgres_changes", { event: "UPDATE", schema: "public", table: "game_matches", filter: "id=eq." + M.id }, function (pl) { try { onRow(pl && pl.new); } catch (e) {} })
         .subscribe();
     } catch (e) { M.ch = null; }
