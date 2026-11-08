@@ -21737,6 +21737,15 @@ async function zzBakeEntries(entries){
       return;
     }
     if (!(st.v && st.v > ST.v && st.st && st.st.g)) return;
+    // partie terminée chez moi et l'autre relance (« Rejouer ») : je démarre tout de suite
+    if (ST.phase === "over" && !hasShot && !st.done && row.status === "playing") {
+      ST.v = st.v; ST.remote = null; ST.pending = null;
+      var en = document.getElementById("zgend"); if (en) en.remove();
+      ST.G = P.des(st.st.g); syncPrev(); ST.aim = defaultAim(); ST.ai = null;
+      ST.tray = []; ST.potAnim = []; ST.parts = []; updateHud(); updateTray(); setPowerUi(0);
+      beginTurn(); beginTurnText(true);
+      return;
+    }
     if (ST.phase !== "wait" && ST.phase !== "aim") { ST.pending = row; return; }
     var consecutive = st.v === ST.v + 1 && hasShot && ST.phase === "wait" && !humanTurn();
     ST.v = st.v;
