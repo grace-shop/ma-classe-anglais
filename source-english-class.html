@@ -21690,7 +21690,12 @@ async function zzBakeEntries(entries){
   // envoi direct sur le canal (le délai de la base n'intervient pas)
   function sendBc(event, payload) { try { var M = ST.match; if (M && M.ch) M.ch.send({ type: "broadcast", event: event, payload: payload }); } catch (e) {} }
   // visée de l'autre : je montre mon bâton pendant que je vise
-  function onAim(p) { if (!p || ST.mode !== "online" || !ST.playing || ST.phase !== "wait") return; ST.remoteAim = { a: p.a, p: p.p, sx: p.sx, t: Date.now() }; }
+  function onAim(p) {
+    if (!p || ST.mode !== "online" || !ST.playing) return;
+    if (!ST.aimSeen) { ST.aimSeen = 1; say("Live: aim received", "ok", 2); }
+    if (ST.phase !== "wait") return;
+    ST.remoteAim = { a: p.a, p: p.p, sx: p.sx, t: Date.now() };
+  }
   // tir de l'autre : je le rejoue tout de suite ; la base confirmera le même numéro de version
   function onShotBc(p) {
     if (!p || ST.mode !== "online" || !ST.playing || !ST.match) return;
@@ -21741,7 +21746,7 @@ async function zzBakeEntries(entries){
         .on("broadcast", { event: "aim" }, function (m) { try { onAim(m && m.payload); } catch (e) {} })
         .on("broadcast", { event: "shot" }, function (m) { try { onShotBc(m && m.payload); } catch (e) {} })
         .on("postgres_changes", { event: "UPDATE", schema: "public", table: "game_matches", filter: "id=eq." + M.id }, function (pl) { try { onRow(pl && pl.new); } catch (e) {} })
-        .subscribe();
+        .subscribe(function (st) { try { if (ST.match === M) say("Live connection: " + st, st === "SUBSCRIBED" ? "ok" : "bad", 4); } catch (e) {} });
     } catch (e) { M.ch = null; }
     M.poll = setInterval(async function () {
       if (ST.match !== M || !ST.playing) return;
