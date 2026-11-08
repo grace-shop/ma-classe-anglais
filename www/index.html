@@ -21746,15 +21746,31 @@ async function zzBakeEntries(entries){
   }
 
   // on s'abonne aux mises à jour de la partie (direct + vérification toutes les 0,9 s)
-  function subscribe() {
-    var M = ST.match, sb = window.__sb;
+  // rejoint le canal de la partie ; si la connexion tombe, on se reconnecte (le même nom pour les deux joueurs)
+  function joinChannel(M) {
+    var sb = window.__sb;
     try {
-      M.ch = sb.channel("pool-" + M.id)   // même nom sur les deux téléphones : sinon les messages en direct n'arrivent pas
+      M.ch = sb.channel("pool-" + M.id)
         .on("broadcast", { event: "aim" }, function (m) { try { onAim(m && m.payload); } catch (e) {} })
         .on("broadcast", { event: "shot" }, function (m) { try { onShotBc(m && m.payload); } catch (e) {} })
         .on("postgres_changes", { event: "UPDATE", schema: "public", table: "game_matches", filter: "id=eq." + M.id }, function (pl) { try { onRow(pl && pl.new); } catch (e) {} })
-        .subscribe(function (st) { try { if (ST.match === M) say("Live connection: " + st, st === "SUBSCRIBED" ? "ok" : "bad", 4); } catch (e) {} });
+        .subscribe(function (st) {
+          try { if (ST.match === M) say("Live connection: " + st, st === "SUBSCRIBED" ? "ok" : "bad", 4); } catch (e) {}
+          if (st === "SUBSCRIBED") { M.tries = 0; return; }
+          if ((st === "CHANNEL_ERROR" || st === "TIMED_OUT" || st === "CLOSED") && ST.match === M && ST.playing && (M.tries || 0) < 20) {
+            M.tries = (M.tries || 0) + 1;
+            setTimeout(function () {
+              if (ST.match !== M || !ST.playing) return;
+              try { if (M.ch) sb.removeChannel(M.ch); } catch (e) {}
+              joinChannel(M);
+            }, Math.min(8000, 1000 * M.tries));
+          }
+        });
     } catch (e) { M.ch = null; }
+  }
+  function subscribe() {
+    var M = ST.match, sb = window.__sb;
+    joinChannel(M);
     M.poll = setInterval(async function () {
       if (ST.match !== M || !ST.playing) return;
       try { var r = await sb.from("game_matches").select("*").eq("id", M.id).single(); if (r && r.data && ST.match === M) onRow(r.data); } catch (e) {}
