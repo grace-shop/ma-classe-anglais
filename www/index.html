@@ -21749,7 +21749,7 @@ async function zzBakeEntries(entries){
   function subscribe() {
     var M = ST.match, sb = window.__sb;
     try {
-      M.ch = sb.channel("pool-" + M.id + "-" + Math.random().toString(36).slice(2, 6))
+      M.ch = sb.channel("pool-" + M.id)   // même nom sur les deux téléphones : sinon les messages en direct n'arrivent pas
         .on("broadcast", { event: "aim" }, function (m) { try { onAim(m && m.payload); } catch (e) {} })
         .on("broadcast", { event: "shot" }, function (m) { try { onShotBc(m && m.payload); } catch (e) {} })
         .on("postgres_changes", { event: "UPDATE", schema: "public", table: "game_matches", filter: "id=eq." + M.id }, function (pl) { try { onRow(pl && pl.new); } catch (e) {} })
