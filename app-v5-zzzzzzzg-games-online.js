@@ -58,7 +58,8 @@
   // a new version of the match (from the live channel or from the poll): show it right away
   function applyRow(row) {
     var G = ZGUI.current && ZGUI.current();
-    if (!G || G.mode !== "online" || !row || row.id !== G.id || G.over) return;
+    if (!G || G.mode !== "online" || !row || row.id !== G.id) return;
+    if (G.over && !(row.status === "playing" && row.state && row.state.v > G.v)) return;   // fin de partie : seule une nouvelle partie (« Rejouer ») passe
     if (row.status === "declined") { note(G.oppName + " declined", "x"); ZGUI.close(); return; }
     if (row.state && row.state.v > G.v) ZGUI.adopt(row.state.st, row.state.v, row.state.cols);
     else if (row.status === "over" && row.state && !G.over) ZGUI.adopt(row.state.st, row.state.v, row.state.cols);
@@ -72,16 +73,22 @@
     RT.id = want;
     if (!want) return;
     try {
-      RT.ch = sb().channel("zg-" + want + "-" + Math.random().toString(36).slice(2, 6))
+      // même nom de canal pour les deux joueurs : sinon la sélection de l'adversaire n'arrive pas
+      RT.ch = sb().channel("zg-" + want)
+        .on("broadcast", { event: "sel" }, function (m) { try { if (window.zgOnSel) window.zgOnSel(m && m.payload); } catch (e) {} })
         .on("postgres_changes", { event: "UPDATE", schema: "public", table: "game_matches", filter: "id=eq." + want }, function (pl) { try { applyRow(pl && pl.new); } catch (e) {} })
         .subscribe();
     } catch (e) { RT.ch = null; }
   }
+  // ma pièce choisie, envoyée tout de suite à l'adversaire
+  window.zgSendSel = function (sq, v) {
+    try { if (RT.ch && RT.ch.send) RT.ch.send({ type: "broadcast", event: "sel", payload: { sq: sq, v: v } }); } catch (e) {}
+  };
   setInterval(async function () {
     var G = ZGUI.current && ZGUI.current();
     if (!sb()) return;
     ensureChannel(G);
-    if (!G || G.mode !== "online" || !G.id || G.over) return;
+    if (!G || G.mode !== "online" || !G.id) return;
     try {
       var r = await sb().from("game_matches").select("*").eq("id", G.id).single();
       if (r && r.data) applyRow(r.data);

@@ -407,6 +407,8 @@
   }
   function adopt(st, v, cols) {
     if (!G) return;
+    if (G.over) { G.over = false; var oldEnd = document.getElementById("zgend"); if (oldEnd) oldEnd.remove(); }   // nouvelle partie (« Rejouer »)
+    G.oppSel = null;
     var mover = sideOfTurn(G.st);
     var caps = diffCaps(G.st, st, mover);
     caps.forEach(function (c) { (G.caps[mover] = G.caps[mover] || []).push(c); });
@@ -567,10 +569,14 @@
     var st = G.st, legal = ZG.chess.legal(st);
     var targets = G.sel != null ? legal.filter(function (m) { return m.f === G.sel; }) : [];
     var last = G.last, rows = "";
+    var oppOn = G.mode === "online" && G.oppSel != null && !G.over && !humanTurn();
+    var oppT = oppOn ? legal.filter(function (m) { return m.f === G.oppSel; }).map(function (m) { return m.t; }) : [];
     for (var r = 0; r < 8; r++) for (var c = 0; c < 8; c++) {
       var i = r * 8 + c, p = st.b[i];
       var cls = "zgc-sq " + ((r + c) % 2 ? "dk" : "lt");
       if (i === G.sel) cls += " sel";
+      if (oppOn && i === G.oppSel) cls += " osel";
+      if (oppT.indexOf(i) >= 0) cls += " ot";
       var tg = targets.filter(function (m) { return m.t === i; });
       if (tg.length) cls += " to" + (tg[0].c || (st.b[i] && ZG.chess.white(st.b[i]) !== ZG.chess.white(st.b[G.sel])) ? " cap" : "");
       if (last && last.t === i) cls += " lastt";
@@ -967,8 +973,15 @@
       if (m) { G.last = { f: m.f, t: m.t }; G.anim = true; commit(ZG.chess.make(st, m), sideOfTurn(st)); afterMove(); return; }
     }
     G.sel = mine ? sq : null;
+    if (G.mode === "online" && window.zgSendSel) window.zgSendSel(G.sel, G.v);   // l'adversaire voit ma pièce choisie
     paint();
   }
+  // l'adversaire a choisi une pièce : je vois où elle peut aller
+  window.zgOnSel = function (p) {
+    if (!G || G.mode !== "online" || !p || p.v !== G.v || G.over || humanTurn()) return;
+    G.oppSel = p.sq == null ? null : p.sq;
+    if (G.game === "chess") paint();
+  };
   function morrisTap(i) {
     var st = G.st, mv = ZG.morris.moves(st), mover = sideOfTurn(st);
     if (st.pending) {
@@ -1261,6 +1274,9 @@
 .zgc-sq.chk::before{content:"";position:absolute;inset:0;background:radial-gradient(circle,#ff2a2a 0,rgba(235,40,40,.85) 25%,rgba(200,30,30,.35) 55%,transparent 75%);pointer-events:none}
 .zgc-sq.to::before{content:"";position:absolute;left:50%;top:50%;width:32%;height:32%;margin:-16% 0 0 -16%;border-radius:50%;background:rgba(20,20,20,.26);pointer-events:none;z-index:3}
 .zgc-sq.to{box-shadow:none}
+.zgc-sq.ot::before{content:"";position:absolute;left:50%;top:50%;width:30%;height:30%;margin:-15% 0 0 -15%;border-radius:50%;background:rgba(255,196,60,.9);box-shadow:0 0 0 2px rgba(255,196,60,.35);pointer-events:none;z-index:3}
+.zgc-sq.osel{box-shadow:inset 0 0 0 3px rgba(255,196,60,.9)}
+.zgc-sq.osel.ot::before{background:rgba(255,196,60,1)}
 .zgc-sq.cap::before{left:0;top:0;width:100%;height:100%;margin:0;border-radius:0;background:radial-gradient(circle,transparent 58%,rgba(20,20,20,.26) 60%,rgba(20,20,20,.26) 86%,transparent 88%)}
 .zgp{position:absolute;inset:0;display:block;font-size:0;line-height:0;z-index:1;pointer-events:none}
 .zgp svg{width:100%;height:100%;display:block;overflow:visible}
