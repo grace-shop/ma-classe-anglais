@@ -44,8 +44,8 @@
       if (id > 8) { g.fillStyle = col(id); g.fillRect(0, th * (0.5 - 0.62 / Math.PI), tw, th * (1.24 / Math.PI)); }
       if (id > 0) {
         [0, tw / 2, tw].forEach(function (x) {
-          g.fillStyle = "#f7f4ec"; g.beginPath(); g.arc(x, th / 2, 22, 0, 7); g.fill();
-          g.fillStyle = "#14161c"; g.font = "bold " + (id > 9 ? 24 : 29) + "px Arial, Helvetica, sans-serif";
+          g.fillStyle = "#f7f4ec"; g.beginPath(); g.arc(x, th / 2, 40, 0, 7); g.fill();
+          g.fillStyle = "#14161c"; g.font = "bold " + (id > 9 ? 42 : 52) + "px Arial, Helvetica, sans-serif";
           g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(String(id), x, th / 2 + 1.5);
         });
       } else {
@@ -606,7 +606,7 @@
   function drawBall(g, id, x, y, scale, dark) {
     var vb = ST.VB[id], sU = ST.sU;
     if (vb.dirty) { ST.spr.render(id, vb.M, vb.cv); vb.dirty = false; }
-    var s = sU * scale;
+    var s = sU * scale * 1.3;   // billes un peu plus grosses à l'écran, numéros bien visibles
     g.drawImage(vb.cv, x - s / 2, y - s / 2, s, s);
     if (dark) { g.globalAlpha = dark; g.fillStyle = "#000"; g.beginPath(); g.arc(x, y, R * scale, 0, 7); g.fill(); g.globalAlpha = 1; }
   }
